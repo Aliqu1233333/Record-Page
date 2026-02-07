@@ -39,9 +39,9 @@
     /* ---------- APP FRAME ---------- */
     .app{
       width: 100%;
-      max-width: none;              /* full width inside embed */
-      margin: 0;                    /* let embed control margins */
-      padding: 14px 14px 18px;      /* a bit more breathing room */
+      max-width: none;
+      margin: 0;
+      padding: 14px 14px 18px;
     }
 
     .topbar{
@@ -77,19 +77,19 @@
       flex: 0 0 auto;
     }
 
-    /* centered address title, slightly larger */
+    /* Address left + slightly larger (+0.5pt-ish) */
     .record-title-main{
+      min-width: 0;
       flex: 1 1 auto;
       display:flex;
-      justify-content:center;
-      min-width: 0;
+      justify-content:flex-start;
     }
     .record-title-main h1{
       margin:0;
-      font-size: 16.5px; /* slightly larger than before */
+      font-size: 17px; /* was 16.5px; slight bump */
       font-weight: 750;
       letter-spacing: .1px;
-      text-align: center;
+      text-align: left;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -144,6 +144,7 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+
     .panel-header{
       padding: 10px 14px;
       border-bottom: 1px solid var(--line);
@@ -152,6 +153,7 @@
       justify-content:space-between;
       gap:10px;
     }
+
     .panel-title{
       margin:0;
       font-size: 13px;
@@ -159,16 +161,12 @@
       color: #111827;
       letter-spacing: .1px;
     }
-    .panel-subtitle{
-      font-size: 12px;
-      color: var(--muted);
-    }
 
-    /* ---------- TABS (bigger + more padding above) ---------- */
+    /* ---------- TABS (more spacing between) ---------- */
     .tabs{
       display:flex;
-      gap: 18px;
-      padding: 8px 14px 0;        /* more padding above */
+      gap: 28px;                /* increased spacing between tab labels */
+      padding: 8px 14px 0;
       border-bottom: 1px solid var(--line);
       background: var(--surface);
     }
@@ -177,7 +175,7 @@
       border: 0;
       background: transparent;
       font-family: var(--font);
-      font-size: 15.5px;          /* +3pts from ~12.5 */
+      font-size: 15.5px;
       padding: 12px 0 12px;
       color: var(--muted);
       cursor:pointer;
@@ -201,7 +199,7 @@
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- SECTION HEADERS (bigger by ~2pts) ---------- */
+    /* ---------- SECTION HEADERS (Opportunity Details, Property Information, Related Contacts +1.5pt) ---------- */
     .section{
       padding: 0 14px 14px;
     }
@@ -218,12 +216,12 @@
     }
     .section-head h3{
       margin:0;
-      font-size: 14.5px; /* +2pts */
+      font-size: 16px; /* was 14.5px; +1.5-ish */
       font-weight: 750;
       color:#111827;
     }
 
-    /* removed helper text under Opportunity Details (per request) */
+    /* removed helper text under Opportunity Details */
     .section-head .panel-subtitle{ display:none; }
 
     .field-grid{
@@ -245,13 +243,16 @@
     }
     .field:last-child{ border-bottom: 1px solid var(--line); }
 
+    /* subtext/field labels +1.5pt */
     .label{
-      font-size: 11.5px;
+      font-size: 13px;  /* was 11.5px */
       color: var(--muted);
       font-weight: 650;
     }
+
+    /* field values +1.5pt */
     .value{
-      font-size: 12.5px;
+      font-size: 14px;  /* was 12.5px */
       color: var(--text);
       display:flex;
       align-items:center;
@@ -259,6 +260,7 @@
       gap:10px;
       min-width: 0;
     }
+
     .value-text{
       min-width:0;
       overflow:hidden;
@@ -297,8 +299,8 @@
     .inline-input{
       width:100%;
       font-family: var(--font);
-      font-size: 12.5px;
-      padding: 6px 8px;
+      font-size: 14px;
+      padding: 7px 9px;
       border: 1px solid var(--line-2);
       border-radius: 8px;
       outline:none;
@@ -351,10 +353,8 @@
     }
     .collapsible[data-open="true"] .chev{ transform: rotate(90deg); }
 
-    /* Property Information header bigger by +2 already via section header,
-       but collapsible title needs its own bump */
     .collapsible-title{
-      font-size: 14.5px; /* +2pts to match request */
+      font-size: 16px; /* was 14.5px; +1.5ish */
       font-weight: 750;
       color:#111827;
       white-space:nowrap;
@@ -362,7 +362,7 @@
       text-overflow:ellipsis;
     }
     .collapsible-meta{
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
       white-space:nowrap;
     }
@@ -386,39 +386,20 @@
       .sidebar-stack{ position: static; }
     }
 
-    .kpi-row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 12px 14px 14px;
+    /* ---------- NEXT ACTIONS PANEL EMPHASIS ---------- */
+    .panel.emphasis{
+      border-color: rgba(1,118,211,.35);
+      box-shadow:
+        0 1px 0 rgba(0,0,0,.03),
+        0 0 0 3px rgba(1,118,211,.10);
     }
-    .kpi{
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 10px;
-      background: #fff;
+    .panel.emphasis .panel-header{
+      background: linear-gradient(180deg, rgba(1,118,211,.06), rgba(1,118,211,0));
+      border-bottom-color: rgba(1,118,211,.18);
     }
-    .kpi .k{
-      font-size: 11px;
-      color: var(--muted);
+    .panel.emphasis .panel-title{
+      color: #0b2e4a;
       font-weight: 800;
-      letter-spacing: .2px;
-    }
-    .kpi .v{
-      margin-top: 4px;
-      font-size: 13.5px;
-      font-weight: 800;
-      letter-spacing: .15px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-
-    /* compact Next Actions Banner (less wording, more “datapoints”) */
-    .next-actions{ padding: 8px 14px 14px; }
-
-    .actions-header{
-      padding: 10px 14px 0;
     }
 
     .actions-fields{
@@ -449,7 +430,7 @@
       height: 16px;
       border: 1px solid var(--line-2);
       border-radius: 4px;
-      margin-top: 2px;
+      margin-top: 3px;
       display:grid;
       place-items:center;
       cursor:pointer;
@@ -466,14 +447,14 @@
     .action.done .chk svg{ opacity: 1; }
     .action-text{ min-width:0; flex: 1; }
     .action-title{
-      font-size: 12.5px;
+      font-size: 14px;  /* match field values */
       font-weight: 750;
       margin: 0;
       line-height: 1.3;
     }
     .action-meta{
-      margin: 4px 0 0;
-      font-size: 12px;
+      margin: 6px 0 0;
+      font-size: 13px;
       color: var(--muted);
       display:flex;
       gap:10px;
@@ -482,8 +463,8 @@
     .pill{
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 11px;
+      padding: 3px 9px;
+      font-size: 12px;
       color: var(--muted);
       background:#fff;
     }
@@ -493,25 +474,25 @@
     table{
       width:100%;
       border-collapse: collapse;
-      font-size: 12.5px;
+      font-size: 14px; /* was 12.5px */
       background: #fff;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow:hidden;
-      min-width: 980px; /* keeps columns readable; wrapper scrolls */
+      min-width: 980px;
     }
     thead th{
       text-align:left;
-      font-size: 11.5px;
+      font-size: 13px; /* was 11.5px */
       color: var(--muted);
       font-weight: 850;
-      padding: 10px 10px;
+      padding: 11px 10px;
       background: #fafbfc;
       border-bottom: 1px solid var(--line);
       white-space: nowrap;
     }
     tbody td{
-      padding: 10px 10px;
+      padding: 11px 10px;
       border-bottom: 1px solid var(--line);
       vertical-align: middle;
       white-space: nowrap;
@@ -528,11 +509,11 @@
     .status{
       display:inline-flex;
       align-items:center;
-      gap:6px;
+      gap:8px;
     }
     .dot{
-      width:8px;
-      height:8px;
+      width:9px;
+      height:9px;
       border-radius: 50%;
       background: #cbd5e1;
     }
@@ -556,7 +537,7 @@
       <div class="record-title">
         <div class="record-badge">DP</div>
 
-        <!-- Centered address title (subheader removed) -->
+        <!-- Address left -->
         <div class="record-title-main">
           <h1 id="recordAddress">123 Main Street</h1>
         </div>
@@ -590,13 +571,11 @@
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
             <div class="section">
               <div class="section-head">
-                <div>
-                  <h3>Opportunity Details</h3>
-                </div>
+                <div><h3>Opportunity Details</h3></div>
               </div>
 
               <div class="field-grid" id="dealFieldGrid">
-                <!-- Left column fields -->
+                <!-- Left column -->
                 <div>
                   <div class="field" data-field="opportunity_owner">
                     <div class="label">Opportunity Owner</div>
@@ -664,7 +643,7 @@
                   </div>
                 </div>
 
-                <!-- Right column fields -->
+                <!-- Right column -->
                 <div>
                   <div class="field" data-field="close_date">
                     <div class="label">Close Date</div>
@@ -1007,14 +986,12 @@
 
       <!-- RIGHT: SIDEBAR -->
       <div class="sidebar-stack">
-        <!-- NEXT ACTIONS BANNER -->
-        <div class="panel" id="nextActionsPanel">
+        <!-- NEXT ACTIONS (emphasis + remove +Add button) -->
+        <div class="panel emphasis" id="nextActionsPanel">
           <div class="panel-header">
             <div class="panel-title">Next Actions</div>
-            <button class="btn mini" id="btnAddAction" type="button" title="Add Action">+ Add</button>
           </div>
 
-          <!-- structured datapoints (webhook-friendly) -->
           <div class="actions-fields">
             <div class="field" data-field="na_followup_date">
               <div class="label">Follow Up Date</div>
@@ -1056,22 +1033,34 @@
             </div>
           </div>
 
-          <!-- optional checklist stays (still “Lightning-like”) -->
           <div class="actions-list" id="actionsList"></div>
         </div>
 
-        <!-- PROPERTY CONDITION (replaces Account Details) -->
+        <!-- PROPERTY CONDITION (Lead Score added at top) -->
         <div class="panel" id="propertyConditionPanel">
           <div class="panel-header">
             <div class="panel-title">Property Condition</div>
           </div>
 
           <div class="section" style="padding-top: 4px;">
+            <div class="field" data-field="lead_score">
+              <div class="label">Lead Score</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">82</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
             <div class="field" data-field="lead_type">
               <div class="label">Lead Type</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Tax Delinquent</span>
-                <span class="edit" title="Edit">
+                <span class="edit"> <!-- intentionally no title duplication -->
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1084,7 +1073,7 @@
               <div class="label">Owed Amount</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$23,450</span>
-                <span class="edit" title="Edit">
+                <span class="edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1097,7 +1086,7 @@
               <div class="label">Taxes</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$9,800</span>
-                <span class="edit" title="Edit">
+                <span class="edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1110,7 +1099,7 @@
               <div class="label">Condition</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Fair</span>
-                <span class="edit" title="Edit">
+                <span class="edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1123,7 +1112,7 @@
               <div class="label">Occupancy</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Unknown</span>
-                <span class="edit" title="Edit">
+                <span class="edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1136,7 +1125,7 @@
               <div class="label">Total Equity</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$112,000</span>
-                <span class="edit" title="Edit">
+                <span class="edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1154,49 +1143,36 @@
   <script>
     /*****************************************************************
      * WEBHOOK / FUTURE DATA HOOKS
-     * - You can later call: window.RecordPage.applyData(payload)
-     * - payload keys map to elements with matching data-field OR data-key
+     * - Call: window.RecordPage.applyData(payload)
      *****************************************************************/
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
 
-        // 1) Address title
         if (payload.address) {
-          const el = document.getElementById("recordAddress");
-          el.textContent = payload.address;
+          document.getElementById("recordAddress").textContent = payload.address;
         }
 
-        // 2) Field values by data-field
         for (const [key, value] of Object.entries(payload)) {
-          // support both "field keys" and nested "next_actions" object
           if (key === "next_actions" && value && typeof value === "object") continue;
-
           const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) node.textContent = formatValue(value);
         }
 
-        // 3) Next actions object mapping (if you send it nested)
         if (payload.next_actions && typeof payload.next_actions === "object") {
           const na = payload.next_actions;
-
-          // map by data-key (webhook friendly)
           for (const [k,v] of Object.entries(na)) {
             const node = document.querySelector(`.value-text[data-key="${cssEscape(k)}"]`);
             if (node) node.textContent = formatValue(v);
           }
         }
 
-        // 4) Contacts table
         if (Array.isArray(payload.related_contacts)) {
           renderContacts(payload.related_contacts);
         }
       }
     };
 
-    /*****************************************************************
-     * SAMPLE CONTACTS (replace with payload.related_contacts)
-     *****************************************************************/
     const sampleContacts = [
       {
         name: "Rebeca McCrory",
@@ -1224,21 +1200,15 @@
       }
     ];
 
-    /*****************************************************************
-     * NEXT ACTIONS CHECKLIST (optional)
-     *****************************************************************/
     let actions = [
       { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today"], done: false },
       { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days"], done: false },
       { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week"], done: true }
     ];
 
-    /*****************************************************************
-     * TABS
-     *****************************************************************/
+    // Tabs
     const tabs = Array.from(document.querySelectorAll(".tab"));
     const panes = Array.from(document.querySelectorAll(".tab-pane"));
-
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         tabs.forEach(t => t.setAttribute("aria-selected", "false"));
@@ -1248,9 +1218,7 @@
       });
     });
 
-    /*****************************************************************
-     * COLLAPSIBLE PROPERTY INFO
-     *****************************************************************/
+    // Collapsible
     const collapsible = document.getElementById("propertyCollapsible");
     const toggleCollapsible = () => {
       const isOpen = collapsible.getAttribute("data-open") === "true";
@@ -1262,9 +1230,7 @@
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCollapsible(); }
     });
 
-    /*****************************************************************
-     * RENDER: RELATED CONTACTS
-     *****************************************************************/
+    // Contacts
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
       if (tone === "warn") return "dot warn";
@@ -1277,7 +1243,6 @@
       const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
-
     function renderContacts(contacts){
       const tbody = document.getElementById("contactsTbody");
       const rows = (contacts || []).map(c => `
@@ -1294,13 +1259,10 @@
           <td>${statusCell(c.phone3Status)}</td>
         </tr>
       `).join("");
-
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No related contacts.</td></tr>`;
     }
 
-    /*****************************************************************
-     * RENDER: NEXT ACTIONS LIST
-     *****************************************************************/
+    // Actions
     function renderActions(){
       const list = document.getElementById("actionsList");
       list.innerHTML = actions.map(a => `
@@ -1332,16 +1294,7 @@
       });
     }
 
-    document.getElementById("btnAddAction").addEventListener("click", () => {
-      const title = prompt("New action title:");
-      if (!title) return;
-      actions.unshift({ id: crypto.randomUUID(), title, meta: ["New"], done: false });
-      renderActions();
-    });
-
-    /*****************************************************************
-     * INLINE EDIT (pencil hover)
-     *****************************************************************/
+    // Inline Edit
     Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1352,7 +1305,6 @@
         if (field.querySelector(".inline-input")) return;
 
         const oldValue = valueText.textContent.trim();
-
         const valueWrap = field.querySelector(".value");
         valueText.style.display = "none";
         pencil.style.display = "none";
@@ -1398,11 +1350,6 @@
         const save = () => {
           const newValue = input.value.trim() || "—";
           valueText.textContent = newValue;
-
-          // TODO: WIRE TO MONDAY / WEBHOOK
-          // const fieldKey = field.getAttribute("data-field");
-          // send { [fieldKey]: newValue } to your endpoint or change_column_value mutation
-
           cleanup();
         };
 
@@ -1416,9 +1363,7 @@
       });
     });
 
-    /*****************************************************************
-     * HEADER BUTTONS
-     *****************************************************************/
+    // Header buttons
     document.getElementById("btnRefresh").addEventListener("click", () => {
       alert("Refresh placeholder — wire to monday item/subitem fetch.");
     });
@@ -1426,9 +1371,7 @@
       alert("Save placeholder — inline edits apply immediately in this demo.");
     });
 
-    /*****************************************************************
-     * UTILS
-     *****************************************************************/
+    // Utils
     function escapeHtml(str){
       return String(str ?? "")
         .replaceAll("&","&amp;")
@@ -1444,28 +1387,12 @@
       return String(v);
     }
     function cssEscape(s){
-      // minimal escape for attribute selectors
       return String(s).replaceAll('"', '\\"');
     }
 
-    /*****************************************************************
-     * INIT
-     *****************************************************************/
+    // Init
     renderContacts(sampleContacts);
     renderActions();
-
-    // Example: future webhook usage:
-    // window.RecordPage.applyData({
-    //   address: "987 Westheimer Rd",
-    //   lead_type: "Probate",
-    //   total_equity: "$154,000",
-    //   next_actions: {
-    //     follow_up_date: "2026-03-01",
-    //     next_action_step: "Send offer packet",
-    //     stalled_reason: "Waiting on signature"
-    //   },
-    //   related_contacts: [...]
-    // });
   </script>
 </body>
 </html>
