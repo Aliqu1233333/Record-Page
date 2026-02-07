@@ -1312,6 +1312,83 @@
 
     // --- Initialize
     setTab("deal");
+    setTab("deal");
+
+const demo = getParam("demo") === "1";
+if(demo){
+  record = {
+    id: "DEMO-123",
+    name: "Maria Resendez",
+    column_values: [
+      { id:"lead_score", title:"Lead Score", text:"76", type:"numbers" },
+      { id:"age_stage", title:"Age In Stage", text:"10 days", type:"text" },
+      { id:"last_activity", title:"Last Activity Date", text:"2026-02-01", type:"date" },
+
+      { id:"address", title:"Address", text:"1805 Vermont St", type:"text" },
+      { id:"city", title:"City", text:"Houston", type:"text" },
+      { id:"lead_type", title:"Lead Type", text:"Taxes Under Suit", type:"text" },
+      { id:"taxes", title:"Taxes", text:"3–4 years unpaid", type:"text" },
+      { id:"condition", title:"Condition", text:"Medium Rehab / Needs work", type:"text" },
+      { id:"occupancy", title:"Occupancy", text:"Occupied", type:"text" },
+      { id:"title_issue", title:"Title issue", text:"AOH needed", type:"text" },
+      { id:"will_status", title:"Will Status", text:"Will Not Filed", type:"text" },
+      { id:"deed_status", title:"Deed Status", text:"Deed Found", type:"text" },
+
+      { id:"tax_assessor", title:"Tax Assesor", text:"https://example.com/tax", type:"link" },
+      { id:"zillow", title:"Zillow", text:"https://example.com/zillow", type:"link" },
+      { id:"obituary", title:"Obituary", text:"https://example.com/obit", type:"link" },
+      { id:"ancestry", title:"Ancestry", text:"https://example.com/ancestry", type:"link" },
+      { id:"age", title:"Age", text:"56", type:"numbers" },
+      { id:"birth", title:"Birth Date", text:"1968-08-15", type:"date" },
+      { id:"death", title:"Death Date", text:"2024-11-20", type:"date" },
+
+      { id:"follow_up", title:"Follow Up Date", text:"2026-02-10", type:"date" },
+      { id:"next_step", title:"Next Action Step", text:"Call heir #2 and confirm ownership %", type:"text" },
+      { id:"stalled", title:"Stalled Reason", text:"Waiting on callback", type:"text" }
+    ],
+    subitems: [
+      {
+        id: "S-001",
+        name: "Owner: John Resendez",
+        column_values: [
+          { id:"offer_made", title:"Offer Made", text:"Yes", type:"text" },
+          { id:"relationship", title:"Relation Ship", text:"Son", type:"text" },
+          { id:"lead_status", title:"Lead Status", text:"Contacted", type:"text" },
+
+          { id:"p1", title:"Phone 1", text:"(832) 555-1201", type:"text" },
+          { id:"p1s", title:"Phone 1 status", text:"Good", type:"text" },
+          { id:"p2", title:"Phone 2", text:"(832) 555-9981", type:"text" },
+          { id:"p2s", title:"Phone 2 status", text:"No answer", type:"text" },
+          { id:"p3", title:"Phone 3", text:"", type:"text" },
+          { id:"p3s", title:"Phone 3 status", text:"", type:"text" }
+        ]
+      },
+      {
+        id: "S-002",
+        name: "Owner: Maria Resendez",
+        column_values: [
+          { id:"offer_made", title:"Offer Made", text:"No", type:"text" },
+          { id:"relationship", title:"Relation Ship", text:"Daughter", type:"text" },
+          { id:"lead_status", title:"Lead Status", text:"Dial NA", type:"text" },
+
+          { id:"p1", title:"Phone 1", text:"(713) 555-3411", type:"text" },
+          { id:"p1s", title:"Phone 1 status", text:"Bad", type:"text" },
+          { id:"p2", title:"Phone 2", text:"", type:"text" },
+          { id:"p2s", title:"Phone 2 status", text:"", type:"text" },
+          { id:"p3", title:"Phone 3", text:"", type:"text" },
+          { id:"p3s", title:"Phone 3 status", text:"", type:"text" }
+        ]
+      }
+    ]
+  };
+
+  // IMPORTANT: reset dirty state and render
+  dirty.item.clear();
+  dirty.subitems.clear();
+  renderAll();
+} else {
+  loadRecord();
+}
     loadRecord();
   </script>
 </body>
