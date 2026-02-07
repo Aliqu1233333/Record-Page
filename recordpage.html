@@ -1,1041 +1,1402 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Record Page</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lightning-Style Record Page Replica</title>
+
   <style>
     :root{
-      /* Cleaner, more native SF-ish stack (less rigid) */
-      --font: "Salesforce Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-
-      --bg: transparent;
-      --card: #ffffff;
-      --border: #e6e6e6;
+      /* Salesforce-ish neutrals */
+      --bg: #f3f4f6;              /* app background */
+      --surface: #ffffff;         /* main surface */
+      --surface-2: #f7f8fa;       /* subtle section bg */
+      --line: #e5e7eb;            /* dividers */
+      --line-2: #dbe0e6;
+      --text: #1f2937;
       --muted: #6b7280;
-      --text: #111827;
+      --muted-2: #9aa3af;
+      --blue: #0176d3;            /* Salesforce-ish blue */
+      --blue-2: #0b5cab;
+      --good: #2e844a;
+      --warn: #b95000;
 
-      --blue: #17345b;
-      --blue-2: #1d63ff;
-
-      --radius: 12px;
-
-      --padY: 12px;
-      --padX: 10px;
-
-      --gap: 12px;
-
-      --field-h: 34px;
-      --field-radius: 8px;
-      --field-bg: #ffffff;
-      --field-border: #d1d5db;
-
-      --toast-bg: #bff3ea;
-      --toast-fg: #0d3a33;
-      --toast-shadow: 0 10px 30px rgba(0,0,0,0.10);
-      --toast-radius: 10px;
+      --radius: 10px;            /* slightly rounded, not bubbly */
+      --shadow: 0 1px 0 rgba(0,0,0,.03);
+      --font: "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     }
 
-    html,body{
-      width:100%;
-      max-width:100%;
-      overflow-x:hidden;
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
       background: var(--bg);
-      font-family: var(--font);
       color: var(--text);
+      font-family: var(--font);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      margin:0;
-      padding:0;
     }
 
-    body{
-      padding: var(--padY) var(--padX);
-      box-sizing:border-box;
-      min-height: 180px;
+    /* ---------- APP FRAME ---------- */
+    .app{
+      max-width: 1240px;
+      margin: 18px auto;
+      padding: 0 14px 24px;
     }
 
-    .page{
-      width:100%;
-      max-width: 100%;
-      min-width: 0;
-      display:flex;
-      flex-direction: column;
-      gap: var(--gap);
-    }
-
-    /* ----- Minimal, clean containers (less “bubbly”) ----- */
-    .section{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow:hidden;
-    }
-
-    .sectionHeader{
+    /* subtle “lightning page” header strip (minimal) */
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      min-width:0;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-
-    /* Header */
-    .headerLeft{
+    .record-title{
       display:flex;
+      gap:10px;
       align-items:center;
-      gap: 10px;
-      min-width:0;
+      min-width: 0;
     }
-
-    .iconBadge{
-      width: 28px;
-      height: 28px;
+    .record-badge{
+      width: 34px;
+      height: 34px;
       border-radius: 8px;
-      background: rgba(29,99,255,0.10);
+      background: linear-gradient(135deg, rgba(1,118,211,.15), rgba(1,118,211,.05));
+      border: 1px solid rgba(1,118,211,.25);
       display:grid;
       place-items:center;
-      flex: 0 0 auto;
-    }
-
-    .recordTitle{
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-    }
-    .recordType{
-      font-size: 11px;
-      font-weight: 650;
-      color: var(--muted);
-      line-height: 1.2;
-    }
-    .recordName{
-      font-size: 14px;
-      font-weight: 750;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-    }
-
-    .headerActions{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-
-    .btn{
-      height: 32px;
-      padding: 0 10px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: #111;
-      font-size: 12px;
-      font-weight: 650;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      transition: transform 120ms ease, filter 120ms ease;
-      white-space:nowrap;
-    }
-    .btn:hover{ transform: translateY(-1px); }
-    .btn:active{ transform: translateY(0px); }
-
-    .btnPrimary{
-      border: 0;
-      background: var(--blue-2);
-      color: #fff;
+      color: var(--blue);
       font-weight: 700;
+      font-size: 13px;
+      flex: 0 0 auto;
     }
-    .btnPrimary:hover{ filter: brightness(1.03); }
-
-    /* Highlights row (remove “bubble cards”; keep clean) */
-    .highlights{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0;
-      padding: 10px 12px;
-    }
-
-    .metric{
-      padding: 8px 10px;
-      min-width:0;
-    }
-    .metric + .metric{
-      border-left: 1px solid var(--border);
-    }
-    .metricLabel{
-      font-size: 11px;
+    .record-title h1{
+      margin:0;
+      font-size: 15px;
       font-weight: 650;
-      color: var(--muted);
-    }
-    .metricValue{
-      margin-top: 6px;
-      font-size: 18px;
-      font-weight: 750;
       letter-spacing: .1px;
       white-space: nowrap;
-      overflow:hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
+    .record-sub{
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar-actions{
+      display:flex;
+      gap:8px;
+      flex: 0 0 auto;
+    }
+    .btn{
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .btn:hover{ background:#fafafa; border-color:#cfd6df; }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: var(--blue);
+      color:#fff;
+      border-color: rgba(0,0,0,0);
+    }
+    .btn.primary:hover{ background: var(--blue-2); }
 
-    /* Main grid */
-    .grid{
+    /* ---------- MAIN LAYOUT ---------- */
+    .layout{
+      margin-top: 12px;
       display:grid;
-      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-      gap: var(--gap);
+      grid-template-columns: 1fr 360px;
+      gap: 12px;
       align-items:start;
-      min-width:0;
+    }
+    @media (max-width: 1080px){
+      .layout{ grid-template-columns: 1fr; }
     }
 
-    /* Tabs: NOT bubbles. Clickable categories with underline like SF */
-    .tabsBar{
+    /* “cards” but flat/efficient (no bubbly look) */
+    .panel{
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
       display:flex;
       align-items:center;
-      gap: 18px;
-      padding: 10px 12px 0 12px;
-      background: #fff;
+      justify-content:space-between;
+      gap:10px;
     }
-    .tabLink{
-      appearance:none;
-      border:0;
-      background: transparent;
-      padding: 8px 0;
+    .panel-title{
+      margin:0;
+      font-size: 13px;
+      font-weight: 650;
+      color: #111827;
+      letter-spacing: .1px;
+    }
+    .panel-subtitle{
       font-size: 12px;
-      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* ---------- TABS ---------- */
+    .tabs{
+      display:flex;
+      gap: 18px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .tab{
+      appearance:none;
+      border: 0;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 12.5px;
+      padding: 12px 0 10px;
       color: var(--muted);
       cursor:pointer;
-      position: relative;
+      position:relative;
+      font-weight: 600;
     }
-    .tabLink[aria-selected="true"]{
+    .tab[aria-selected="true"]{
       color: var(--text);
     }
-    .tabLink[aria-selected="true"]::after{
+    .tab[aria-selected="true"]::after{
       content:"";
       position:absolute;
       left:0;
       right:0;
       bottom:-1px;
       height:2px;
-      background: var(--blue-2);
-      border-radius: 2px;
+      background: var(--blue);
     }
-    .tabsDivider{
-      border-bottom: 1px solid var(--border);
-      margin: 0 12px;
+    .tab:focus{ outline: none; }
+    .tab:focus-visible{ outline: 2px solid rgba(1,118,211,.25); outline-offset: 2px; border-radius: 8px; }
+
+    .tab-content{
+      padding: 12px 0 0;
+    }
+    .tab-pane{ display:none; }
+    .tab-pane.active{ display:block; }
+
+    /* ---------- FIELD GRID (Lightning-ish) ---------- */
+    .section{
+      padding: 0 14px 14px;
+    }
+    .section + .section{
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
     }
 
-    .tabPanel{
-      padding: 12px;
-      min-width:0;
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 8px 0 10px;
     }
-    .tabPanel[hidden]{ display:none; }
+    .section-head h3{
+      margin:0;
+      font-size: 12.5px;
+      font-weight: 700;
+      color:#111827;
+    }
 
-    /* “Details-style” fields (fixed placement, never disappear) */
-    .detailsGrid{
+    .field-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0 24px;
-      min-width:0;
+      gap: 10px 18px;
+    }
+    @media (max-width: 820px){
+      .field-grid{ grid-template-columns: 1fr; }
     }
 
-    .detailsCol{
+    .field{
+      border-top: 1px solid var(--line);
+      padding: 10px 0;
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      align-items:center;
+    }
+    .field:last-child{
+      border-bottom: 1px solid var(--line);
+    }
+
+    .label{
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .value{
+      font-size: 12.5px;
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      min-width: 0;
+    }
+    .value-text{
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      padding-right: 4px;
+    }
+    .value-text.link{
+      color: var(--blue);
+      cursor:pointer;
+    }
+    .value-text.link:hover{
+      text-decoration: underline;
+    }
+
+    /* hover pencil (very light grey, pops on hover) */
+    .edit{
+      opacity: 0;
+      transform: translateY(1px);
+      transition: opacity .12s ease, transform .12s ease, color .12s ease;
+      color: var(--muted-2);
+      cursor:pointer;
+      flex: 0 0 auto;
+      display:flex;
+      align-items:center;
+      padding: 2px;
+      border-radius: 6px;
+    }
+    .field:hover .edit{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .edit:hover{
+      color: #6b7280;
+      background: rgba(0,0,0,.03);
+    }
+    .edit svg{ width: 14px; height: 14px; display:block; }
+
+    /* inline editor input */
+    .inline-input{
+      width:100%;
+      font-family: var(--font);
+      font-size: 12.5px;
+      padding: 6px 8px;
+      border: 1px solid var(--line-2);
+      border-radius: 8px;
+      outline:none;
+    }
+    .inline-input:focus{
+      border-color: rgba(1,118,211,.55);
+      box-shadow: 0 0 0 3px rgba(1,118,211,.12);
+    }
+    .inline-actions{
+      display:flex;
+      gap:6px;
+      margin-left: 10px;
+      flex: 0 0 auto;
+    }
+    .mini{
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
+
+    /* ---------- COLLAPSIBLE BANNER ---------- */
+    .collapsible{
+      margin: 10px 14px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      overflow:hidden;
+    }
+    .collapsible-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      cursor:pointer;
+      user-select:none;
+      gap:10px;
+    }
+    .collapsible-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .chev{
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      transition: transform .14s ease;
+      flex: 0 0 auto;
+    }
+    .collapsible[data-open="true"] .chev{ transform: rotate(90deg); }
+    .collapsible-title{
+      font-size: 12.5px;
+      font-weight: 700;
+      color:#111827;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .collapsible-meta{
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .collapsible-body{
+      display:none;
+      border-top: 1px solid var(--line);
+      padding: 0 12px 10px;
+      background: #fff;
+    }
+    .collapsible[data-open="true"] .collapsible-body{ display:block; }
+
+    /* ---------- RIGHT SIDEBAR ---------- */
+    .sidebar-stack{
       display:flex;
       flex-direction:column;
-      gap: 0;
-      min-width:0;
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns: 160px 1fr;
       gap: 12px;
-      align-items:center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.04); /* very subtle */
-      min-width:0;
+      position: sticky;
+      top: 12px;
     }
-    .row:last-child{ border-bottom: 0; }
+    @media (max-width: 1080px){
+      .sidebar-stack{ position: static; }
+    }
 
-    .rowLabel{
+    .kpi-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px 14px 14px;
+    }
+    .kpi{
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 10px;
+      background: #fff;
+    }
+    .kpi .k{
       font-size: 11px;
-      font-weight: 650;
       color: var(--muted);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .input{
-      width: 100%;
-      height: var(--field-h);
-      border-radius: var(--field-radius);
-      border: 1px solid var(--field-border);
-      background: var(--field-bg);
-      padding: 0 10px;
-      box-sizing:border-box;
-      font-size: 12px;
-      font-weight: 600;
-      color: #111;
-      outline: none;
-      transition: box-shadow 140ms ease, border-color 140ms ease;
-      min-width:0;
-    }
-    .input:focus{
-      border-color: rgba(29,99,255,0.55);
-      box-shadow: 0 0 0 3px rgba(29,99,255,0.10);
-    }
-
-    /* subtle placeholder styling */
-    .input::placeholder{
-      color: rgba(107,114,128,0.9);
-      font-weight: 550;
-    }
-
-    .rowActions{
-      display:flex;
-      gap: 8px;
-      justify-content:flex-end;
-      margin-top: 12px;
-    }
-
-    .btnSmall{
-      height: 30px;
-      padding: 0 10px;
-      border-radius: 15px;
-      font-size: 12px;
       font-weight: 700;
     }
-
-    /* Right panel body */
-    .panelBody{
-      padding: 12px;
-      min-width:0;
+    .kpi .v{
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: .2px;
     }
 
-    /* Related table (keep clean) */
-    .tableWrap{
-      width:100%;
-      overflow:auto;
+    .next-actions{
+      padding: 8px 14px 14px;
+    }
+    .actions-list{
+      margin-top: 6px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .action{
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .action:first-child{
+      border-top: 0;
+      padding-top: 6px;
+    }
+    .chk{
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--line-2);
+      border-radius: 4px;
+      margin-top: 2px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      flex: 0 0 auto;
+      background:#fff;
+    }
+    .chk svg{
+      width: 12px;
+      height: 12px;
+      opacity: 0;
+      transition: opacity .12s ease;
+      color: var(--good);
+    }
+    .action.done .chk svg{ opacity: 1; }
+    .action-text{
+      min-width:0;
+      flex: 1;
+    }
+    .action-title{
+      font-size: 12.5px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.3;
+    }
+    .action-meta{
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      background:#fff;
+    }
+
+    /* ---------- RELATED CONTACTS TABLE ---------- */
+    .table-wrap{
+      padding: 0 14px 14px;
     }
     table{
       width:100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow:hidden;
     }
     thead th{
-      background: #fafafa;
-      border-bottom: 1px solid var(--border);
-      font-size: 11px;
-      font-weight: 700;
-      color: #374151;
       text-align:left;
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 800;
       padding: 10px 10px;
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--line);
       white-space: nowrap;
     }
     tbody td{
-      border-bottom: 1px solid rgba(0,0,0,0.06);
       padding: 10px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #111827;
+      border-bottom: 1px solid var(--line);
       vertical-align: middle;
       white-space: nowrap;
     }
-
-    .nameCell{
-      font-weight: 700;
-      max-width: 240px;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .muted{
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    /* Toast */
-    .toast{
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-10px);
-      opacity: 0;
-      pointer-events:none;
-      background: var(--toast-bg);
-      color: var(--toast-fg);
-      border-radius: var(--toast-radius);
-      box-shadow: var(--toast-shadow);
-      padding: 10px 12px;
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width: 320px;
-      max-width: min(520px, calc(100vw - 24px));
-      z-index: 99999;
-      transition: opacity 200ms ease, transform 200ms ease;
-    }
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0px);
-      pointer-events:auto;
-    }
-    .toast .msg{
-      font-weight: 700;
-      font-size: 13px;
-      flex:1;
-    }
-    .toast .x{
-      border:0;
-      background: transparent;
+    tbody tr:last-child td{ border-bottom: 0; }
+    .td-muted{ color: var(--muted); }
+    .td-link{
+      color: var(--blue);
       cursor:pointer;
-      width: 26px;
-      height: 26px;
-      display:grid;
-      place-items:center;
-      border-radius: 7px;
-      transition: background 120ms ease;
+      font-weight: 650;
     }
-    .toast .x:hover{ background: rgba(0,0,0,0.06); }
+    .td-link:hover{ text-decoration: underline; }
 
-    @media (max-width: 920px){
-      .grid{ grid-template-columns: 1fr; }
-      table{ min-width: 720px; }
-      .highlights{ grid-template-columns: 1fr; }
-      .metric + .metric{ border-left: 0; border-top: 1px solid var(--border); }
-      .detailsGrid{ grid-template-columns: 1fr; }
-      .row{ grid-template-columns: 140px 1fr; }
+    /* tiny status dot */
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+    .dot.good{ background: rgba(46,132,74,.95); }
+    .dot.warn{ background: rgba(185,80,0,.95); }
+
+    /* ---------- FOOTER HELP ---------- */
+    .hint{
+      padding: 10px 14px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    /* Utility */
+    .sr-only{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
     }
   </style>
 </head>
 
 <body>
-  <div class="page" id="app">
-
-    <!-- Header -->
-    <div class="section">
-      <div class="sectionHeader">
-        <div class="headerLeft">
-          <div class="iconBadge" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24">
-              <path fill="#1d63ff" d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4Zm0 2c-2.7 0-8 1.4-8 4v2h16v-2c0-2.6-5.3-4-8-4Z"/>
-            </svg>
-          </div>
-          <div class="recordTitle">
-            <div class="recordType">Lead</div>
-            <div class="recordName" id="recordName">—</div>
-          </div>
-        </div>
-
-        <div class="headerActions">
-          <button class="btn" id="refreshBtn" type="button" title="Refresh data">
-            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#111827" d="M17.65 6.35A7.95 7.95 0 0 0 12 4V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 13.65-6.65Z"/>
-            </svg>
-            Refresh
-          </button>
-          <button class="btn btnPrimary" id="saveAllBtn" type="button" title="Save all changes">
-            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="#fff" d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4Zm0 16H7v-6h10v6Zm-3-10H6V5h8v4Z"/>
-            </svg>
-            Save Changes
-          </button>
+  <div class="app">
+    <!-- TOP HEADER (minimal lightning-like) -->
+    <div class="topbar">
+      <div class="record-title">
+        <div class="record-badge">DP</div>
+        <div style="min-width:0">
+          <h1 id="recordName">123 MAIN ST — Deal Record</h1>
+          <p class="record-sub" id="recordSubtitle">Owner: John Doe • Stage: Prospecting • Board Item ID: <span class="td-muted">—</span></p>
         </div>
       </div>
 
-      <div class="highlights">
-        <div class="metric">
-          <div class="metricLabel">Lead Score</div>
-          <div class="metricValue" id="metricLeadScore">—</div>
-        </div>
-        <div class="metric">
-          <div class="metricLabel">Age in Stage</div>
-          <div class="metricValue" id="metricAgeInStage">—</div>
-        </div>
-        <div class="metric">
-          <div class="metricLabel">Days Since Last Activity</div>
-          <div class="metricValue" id="metricDaysSince">—</div>
-        </div>
+      <div class="topbar-actions">
+        <button class="btn" id="btnRefresh" type="button" title="Refresh">
+          <span aria-hidden="true">⟳</span>
+          Refresh
+        </button>
+        <button class="btn primary" id="btnSaveAll" type="button" title="Save">
+          <span aria-hidden="true">✓</span>
+          Save
+        </button>
       </div>
     </div>
 
-    <!-- Main -->
-    <div class="grid">
-
-      <!-- Left: tabs + details layout -->
-      <div class="section">
-        <div class="tabsBar" role="tablist" aria-label="Record tabs">
-          <button class="tabLink" id="tabDeal" role="tab" aria-selected="true" aria-controls="panelDeal" type="button">Deal Information</button>
-          <button class="tabLink" id="tabResearch" role="tab" aria-selected="false" aria-controls="panelResearch" type="button">Deep Research</button>
-        </div>
-        <div class="tabsDivider"></div>
-
-        <div class="tabPanel" id="panelDeal" role="tabpanel" aria-labelledby="tabDeal">
-          <div class="detailsGrid">
-            <div class="detailsCol" id="dealColLeft"></div>
-            <div class="detailsCol" id="dealColRight"></div>
-          </div>
-          <div class="rowActions">
-            <button class="btn btnSmall" id="saveDealBtn" type="button">Save Deal Info</button>
-          </div>
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+      <!-- LEFT: MAIN CONTENT -->
+      <div class="panel">
+        <!-- Tabs -->
+        <div class="tabs" role="tablist" aria-label="Record Tabs">
+          <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
+          <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Deep Research</button>
+          <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
         </div>
 
-        <div class="tabPanel" id="panelResearch" role="tabpanel" aria-labelledby="tabResearch" hidden>
-          <div class="detailsGrid">
-            <div class="detailsCol" id="researchColLeft"></div>
-            <div class="detailsCol" id="researchColRight"></div>
+        <div class="tab-content">
+          <!-- PANE 1: DEAL INFORMATION -->
+          <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <h3>Opportunity Details</h3>
+                  <div class="panel-subtitle">Column type on the left, value on the right, with light grey dividers.</div>
+                </div>
+              </div>
+
+              <div class="field-grid" id="dealFieldGrid">
+                <!-- Left column fields -->
+                <div>
+                  <div class="field" data-field="opportunity_owner">
+                    <div class="label">Opportunity Owner</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="false">Victor Le</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="opportunity_name">
+                    <div class="label">Opportunity Name</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Blue Orca — Full Building AC Unit Upgrade</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="account_name">
+                    <div class="label">Account Name</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">Blue Orca Incorporated</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="type">
+                    <div class="label">Type</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Existing Customer — Upgrade</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="next_step">
+                    <div class="label">Next Step</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Call to follow up on business need</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right column fields -->
+                <div>
+                  <div class="field" data-field="close_date">
+                    <div class="label">Close Date</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">4/1/2024</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="amount">
+                    <div class="label">Amount</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">$680,000.00</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="expected_revenue">
+                    <div class="label">Expected Revenue</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">$68,000.00</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="stage">
+                    <div class="label">Stage</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Prospecting</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="probability">
+                    <div class="label">Probability (%)</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">10%</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsible Property Information banner -->
+            <div class="collapsible" id="propertyCollapsible" data-open="true">
+              <div class="collapsible-head" role="button" tabindex="0" aria-expanded="true" aria-controls="propertyBody">
+                <div class="collapsible-left">
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="collapsible-title">Property Information</div>
+                </div>
+                <div class="collapsible-meta" id="propertySummary">123 Main St • Houston, TX • 77002</div>
+              </div>
+
+              <div class="collapsible-body" id="propertyBody">
+                <div class="field-grid">
+                  <div>
+                    <div class="field" data-field="property_address">
+                      <div class="label">Address</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">123 Main St</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="field" data-field="property_city">
+                      <div class="label">City</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Houston</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="field" data-field="property_zip">
+                      <div class="label">Zip</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">77002</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="field" data-field="property_type">
+                      <div class="label">Property Type</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Single Family</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="field" data-field="condition">
+                      <div class="label">Condition</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Fair</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="field" data-field="tax_status">
+                      <div class="label">Tax Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Delinquent — Lawsuit</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Related Contacts -->
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <h3>Related Contacts</h3>
+                  <div class="panel-subtitle">Quick summary of subitems related to this deal (minimal table).</div>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table aria-label="Related Contacts Table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Lead Status</th>
+                      <th>Follow-up Date</th>
+                      <th>Relationship</th>
+                      <th>Phone 1</th>
+                      <th>Phone 1 Status</th>
+                      <th>Phone 2</th>
+                      <th>Phone 2 Status</th>
+                      <th>Phone 3</th>
+                      <th>Phone 3 Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="contactsTbody">
+                    <!-- populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="hint">
+              Tip: This is self-contained HTML/CSS/JS. Replace the sample data + wire it to monday.com (item + subitems) where marked in the JS.
+            </div>
           </div>
-          <div class="rowActions">
-            <button class="btn btnSmall" id="saveResearchBtn" type="button">Save Deep Research</button>
+
+          <!-- PANE 2: DEEP RESEARCH -->
+          <div class="tab-pane" id="pane-research" role="tabpanel" aria-labelledby="tab-research">
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <h3>Deep Research</h3>
+                  <div class="panel-subtitle">Drop in research notes, liens, probate context, entity links, etc.</div>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div>
+                  <div class="field" data-field="research_summary">
+                    <div class="label">Research Summary</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Heirs identified; probate filing pending. Title chain reviewed.</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="county_case">
+                    <div class="label">County Case</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">Harris CAD / Tax Suit Link</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="field" data-field="title_notes">
+                    <div class="label">Title Notes</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">2 liens discovered; payoff estimates requested.</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="risk_flags">
+                    <div class="label">Risk Flags</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">Occupancy unknown; one heir unresponsive.</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hint">
+              Keep this pane “dense” and scannable like Lightning: short fields, crisp dividers, no bubbles.
+            </div>
+          </div>
+
+          <!-- PANE 3: ACTIVITY -->
+          <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <h3>Activity</h3>
+                  <div class="panel-subtitle">Log calls, follow-ups, notes, attachments (wire to monday updates).</div>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div>
+                  <div class="field" data-field="last_contacted">
+                    <div class="label">Last Contacted</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="next_followup">
+                    <div class="label">Next Follow-up</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="field" data-field="activity_notes">
+                    <div class="label">Notes</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="attachments">
+                    <div class="label">Attachments</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="false">Open Files</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hint">
+              If you want the Lightning “related” quick links rail like in your screenshot, add another right panel block for links.
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Right: Action panel -->
-      <div class="section">
-        <div class="sectionHeader">
-          <div style="min-width:0;">
-            <div style="font-size:12px;font-weight:750;">Next Actions</div>
-            <div style="font-size:11px;font-weight:600;color:var(--muted);">Follow-up + next step</div>
+      <!-- RIGHT: SIDEBAR -->
+      <div class="sidebar-stack">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Next Actions Banner</div>
+              <div class="panel-subtitle">Interactive checklist + quick KPIs</div>
+            </div>
+            <button class="btn mini" id="btnAddAction" type="button" title="Add Action">+ Add</button>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="k">Stage</div>
+              <div class="v" id="kpiStage">Prospecting</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Probability</div>
+              <div class="v" id="kpiProb">10%</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Follow-up</div>
+              <div class="v" id="kpiFollowup">Today</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Owner Status</div>
+              <div class="v" id="kpiOwner">Active</div>
+            </div>
+          </div>
+
+          <div class="next-actions">
+            <div class="actions-list" id="actionsList">
+              <!-- populated by JS -->
+            </div>
           </div>
         </div>
-        <div class="panelBody" id="actionPanel"></div>
-        <div class="rowActions" style="padding: 0 12px 12px;">
-          <button class="btn btnSmall btnPrimary" id="saveActionsBtn" type="button">Save Actions</button>
-        </div>
-      </div>
 
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Account Details</div>
+              <div class="panel-subtitle">Right-rail summary block</div>
+            </div>
+          </div>
+
+          <div class="section" style="padding-top: 4px;">
+            <div class="field" data-field="account_industry">
+              <div class="label">Industry</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">Communications</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field" data-field="account_annual_revenue">
+              <div class="label">Annual Revenue</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">$18,000,000</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field" data-field="account_phone">
+              <div class="label">Phone</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">(700) 555-8801</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field" data-field="account_website">
+              <div class="label">Website</div>
+              <div class="value">
+                <span class="value-text link" data-editable="true">https://example.com</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field" data-field="account_billing">
+              <div class="label">Billing Address</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">632 US Highway 46, Fairfield NJ 7004, USA</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-
-    <!-- Related records -->
-    <div class="section">
-      <div class="sectionHeader">
-        <div style="min-width:0;">
-          <div style="font-size:12px;font-weight:750;">Related Records</div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);">Owners / Subitems</div>
-        </div>
-        <button class="btn" id="saveSubitemsBtn" type="button">Save Subitems</button>
-      </div>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Offer Made</th>
-              <th>Relationship</th>
-              <th>Lead Status</th>
-              <th>Phone 1</th>
-              <th>Phone 1 Status</th>
-              <th>Phone 2</th>
-              <th>Phone 2 Status</th>
-              <th>Phone 3</th>
-              <th>Phone 3 Status</th>
-            </tr>
-          </thead>
-          <tbody id="subitemsBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" role="status" aria-live="polite">
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#0ba79c" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 14-4-4 1.4-1.4L11 12.2l5.6-5.6L18 8l-7 8Z"/>
-    </svg>
-    <div class="msg" id="toastMsg">Saved.</div>
-    <button class="x" id="toastClose" type="button" aria-label="Dismiss">
-      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="#0d3a33" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/>
-      </svg>
-    </button>
   </div>
 
   <script>
-    // OPTIONAL (later): Paste your Make webhook endpoints (FULL URLs)
-    // If you haven't set these yet, the UI will STILL render with empty fields (this update).
-    const MAKE_GET_RECORD_URL = ""; // ex: "https://hook.us1.make.com/xxxxxxx"
-    const MAKE_SET_FIELD_URL  = ""; // ex: "https://hook.us1.make.com/yyyyyyy"
-
-    // Titles to match from your board (for real data later)
-    const TITLES = {
-      leadScore: "Lead Score",
-      ageInStage: "Age In Stage",
-      lastActivityDate: "Last Activity Date",
-
-      address: "Address",
-      city: "City",
-      leadType: "Lead Type",
-      taxes: "Taxes",
-      condition: "Condition",
-      occupancy: "Occupancy",
-      titleIssue: "Title issue",
-      willStatus: "Will Status",
-      deedStatus: "Deed Status",
-
-      taxAssessor: "Tax Assesor",
-      zillow: "Zillow",
-      obituary: "Obituary",
-      ancestry: "Ancestry",
-      age: "Age",
-      birthDate: "Birth Date",
-      deathDate: "Death Date",
-
-      followUpDate: "Follow Up Date",
-      nextActionStep: "Next Action Step",
-      stalledReason: "Stalled Reason"
-    };
-
-    const SUB_TITLES = {
-      offerMade: "Offer Made",
-      relationship: "Relation Ship",
-      leadStatus: "Lead Status",
-      phone1: "Phone 1",
-      phone1Status: "Phone 1 status",
-      phone2: "Phone 2",
-      phone2Status: "Phone 2 status",
-      phone3: "Phone 3",
-      phone3Status: "Phone 3 status"
-    };
-
-    // --- DOM
-    const recordNameEl = document.getElementById("recordName");
-    const metricLeadScoreEl = document.getElementById("metricLeadScore");
-    const metricAgeInStageEl = document.getElementById("metricAgeInStage");
-    const metricDaysSinceEl = document.getElementById("metricDaysSince");
-
-    const dealColLeft = document.getElementById("dealColLeft");
-    const dealColRight = document.getElementById("dealColRight");
-    const researchColLeft = document.getElementById("researchColLeft");
-    const researchColRight = document.getElementById("researchColRight");
-
-    const actionPanelEl = document.getElementById("actionPanel");
-    const subitemsBodyEl = document.getElementById("subitemsBody");
-
-    const refreshBtn = document.getElementById("refreshBtn");
-    const saveAllBtn = document.getElementById("saveAllBtn");
-    const saveDealBtn = document.getElementById("saveDealBtn");
-    const saveResearchBtn = document.getElementById("saveResearchBtn");
-    const saveActionsBtn = document.getElementById("saveActionsBtn");
-    const saveSubitemsBtn = document.getElementById("saveSubitemsBtn");
-
-    // Tabs
-    const tabDeal = document.getElementById("tabDeal");
-    const tabResearch = document.getElementById("tabResearch");
-    const panelDeal = document.getElementById("panelDeal");
-    const panelResearch = document.getElementById("panelResearch");
-
-    // Toast
-    const toast = document.getElementById("toast");
-    const toastMsg = document.getElementById("toastMsg");
-    const toastClose = document.getElementById("toastClose");
-    let toastTimer = null;
-
-    function showToast(msg){
-      toastMsg.textContent = msg || "Saved.";
-      toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(()=>toast.classList.remove("show"), 2400);
-    }
-    toastClose.addEventListener("click", ()=>toast.classList.remove("show"));
-
-    function getParam(name){
-      return new URLSearchParams(window.location.search).get(name);
-    }
-
-    // --- State
-    let record = null;
-    let itemColsByTitle = new Map();
-    const dirty = {
-      item: new Map(),        // columnId -> payload
-      subitems: new Map()     // `${subitemId}:${columnId}` -> payload
-    };
-
-    function normalize(s){ return String(s || "").trim().toLowerCase(); }
-
-    function indexColumns(columnValues){
-      const byTitle = new Map();
-      (columnValues || []).forEach(cv => byTitle.set(normalize(cv.title), cv));
-      return byTitle;
-    }
-
-    function findByTitle(byTitleMap, title){
-      if(!title) return null;
-      const exact = byTitleMap.get(normalize(title));
-      if(exact) return exact;
-      const t = normalize(title);
-      for(const [k,v] of byTitleMap.entries()){
-        if(k.includes(t) || t.includes(k)) return v;
+    /*****************************************************************
+     * DATA (replace these with monday item/column + subitems payloads)
+     *****************************************************************/
+    const sampleContacts = [
+      {
+        name: "Rebeca McCrory",
+        leadStatus: { text: "Active", tone: "good" },
+        followupDate: "2026-02-08",
+        relationship: "Heir",
+        phone1: "832-555-1122",
+        phone1Status: { text: "Valid", tone: "good" },
+        phone2: "—",
+        phone2Status: { text: "—", tone: "muted" },
+        phone3: "—",
+        phone3Status: { text: "—", tone: "muted" }
+      },
+      {
+        name: "Derrick Lane",
+        leadStatus: { text: "Follow-up", tone: "warn" },
+        followupDate: "2026-02-06",
+        relationship: "Relative",
+        phone1: "713-555-0909",
+        phone1Status: { text: "VM Left", tone: "warn" },
+        phone2: "346-555-7744",
+        phone2Status: { text: "No Answer", tone: "warn" },
+        phone3: "—",
+        phone3Status: { text: "—", tone: "muted" }
       }
-      return null;
+    ];
+
+    let actions = [
+      { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today", "Owner: John Doe"], done: false },
+      { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days", "Docs"], done: false },
+      { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week", "Follow-up"], done: true }
+    ];
+
+    /*****************************************************************
+     * TABS
+     *****************************************************************/
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const panes = Array.from(document.querySelectorAll(".tab-pane"));
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.setAttribute("aria-selected", "false"));
+        panes.forEach(p => p.classList.remove("active"));
+
+        tab.setAttribute("aria-selected", "true");
+        const pane = document.getElementById(tab.getAttribute("aria-controls"));
+        pane.classList.add("active");
+      });
+    });
+
+    /*****************************************************************
+     * COLLAPSIBLE PROPERTY INFO
+     *****************************************************************/
+    const collapsible = document.getElementById("propertyCollapsible");
+    const toggleCollapsible = () => {
+      const isOpen = collapsible.getAttribute("data-open") === "true";
+      collapsible.setAttribute("data-open", String(!isOpen));
+      const head = collapsible.querySelector(".collapsible-head");
+      head.setAttribute("aria-expanded", String(!isOpen));
+    };
+    collapsible.querySelector(".collapsible-head").addEventListener("click", toggleCollapsible);
+    collapsible.querySelector(".collapsible-head").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCollapsible(); }
+    });
+
+    /*****************************************************************
+     * RENDER: RELATED CONTACTS TABLE
+     *****************************************************************/
+    function toneDotClass(tone){
+      if (tone === "good") return "dot good";
+      if (tone === "warn") return "dot warn";
+      return "dot";
+    }
+    function statusCell(statusObj){
+      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
+      const dot = toneDotClass(statusObj.tone);
+      const text = statusObj.text ?? "—";
+      const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
+      return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
 
-    function parseDateFromText(text){
-      const s = String(text || "").trim();
-      if(!s) return null;
-      const d = new Date(s);
-      return isNaN(d.getTime()) ? null : d;
+    function renderContacts(){
+      const tbody = document.getElementById("contactsTbody");
+      tbody.innerHTML = sampleContacts.map(c => `
+        <tr>
+          <td><span class="td-link">${escapeHtml(c.name)}</span></td>
+          <td>${statusCell(c.leadStatus)}</td>
+          <td>${escapeHtml(c.followupDate)}</td>
+          <td class="td-muted">${escapeHtml(c.relationship)}</td>
+          <td>${escapeHtml(c.phone1)}</td>
+          <td>${statusCell(c.phone1Status)}</td>
+          <td>${escapeHtml(c.phone2)}</td>
+          <td>${statusCell(c.phone2Status)}</td>
+          <td>${escapeHtml(c.phone3)}</td>
+          <td>${statusCell(c.phone3Status)}</td>
+        </tr>
+      `).join("");
     }
 
-    function toISODate(text){
-      const d = parseDateFromText(text);
-      if(!d) return "";
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
+    /*****************************************************************
+     * RENDER: NEXT ACTIONS
+     *****************************************************************/
+    function renderActions(){
+      const list = document.getElementById("actionsList");
+      list.innerHTML = actions.map(a => `
+        <div class="action ${a.done ? "done" : ""}" data-action-id="${a.id}">
+          <div class="chk" role="button" tabindex="0" aria-label="Toggle action complete">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="action-text">
+            <p class="action-title">${escapeHtml(a.title)}</p>
+            <div class="action-meta">
+              ${(a.meta || []).map(m => `<span class="pill">${escapeHtml(m)}</span>`).join("")}
+            </div>
+          </div>
+        </div>
+      `).join("");
 
-    function daysBetween(d1, d2){
-      const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()).getTime();
-      const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate()).getTime();
-      return Math.floor((b - a) / (1000*60*60*24));
-    }
-
-    /**
-     * ✅ KEY CHANGE:
-     * We ALWAYS create/render the rows (even if there's no data and no columns yet).
-     * - If we don't have columnId yet, input still appears and is editable.
-     * - It just won't "save" until Make + Monday mapping exists (expected).
-     */
-    function makeRow({label, valueText, kind="text", columnId=null, valueType="text", placeholder=""}){
-      const row = document.createElement("div");
-      row.className = "row";
-
-      const l = document.createElement("div");
-      l.className = "rowLabel";
-      l.textContent = label;
-
-      const input = document.createElement("input");
-      input.className = "input";
-      input.type = (kind === "date") ? "date" : "text";
-      input.placeholder = placeholder || "";
-      input.value = (kind === "date") ? toISODate(valueText) : (valueText || "");
-
-      input.addEventListener("change", ()=>{
-        if(!columnId) return; // cannot save until real Monday columns exist / loaded
-        dirty.item.set(columnId, {
-          target:"item",
-          itemId: record?.id,
-          columnId,
-          valueText: input.value,
-          valueType: valueType || (kind === "date" ? "date" : "text")
+      // toggle listeners
+      list.querySelectorAll(".action .chk").forEach(chk => {
+        chk.addEventListener("click", () => {
+          const row = chk.closest(".action");
+          const id = row.getAttribute("data-action-id");
+          actions = actions.map(x => x.id === id ? ({...x, done: !x.done}) : x);
+          renderActions();
+        });
+        chk.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chk.click(); }
         });
       });
-
-      row.appendChild(l);
-      row.appendChild(input);
-      return row;
     }
 
-    function buildMetrics(){
-      const byTitle = itemColsByTitle;
-      metricLeadScoreEl.textContent = findByTitle(byTitle, TITLES.leadScore)?.text || "—";
-      metricAgeInStageEl.textContent = findByTitle(byTitle, TITLES.ageInStage)?.text || "—";
+    document.getElementById("btnAddAction").addEventListener("click", () => {
+      const title = prompt("New action title:");
+      if (!title) return;
+      actions.unshift({ id: crypto.randomUUID(), title, meta: ["New"], done: false });
+      renderActions();
+    });
 
-      const lastAct = findByTitle(byTitle, TITLES.lastActivityDate);
-      const d = parseDateFromText(lastAct?.text || "");
-      metricDaysSinceEl.textContent = d ? `${Math.max(0, daysBetween(d, new Date()))} days` : "—";
-    }
+    /*****************************************************************
+     * INLINE EDIT (hover pencil → click → inline input + save/cancel)
+     * - This is UI-only. Hook into monday API where noted below.
+     *****************************************************************/
+    const pencilClicks = Array.from(document.querySelectorAll(".field .edit"));
+    pencilClicks.forEach(pencil => {
+      pencil.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const field = pencil.closest(".field");
+        const valueText = field.querySelector(".value-text");
+        const editable = valueText.getAttribute("data-editable") === "true";
+        if (!editable) return;
 
-    // Fixed layout field lists (these rows ALWAYS render)
-    const DEAL_LEFT = [
-      { key:"address", label:"Address", placeholder:"Enter address" },
-      { key:"city", label:"City", placeholder:"Enter city" },
-      { key:"leadType", label:"Lead Type", placeholder:"Enter lead type" },
-      { key:"taxes", label:"Taxes", placeholder:"Enter taxes info" }
-    ];
-    const DEAL_RIGHT = [
-      { key:"condition", label:"Condition", placeholder:"Enter condition" },
-      { key:"occupancy", label:"Occupancy", placeholder:"Enter occupancy" },
-      { key:"titleIssue", label:"Title issue", placeholder:"Enter title issue" },
-      { key:"willStatus", label:"Will Status", placeholder:"Enter will status" },
-      { key:"deedStatus", label:"Deed Status", placeholder:"Enter deed status" }
-    ];
+        // If already editing, ignore
+        if (field.querySelector(".inline-input")) return;
 
-    const RESEARCH_LEFT = [
-      { key:"taxAssessor", label:"Tax Assessor Link", placeholder:"Paste link" },
-      { key:"zillow", label:"Zillow", placeholder:"Paste link" },
-      { key:"obituary", label:"Obituary", placeholder:"Paste link" },
-      { key:"ancestry", label:"Ancestry", placeholder:"Paste link" }
-    ];
-    const RESEARCH_RIGHT = [
-      { key:"age", label:"Age", placeholder:"Enter age" },
-      { key:"birthDate", label:"Birth Date", kind:"date" },
-      { key:"deathDate", label:"Death Date", kind:"date" }
-    ];
+        const oldValue = valueText.textContent.trim();
 
-    const ACTIONS = [
-      { key:"followUpDate", label:"Follow Up Date", kind:"date" },
-      { key:"nextActionStep", label:"Next Action Step", placeholder:"Enter next step" },
-      { key:"stalledReason", label:"Stalled Reason", placeholder:"Enter stalled reason" }
-    ];
+        // Build inline editor
+        const valueWrap = field.querySelector(".value");
+        valueText.style.display = "none";
+        pencil.style.display = "none";
 
-    function buildDealInfo(){
-      dealColLeft.innerHTML = "";
-      dealColRight.innerHTML = "";
-      const byTitle = itemColsByTitle;
+        const input = document.createElement("input");
+        input.className = "inline-input";
+        input.value = oldValue;
 
-      DEAL_LEFT.forEach(f=>{
-        const cv = findByTitle(byTitle, TITLES[f.key]);
-        dealColLeft.appendChild(makeRow({
-          label: f.label,
-          valueText: cv?.text || "",
-          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
-          columnId: cv?.id || null,
-          valueType: cv?.type || "text",
-          placeholder: f.placeholder || ""
-        }));
-      });
+        const actionsWrap = document.createElement("div");
+        actionsWrap.className = "inline-actions";
 
-      DEAL_RIGHT.forEach(f=>{
-        const cv = findByTitle(byTitle, TITLES[f.key]);
-        dealColRight.appendChild(makeRow({
-          label: f.label,
-          valueText: cv?.text || "",
-          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
-          columnId: cv?.id || null,
-          valueType: cv?.type || "text",
-          placeholder: f.placeholder || ""
-        }));
-      });
-    }
+        const btnOk = document.createElement("button");
+        btnOk.className = "btn mini primary";
+        btnOk.type = "button";
+        btnOk.textContent = "Save";
 
-    function buildResearch(){
-      researchColLeft.innerHTML = "";
-      researchColRight.innerHTML = "";
-      const byTitle = itemColsByTitle;
+        const btnCancel = document.createElement("button");
+        btnCancel.className = "btn mini";
+        btnCancel.type = "button";
+        btnCancel.textContent = "Cancel";
 
-      RESEARCH_LEFT.forEach(f=>{
-        const cv = findByTitle(byTitle, TITLES[f.key]);
-        researchColLeft.appendChild(makeRow({
-          label: f.label,
-          valueText: cv?.text || "",
-          kind: "text",
-          columnId: cv?.id || null,
-          valueType: cv?.type || "text",
-          placeholder: f.placeholder || ""
-        }));
-      });
+        actionsWrap.appendChild(btnOk);
+        actionsWrap.appendChild(btnCancel);
 
-      RESEARCH_RIGHT.forEach(f=>{
-        const cv = findByTitle(byTitle, TITLES[f.key]);
-        researchColRight.appendChild(makeRow({
-          label: f.label,
-          valueText: cv?.text || "",
-          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
-          columnId: cv?.id || null,
-          valueType: cv?.type || (f.kind === "date" ? "date" : "text"),
-          placeholder: f.placeholder || ""
-        }));
-      });
-    }
+        // Insert editor
+        const left = document.createElement("div");
+        left.style.flex = "1";
+        left.style.minWidth = "0";
+        left.appendChild(input);
 
-    function buildActions(){
-      actionPanelEl.innerHTML = "";
-      const byTitle = itemColsByTitle;
+        valueWrap.insertBefore(left, valueWrap.firstChild);
+        valueWrap.appendChild(actionsWrap);
 
-      ACTIONS.forEach(f=>{
-        const cv = findByTitle(byTitle, TITLES[f.key]);
-        actionPanelEl.appendChild(makeRow({
-          label: f.label,
-          valueText: cv?.text || "",
-          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
-          columnId: cv?.id || null,
-          valueType: cv?.type || (f.kind === "date" ? "date" : "text"),
-          placeholder: f.placeholder || ""
-        }));
-      });
-    }
+        input.focus();
+        input.select();
 
-    function buildSubitems(){
-      subitemsBodyEl.innerHTML = "";
-      const subs = record?.subitems || [];
-
-      if(!subs.length){
-        // ✅ Always show at least one empty row (layout stays consistent)
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="nameCell">—</td>
-          <td><input class="input" style="height:30px;" placeholder="Offer Made"></td>
-          <td><input class="input" style="height:30px;" placeholder="Relationship"></td>
-          <td><input class="input" style="height:30px;" placeholder="Lead Status"></td>
-          <td><input class="input" style="height:30px;" placeholder="Phone 1"></td>
-          <td><input class="input" style="height:30px;" placeholder="Status"></td>
-          <td><input class="input" style="height:30px;" placeholder="Phone 2"></td>
-          <td><input class="input" style="height:30px;" placeholder="Status"></td>
-          <td><input class="input" style="height:30px;" placeholder="Phone 3"></td>
-          <td><input class="input" style="height:30px;" placeholder="Status"></td>
-        `;
-        subitemsBodyEl.appendChild(tr);
-        return;
-      }
-
-      // (If subitems exist later, you can map and render them here)
-      subs.forEach(sub=>{
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="nameCell" title="${String(sub.name||"")}">${String(sub.name||"—")}</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-          <td class="muted">—</td>
-        `;
-        subitemsBodyEl.appendChild(tr);
-      });
-    }
-
-    function setTab(which){
-      const deal = (which === "deal");
-      tabDeal.setAttribute("aria-selected", String(deal));
-      tabResearch.setAttribute("aria-selected", String(!deal));
-      panelDeal.hidden = !deal;
-      panelResearch.hidden = deal;
-    }
-    tabDeal.addEventListener("click", ()=>setTab("deal"));
-    tabResearch.addEventListener("click", ()=>setTab("research"));
-
-    function renderAll(){
-      recordNameEl.textContent = record?.name || "—";
-      itemColsByTitle = indexColumns(record?.column_values || []);
-      buildMetrics();
-      buildDealInfo();
-      buildResearch();
-      buildActions();
-      buildSubitems();
-    }
-
-    // ✅ NEW: Always initialize a blank record so fields render instantly.
-    function initBlankRecord(){
-      const itemId = getParam("itemId") || "—";
-      record = {
-        id: String(itemId),
-        name: (itemId && itemId !== "—") ? `Item ${itemId}` : "—",
-        column_values: [],
-        subitems: []
-      };
-      dirty.item.clear();
-      dirty.subitems.clear();
-      renderAll();
-    }
-
-    async function loadRecord(){
-      const itemId = getParam("itemId");
-
-      // Even if missing itemId, we still render all fields (blank)
-      if(!itemId){
-        initBlankRecord();
-        showToast("Tip: Add ?itemId=### to the URL to tie this page to a Monday item.");
-        return;
-      }
-
-      // If no webhook configured yet, still render fields (blank) immediately
-      if(!MAKE_GET_RECORD_URL){
-        initBlankRecord();
-        return;
-      }
-
-      // If webhook is configured later, it will load and fill values
-      try{
-        const url = new URL(MAKE_GET_RECORD_URL);
-        url.searchParams.set("itemId", itemId);
-
-        const res = await fetch(url.toString(), {
-          method: "GET",
-          headers: { "Accept": "application/json" },
-          cache: "no-store"
-        });
-        if(!res.ok) throw new Error("GET failed: " + res.status);
-
-        const data = await res.json();
-        const item = data?.item || data?.items?.[0] || data?.data?.items?.[0];
-        if(!item) throw new Error("No item in response");
-
-        record = {
-          id: String(item.id),
-          name: item.name || `Item ${itemId}`,
-          column_values: item.column_values || [],
-          subitems: item.subitems || []
+        const cleanup = () => {
+          left.remove();
+          actionsWrap.remove();
+          valueText.style.display = "";
+          pencil.style.display = "";
         };
 
-        dirty.item.clear();
-        dirty.subitems.clear();
-        renderAll();
-      } catch (e){
-        console.warn(e);
-        initBlankRecord();
-        showToast("Could not load item yet (no webhook / bad response). Showing empty fields.");
-      }
+        const save = () => {
+          const newValue = input.value.trim() || "—";
+          valueText.textContent = newValue;
+
+          // TODO: WIRE TO MONDAY
+          // Example:
+          // const fieldKey = field.getAttribute("data-field");
+          // await monday.api(`mutation { change_column_value(item_id:..., column_id:"${fieldKey}", value:"${JSON.stringify(newValue)}") { id } }`);
+
+          // update a couple of KPIs as a sample linkage
+          if (field.getAttribute("data-field") === "stage") {
+            document.getElementById("kpiStage").textContent = newValue;
+          }
+          if (field.getAttribute("data-field") === "probability") {
+            document.getElementById("kpiProb").textContent = newValue;
+          }
+
+          cleanup();
+        };
+
+        btnOk.addEventListener("click", save);
+        btnCancel.addEventListener("click", cleanup);
+
+        input.addEventListener("keydown", (ke) => {
+          if (ke.key === "Enter") save();
+          if (ke.key === "Escape") cleanup();
+        });
+      });
+    });
+
+    /*****************************************************************
+     * HEADER BUTTONS (placeholders)
+     *****************************************************************/
+    document.getElementById("btnRefresh").addEventListener("click", () => {
+      // TODO: re-fetch monday item/subitems and rerender
+      alert("Refresh placeholder — wire this to monday item/subitem fetch.");
+    });
+    document.getElementById("btnSaveAll").addEventListener("click", () => {
+      // TODO: commit any staged edits
+      alert("Save placeholder — inline edits already apply immediately in this demo.");
+    });
+
+    /*****************************************************************
+     * UTILS
+     *****************************************************************/
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
-    // Save buttons (will no-op until you set SET webhook + columns are known)
-    function webhookMissing(){
-      return !MAKE_SET_FIELD_URL;
-    }
-
-    saveAllBtn.addEventListener("click", ()=>{
-      if(webhookMissing()){
-        showToast("Saving disabled until you set up Make webhooks.");
-        return;
-      }
-      showToast("Saving will be enabled once Make is connected.");
-    });
-
-    saveDealBtn.addEventListener("click", ()=>{
-      if(webhookMissing()){
-        showToast("Saving disabled until you set up Make webhooks.");
-        return;
-      }
-      showToast("Saving will be enabled once Make is connected.");
-    });
-
-    saveResearchBtn.addEventListener("click", ()=>{
-      if(webhookMissing()){
-        showToast("Saving disabled until you set up Make webhooks.");
-        return;
-      }
-      showToast("Saving will be enabled once Make is connected.");
-    });
-
-    saveActionsBtn.addEventListener("click", ()=>{
-      if(webhookMissing()){
-        showToast("Saving disabled until you set up Make webhooks.");
-        return;
-      }
-      showToast("Saving will be enabled once Make is connected.");
-    });
-
-    saveSubitemsBtn.addEventListener("click", ()=>{
-      if(webhookMissing()){
-        showToast("Saving disabled until you set up Make webhooks.");
-        return;
-      }
-      showToast("Saving will be enabled once Make is connected.");
-    });
-
-    refreshBtn.addEventListener("click", loadRecord);
-
-    // Init
-    setTab("deal");
-    initBlankRecord();  // ✅ render immediately with empty fields
-    loadRecord();       // ✅ attempt to fill if GET webhook exists (otherwise stays blank)
+    /*****************************************************************
+     * INIT
+     *****************************************************************/
+    renderContacts();
+    renderActions();
   </script>
 </body>
 </html>
