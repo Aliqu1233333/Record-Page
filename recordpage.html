@@ -6,23 +6,21 @@
   <title>Record Page</title>
   <style>
     :root{
-      --font: "Salesforce Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      /* Cleaner, more native SF-ish stack (less rigid) */
+      --font: "Salesforce Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
 
       --bg: transparent;
       --card: #ffffff;
-      --border: #e5e7eb;
+      --border: #e6e6e6;
       --muted: #6b7280;
       --text: #111827;
 
-      --blue: #17345b;          /* your SF-ish dark */
-      --blue-2: #1d63ff;        /* action button blue */
-      --chip: #f3f4f6;
-
-      --shadow: 0 8px 24px rgba(0,0,0,0.06);
+      --blue: #17345b;
+      --blue-2: #1d63ff;
 
       --radius: 12px;
 
-      --padY: 14px;
+      --padY: 12px;
       --padX: 10px;
 
       --gap: 12px;
@@ -31,12 +29,6 @@
       --field-radius: 8px;
       --field-bg: #ffffff;
       --field-border: #d1d5db;
-
-      --tab-h: 34px;
-      --tab-radius: 10px;
-
-      --table-head: #f9fafb;
-      --row-hover: #fafafa;
 
       --toast-bg: #bff3ea;
       --toast-fg: #0d3a33;
@@ -63,7 +55,6 @@
       min-height: 180px;
     }
 
-    /* Layout */
     .page{
       width:100%;
       max-width: 100%;
@@ -73,16 +64,15 @@
       gap: var(--gap);
     }
 
-    /* Top header like Salesforce */
-    .headerCard{
+    /* ----- Minimal, clean containers (less “bubbly”) ----- */
+    .section{
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: none;
       overflow:hidden;
     }
 
-    .headerTop{
+    .sectionHeader{
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -92,6 +82,7 @@
       min-width:0;
     }
 
+    /* Header */
     .headerLeft{
       display:flex;
       align-items:center;
@@ -116,13 +107,13 @@
     }
     .recordType{
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 650;
       color: var(--muted);
       line-height: 1.2;
     }
     .recordName{
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 750;
       white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
@@ -144,53 +135,50 @@
       background: #fff;
       color: #111;
       font-size: 12px;
-      font-weight: 750;
+      font-weight: 650;
       cursor:pointer;
       display:flex;
       align-items:center;
       gap: 8px;
-      transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+      transition: transform 120ms ease, filter 120ms ease;
       white-space:nowrap;
     }
-    .btn:hover{ box-shadow: 0 8px 18px rgba(0,0,0,0.08); transform: translateY(-1px); }
-    .btn:active{ transform: translateY(0px); box-shadow: none; }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
 
     .btnPrimary{
       border: 0;
       background: var(--blue-2);
       color: #fff;
-      box-shadow: 0 8px 18px rgba(29,99,255,0.18);
+      font-weight: 700;
     }
     .btnPrimary:hover{ filter: brightness(1.03); }
 
-    /* Highlights row */
+    /* Highlights row (remove “bubble cards”; keep clean) */
     .highlights{
       display:grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      gap: 0;
       padding: 10px 12px;
     }
 
     .metric{
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px;
-      background: #fff;
+      padding: 8px 10px;
       min-width:0;
+    }
+    .metric + .metric{
+      border-left: 1px solid var(--border);
     }
     .metricLabel{
       font-size: 11px;
-      font-weight: 750;
+      font-weight: 650;
       color: var(--muted);
-      display:flex;
-      align-items:center;
-      gap: 8px;
     }
     .metricValue{
       margin-top: 6px;
       font-size: 18px;
-      font-weight: 850;
-      letter-spacing: .2px;
+      font-weight: 750;
+      letter-spacing: .1px;
       white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
@@ -205,71 +193,41 @@
       min-width:0;
     }
 
-    /* Cards */
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: none;
-      overflow:hidden;
-      min-width:0;
-    }
-
-    .cardHeader{
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
+    /* Tabs: NOT bubbles. Clickable categories with underline like SF */
+    .tabsBar{
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      min-width:0;
+      gap: 18px;
+      padding: 10px 12px 0 12px;
+      background: #fff;
     }
-    .cardTitle{
+    .tabLink{
+      appearance:none;
+      border:0;
+      background: transparent;
+      padding: 8px 0;
       font-size: 12px;
-      font-weight: 850;
-      color: #111827;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .cardSub{
-      font-size: 11px;
-      font-weight: 650;
+      font-weight: 700;
       color: var(--muted);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Tabs */
-    .tabs{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-      min-width:0;
-    }
-    .tab{
-      height: var(--tab-h);
-      padding: 0 12px;
-      border-radius: var(--tab-radius);
-      border: 1px solid var(--border);
-      background: #fff;
-      color: #111;
-      font-size: 12px;
-      font-weight: 800;
       cursor:pointer;
-      display:flex;
-      align-items:center;
-      transition: background 140ms ease, border-color 140ms ease;
-      white-space:nowrap;
+      position: relative;
     }
-    .tab[aria-selected="true"]{
-      background: rgba(23,52,91,0.08);
-      border-color: rgba(23,52,91,0.25);
-      color: var(--blue);
+    .tabLink[aria-selected="true"]{
+      color: var(--text);
+    }
+    .tabLink[aria-selected="true"]::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-1px;
+      height:2px;
+      background: var(--blue-2);
+      border-radius: 2px;
+    }
+    .tabsDivider{
+      border-bottom: 1px solid var(--border);
+      margin: 0 12px;
     }
 
     .tabPanel{
@@ -278,36 +236,42 @@
     }
     .tabPanel[hidden]{ display:none; }
 
-    /* Form grid */
-    .formGrid{
+    /* “Details-style” fields (fixed placement, never disappear) */
+    .detailsGrid{
       display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px 12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24px;
       min-width:0;
     }
 
-    .field{
-      min-width:0;
-    }
-    .fieldLabel{
-      font-size: 11px;
-      font-weight: 750;
-      color: var(--muted);
-      margin: 0 0 6px 2px;
+    .detailsCol{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 8px;
+      flex-direction:column;
+      gap: 0;
       min-width:0;
     }
-    .fieldLabel .hint{
-      font-size: 10px;
-      font-weight: 700;
-      color: #9ca3af;
+
+    .row{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      align-items:center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04); /* very subtle */
+      min-width:0;
+    }
+    .row:last-child{ border-bottom: 0; }
+
+    .rowLabel{
+      font-size: 11px;
+      font-weight: 650;
+      color: var(--muted);
       white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
     }
 
-    .input, .select{
+    .input{
       width: 100%;
       height: var(--field-h);
       border-radius: var(--field-radius);
@@ -316,41 +280,22 @@
       padding: 0 10px;
       box-sizing:border-box;
       font-size: 12px;
-      font-weight: 650;
+      font-weight: 600;
       color: #111;
       outline: none;
       transition: box-shadow 140ms ease, border-color 140ms ease;
       min-width:0;
     }
-    .input:focus, .select:focus{
+    .input:focus{
       border-color: rgba(29,99,255,0.55);
-      box-shadow: 0 0 0 3px rgba(29,99,255,0.12);
-    }
-
-    .textarea{
-      width:100%;
-      min-height: 78px;
-      border-radius: var(--field-radius);
-      border: 1px solid var(--field-border);
-      background: var(--field-bg);
-      padding: 10px;
-      box-sizing:border-box;
-      font-size: 12px;
-      font-weight: 650;
-      outline:none;
-      resize: vertical;
-      transition: box-shadow 140ms ease, border-color 140ms ease;
-    }
-    .textarea:focus{
-      border-color: rgba(29,99,255,0.55);
-      box-shadow: 0 0 0 3px rgba(29,99,255,0.12);
+      box-shadow: 0 0 0 3px rgba(29,99,255,0.10);
     }
 
     .rowActions{
       display:flex;
       gap: 8px;
       justify-content:flex-end;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .btnSmall{
@@ -358,19 +303,16 @@
       padding: 0 10px;
       border-radius: 15px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
     }
 
-    /* Right action panel */
-    .actionPanelBody{
+    /* Right panel body */
+    .panelBody{
       padding: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
       min-width:0;
     }
 
-    /* Related records */
+    /* Related table (keep clean) */
     .tableWrap{
       width:100%;
       overflow:auto;
@@ -379,13 +321,13 @@
       width:100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 760px; /* allows horizontal scroll in embed */
+      min-width: 760px;
     }
     thead th{
-      background: var(--table-head);
+      background: #fafafa;
       border-bottom: 1px solid var(--border);
       font-size: 11px;
-      font-weight: 850;
+      font-weight: 700;
       color: #374151;
       text-align:left;
       padding: 10px 10px;
@@ -395,42 +337,33 @@
       white-space: nowrap;
     }
     tbody td{
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
       padding: 10px 10px;
       font-size: 12px;
-      font-weight: 650;
+      font-weight: 600;
       color: #111827;
       vertical-align: middle;
       white-space: nowrap;
     }
-    tbody tr:hover td{ background: var(--row-hover); }
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 6px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: var(--chip);
-      border: 1px solid #e5e7eb;
-      font-size: 11px;
-      font-weight: 800;
-      color: #111827;
-      max-width: 220px;
+    .nameCell{
+      font-weight: 700;
+      max-width: 240px;
       overflow:hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .muted{
       color: var(--muted);
-      font-weight: 650;
+      font-weight: 600;
     }
 
     .skeleton{
       background: linear-gradient(90deg, #f2f3f5 25%, #eceef2 37%, #f2f3f5 63%);
       background-size: 400% 100%;
       animation: shimmer 1.2s ease infinite;
-      border-radius: 10px;
+      border-radius: 8px;
     }
     @keyframes shimmer{
       0%{ background-position: 100% 0; }
@@ -464,7 +397,7 @@
       pointer-events:auto;
     }
     .toast .msg{
-      font-weight: 800;
+      font-weight: 700;
       font-size: 13px;
       flex:1;
     }
@@ -481,12 +414,13 @@
     }
     .toast .x:hover{ background: rgba(0,0,0,0.06); }
 
-    /* Responsive */
     @media (max-width: 920px){
       .grid{ grid-template-columns: 1fr; }
       table{ min-width: 720px; }
       .highlights{ grid-template-columns: 1fr; }
-      .formGrid{ grid-template-columns: 1fr; }
+      .metric + .metric{ border-left: 0; border-top: 1px solid var(--border); }
+      .detailsGrid{ grid-template-columns: 1fr; }
+      .row{ grid-template-columns: 140px 1fr; }
     }
   </style>
 </head>
@@ -495,8 +429,8 @@
   <div class="page" id="app">
 
     <!-- Header -->
-    <div class="headerCard">
-      <div class="headerTop">
+    <div class="section">
+      <div class="sectionHeader">
         <div class="headerLeft">
           <div class="iconBadge" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24">
@@ -528,15 +462,21 @@
       <div class="highlights">
         <div class="metric">
           <div class="metricLabel">Lead Score</div>
-          <div class="metricValue" id="metricLeadScore"><span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span></div>
+          <div class="metricValue" id="metricLeadScore">
+            <span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span>
+          </div>
         </div>
         <div class="metric">
           <div class="metricLabel">Age in Stage</div>
-          <div class="metricValue" id="metricAgeInStage"><span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span></div>
+          <div class="metricValue" id="metricAgeInStage">
+            <span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>
+          </div>
         </div>
         <div class="metric">
           <div class="metricLabel">Days Since Last Activity</div>
-          <div class="metricValue" id="metricDaysSince"><span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span></div>
+          <div class="metricValue" id="metricDaysSince">
+            <span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -544,22 +484,29 @@
     <!-- Main -->
     <div class="grid">
 
-      <!-- Left: Tabs + forms -->
-      <div class="card">
-        <div class="tabs" role="tablist" aria-label="Record tabs">
-          <button class="tab" id="tabDeal" role="tab" aria-selected="true" aria-controls="panelDeal" type="button">Deal Information</button>
-          <button class="tab" id="tabResearch" role="tab" aria-selected="false" aria-controls="panelResearch" type="button">Deep Research</button>
+      <!-- Left: tabs + details layout -->
+      <div class="section">
+        <div class="tabsBar" role="tablist" aria-label="Record tabs">
+          <button class="tabLink" id="tabDeal" role="tab" aria-selected="true" aria-controls="panelDeal" type="button">Deal Information</button>
+          <button class="tabLink" id="tabResearch" role="tab" aria-selected="false" aria-controls="panelResearch" type="button">Deep Research</button>
         </div>
+        <div class="tabsDivider"></div>
 
         <div class="tabPanel" id="panelDeal" role="tabpanel" aria-labelledby="tabDeal">
-          <div class="formGrid" id="dealForm"></div>
+          <div class="detailsGrid">
+            <div class="detailsCol" id="dealColLeft"></div>
+            <div class="detailsCol" id="dealColRight"></div>
+          </div>
           <div class="rowActions">
             <button class="btn btnSmall" id="saveDealBtn" type="button">Save Deal Info</button>
           </div>
         </div>
 
         <div class="tabPanel" id="panelResearch" role="tabpanel" aria-labelledby="tabResearch" hidden>
-          <div class="formGrid" id="researchForm"></div>
+          <div class="detailsGrid">
+            <div class="detailsCol" id="researchColLeft"></div>
+            <div class="detailsCol" id="researchColRight"></div>
+          </div>
           <div class="rowActions">
             <button class="btn btnSmall" id="saveResearchBtn" type="button">Save Deep Research</button>
           </div>
@@ -567,14 +514,14 @@
       </div>
 
       <!-- Right: Action panel -->
-      <div class="card">
-        <div class="cardHeader">
-          <div>
-            <div class="cardTitle">Next Actions</div>
-            <div class="cardSub">Set follow-up + stalled reason</div>
+      <div class="section">
+        <div class="sectionHeader">
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:750;">Next Actions</div>
+            <div style="font-size:11px;font-weight:600;color:var(--muted);">Follow-up + next step</div>
           </div>
         </div>
-        <div class="actionPanelBody" id="actionPanel"></div>
+        <div class="panelBody" id="actionPanel"></div>
         <div class="rowActions" style="padding: 0 12px 12px;">
           <button class="btn btnSmall btnPrimary" id="saveActionsBtn" type="button">Save Actions</button>
         </div>
@@ -583,13 +530,13 @@
     </div>
 
     <!-- Related records -->
-    <div class="card">
-      <div class="cardHeader">
-        <div>
-          <div class="cardTitle">Related Records</div>
-          <div class="cardSub">Owners / Subitems</div>
+    <div class="section">
+      <div class="sectionHeader">
+        <div style="min-width:0;">
+          <div style="font-size:12px;font-weight:750;">Related Records</div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);">Owners / Subitems</div>
         </div>
-        <button class="btn" id="saveSubitemsBtn" type="button" title="Save any edited subitems">Save Subitems</button>
+        <button class="btn" id="saveSubitemsBtn" type="button">Save Subitems</button>
       </div>
       <div class="tableWrap">
         <table>
@@ -632,57 +579,16 @@
   </div>
 
   <script>
-    /**********************************************************************
-     * UNIVERSAL RECORD PAGE (GitHub Pages) + Make.com proxy to Monday
-     *
-     * ✅ One universal URL: record.html?itemId=123
-     *
-     * You need TWO Make webhooks:
-     *
-     * 1) GET RECORD (GET)
-     *    Called like: MAKE_GET_RECORD_URL?itemId=123
-     *    Make does Monday GraphQL to fetch:
-     *      - item name
-     *      - column_values (id/title/text/value/type)
-     *      - subitems with column_values
-     *    Make responds with JSON. Recommended shape:
-     *    {
-     *      "item": {
-     *        "id":"123",
-     *        "name":"Maria Resendez",
-     *        "column_values":[ { "id":"status__1","title":"Lead Status","text":"Dial NA","value":"...","type":"status" }, ... ],
-     *        "subitems":[ { "id":"999","name":"Heir 1","column_values":[ ... ] }, ... ]
-     *      }
-     *    }
-     *
-     * 2) SET FIELD (POST)
-     *    Body:
-     *    {
-     *      "itemId":"123",
-     *      "target":"item" | "subitem",
-     *      "columnId":"status__1",
-     *      "valueText":"Dial NA",
-     *      "valueType":"status" | "date" | "text" | "numbers" | "link" | ...
-     *      "subitemId":"999"   // only if target=subitem
-     *    }
-     *
-     * Make then runs Monday mutation update_column_value appropriately.
-     * (You control the exact mapping in Make per column type.)
-     **********************************************************************/
-
-    // ✅ Paste your Make webhook endpoints:
+    // ✅ Paste your Make webhook endpoints (FULL URLs)
     const MAKE_GET_RECORD_URL = "https://hook.us1.make.com/"; // <-- FULL get-record webhook url
     const MAKE_SET_FIELD_URL  = "https://hook.us1.make.com/"; // <-- FULL set-field webhook url
 
-    // Titles to match from your board (exact match is best; we also do fuzzy fallback)
+    // Titles to match from your board
     const TITLES = {
-      // Header metrics
       leadScore: "Lead Score",
       ageInStage: "Age In Stage",
-      // You said you need to add this: create a Date column in Monday called exactly this:
-      lastActivityDate: "Last Activity Date",
+      lastActivityDate: "Last Activity Date", // add this column in Monday for the metric
 
-      // Deal Information tab
       address: "Address",
       city: "City",
       leadType: "Lead Type",
@@ -693,7 +599,6 @@
       willStatus: "Will Status",
       deedStatus: "Deed Status",
 
-      // Deep Research tab
       taxAssessor: "Tax Assesor",
       zillow: "Zillow",
       obituary: "Obituary",
@@ -702,13 +607,11 @@
       birthDate: "Birth Date",
       deathDate: "Death Date",
 
-      // Next Actions panel
       followUpDate: "Follow Up Date",
       nextActionStep: "Next Action Step",
       stalledReason: "Stalled Reason"
     };
 
-    // Subitems (Related Records)
     const SUB_TITLES = {
       offerMade: "Offer Made",
       relationship: "Relation Ship",
@@ -727,8 +630,11 @@
     const metricAgeInStageEl = document.getElementById("metricAgeInStage");
     const metricDaysSinceEl = document.getElementById("metricDaysSince");
 
-    const dealFormEl = document.getElementById("dealForm");
-    const researchFormEl = document.getElementById("researchForm");
+    const dealColLeft = document.getElementById("dealColLeft");
+    const dealColRight = document.getElementById("dealColRight");
+    const researchColLeft = document.getElementById("researchColLeft");
+    const researchColRight = document.getElementById("researchColRight");
+
     const actionPanelEl = document.getElementById("actionPanel");
     const subitemsBodyEl = document.getElementById("subitemsBody");
 
@@ -774,28 +680,19 @@
 
     // --- State
     let record = null;
-
-    // For saving: keep an index of title -> column meta (id/type/text/value)
     let itemColsByTitle = new Map();
-    // For subitems: per subitem id: title -> column meta
     let subColsById = new Map();
 
-    // Track dirty edits
     const dirty = {
-      item: new Map(),        // columnId -> {columnId, valueText, valueType}
-      subitems: new Map()     // key `${subitemId}:${columnId}` -> payload
+      item: new Map(),        // columnId -> payload
+      subitems: new Map()     // `${subitemId}:${columnId}` -> payload
     };
 
-    // ---- Utilities: find columns
-    function normalize(s){
-      return String(s || "").trim().toLowerCase();
-    }
+    function normalize(s){ return String(s || "").trim().toLowerCase(); }
 
     function indexColumns(columnValues){
       const byTitle = new Map();
-      (columnValues || []).forEach(cv=>{
-        byTitle.set(normalize(cv.title), cv);
-      });
+      (columnValues || []).forEach(cv => byTitle.set(normalize(cv.title), cv));
       return byTitle;
     }
 
@@ -803,8 +700,6 @@
       if(!title) return null;
       const exact = byTitleMap.get(normalize(title));
       if(exact) return exact;
-
-      // mild fallback: contains match
       const t = normalize(title);
       for(const [k,v] of byTitleMap.entries()){
         if(k.includes(t) || t.includes(k)) return v;
@@ -813,66 +708,13 @@
     }
 
     function parseDateFromText(text){
-      // Monday often returns date text like "2026-02-06" or "Feb 6, 2026"
       const s = String(text || "").trim();
       if(!s) return null;
       const d = new Date(s);
-      if(!isNaN(d.getTime())) return d;
-      return null;
-    }
-
-    function daysBetween(d1, d2){
-      const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()).getTime();
-      const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate()).getTime();
-      const diff = b - a;
-      return Math.floor(diff / (1000*60*60*24));
-    }
-
-    // ---- UI builders
-    function makeInputField({label, columnTitle, placeholder, kind="text", help=null, valueText="", columnId=null, valueType=null}){
-      const id = `fld_${Math.random().toString(16).slice(2)}`;
-
-      const wrap = document.createElement("div");
-      wrap.className = "field";
-
-      const lab = document.createElement("div");
-      lab.className = "fieldLabel";
-      lab.innerHTML = `
-        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}</span>
-        ${help ? `<span class="hint">${escapeHtml(help)}</span>` : ``}
-      `;
-
-      let control;
-      if(kind === "textarea"){
-        control = document.createElement("textarea");
-        control.className = "textarea";
-        control.id = id;
-        control.placeholder = placeholder || "";
-        control.value = valueText || "";
-      } else {
-        control = document.createElement("input");
-        control.className = "input";
-        control.id = id;
-        control.type = (kind === "date") ? "date" : "text";
-        control.placeholder = placeholder || "";
-        control.value = (kind === "date") ? toISODate(valueText) : (valueText || "");
-      }
-
-      // Mark dirty on change (only if we know a columnId)
-      control.addEventListener("change", ()=>{
-        if(!columnId) return;
-        const v = (kind === "date") ? control.value : control.value;
-        dirty.item.set(columnId, { target:"item", itemId: record?.id, columnId, valueText: v, valueType: valueType || "text" });
-      });
-
-      wrap.appendChild(lab);
-      wrap.appendChild(control);
-
-      return wrap;
+      return isNaN(d.getTime()) ? null : d;
     }
 
     function toISODate(text){
-      // tries to turn Monday text into YYYY-MM-DD for <input type="date">
       const d = parseDateFromText(text);
       if(!d) return "";
       const yyyy = d.getFullYear();
@@ -881,29 +723,67 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    function makeLinkField({label, valueText, columnId, valueType}){
-      // links are typically stored as text; user can paste URL or label
-      return makeInputField({
-        label,
-        columnTitle: label,
-        placeholder: "Paste link URL…",
-        kind: "text",
-        valueText: valueText || "",
-        columnId,
-        valueType: valueType || "link"
-      });
+    function daysBetween(d1, d2){
+      const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()).getTime();
+      const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate()).getTime();
+      return Math.floor((b - a) / (1000*60*60*24));
     }
 
-    function buildDealInfoForm(){
-      dealFormEl.innerHTML = "";
+    function makeRow({label, valueText, kind="text", columnId=null, valueType="text"}){
+      // IMPORTANT: Always render rows in fixed placement even if empty / missing column
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const l = document.createElement("div");
+      l.className = "rowLabel";
+      l.textContent = label;
+
+      const input = document.createElement("input");
+      input.className = "input";
+      input.type = (kind === "date") ? "date" : "text";
+      input.value = (kind === "date") ? toISODate(valueText) : (valueText || "");
+
+      input.addEventListener("change", ()=>{
+        if(!columnId) return; // if the column truly doesn't exist in Monday yet, can't save
+        const v = input.value;
+        dirty.item.set(columnId, {
+          target:"item",
+          itemId: record?.id,
+          columnId,
+          valueText: v,
+          valueType: valueType || (kind === "date" ? "date" : "text")
+        });
+      });
+
+      row.appendChild(l);
+      row.appendChild(input);
+      return row;
+    }
+
+    function buildMetrics(){
+      const byTitle = itemColsByTitle;
+
+      metricLeadScoreEl.textContent = findByTitle(byTitle, TITLES.leadScore)?.text || "—";
+      metricAgeInStageEl.textContent = findByTitle(byTitle, TITLES.ageInStage)?.text || "—";
+
+      const lastAct = findByTitle(byTitle, TITLES.lastActivityDate);
+      const d = parseDateFromText(lastAct?.text || "");
+      metricDaysSinceEl.textContent = d ? `${Math.max(0, daysBetween(d, new Date()))} days` : "—";
+    }
+
+    function buildDealInfo(){
+      dealColLeft.innerHTML = "";
+      dealColRight.innerHTML = "";
 
       const byTitle = itemColsByTitle;
 
-      const fields = [
+      const left = [
         { key:"address", label:"Address" },
         { key:"city", label:"City" },
         { key:"leadType", label:"Lead Type" },
-        { key:"taxes", label:"Taxes" },
+        { key:"taxes", label:"Taxes" }
+      ];
+      const right = [
         { key:"condition", label:"Condition" },
         { key:"occupancy", label:"Occupancy" },
         { key:"titleIssue", label:"Title issue" },
@@ -911,63 +791,71 @@
         { key:"deedStatus", label:"Deed Status" }
       ];
 
-      fields.forEach(f=>{
+      left.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
-        const valueText = cv?.text || "";
-        const valueType = cv?.type || "text";
-
-        dealFormEl.appendChild(makeInputField({
+        dealColLeft.appendChild(makeRow({
           label: f.label,
-          placeholder: "",
-          kind: (valueType === "date") ? "date" : "text",
-          valueText,
+          valueText: cv?.text || "",
+          kind: (cv?.type === "date") ? "date" : "text",
           columnId: cv?.id || null,
-          valueType
+          valueType: cv?.type || "text"
+        }));
+      });
+
+      right.forEach(f=>{
+        const cv = findByTitle(byTitle, TITLES[f.key]);
+        dealColRight.appendChild(makeRow({
+          label: f.label,
+          valueText: cv?.text || "",
+          kind: (cv?.type === "date") ? "date" : "text",
+          columnId: cv?.id || null,
+          valueType: cv?.type || "text"
         }));
       });
     }
 
-    function buildResearchForm(){
-      researchFormEl.innerHTML = "";
+    function buildResearch(){
+      researchColLeft.innerHTML = "";
+      researchColRight.innerHTML = "";
 
       const byTitle = itemColsByTitle;
 
-      const fields = [
-        { key:"taxAssessor", label:"Tax Assessor Link", kind:"link" },
-        { key:"zillow", label:"Zillow", kind:"link" },
-        { key:"obituary", label:"Obituary", kind:"link" },
-        { key:"ancestry", label:"Ancestry", kind:"link" },
-        { key:"age", label:"Age", kind:"text" },
+      const left = [
+        { key:"taxAssessor", label:"Tax Assessor Link" },
+        { key:"zillow", label:"Zillow" },
+        { key:"obituary", label:"Obituary" },
+        { key:"ancestry", label:"Ancestry" }
+      ];
+      const right = [
+        { key:"age", label:"Age" },
         { key:"birthDate", label:"Birth Date", kind:"date" },
         { key:"deathDate", label:"Death Date", kind:"date" }
       ];
 
-      fields.forEach(f=>{
+      left.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
-        const valueText = cv?.text || "";
-        const valueType = cv?.type || (f.kind === "link" ? "link" : "text");
+        researchColLeft.appendChild(makeRow({
+          label: f.label,
+          valueText: cv?.text || "",
+          kind: "text",
+          columnId: cv?.id || null,
+          valueType: cv?.type || "text"
+        }));
+      });
 
-        if(f.kind === "link"){
-          researchFormEl.appendChild(makeLinkField({
-            label: f.label,
-            valueText,
-            columnId: cv?.id || null,
-            valueType
-          }));
-        } else {
-          researchFormEl.appendChild(makeInputField({
-            label: f.label,
-            placeholder: "",
-            kind: f.kind,
-            valueText,
-            columnId: cv?.id || null,
-            valueType
-          }));
-        }
+      right.forEach(f=>{
+        const cv = findByTitle(byTitle, TITLES[f.key]);
+        researchColRight.appendChild(makeRow({
+          label: f.label,
+          valueText: cv?.text || "",
+          kind: f.kind || ((cv?.type === "date") ? "date" : "text"),
+          columnId: cv?.id || null,
+          valueType: cv?.type || (f.kind === "date" ? "date" : "text")
+        }));
       });
     }
 
-    function buildActionPanel(){
+    function buildActions(){
       actionPanelEl.innerHTML = "";
 
       const byTitle = itemColsByTitle;
@@ -976,77 +864,50 @@
       const nextStep = findByTitle(byTitle, TITLES.nextActionStep);
       const stalled = findByTitle(byTitle, TITLES.stalledReason);
 
-      actionPanelEl.appendChild(makeInputField({
+      actionPanelEl.appendChild(makeRow({
         label: "Follow Up Date",
-        placeholder: "",
-        kind: "date",
         valueText: followUp?.text || "",
+        kind: "date",
         columnId: followUp?.id || null,
         valueType: followUp?.type || "date"
       }));
 
-      actionPanelEl.appendChild(makeInputField({
+      actionPanelEl.appendChild(makeRow({
         label: "Next Action Step",
-        placeholder: "e.g., Call heir #2, send text, request docs…",
-        kind: "text",
         valueText: nextStep?.text || "",
+        kind: "text",
         columnId: nextStep?.id || null,
         valueType: nextStep?.type || "text"
       }));
 
-      // stalled reason often text/status; allow text
-      actionPanelEl.appendChild(makeInputField({
+      actionPanelEl.appendChild(makeRow({
         label: "Stalled Reason",
-        placeholder: "Optional",
-        kind: "text",
         valueText: stalled?.text || "",
+        kind: "text",
         columnId: stalled?.id || null,
         valueType: stalled?.type || "text"
       }));
     }
 
-    function buildMetrics(){
-      const byTitle = itemColsByTitle;
-
-      const leadScore = findByTitle(byTitle, TITLES.leadScore);
-      metricLeadScoreEl.textContent = leadScore?.text || "—";
-
-      const ageInStage = findByTitle(byTitle, TITLES.ageInStage);
-      metricAgeInStageEl.textContent = ageInStage?.text || "—";
-
-      // Days since last activity (requires you to add a date column in Monday titled "Last Activity Date")
-      const lastAct = findByTitle(byTitle, TITLES.lastActivityDate);
-      const d = parseDateFromText(lastAct?.text || "");
-      if(d){
-        const days = daysBetween(d, new Date());
-        metricDaysSinceEl.textContent = `${Math.max(0, days)} days`;
-      } else {
-        metricDaysSinceEl.textContent = "—";
-      }
-    }
-
-    function makeSubCellInput({subitemId, columnMeta, kind="text"}){
+    function makeSubCellInput({subitemId, columnMeta}){
       const input = document.createElement("input");
       input.className = "input";
       input.style.height = "30px";
       input.style.borderRadius = "8px";
       input.style.fontSize = "12px";
-      input.style.fontWeight = "650";
-      input.type = (kind === "date") ? "date" : "text";
-
-      const valueText = columnMeta?.text || "";
-      input.value = (kind === "date") ? toISODate(valueText) : valueText;
+      input.style.fontWeight = "600";
+      input.type = "text";
+      input.value = columnMeta?.text || "";
 
       input.addEventListener("change", ()=>{
         if(!columnMeta?.id) return;
-        const v = input.value;
         const key = `${subitemId}:${columnMeta.id}`;
         dirty.subitems.set(key, {
           target: "subitem",
           itemId: record?.id,
           subitemId,
           columnId: columnMeta.id,
-          valueText: v,
+          valueText: input.value,
           valueType: columnMeta.type || "text"
         });
       });
@@ -1054,10 +915,10 @@
       return input;
     }
 
-    function buildSubitemsTable(){
+    function buildSubitems(){
       subitemsBodyEl.innerHTML = "";
-
       const subs = record?.subitems || [];
+
       if(!subs.length){
         subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">No related records (subitems).</td></tr>`;
         return;
@@ -1065,8 +926,6 @@
 
       subs.forEach(sub=>{
         const byTitle = indexColumns(sub.column_values || []);
-
-        // store mapping for later (optional)
         subColsById.set(String(sub.id), byTitle);
 
         const offerMade = findByTitle(byTitle, SUB_TITLES.offerMade);
@@ -1084,73 +943,29 @@
 
         const tr = document.createElement("tr");
 
-        // Name (read-only)
         const tdName = document.createElement("td");
-        tdName.innerHTML = `<span class="pill" title="${escapeHtml(sub.name)}">${escapeHtml(sub.name)}</span>`;
+        tdName.className = "nameCell";
+        tdName.title = sub.name || "";
+        tdName.textContent = sub.name || "—";
         tr.appendChild(tdName);
 
-        // Editable cells
-        const tdOffer = document.createElement("td");
-        tdOffer.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: offerMade }));
-        tr.appendChild(tdOffer);
+        const tdOffer = document.createElement("td"); tdOffer.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: offerMade })); tr.appendChild(tdOffer);
+        const tdRel   = document.createElement("td"); tdRel.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: relationship })); tr.appendChild(tdRel);
+        const tdLead  = document.createElement("td"); tdLead.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: leadStatus })); tr.appendChild(tdLead);
 
-        const tdRel = document.createElement("td");
-        tdRel.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: relationship }));
-        tr.appendChild(tdRel);
+        const tdP1    = document.createElement("td"); tdP1.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone1 })); tr.appendChild(tdP1);
+        const tdP1s   = document.createElement("td"); tdP1s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone1Status })); tr.appendChild(tdP1s);
 
-        const tdLead = document.createElement("td");
-        tdLead.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: leadStatus }));
-        tr.appendChild(tdLead);
+        const tdP2    = document.createElement("td"); tdP2.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone2 })); tr.appendChild(tdP2);
+        const tdP2s   = document.createElement("td"); tdP2s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone2Status })); tr.appendChild(tdP2s);
 
-        const tdP1 = document.createElement("td");
-        tdP1.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone1 }));
-        tr.appendChild(tdP1);
-
-        const tdP1s = document.createElement("td");
-        tdP1s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone1Status }));
-        tr.appendChild(tdP1s);
-
-        const tdP2 = document.createElement("td");
-        tdP2.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone2 }));
-        tr.appendChild(tdP2);
-
-        const tdP2s = document.createElement("td");
-        tdP2s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone2Status }));
-        tr.appendChild(tdP2s);
-
-        const tdP3 = document.createElement("td");
-        tdP3.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone3 }));
-        tr.appendChild(tdP3);
-
-        const tdP3s = document.createElement("td");
-        tdP3s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone3Status }));
-        tr.appendChild(tdP3s);
+        const tdP3    = document.createElement("td"); tdP3.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone3 })); tr.appendChild(tdP3);
+        const tdP3s   = document.createElement("td"); tdP3s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone3Status })); tr.appendChild(tdP3s);
 
         subitemsBodyEl.appendChild(tr);
       });
     }
 
-    function setLoadingState(isLoading){
-      if(isLoading){
-        recordNameEl.textContent = "Loading…";
-        subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td></tr>`;
-      }
-    }
-
-    function renderAll(){
-      recordNameEl.textContent = record?.name || "—";
-
-      // rebuild column index
-      itemColsByTitle = indexColumns(record?.column_values || []);
-
-      buildMetrics();
-      buildDealInfoForm();
-      buildResearchForm();
-      buildActionPanel();
-      buildSubitemsTable();
-    }
-
-    // ---- Tabs
     function setTab(which){
       const deal = (which === "deal");
       tabDeal.setAttribute("aria-selected", String(deal));
@@ -1161,7 +976,24 @@
     tabDeal.addEventListener("click", ()=>setTab("deal"));
     tabResearch.addEventListener("click", ()=>setTab("research"));
 
-    // ---- Network
+    function setLoadingState(){
+      recordNameEl.textContent = "Loading…";
+      metricLeadScoreEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span>`;
+      metricAgeInStageEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>`;
+      metricDaysSinceEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>`;
+      subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td></tr>`;
+    }
+
+    function renderAll(){
+      recordNameEl.textContent = record?.name || "—";
+      itemColsByTitle = indexColumns(record?.column_values || []);
+      buildMetrics();
+      buildDealInfo();
+      buildResearch();
+      buildActions();
+      buildSubitems();
+    }
+
     async function loadRecord(){
       const itemId = getParam("itemId");
       if(!itemId){
@@ -1173,7 +1005,7 @@
         return;
       }
 
-      setLoadingState(true);
+      setLoadingState();
 
       try{
         const url = new URL(MAKE_GET_RECORD_URL);
@@ -1187,8 +1019,6 @@
         if(!res.ok) throw new Error("GET failed: " + res.status);
 
         const data = await res.json();
-
-        // accept either {item:{...}} or {items:[...]} shapes
         const item = data?.item || data?.items?.[0] || data?.data?.items?.[0];
         if(!item) throw new Error("No item in response");
 
@@ -1199,12 +1029,11 @@
           subitems: item.subitems || []
         };
 
-        // clear dirty maps on load
         dirty.item.clear();
         dirty.subitems.clear();
 
         renderAll();
-      } catch (e) {
+      } catch (e){
         console.warn(e);
         showToast("Could not load record.");
       }
@@ -1221,9 +1050,7 @@
         body: JSON.stringify(payload),
         keepalive: true
       });
-      if(!res.ok){
-        throw new Error("SET failed: " + res.status);
-      }
+      if(!res.ok) throw new Error("SET failed: " + res.status);
     }
 
     async function savePayloads(payloads){
@@ -1231,14 +1058,10 @@
         showToast("No changes to save.");
         return;
       }
-
       try{
-        // run sequentially to be gentle on Make/Monday
-        for(const p of payloads){
-          await postSetField(p);
-        }
+        for(const p of payloads) await postSetField(p);
         showToast("Saved successfully.");
-        await loadRecord(); // refresh to reflect server truth
+        await loadRecord();
       } catch (e){
         console.warn(e);
         showToast("Save failed. Please retry.");
@@ -1253,54 +1076,36 @@
       }
       return out;
     }
-
     function collectSubitemPayloads(){
       return Array.from(dirty.subitems.values());
     }
 
-    // ---- Save buttons
+    // Save buttons
     saveAllBtn.addEventListener("click", async ()=>{
-      const payloads = [
-        ...collectItemPayloads(),
-        ...collectSubitemPayloads()
-      ];
-      await savePayloads(payloads);
+      await savePayloads([...collectItemPayloads(), ...collectSubitemPayloads()]);
     });
 
     saveDealBtn.addEventListener("click", async ()=>{
-      // Save just the Deal tab fields (by matching TITLES)
       const ids = [];
       const byTitle = itemColsByTitle;
-      [
-        TITLES.address, TITLES.city, TITLES.leadType, TITLES.taxes, TITLES.condition,
-        TITLES.occupancy, TITLES.titleIssue, TITLES.willStatus, TITLES.deedStatus
-      ].forEach(t=>{
-        const cv = findByTitle(byTitle, t);
-        if(cv?.id) ids.push(cv.id);
-      });
+      [TITLES.address, TITLES.city, TITLES.leadType, TITLES.taxes, TITLES.condition, TITLES.occupancy, TITLES.titleIssue, TITLES.willStatus, TITLES.deedStatus]
+        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
       await savePayloads(collectItemPayloads(ids));
     });
 
     saveResearchBtn.addEventListener("click", async ()=>{
       const ids = [];
       const byTitle = itemColsByTitle;
-      [
-        TITLES.taxAssessor, TITLES.zillow, TITLES.obituary, TITLES.ancestry,
-        TITLES.age, TITLES.birthDate, TITLES.deathDate
-      ].forEach(t=>{
-        const cv = findByTitle(byTitle, t);
-        if(cv?.id) ids.push(cv.id);
-      });
+      [TITLES.taxAssessor, TITLES.zillow, TITLES.obituary, TITLES.ancestry, TITLES.age, TITLES.birthDate, TITLES.deathDate]
+        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
       await savePayloads(collectItemPayloads(ids));
     });
 
     saveActionsBtn.addEventListener("click", async ()=>{
       const ids = [];
       const byTitle = itemColsByTitle;
-      [TITLES.followUpDate, TITLES.nextActionStep, TITLES.stalledReason].forEach(t=>{
-        const cv = findByTitle(byTitle, t);
-        if(cv?.id) ids.push(cv.id);
-      });
+      [TITLES.followUpDate, TITLES.nextActionStep, TITLES.stalledReason]
+        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
       await savePayloads(collectItemPayloads(ids));
     });
 
@@ -1310,85 +1115,8 @@
 
     refreshBtn.addEventListener("click", loadRecord);
 
-    // --- Initialize
+    // Init
     setTab("deal");
-    setTab("deal");
-
-const demo = getParam("demo") === "1";
-if(demo){
-  record = {
-    id: "DEMO-123",
-    name: "Maria Resendez",
-    column_values: [
-      { id:"lead_score", title:"Lead Score", text:"76", type:"numbers" },
-      { id:"age_stage", title:"Age In Stage", text:"10 days", type:"text" },
-      { id:"last_activity", title:"Last Activity Date", text:"2026-02-01", type:"date" },
-
-      { id:"address", title:"Address", text:"1805 Vermont St", type:"text" },
-      { id:"city", title:"City", text:"Houston", type:"text" },
-      { id:"lead_type", title:"Lead Type", text:"Taxes Under Suit", type:"text" },
-      { id:"taxes", title:"Taxes", text:"3–4 years unpaid", type:"text" },
-      { id:"condition", title:"Condition", text:"Medium Rehab / Needs work", type:"text" },
-      { id:"occupancy", title:"Occupancy", text:"Occupied", type:"text" },
-      { id:"title_issue", title:"Title issue", text:"AOH needed", type:"text" },
-      { id:"will_status", title:"Will Status", text:"Will Not Filed", type:"text" },
-      { id:"deed_status", title:"Deed Status", text:"Deed Found", type:"text" },
-
-      { id:"tax_assessor", title:"Tax Assesor", text:"https://example.com/tax", type:"link" },
-      { id:"zillow", title:"Zillow", text:"https://example.com/zillow", type:"link" },
-      { id:"obituary", title:"Obituary", text:"https://example.com/obit", type:"link" },
-      { id:"ancestry", title:"Ancestry", text:"https://example.com/ancestry", type:"link" },
-      { id:"age", title:"Age", text:"56", type:"numbers" },
-      { id:"birth", title:"Birth Date", text:"1968-08-15", type:"date" },
-      { id:"death", title:"Death Date", text:"2024-11-20", type:"date" },
-
-      { id:"follow_up", title:"Follow Up Date", text:"2026-02-10", type:"date" },
-      { id:"next_step", title:"Next Action Step", text:"Call heir #2 and confirm ownership %", type:"text" },
-      { id:"stalled", title:"Stalled Reason", text:"Waiting on callback", type:"text" }
-    ],
-    subitems: [
-      {
-        id: "S-001",
-        name: "Owner: John Resendez",
-        column_values: [
-          { id:"offer_made", title:"Offer Made", text:"Yes", type:"text" },
-          { id:"relationship", title:"Relation Ship", text:"Son", type:"text" },
-          { id:"lead_status", title:"Lead Status", text:"Contacted", type:"text" },
-
-          { id:"p1", title:"Phone 1", text:"(832) 555-1201", type:"text" },
-          { id:"p1s", title:"Phone 1 status", text:"Good", type:"text" },
-          { id:"p2", title:"Phone 2", text:"(832) 555-9981", type:"text" },
-          { id:"p2s", title:"Phone 2 status", text:"No answer", type:"text" },
-          { id:"p3", title:"Phone 3", text:"", type:"text" },
-          { id:"p3s", title:"Phone 3 status", text:"", type:"text" }
-        ]
-      },
-      {
-        id: "S-002",
-        name: "Owner: Maria Resendez",
-        column_values: [
-          { id:"offer_made", title:"Offer Made", text:"No", type:"text" },
-          { id:"relationship", title:"Relation Ship", text:"Daughter", type:"text" },
-          { id:"lead_status", title:"Lead Status", text:"Dial NA", type:"text" },
-
-          { id:"p1", title:"Phone 1", text:"(713) 555-3411", type:"text" },
-          { id:"p1s", title:"Phone 1 status", text:"Bad", type:"text" },
-          { id:"p2", title:"Phone 2", text:"", type:"text" },
-          { id:"p2s", title:"Phone 2 status", text:"", type:"text" },
-          { id:"p3", title:"Phone 3", text:"", type:"text" },
-          { id:"p3s", title:"Phone 3 status", text:"", type:"text" }
-        ]
-      }
-    ]
-  };
-
-  // IMPORTANT: reset dirty state and render
-  dirty.item.clear();
-  dirty.subitems.clear();
-  renderAll();
-} else {
-  loadRecord();
-}
     loadRecord();
   </script>
 </body>
