@@ -36,7 +36,6 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* ---------- APP FRAME ---------- */
     .app{
       width: 100%;
       max-width: none;
@@ -44,6 +43,7 @@
       padding: 14px 14px 18px;
     }
 
+    /* ---------- TOP BAR ---------- */
     .topbar{
       display:flex;
       align-items:center;
@@ -77,7 +77,6 @@
       flex: 0 0 auto;
     }
 
-    /* Address left + slightly larger (+0.5pt-ish) */
     .record-title-main{
       min-width: 0;
       flex: 1 1 auto;
@@ -86,7 +85,7 @@
     }
     .record-title-main h1{
       margin:0;
-      font-size: 17px; /* was 16.5px; slight bump */
+      font-size: 17px;
       font-weight: 750;
       letter-spacing: .1px;
       text-align: left;
@@ -124,7 +123,7 @@
     }
     .btn.primary:hover{ background: var(--blue-2); }
 
-    /* ---------- MAIN LAYOUT ---------- */
+    /* ---------- LAYOUT ---------- */
     .layout{
       margin-top: 12px;
       display:grid;
@@ -145,6 +144,7 @@
       overflow:hidden;
     }
 
+    /* headers + subheaders +1.5pt */
     .panel-header{
       padding: 10px 14px;
       border-bottom: 1px solid var(--line);
@@ -153,19 +153,18 @@
       justify-content:space-between;
       gap:10px;
     }
-
     .panel-title{
       margin:0;
-      font-size: 13px;
-      font-weight: 650;
+      font-size: 14.5px; /* was 13px */
+      font-weight: 700;
       color: #111827;
       letter-spacing: .1px;
     }
 
-    /* ---------- TABS (more spacing between) ---------- */
+    /* ---------- TABS ---------- */
     .tabs{
       display:flex;
-      gap: 28px;                /* increased spacing between tab labels */
+      gap: 28px;
       padding: 8px 14px 0;
       border-bottom: 1px solid var(--line);
       background: var(--surface);
@@ -199,7 +198,7 @@
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- SECTION HEADERS (Opportunity Details, Property Information, Related Contacts +1.5pt) ---------- */
+    /* ---------- SECTIONS ---------- */
     .section{
       padding: 0 14px 14px;
     }
@@ -216,13 +215,10 @@
     }
     .section-head h3{
       margin:0;
-      font-size: 16px; /* was 14.5px; +1.5-ish */
+      font-size: 17.5px; /* was 16px; +1.5pt */
       font-weight: 750;
       color:#111827;
     }
-
-    /* removed helper text under Opportunity Details */
-    .section-head .panel-subtitle{ display:none; }
 
     .field-grid{
       display:grid;
@@ -233,26 +229,24 @@
       .field-grid{ grid-template-columns: 1fr; }
     }
 
+    /* fields + field names +1pt */
     .field{
       border-top: 1px solid var(--line);
       padding: 10px 0;
       display:grid;
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 155px 1fr;
       gap: 10px;
       align-items:center;
     }
     .field:last-child{ border-bottom: 1px solid var(--line); }
 
-    /* subtext/field labels +1.5pt */
     .label{
-      font-size: 13px;  /* was 11.5px */
+      font-size: 14px; /* was 13px */
       color: var(--muted);
       font-weight: 650;
     }
-
-    /* field values +1.5pt */
     .value{
-      font-size: 14px;  /* was 12.5px */
+      font-size: 15px; /* was 14px */
       color: var(--text);
       display:flex;
       align-items:center;
@@ -299,7 +293,7 @@
     .inline-input{
       width:100%;
       font-family: var(--font);
-      font-size: 14px;
+      font-size: 15px;
       padding: 7px 9px;
       border: 1px solid var(--line-2);
       border-radius: 8px;
@@ -321,24 +315,21 @@
       border-radius: 8px;
     }
 
-    /* ---------- COLLAPSIBLE BANNER ---------- */
-    .collapsible{
-      margin: 10px 14px 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface-2);
-      overflow:hidden;
+    /* ---------- INLINE TOGGLE (replaces bubble) ---------- */
+    .inline-toggle{
+      padding: 0 14px 14px;
+      border-top: 1px solid var(--line);
     }
-    .collapsible-head{
+    .toggle-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding: 10px 12px;
+      gap:10px;
+      padding: 10px 0 10px;
       cursor:pointer;
       user-select:none;
-      gap:10px;
     }
-    .collapsible-left{
+    .toggle-left{
       display:flex;
       align-items:center;
       gap:10px;
@@ -351,28 +342,26 @@
       transition: transform .14s ease;
       flex: 0 0 auto;
     }
-    .collapsible[data-open="true"] .chev{ transform: rotate(90deg); }
+    .inline-toggle[data-open="true"] .chev{ transform: rotate(90deg); }
 
-    .collapsible-title{
-      font-size: 16px; /* was 14.5px; +1.5ish */
+    .toggle-title{
+      font-size: 17.5px; /* header size */
       font-weight: 750;
       color:#111827;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .collapsible-meta{
-      font-size: 13px;
+    .toggle-meta{
+      font-size: 14px; /* subheader +1.5-ish */
       color: var(--muted);
       white-space:nowrap;
     }
-    .collapsible-body{
+    .toggle-body{
       display:none;
-      border-top: 1px solid var(--line);
-      padding: 0 12px 10px;
-      background: #fff;
+      padding: 0 0 4px;
     }
-    .collapsible[data-open="true"] .collapsible-body{ display:block; }
+    .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
     /* ---------- RIGHT SIDEBAR ---------- */
     .sidebar-stack{
@@ -386,7 +375,7 @@
       .sidebar-stack{ position: static; }
     }
 
-    /* ---------- NEXT ACTIONS PANEL EMPHASIS ---------- */
+    /* Next Actions emphasis */
     .panel.emphasis{
       border-color: rgba(1,118,211,.35);
       box-shadow:
@@ -406,7 +395,7 @@
       padding: 10px 14px 12px;
     }
     .actions-fields .field{
-      grid-template-columns: 120px 1fr;
+      grid-template-columns: 135px 1fr;
       padding: 9px 0;
     }
 
@@ -430,7 +419,7 @@
       height: 16px;
       border: 1px solid var(--line-2);
       border-radius: 4px;
-      margin-top: 3px;
+      margin-top: 4px;
       display:grid;
       place-items:center;
       cursor:pointer;
@@ -445,16 +434,15 @@
       color: var(--good);
     }
     .action.done .chk svg{ opacity: 1; }
-    .action-text{ min-width:0; flex: 1; }
     .action-title{
-      font-size: 14px;  /* match field values */
+      font-size: 15px;
       font-weight: 750;
       margin: 0;
       line-height: 1.3;
     }
     .action-meta{
       margin: 6px 0 0;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--muted);
       display:flex;
       gap:10px;
@@ -464,7 +452,7 @@
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 3px 9px;
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--muted);
       background:#fff;
     }
@@ -474,7 +462,7 @@
     table{
       width:100%;
       border-collapse: collapse;
-      font-size: 14px; /* was 12.5px */
+      font-size: 15px;
       background: #fff;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -483,7 +471,7 @@
     }
     thead th{
       text-align:left;
-      font-size: 13px; /* was 11.5px */
+      font-size: 14px;
       color: var(--muted);
       font-weight: 850;
       padding: 11px 10px;
@@ -536,8 +524,6 @@
     <div class="topbar">
       <div class="record-title">
         <div class="record-badge">DP</div>
-
-        <!-- Address left -->
         <div class="record-title-main">
           <h1 id="recordAddress">123 Main Street</h1>
         </div>
@@ -557,12 +543,12 @@
 
     <!-- MAIN LAYOUT -->
     <div class="layout">
-      <!-- LEFT: MAIN CONTENT -->
+      <!-- LEFT -->
       <div class="panel">
         <!-- Tabs -->
         <div class="tabs" role="tablist" aria-label="Record Tabs">
           <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
-          <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Deep Research</button>
+          <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
           <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
         </div>
 
@@ -571,16 +557,16 @@
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
             <div class="section">
               <div class="section-head">
-                <div><h3>Opportunity Details</h3></div>
+                <div><h3>Owner Details</h3></div>
               </div>
 
-              <div class="field-grid" id="dealFieldGrid">
-                <!-- Left column -->
+              <div class="field-grid" id="ownerDetailsGrid">
+                <!-- Left column (5 fields) -->
                 <div>
-                  <div class="field" data-field="opportunity_owner">
-                    <div class="label">Opportunity Owner</div>
+                  <div class="field" data-field="lead_name">
+                    <div class="label">Lead Name</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="false">Victor Le</span>
+                      <span class="value-text" data-editable="true">John Doe</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -590,10 +576,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="opportunity_name">
-                    <div class="label">Opportunity Name</div>
+                  <div class="field" data-field="next_action_step">
+                    <div class="label">Next Action Step</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Blue Orca — Full Building AC Unit Upgrade</span>
+                      <span class="value-text" data-editable="true">Text + voicemail to heir #2</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -603,10 +589,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="account_name">
-                    <div class="label">Account Name</div>
+                  <div class="field" data-field="address">
+                    <div class="label">Address</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Blue Orca Incorporated</span>
+                      <span class="value-text" data-editable="true">123 Main Street</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -616,10 +602,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="type">
-                    <div class="label">Type</div>
+                  <div class="field" data-field="received_offer">
+                    <div class="label">Received Offer</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Existing Customer — Upgrade</span>
+                      <span class="value-text" data-editable="true">No</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -629,10 +615,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="next_step">
-                    <div class="label">Next Step</div>
+                  <div class="field" data-field="city">
+                    <div class="label">City</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Call to follow up on business need</span>
+                      <span class="value-text" data-editable="true">Houston</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -643,12 +629,12 @@
                   </div>
                 </div>
 
-                <!-- Right column -->
+                <!-- Right column (4 fields) -->
                 <div>
-                  <div class="field" data-field="close_date">
-                    <div class="label">Close Date</div>
+                  <div class="field" data-field="follow_up_date">
+                    <div class="label">Follow Up Date</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">4/1/2024</span>
+                      <span class="value-text" data-editable="true">2026-02-08</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -658,10 +644,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="amount">
-                    <div class="label">Amount</div>
+                  <div class="field" data-field="zip">
+                    <div class="label">Zip</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">$680,000.00</span>
+                      <span class="value-text" data-editable="true">77002</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -671,10 +657,10 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="expected_revenue">
-                    <div class="label">Expected Revenue</div>
+                  <div class="field" data-field="length_of_inactivity">
+                    <div class="label">Length of Inactivity</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">$68,000.00</span>
+                      <span class="value-text" data-editable="true">12 days</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -684,54 +670,35 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="stage">
-                    <div class="label">Stage</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">Prospecting</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="probability">
-                    <div class="label">Probability (%)</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">10%</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
+                  <!-- Keeping grid balanced; optional placeholder field slot for future -->
+                  <div class="field" data-field="owner_details_extra" style="visibility:hidden;">
+                    <div class="label">—</div>
+                    <div class="value"><span class="value-text">—</span></div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Collapsible Property Information banner -->
-            <div class="collapsible" id="propertyCollapsible" data-open="true">
-              <div class="collapsible-head" role="button" tabindex="0" aria-expanded="true" aria-controls="propertyBody">
-                <div class="collapsible-left">
+            <!-- Characteristics (replaces bubble, still collapsible, NOT in a bubble) -->
+            <div class="inline-toggle" id="characteristicsToggle" data-open="true">
+              <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
+                <div class="toggle-left">
                   <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <div class="collapsible-title">Property Information</div>
+                  <div class="toggle-title">Characteristics</div>
                 </div>
-                <div class="collapsible-meta" id="propertySummary">123 Main St • Houston, TX • 77002</div>
+                <div class="toggle-meta" id="characteristicsSummary">Equity • Taxes • Occupancy • Links</div>
               </div>
 
-              <div class="collapsible-body" id="propertyBody">
+              <div class="toggle-body" id="characteristicsBody">
                 <div class="field-grid">
+                  <!-- Left column (5) -->
                   <div>
-                    <div class="field" data-field="property_address">
-                      <div class="label">Address</div>
+                    <div class="field" data-field="equity">
+                      <div class="label">Equity</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">123 Main St</span>
+                        <span class="value-text" data-editable="true">$112,000</span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -740,10 +707,11 @@
                         </span>
                       </div>
                     </div>
-                    <div class="field" data-field="property_city">
-                      <div class="label">City</div>
+
+                    <div class="field" data-field="lead_type">
+                      <div class="label">Lead Type</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">Houston</span>
+                        <span class="value-text" data-editable="true">Tax Delinquent</span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -752,10 +720,37 @@
                         </span>
                       </div>
                     </div>
-                    <div class="field" data-field="property_zip">
-                      <div class="label">Zip</div>
+
+                    <div class="field" data-field="owed_amount">
+                      <div class="label">Owed Amount</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">77002</span>
+                        <span class="value-text" data-editable="true">$23,450</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="tax_status">
+                      <div class="label">Tax Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Delinquent — Lawsuit</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="occupancy">
+                      <div class="label">Occupancy</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Unknown</span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -766,19 +761,8 @@
                     </div>
                   </div>
 
+                  <!-- Right column (5) -->
                   <div>
-                    <div class="field" data-field="property_type">
-                      <div class="label">Property Type</div>
-                      <div class="value">
-                        <span class="value-text" data-editable="true">Single Family</span>
-                        <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                        </span>
-                      </div>
-                    </div>
                     <div class="field" data-field="condition">
                       <div class="label">Condition</div>
                       <div class="value">
@@ -791,10 +775,50 @@
                         </span>
                       </div>
                     </div>
-                    <div class="field" data-field="tax_status">
-                      <div class="label">Tax Status</div>
+
+                    <div class="field" data-field="deed_status">
+                      <div class="label">Deed Status</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">Delinquent — Lawsuit</span>
+                        <span class="value-text" data-editable="true">Verified</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="will_status">
+                      <div class="label">Will Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Unknown</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="zillow_link">
+                      <div class="label">Zillow Link</div>
+                      <div class="value">
+                        <span class="value-text link" data-editable="true">Open Zillow</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="tax_assessor_link">
+                      <div class="label">Tax Assessor Link</div>
+                      <div class="value">
+                        <span class="value-text link" data-editable="true">Open Assessor</span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -836,23 +860,24 @@
             </div>
 
             <div class="hint">
-              Wiring note: each field block has a <code>data-field</code> you can map to monday column IDs or webhook keys later.
+              Wiring note: each field is keyed by <code>data-field</code> (ideal for monday column IDs or webhook keys).
             </div>
           </div>
 
-          <!-- PANE 2: DEEP RESEARCH -->
+          <!-- PANE 2: RESEARCH -->
           <div class="tab-pane" id="pane-research" role="tabpanel" aria-labelledby="tab-research">
             <div class="section">
               <div class="section-head">
-                <div><h3>Deep Research</h3></div>
+                <div><h3>Research</h3></div>
               </div>
 
               <div class="field-grid">
+                <!-- Left column (5) -->
                 <div>
-                  <div class="field" data-field="research_summary">
-                    <div class="label">Research Summary</div>
+                  <div class="field" data-field="obituary">
+                    <div class="label">Obituary</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Heirs identified; probate filing pending. Title chain reviewed.</span>
+                      <span class="value-text link" data-editable="true">Open Obituary</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -862,10 +887,49 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="county_case">
-                    <div class="label">County Case</div>
+                  <div class="field" data-field="death_date">
+                    <div class="label">Death Date</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Harris CAD / Tax Suit Link</span>
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="ancestry">
+                    <div class="label">Ancestry</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">Open Ancestry</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="birth_date">
+                    <div class="label">Birth Date</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="google_maps">
+                    <div class="label">Google Maps</div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">Open Map</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -876,11 +940,12 @@
                   </div>
                 </div>
 
+                <!-- Right column (5) -->
                 <div>
-                  <div class="field" data-field="title_notes">
-                    <div class="label">Title Notes</div>
+                  <div class="field" data-field="age">
+                    <div class="label">Age</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">2 liens discovered; payoff estimates requested.</span>
+                      <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -890,10 +955,49 @@
                     </div>
                   </div>
 
-                  <div class="field" data-field="risk_flags">
-                    <div class="label">Risk Flags</div>
+                  <div class="field" data-field="appraisal">
+                    <div class="label">Appraisal</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Occupancy unknown; one heir unresponsive.</span>
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="tax_percent">
+                    <div class="label">Tax %</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="owner_count">
+                    <div class="label">Owner Count</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="field" data-field="owners_contacted">
+                    <div class="label">Owners Contacted</div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -907,11 +1011,11 @@
             </div>
 
             <div class="hint">
-              Keep this pane dense and scannable—short fields, crisp dividers, no bubbles.
+              All research fields are keyed for webhook mapping (example: <code>death_date</code>, <code>owner_count</code>, etc.).
             </div>
           </div>
 
-          <!-- PANE 3: ACTIVITY -->
+          <!-- PANE 3: ACTIVITY (kept, unchanged content placeholder) -->
           <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
             <div class="section">
               <div class="section-head">
@@ -922,19 +1026,6 @@
                 <div>
                   <div class="field" data-field="last_contacted">
                     <div class="label">Last Contacted</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="next_followup">
-                    <div class="label">Next Follow-up</div>
                     <div class="value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
@@ -960,33 +1051,20 @@
                       </span>
                     </div>
                   </div>
-
-                  <div class="field" data-field="attachments">
-                    <div class="label">Attachments</div>
-                    <div class="value">
-                      <span class="value-text link" data-editable="false">Open Files</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
             <div class="hint">
-              Wire this pane to monday updates + files if you want a true “activity” feed.
+              Wire this pane to monday updates + files if you want a true activity feed.
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: SIDEBAR -->
+      <!-- RIGHT SIDEBAR -->
       <div class="sidebar-stack">
-        <!-- NEXT ACTIONS (emphasis + remove +Add button) -->
+        <!-- NEXT ACTIONS -->
         <div class="panel emphasis" id="nextActionsPanel">
           <div class="panel-header">
             <div class="panel-title">Next Actions</div>
@@ -1036,7 +1114,7 @@
           <div class="actions-list" id="actionsList"></div>
         </div>
 
-        <!-- PROPERTY CONDITION (Lead Score added at top) -->
+        <!-- PROPERTY CONDITION (kept) -->
         <div class="panel" id="propertyConditionPanel">
           <div class="panel-header">
             <div class="panel-title">Property Condition</div>
@@ -1060,7 +1138,7 @@
               <div class="label">Lead Type</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Tax Delinquent</span>
-                <span class="edit"> <!-- intentionally no title duplication -->
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1073,7 +1151,7 @@
               <div class="label">Owed Amount</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$23,450</span>
-                <span class="edit">
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1086,7 +1164,7 @@
               <div class="label">Taxes</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$9,800</span>
-                <span class="edit">
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1099,7 +1177,7 @@
               <div class="label">Condition</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Fair</span>
-                <span class="edit">
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1112,7 +1190,7 @@
               <div class="label">Occupancy</div>
               <div class="value">
                 <span class="value-text" data-editable="true">Unknown</span>
-                <span class="edit">
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1125,7 +1203,7 @@
               <div class="label">Total Equity</div>
               <div class="value">
                 <span class="value-text" data-editable="true">$112,000</span>
-                <span class="edit">
+                <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1153,12 +1231,14 @@
           document.getElementById("recordAddress").textContent = payload.address;
         }
 
+        // flat key mapping by data-field
         for (const [key, value] of Object.entries(payload)) {
           if (key === "next_actions" && value && typeof value === "object") continue;
           const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) node.textContent = formatValue(value);
         }
 
+        // nested next_actions mapping by data-key
         if (payload.next_actions && typeof payload.next_actions === "object") {
           const na = payload.next_actions;
           for (const [k,v] of Object.entries(na)) {
@@ -1173,38 +1253,17 @@
       }
     };
 
-    const sampleContacts = [
-      {
-        name: "Rebeca McCrory",
-        leadStatus: { text: "Active", tone: "good" },
-        followupDate: "2026-02-08",
-        relationship: "Heir",
-        phone1: "832-555-1122",
-        phone1Status: { text: "Valid", tone: "good" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        phone3: "—",
-        phone3Status: { text: "—", tone: "muted" }
-      },
-      {
-        name: "Derrick Lane",
-        leadStatus: { text: "Follow-up", tone: "warn" },
-        followupDate: "2026-02-06",
-        relationship: "Relative",
-        phone1: "713-555-0909",
-        phone1Status: { text: "VM Left", tone: "warn" },
-        phone2: "346-555-7744",
-        phone2Status: { text: "No Answer", tone: "warn" },
-        phone3: "—",
-        phone3Status: { text: "—", tone: "muted" }
-      }
-    ];
-
-    let actions = [
-      { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today"], done: false },
-      { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days"], done: false },
-      { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week"], done: true }
-    ];
+    // Inline toggle (Characteristics)
+    const characteristics = document.getElementById("characteristicsToggle");
+    const toggleCharacteristics = () => {
+      const isOpen = characteristics.getAttribute("data-open") === "true";
+      characteristics.setAttribute("data-open", String(!isOpen));
+      characteristics.querySelector(".toggle-head").setAttribute("aria-expanded", String(!isOpen));
+    };
+    characteristics.querySelector(".toggle-head").addEventListener("click", toggleCharacteristics);
+    characteristics.querySelector(".toggle-head").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCharacteristics(); }
+    });
 
     // Tabs
     const tabs = Array.from(document.querySelectorAll(".tab"));
@@ -1218,19 +1277,22 @@
       });
     });
 
-    // Collapsible
-    const collapsible = document.getElementById("propertyCollapsible");
-    const toggleCollapsible = () => {
-      const isOpen = collapsible.getAttribute("data-open") === "true";
-      collapsible.setAttribute("data-open", String(!isOpen));
-      collapsible.querySelector(".collapsible-head").setAttribute("aria-expanded", String(!isOpen));
-    };
-    collapsible.querySelector(".collapsible-head").addEventListener("click", toggleCollapsible);
-    collapsible.querySelector(".collapsible-head").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCollapsible(); }
-    });
+    // Contacts render
+    const sampleContacts = [
+      {
+        name: "Rebeca McCrory",
+        leadStatus: { text: "Active", tone: "good" },
+        followupDate: "2026-02-08",
+        relationship: "Heir",
+        phone1: "832-555-1122",
+        phone1Status: { text: "Valid", tone: "good" },
+        phone2: "—",
+        phone2Status: { text: "—", tone: "muted" },
+        phone3: "—",
+        phone3Status: { text: "—", tone: "muted" }
+      }
+    ];
 
-    // Contacts
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
       if (tone === "warn") return "dot warn";
@@ -1262,7 +1324,13 @@
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No related contacts.</td></tr>`;
     }
 
-    // Actions
+    // Next actions checklist (optional)
+    let actions = [
+      { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today"], done: false },
+      { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days"], done: false },
+      { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week"], done: true }
+    ];
+
     function renderActions(){
       const list = document.getElementById("actionsList");
       list.innerHTML = actions.map(a => `
@@ -1272,7 +1340,7 @@
               <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="action-text">
+          <div class="action-text" style="min-width:0; flex:1;">
             <p class="action-title">${escapeHtml(a.title)}</p>
             <div class="action-meta">
               ${(a.meta || []).map(m => `<span class="pill">${escapeHtml(m)}</span>`).join("")}
@@ -1294,7 +1362,7 @@
       });
     }
 
-    // Inline Edit
+    // Inline edit
     Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
