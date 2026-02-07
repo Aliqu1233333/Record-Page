@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Record Page</title>
+  <style>
+    :root{
+      --font: "Salesforce Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+
+      --bg: transparent;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --muted: #6b7280;
+      --text: #111827;
+
+      --blue: #17345b;          /* your SF-ish dark */
+      --blue-2: #1d63ff;        /* action button blue */
+      --chip: #f3f4f6;
+
+      --shadow: 0 8px 24px rgba(0,0,0,0.06);
+
+      --radius: 12px;
+
+      --padY: 14px;
+      --padX: 10px;
+
+      --gap: 12px;
+
+      --field-h: 34px;
+      --field-radius: 8px;
+      --field-bg: #ffffff;
+      --field-border: #d1d5db;
+
+      --tab-h: 34px;
+      --tab-radius: 10px;
+
+      --table-head: #f9fafb;
+      --row-hover: #fafafa;
+
+      --toast-bg: #bff3ea;
+      --toast-fg: #0d3a33;
+      --toast-shadow: 0 10px 30px rgba(0,0,0,0.10);
+      --toast-radius: 10px;
+    }
+
+    html,body{
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
+      background: var(--bg);
+      font-family: var(--font);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin:0;
+      padding:0;
+    }
+
+    body{
+      padding: var(--padY) var(--padX);
+      box-sizing:border-box;
+      min-height: 180px;
+    }
+
+    /* Layout */
+    .page{
+      width:100%;
+      max-width: 100%;
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    /* Top header like Salesforce */
+    .headerCard{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: none;
+      overflow:hidden;
+    }
+
+    .headerTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      min-width:0;
+    }
+
+    .headerLeft{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width:0;
+    }
+
+    .iconBadge{
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(29,99,255,0.10);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+    }
+
+    .recordTitle{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+    .recordType{
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+    .recordName{
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .headerActions{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .btn{
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: #111;
+      font-size: 12px;
+      font-weight: 750;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ box-shadow: 0 8px 18px rgba(0,0,0,0.08); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); box-shadow: none; }
+
+    .btnPrimary{
+      border: 0;
+      background: var(--blue-2);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(29,99,255,0.18);
+    }
+    .btnPrimary:hover{ filter: brightness(1.03); }
+
+    /* Highlights row */
+    .highlights{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 10px 12px;
+    }
+
+    .metric{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+      min-width:0;
+    }
+    .metricLabel{
+      font-size: 11px;
+      font-weight: 750;
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .metricValue{
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Main grid */
+    .grid{
+      display:grid;
+      grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+      gap: var(--gap);
+      align-items:start;
+      min-width:0;
+    }
+
+    /* Cards */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: none;
+      overflow:hidden;
+      min-width:0;
+    }
+
+    .cardHeader{
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      min-width:0;
+    }
+    .cardTitle{
+      font-size: 12px;
+      font-weight: 850;
+      color: #111827;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .cardSub{
+      font-size: 11px;
+      font-weight: 650;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+      min-width:0;
+    }
+    .tab{
+      height: var(--tab-h);
+      padding: 0 12px;
+      border-radius: var(--tab-radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      color: #111;
+      font-size: 12px;
+      font-weight: 800;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      transition: background 140ms ease, border-color 140ms ease;
+      white-space:nowrap;
+    }
+    .tab[aria-selected="true"]{
+      background: rgba(23,52,91,0.08);
+      border-color: rgba(23,52,91,0.25);
+      color: var(--blue);
+    }
+
+    .tabPanel{
+      padding: 12px;
+      min-width:0;
+    }
+    .tabPanel[hidden]{ display:none; }
+
+    /* Form grid */
+    .formGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+      min-width:0;
+    }
+
+    .field{
+      min-width:0;
+    }
+    .fieldLabel{
+      font-size: 11px;
+      font-weight: 750;
+      color: var(--muted);
+      margin: 0 0 6px 2px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 8px;
+      min-width:0;
+    }
+    .fieldLabel .hint{
+      font-size: 10px;
+      font-weight: 700;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .input, .select{
+      width: 100%;
+      height: var(--field-h);
+      border-radius: var(--field-radius);
+      border: 1px solid var(--field-border);
+      background: var(--field-bg);
+      padding: 0 10px;
+      box-sizing:border-box;
+      font-size: 12px;
+      font-weight: 650;
+      color: #111;
+      outline: none;
+      transition: box-shadow 140ms ease, border-color 140ms ease;
+      min-width:0;
+    }
+    .input:focus, .select:focus{
+      border-color: rgba(29,99,255,0.55);
+      box-shadow: 0 0 0 3px rgba(29,99,255,0.12);
+    }
+
+    .textarea{
+      width:100%;
+      min-height: 78px;
+      border-radius: var(--field-radius);
+      border: 1px solid var(--field-border);
+      background: var(--field-bg);
+      padding: 10px;
+      box-sizing:border-box;
+      font-size: 12px;
+      font-weight: 650;
+      outline:none;
+      resize: vertical;
+      transition: box-shadow 140ms ease, border-color 140ms ease;
+    }
+    .textarea:focus{
+      border-color: rgba(29,99,255,0.55);
+      box-shadow: 0 0 0 3px rgba(29,99,255,0.12);
+    }
+
+    .rowActions{
+      display:flex;
+      gap: 8px;
+      justify-content:flex-end;
+      margin-top: 10px;
+    }
+
+    .btnSmall{
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Right action panel */
+    .actionPanelBody{
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      min-width:0;
+    }
+
+    /* Related records */
+    .tableWrap{
+      width:100%;
+      overflow:auto;
+    }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 760px; /* allows horizontal scroll in embed */
+    }
+    thead th{
+      background: var(--table-head);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 850;
+      color: #374151;
+      text-align:left;
+      padding: 10px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    tbody td{
+      border-bottom: 1px solid var(--border);
+      padding: 10px 10px;
+      font-size: 12px;
+      font-weight: 650;
+      color: #111827;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    tbody tr:hover td{ background: var(--row-hover); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--chip);
+      border: 1px solid #e5e7eb;
+      font-size: 11px;
+      font-weight: 800;
+      color: #111827;
+      max-width: 220px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .muted{
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .skeleton{
+      background: linear-gradient(90deg, #f2f3f5 25%, #eceef2 37%, #f2f3f5 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.2s ease infinite;
+      border-radius: 10px;
+    }
+    @keyframes shimmer{
+      0%{ background-position: 100% 0; }
+      100%{ background-position: 0 0; }
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      opacity: 0;
+      pointer-events:none;
+      background: var(--toast-bg);
+      color: var(--toast-fg);
+      border-radius: var(--toast-radius);
+      box-shadow: var(--toast-shadow);
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 320px;
+      max-width: min(520px, calc(100vw - 24px));
+      z-index: 99999;
+      transition: opacity 200ms ease, transform 200ms ease;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0px);
+      pointer-events:auto;
+    }
+    .toast .msg{
+      font-weight: 800;
+      font-size: 13px;
+      flex:1;
+    }
+    .toast .x{
+      border:0;
+      background: transparent;
+      cursor:pointer;
+      width: 26px;
+      height: 26px;
+      display:grid;
+      place-items:center;
+      border-radius: 7px;
+      transition: background 120ms ease;
+    }
+    .toast .x:hover{ background: rgba(0,0,0,0.06); }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      table{ min-width: 720px; }
+      .highlights{ grid-template-columns: 1fr; }
+      .formGrid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page" id="app">
+
+    <!-- Header -->
+    <div class="headerCard">
+      <div class="headerTop">
+        <div class="headerLeft">
+          <div class="iconBadge" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path fill="#1d63ff" d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4Zm0 2c-2.7 0-8 1.4-8 4v2h16v-2c0-2.6-5.3-4-8-4Z"/>
+            </svg>
+          </div>
+          <div class="recordTitle">
+            <div class="recordType">Lead</div>
+            <div class="recordName" id="recordName">Loading…</div>
+          </div>
+        </div>
+
+        <div class="headerActions">
+          <button class="btn" id="refreshBtn" type="button" title="Refresh data">
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#111827" d="M17.65 6.35A7.95 7.95 0 0 0 12 4V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 13.65-6.65Z"/>
+            </svg>
+            Refresh
+          </button>
+          <button class="btn btnPrimary" id="saveAllBtn" type="button" title="Save all changes">
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#fff" d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4Zm0 16H7v-6h10v6Zm-3-10H6V5h8v4Z"/>
+            </svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <div class="highlights">
+        <div class="metric">
+          <div class="metricLabel">Lead Score</div>
+          <div class="metricValue" id="metricLeadScore"><span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span></div>
+        </div>
+        <div class="metric">
+          <div class="metricLabel">Age in Stage</div>
+          <div class="metricValue" id="metricAgeInStage"><span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span></div>
+        </div>
+        <div class="metric">
+          <div class="metricLabel">Days Since Last Activity</div>
+          <div class="metricValue" id="metricDaysSince"><span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="grid">
+
+      <!-- Left: Tabs + forms -->
+      <div class="card">
+        <div class="tabs" role="tablist" aria-label="Record tabs">
+          <button class="tab" id="tabDeal" role="tab" aria-selected="true" aria-controls="panelDeal" type="button">Deal Information</button>
+          <button class="tab" id="tabResearch" role="tab" aria-selected="false" aria-controls="panelResearch" type="button">Deep Research</button>
+        </div>
+
+        <div class="tabPanel" id="panelDeal" role="tabpanel" aria-labelledby="tabDeal">
+          <div class="formGrid" id="dealForm"></div>
+          <div class="rowActions">
+            <button class="btn btnSmall" id="saveDealBtn" type="button">Save Deal Info</button>
+          </div>
+        </div>
+
+        <div class="tabPanel" id="panelResearch" role="tabpanel" aria-labelledby="tabResearch" hidden>
+          <div class="formGrid" id="researchForm"></div>
+          <div class="rowActions">
+            <button class="btn btnSmall" id="saveResearchBtn" type="button">Save Deep Research</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Action panel -->
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="cardTitle">Next Actions</div>
+            <div class="cardSub">Set follow-up + stalled reason</div>
+          </div>
+        </div>
+        <div class="actionPanelBody" id="actionPanel"></div>
+        <div class="rowActions" style="padding: 0 12px 12px;">
+          <button class="btn btnSmall btnPrimary" id="saveActionsBtn" type="button">Save Actions</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Related records -->
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle">Related Records</div>
+          <div class="cardSub">Owners / Subitems</div>
+        </div>
+        <button class="btn" id="saveSubitemsBtn" type="button" title="Save any edited subitems">Save Subitems</button>
+      </div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Offer Made</th>
+              <th>Relationship</th>
+              <th>Lead Status</th>
+              <th>Phone 1</th>
+              <th>Phone 1 Status</th>
+              <th>Phone 2</th>
+              <th>Phone 2 Status</th>
+              <th>Phone 3</th>
+              <th>Phone 3 Status</th>
+            </tr>
+          </thead>
+          <tbody id="subitemsBody">
+            <tr>
+              <td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#0ba79c" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 14-4-4 1.4-1.4L11 12.2l5.6-5.6L18 8l-7 8Z"/>
+    </svg>
+    <div class="msg" id="toastMsg">Saved.</div>
+    <button class="x" id="toastClose" type="button" aria-label="Dismiss">
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#0d3a33" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    /**********************************************************************
+     * UNIVERSAL RECORD PAGE (GitHub Pages) + Make.com proxy to Monday
+     *
+     * ✅ One universal URL: record.html?itemId=123
+     *
+     * You need TWO Make webhooks:
+     *
+     * 1) GET RECORD (GET)
+     *    Called like: MAKE_GET_RECORD_URL?itemId=123
+     *    Make does Monday GraphQL to fetch:
+     *      - item name
+     *      - column_values (id/title/text/value/type)
+     *      - subitems with column_values
+     *    Make responds with JSON. Recommended shape:
+     *    {
+     *      "item": {
+     *        "id":"123",
+     *        "name":"Maria Resendez",
+     *        "column_values":[ { "id":"status__1","title":"Lead Status","text":"Dial NA","value":"...","type":"status" }, ... ],
+     *        "subitems":[ { "id":"999","name":"Heir 1","column_values":[ ... ] }, ... ]
+     *      }
+     *    }
+     *
+     * 2) SET FIELD (POST)
+     *    Body:
+     *    {
+     *      "itemId":"123",
+     *      "target":"item" | "subitem",
+     *      "columnId":"status__1",
+     *      "valueText":"Dial NA",
+     *      "valueType":"status" | "date" | "text" | "numbers" | "link" | ...
+     *      "subitemId":"999"   // only if target=subitem
+     *    }
+     *
+     * Make then runs Monday mutation update_column_value appropriately.
+     * (You control the exact mapping in Make per column type.)
+     **********************************************************************/
+
+    // ✅ Paste your Make webhook endpoints:
+    const MAKE_GET_RECORD_URL = "https://hook.us1.make.com/"; // <-- FULL get-record webhook url
+    const MAKE_SET_FIELD_URL  = "https://hook.us1.make.com/"; // <-- FULL set-field webhook url
+
+    // Titles to match from your board (exact match is best; we also do fuzzy fallback)
+    const TITLES = {
+      // Header metrics
+      leadScore: "Lead Score",
+      ageInStage: "Age In Stage",
+      // You said you need to add this: create a Date column in Monday called exactly this:
+      lastActivityDate: "Last Activity Date",
+
+      // Deal Information tab
+      address: "Address",
+      city: "City",
+      leadType: "Lead Type",
+      taxes: "Taxes",
+      condition: "Condition",
+      occupancy: "Occupancy",
+      titleIssue: "Title issue",
+      willStatus: "Will Status",
+      deedStatus: "Deed Status",
+
+      // Deep Research tab
+      taxAssessor: "Tax Assesor",
+      zillow: "Zillow",
+      obituary: "Obituary",
+      ancestry: "Ancestry",
+      age: "Age",
+      birthDate: "Birth Date",
+      deathDate: "Death Date",
+
+      // Next Actions panel
+      followUpDate: "Follow Up Date",
+      nextActionStep: "Next Action Step",
+      stalledReason: "Stalled Reason"
+    };
+
+    // Subitems (Related Records)
+    const SUB_TITLES = {
+      offerMade: "Offer Made",
+      relationship: "Relation Ship",
+      leadStatus: "Lead Status",
+      phone1: "Phone 1",
+      phone1Status: "Phone 1 status",
+      phone2: "Phone 2",
+      phone2Status: "Phone 2 status",
+      phone3: "Phone 3",
+      phone3Status: "Phone 3 status"
+    };
+
+    // --- DOM
+    const recordNameEl = document.getElementById("recordName");
+    const metricLeadScoreEl = document.getElementById("metricLeadScore");
+    const metricAgeInStageEl = document.getElementById("metricAgeInStage");
+    const metricDaysSinceEl = document.getElementById("metricDaysSince");
+
+    const dealFormEl = document.getElementById("dealForm");
+    const researchFormEl = document.getElementById("researchForm");
+    const actionPanelEl = document.getElementById("actionPanel");
+    const subitemsBodyEl = document.getElementById("subitemsBody");
+
+    const refreshBtn = document.getElementById("refreshBtn");
+    const saveAllBtn = document.getElementById("saveAllBtn");
+    const saveDealBtn = document.getElementById("saveDealBtn");
+    const saveResearchBtn = document.getElementById("saveResearchBtn");
+    const saveActionsBtn = document.getElementById("saveActionsBtn");
+    const saveSubitemsBtn = document.getElementById("saveSubitemsBtn");
+
+    // Tabs
+    const tabDeal = document.getElementById("tabDeal");
+    const tabResearch = document.getElementById("tabResearch");
+    const panelDeal = document.getElementById("panelDeal");
+    const panelResearch = document.getElementById("panelResearch");
+
+    // Toast
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toastMsg");
+    const toastClose = document.getElementById("toastClose");
+    let toastTimer = null;
+
+    function showToast(msg){
+      toastMsg.textContent = msg || "Saved.";
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toast.classList.remove("show"), 2400);
+    }
+    toastClose.addEventListener("click", ()=>toast.classList.remove("show"));
+
+    function getParam(name){
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // --- State
+    let record = null;
+
+    // For saving: keep an index of title -> column meta (id/type/text/value)
+    let itemColsByTitle = new Map();
+    // For subitems: per subitem id: title -> column meta
+    let subColsById = new Map();
+
+    // Track dirty edits
+    const dirty = {
+      item: new Map(),        // columnId -> {columnId, valueText, valueType}
+      subitems: new Map()     // key `${subitemId}:${columnId}` -> payload
+    };
+
+    // ---- Utilities: find columns
+    function normalize(s){
+      return String(s || "").trim().toLowerCase();
+    }
+
+    function indexColumns(columnValues){
+      const byTitle = new Map();
+      (columnValues || []).forEach(cv=>{
+        byTitle.set(normalize(cv.title), cv);
+      });
+      return byTitle;
+    }
+
+    function findByTitle(byTitleMap, title){
+      if(!title) return null;
+      const exact = byTitleMap.get(normalize(title));
+      if(exact) return exact;
+
+      // mild fallback: contains match
+      const t = normalize(title);
+      for(const [k,v] of byTitleMap.entries()){
+        if(k.includes(t) || t.includes(k)) return v;
+      }
+      return null;
+    }
+
+    function parseDateFromText(text){
+      // Monday often returns date text like "2026-02-06" or "Feb 6, 2026"
+      const s = String(text || "").trim();
+      if(!s) return null;
+      const d = new Date(s);
+      if(!isNaN(d.getTime())) return d;
+      return null;
+    }
+
+    function daysBetween(d1, d2){
+      const a = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate()).getTime();
+      const b = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate()).getTime();
+      const diff = b - a;
+      return Math.floor(diff / (1000*60*60*24));
+    }
+
+    // ---- UI builders
+    function makeInputField({label, columnTitle, placeholder, kind="text", help=null, valueText="", columnId=null, valueType=null}){
+      const id = `fld_${Math.random().toString(16).slice(2)}`;
+
+      const wrap = document.createElement("div");
+      wrap.className = "field";
+
+      const lab = document.createElement("div");
+      lab.className = "fieldLabel";
+      lab.innerHTML = `
+        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}</span>
+        ${help ? `<span class="hint">${escapeHtml(help)}</span>` : ``}
+      `;
+
+      let control;
+      if(kind === "textarea"){
+        control = document.createElement("textarea");
+        control.className = "textarea";
+        control.id = id;
+        control.placeholder = placeholder || "";
+        control.value = valueText || "";
+      } else {
+        control = document.createElement("input");
+        control.className = "input";
+        control.id = id;
+        control.type = (kind === "date") ? "date" : "text";
+        control.placeholder = placeholder || "";
+        control.value = (kind === "date") ? toISODate(valueText) : (valueText || "");
+      }
+
+      // Mark dirty on change (only if we know a columnId)
+      control.addEventListener("change", ()=>{
+        if(!columnId) return;
+        const v = (kind === "date") ? control.value : control.value;
+        dirty.item.set(columnId, { target:"item", itemId: record?.id, columnId, valueText: v, valueType: valueType || "text" });
+      });
+
+      wrap.appendChild(lab);
+      wrap.appendChild(control);
+
+      return wrap;
+    }
+
+    function toISODate(text){
+      // tries to turn Monday text into YYYY-MM-DD for <input type="date">
+      const d = parseDateFromText(text);
+      if(!d) return "";
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function makeLinkField({label, valueText, columnId, valueType}){
+      // links are typically stored as text; user can paste URL or label
+      return makeInputField({
+        label,
+        columnTitle: label,
+        placeholder: "Paste link URL…",
+        kind: "text",
+        valueText: valueText || "",
+        columnId,
+        valueType: valueType || "link"
+      });
+    }
+
+    function buildDealInfoForm(){
+      dealFormEl.innerHTML = "";
+
+      const byTitle = itemColsByTitle;
+
+      const fields = [
+        { key:"address", label:"Address" },
+        { key:"city", label:"City" },
+        { key:"leadType", label:"Lead Type" },
+        { key:"taxes", label:"Taxes" },
+        { key:"condition", label:"Condition" },
+        { key:"occupancy", label:"Occupancy" },
+        { key:"titleIssue", label:"Title issue" },
+        { key:"willStatus", label:"Will Status" },
+        { key:"deedStatus", label:"Deed Status" }
+      ];
+
+      fields.forEach(f=>{
+        const cv = findByTitle(byTitle, TITLES[f.key]);
+        const valueText = cv?.text || "";
+        const valueType = cv?.type || "text";
+
+        dealFormEl.appendChild(makeInputField({
+          label: f.label,
+          placeholder: "",
+          kind: (valueType === "date") ? "date" : "text",
+          valueText,
+          columnId: cv?.id || null,
+          valueType
+        }));
+      });
+    }
+
+    function buildResearchForm(){
+      researchFormEl.innerHTML = "";
+
+      const byTitle = itemColsByTitle;
+
+      const fields = [
+        { key:"taxAssessor", label:"Tax Assessor Link", kind:"link" },
+        { key:"zillow", label:"Zillow", kind:"link" },
+        { key:"obituary", label:"Obituary", kind:"link" },
+        { key:"ancestry", label:"Ancestry", kind:"link" },
+        { key:"age", label:"Age", kind:"text" },
+        { key:"birthDate", label:"Birth Date", kind:"date" },
+        { key:"deathDate", label:"Death Date", kind:"date" }
+      ];
+
+      fields.forEach(f=>{
+        const cv = findByTitle(byTitle, TITLES[f.key]);
+        const valueText = cv?.text || "";
+        const valueType = cv?.type || (f.kind === "link" ? "link" : "text");
+
+        if(f.kind === "link"){
+          researchFormEl.appendChild(makeLinkField({
+            label: f.label,
+            valueText,
+            columnId: cv?.id || null,
+            valueType
+          }));
+        } else {
+          researchFormEl.appendChild(makeInputField({
+            label: f.label,
+            placeholder: "",
+            kind: f.kind,
+            valueText,
+            columnId: cv?.id || null,
+            valueType
+          }));
+        }
+      });
+    }
+
+    function buildActionPanel(){
+      actionPanelEl.innerHTML = "";
+
+      const byTitle = itemColsByTitle;
+
+      const followUp = findByTitle(byTitle, TITLES.followUpDate);
+      const nextStep = findByTitle(byTitle, TITLES.nextActionStep);
+      const stalled = findByTitle(byTitle, TITLES.stalledReason);
+
+      actionPanelEl.appendChild(makeInputField({
+        label: "Follow Up Date",
+        placeholder: "",
+        kind: "date",
+        valueText: followUp?.text || "",
+        columnId: followUp?.id || null,
+        valueType: followUp?.type || "date"
+      }));
+
+      actionPanelEl.appendChild(makeInputField({
+        label: "Next Action Step",
+        placeholder: "e.g., Call heir #2, send text, request docs…",
+        kind: "text",
+        valueText: nextStep?.text || "",
+        columnId: nextStep?.id || null,
+        valueType: nextStep?.type || "text"
+      }));
+
+      // stalled reason often text/status; allow text
+      actionPanelEl.appendChild(makeInputField({
+        label: "Stalled Reason",
+        placeholder: "Optional",
+        kind: "text",
+        valueText: stalled?.text || "",
+        columnId: stalled?.id || null,
+        valueType: stalled?.type || "text"
+      }));
+    }
+
+    function buildMetrics(){
+      const byTitle = itemColsByTitle;
+
+      const leadScore = findByTitle(byTitle, TITLES.leadScore);
+      metricLeadScoreEl.textContent = leadScore?.text || "—";
+
+      const ageInStage = findByTitle(byTitle, TITLES.ageInStage);
+      metricAgeInStageEl.textContent = ageInStage?.text || "—";
+
+      // Days since last activity (requires you to add a date column in Monday titled "Last Activity Date")
+      const lastAct = findByTitle(byTitle, TITLES.lastActivityDate);
+      const d = parseDateFromText(lastAct?.text || "");
+      if(d){
+        const days = daysBetween(d, new Date());
+        metricDaysSinceEl.textContent = `${Math.max(0, days)} days`;
+      } else {
+        metricDaysSinceEl.textContent = "—";
+      }
+    }
+
+    function makeSubCellInput({subitemId, columnMeta, kind="text"}){
+      const input = document.createElement("input");
+      input.className = "input";
+      input.style.height = "30px";
+      input.style.borderRadius = "8px";
+      input.style.fontSize = "12px";
+      input.style.fontWeight = "650";
+      input.type = (kind === "date") ? "date" : "text";
+
+      const valueText = columnMeta?.text || "";
+      input.value = (kind === "date") ? toISODate(valueText) : valueText;
+
+      input.addEventListener("change", ()=>{
+        if(!columnMeta?.id) return;
+        const v = input.value;
+        const key = `${subitemId}:${columnMeta.id}`;
+        dirty.subitems.set(key, {
+          target: "subitem",
+          itemId: record?.id,
+          subitemId,
+          columnId: columnMeta.id,
+          valueText: v,
+          valueType: columnMeta.type || "text"
+        });
+      });
+
+      return input;
+    }
+
+    function buildSubitemsTable(){
+      subitemsBodyEl.innerHTML = "";
+
+      const subs = record?.subitems || [];
+      if(!subs.length){
+        subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">No related records (subitems).</td></tr>`;
+        return;
+      }
+
+      subs.forEach(sub=>{
+        const byTitle = indexColumns(sub.column_values || []);
+
+        // store mapping for later (optional)
+        subColsById.set(String(sub.id), byTitle);
+
+        const offerMade = findByTitle(byTitle, SUB_TITLES.offerMade);
+        const relationship = findByTitle(byTitle, SUB_TITLES.relationship);
+        const leadStatus = findByTitle(byTitle, SUB_TITLES.leadStatus);
+
+        const phone1 = findByTitle(byTitle, SUB_TITLES.phone1);
+        const phone1Status = findByTitle(byTitle, SUB_TITLES.phone1Status);
+
+        const phone2 = findByTitle(byTitle, SUB_TITLES.phone2);
+        const phone2Status = findByTitle(byTitle, SUB_TITLES.phone2Status);
+
+        const phone3 = findByTitle(byTitle, SUB_TITLES.phone3);
+        const phone3Status = findByTitle(byTitle, SUB_TITLES.phone3Status);
+
+        const tr = document.createElement("tr");
+
+        // Name (read-only)
+        const tdName = document.createElement("td");
+        tdName.innerHTML = `<span class="pill" title="${escapeHtml(sub.name)}">${escapeHtml(sub.name)}</span>`;
+        tr.appendChild(tdName);
+
+        // Editable cells
+        const tdOffer = document.createElement("td");
+        tdOffer.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: offerMade }));
+        tr.appendChild(tdOffer);
+
+        const tdRel = document.createElement("td");
+        tdRel.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: relationship }));
+        tr.appendChild(tdRel);
+
+        const tdLead = document.createElement("td");
+        tdLead.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: leadStatus }));
+        tr.appendChild(tdLead);
+
+        const tdP1 = document.createElement("td");
+        tdP1.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone1 }));
+        tr.appendChild(tdP1);
+
+        const tdP1s = document.createElement("td");
+        tdP1s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone1Status }));
+        tr.appendChild(tdP1s);
+
+        const tdP2 = document.createElement("td");
+        tdP2.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone2 }));
+        tr.appendChild(tdP2);
+
+        const tdP2s = document.createElement("td");
+        tdP2s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone2Status }));
+        tr.appendChild(tdP2s);
+
+        const tdP3 = document.createElement("td");
+        tdP3.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone3 }));
+        tr.appendChild(tdP3);
+
+        const tdP3s = document.createElement("td");
+        tdP3s.appendChild(makeSubCellInput({ subitemId: String(sub.id), columnMeta: phone3Status }));
+        tr.appendChild(tdP3s);
+
+        subitemsBodyEl.appendChild(tr);
+      });
+    }
+
+    function setLoadingState(isLoading){
+      if(isLoading){
+        recordNameEl.textContent = "Loading…";
+        subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td></tr>`;
+      }
+    }
+
+    function renderAll(){
+      recordNameEl.textContent = record?.name || "—";
+
+      // rebuild column index
+      itemColsByTitle = indexColumns(record?.column_values || []);
+
+      buildMetrics();
+      buildDealInfoForm();
+      buildResearchForm();
+      buildActionPanel();
+      buildSubitemsTable();
+    }
+
+    // ---- Tabs
+    function setTab(which){
+      const deal = (which === "deal");
+      tabDeal.setAttribute("aria-selected", String(deal));
+      tabResearch.setAttribute("aria-selected", String(!deal));
+      panelDeal.hidden = !deal;
+      panelResearch.hidden = deal;
+    }
+    tabDeal.addEventListener("click", ()=>setTab("deal"));
+    tabResearch.addEventListener("click", ()=>setTab("research"));
+
+    // ---- Network
+    async function loadRecord(){
+      const itemId = getParam("itemId");
+      if(!itemId){
+        showToast("Missing itemId in URL. Add ?itemId=###");
+        return;
+      }
+      if(!MAKE_GET_RECORD_URL || MAKE_GET_RECORD_URL === "https://hook.us1.make.com/"){
+        showToast("GET webhook not configured.");
+        return;
+      }
+
+      setLoadingState(true);
+
+      try{
+        const url = new URL(MAKE_GET_RECORD_URL);
+        url.searchParams.set("itemId", itemId);
+
+        const res = await fetch(url.toString(), {
+          method: "GET",
+          headers: { "Accept": "application/json" },
+          cache: "no-store"
+        });
+        if(!res.ok) throw new Error("GET failed: " + res.status);
+
+        const data = await res.json();
+
+        // accept either {item:{...}} or {items:[...]} shapes
+        const item = data?.item || data?.items?.[0] || data?.data?.items?.[0];
+        if(!item) throw new Error("No item in response");
+
+        record = {
+          id: String(item.id),
+          name: item.name || "",
+          column_values: item.column_values || [],
+          subitems: item.subitems || []
+        };
+
+        // clear dirty maps on load
+        dirty.item.clear();
+        dirty.subitems.clear();
+
+        renderAll();
+      } catch (e) {
+        console.warn(e);
+        showToast("Could not load record.");
+      }
+    }
+
+    async function postSetField(payload){
+      if(!MAKE_SET_FIELD_URL || MAKE_SET_FIELD_URL === "https://hook.us1.make.com/"){
+        showToast("SET webhook not configured.");
+        throw new Error("SET webhook not configured");
+      }
+      const res = await fetch(MAKE_SET_FIELD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+      if(!res.ok){
+        throw new Error("SET failed: " + res.status);
+      }
+    }
+
+    async function savePayloads(payloads){
+      if(!payloads.length){
+        showToast("No changes to save.");
+        return;
+      }
+
+      try{
+        // run sequentially to be gentle on Make/Monday
+        for(const p of payloads){
+          await postSetField(p);
+        }
+        showToast("Saved successfully.");
+        await loadRecord(); // refresh to reflect server truth
+      } catch (e){
+        console.warn(e);
+        showToast("Save failed. Please retry.");
+      }
+    }
+
+    function collectItemPayloads(onlyColumnIds=null){
+      const out = [];
+      for(const [columnId, payload] of dirty.item.entries()){
+        if(onlyColumnIds && !onlyColumnIds.includes(columnId)) continue;
+        out.push(payload);
+      }
+      return out;
+    }
+
+    function collectSubitemPayloads(){
+      return Array.from(dirty.subitems.values());
+    }
+
+    // ---- Save buttons
+    saveAllBtn.addEventListener("click", async ()=>{
+      const payloads = [
+        ...collectItemPayloads(),
+        ...collectSubitemPayloads()
+      ];
+      await savePayloads(payloads);
+    });
+
+    saveDealBtn.addEventListener("click", async ()=>{
+      // Save just the Deal tab fields (by matching TITLES)
+      const ids = [];
+      const byTitle = itemColsByTitle;
+      [
+        TITLES.address, TITLES.city, TITLES.leadType, TITLES.taxes, TITLES.condition,
+        TITLES.occupancy, TITLES.titleIssue, TITLES.willStatus, TITLES.deedStatus
+      ].forEach(t=>{
+        const cv = findByTitle(byTitle, t);
+        if(cv?.id) ids.push(cv.id);
+      });
+      await savePayloads(collectItemPayloads(ids));
+    });
+
+    saveResearchBtn.addEventListener("click", async ()=>{
+      const ids = [];
+      const byTitle = itemColsByTitle;
+      [
+        TITLES.taxAssessor, TITLES.zillow, TITLES.obituary, TITLES.ancestry,
+        TITLES.age, TITLES.birthDate, TITLES.deathDate
+      ].forEach(t=>{
+        const cv = findByTitle(byTitle, t);
+        if(cv?.id) ids.push(cv.id);
+      });
+      await savePayloads(collectItemPayloads(ids));
+    });
+
+    saveActionsBtn.addEventListener("click", async ()=>{
+      const ids = [];
+      const byTitle = itemColsByTitle;
+      [TITLES.followUpDate, TITLES.nextActionStep, TITLES.stalledReason].forEach(t=>{
+        const cv = findByTitle(byTitle, t);
+        if(cv?.id) ids.push(cv.id);
+      });
+      await savePayloads(collectItemPayloads(ids));
+    });
+
+    saveSubitemsBtn.addEventListener("click", async ()=>{
+      await savePayloads(collectSubitemPayloads());
+    });
+
+    refreshBtn.addEventListener("click", loadRecord);
+
+    // --- Initialize
+    setTab("deal");
+    loadRecord();
+  </script>
+</body>
+</html>
