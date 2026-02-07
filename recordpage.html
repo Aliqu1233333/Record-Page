@@ -7,21 +7,20 @@
 
   <style>
     :root{
-      /* Salesforce-ish neutrals */
-      --bg: #f3f4f6;              /* app background */
-      --surface: #ffffff;         /* main surface */
-      --surface-2: #f7f8fa;       /* subtle section bg */
-      --line: #e5e7eb;            /* dividers */
+      --bg: #f3f4f6;
+      --surface: #ffffff;
+      --surface-2: #f7f8fa;
+      --line: #e5e7eb;
       --line-2: #dbe0e6;
       --text: #1f2937;
       --muted: #6b7280;
       --muted-2: #9aa3af;
-      --blue: #0176d3;            /* Salesforce-ish blue */
+      --blue: #0176d3;
       --blue-2: #0b5cab;
       --good: #2e844a;
       --warn: #b95000;
 
-      --radius: 10px;            /* slightly rounded, not bubbly */
+      --radius: 10px;
       --shadow: 0 1px 0 rgba(0,0,0,.03);
       --font: "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     }
@@ -39,12 +38,12 @@
 
     /* ---------- APP FRAME ---------- */
     .app{
-      max-width: 1240px;
-      margin: 18px auto;
-      padding: 0 14px 24px;
+      width: 100%;
+      max-width: none;              /* full width inside embed */
+      margin: 0;                    /* let embed control margins */
+      padding: 14px 14px 18px;      /* a bit more breathing room */
     }
 
-    /* subtle “lightning page” header strip (minimal) */
     .topbar{
       display:flex;
       align-items:center;
@@ -54,12 +53,15 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      gap: 12px;
     }
+
     .record-title{
       display:flex;
       gap:10px;
       align-items:center;
       min-width: 0;
+      flex: 1 1 auto;
     }
     .record-badge{
       width: 34px;
@@ -74,23 +76,25 @@
       font-size: 13px;
       flex: 0 0 auto;
     }
-    .record-title h1{
+
+    /* centered address title, slightly larger */
+    .record-title-main{
+      flex: 1 1 auto;
+      display:flex;
+      justify-content:center;
+      min-width: 0;
+    }
+    .record-title-main h1{
       margin:0;
-      font-size: 15px;
-      font-weight: 650;
+      font-size: 16.5px; /* slightly larger than before */
+      font-weight: 750;
       letter-spacing: .1px;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .record-sub{
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+
     .topbar-actions{
       display:flex;
       gap:8px;
@@ -109,6 +113,7 @@
       display:flex;
       gap:8px;
       align-items:center;
+      white-space: nowrap;
     }
     .btn:hover{ background:#fafafa; border-color:#cfd6df; }
     .btn:active{ transform: translateY(1px); }
@@ -126,12 +131,12 @@
       grid-template-columns: 1fr 360px;
       gap: 12px;
       align-items:start;
+      width: 100%;
     }
     @media (max-width: 1080px){
       .layout{ grid-template-columns: 1fr; }
     }
 
-    /* “cards” but flat/efficient (no bubbly look) */
     .panel{
       background: var(--surface);
       border: 1px solid var(--line);
@@ -159,11 +164,11 @@
       color: var(--muted);
     }
 
-    /* ---------- TABS ---------- */
+    /* ---------- TABS (bigger + more padding above) ---------- */
     .tabs{
       display:flex;
       gap: 18px;
-      padding: 0 14px;
+      padding: 8px 14px 0;        /* more padding above */
       border-bottom: 1px solid var(--line);
       background: var(--surface);
     }
@@ -172,16 +177,14 @@
       border: 0;
       background: transparent;
       font-family: var(--font);
-      font-size: 12.5px;
-      padding: 12px 0 10px;
+      font-size: 15.5px;          /* +3pts from ~12.5 */
+      padding: 12px 0 12px;
       color: var(--muted);
       cursor:pointer;
       position:relative;
-      font-weight: 600;
+      font-weight: 650;
     }
-    .tab[aria-selected="true"]{
-      color: var(--text);
-    }
+    .tab[aria-selected="true"]{ color: var(--text); }
     .tab[aria-selected="true"]::after{
       content:"";
       position:absolute;
@@ -194,13 +197,11 @@
     .tab:focus{ outline: none; }
     .tab:focus-visible{ outline: 2px solid rgba(1,118,211,.25); outline-offset: 2px; border-radius: 8px; }
 
-    .tab-content{
-      padding: 12px 0 0;
-    }
+    .tab-content{ padding: 12px 0 0; }
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- FIELD GRID (Lightning-ish) ---------- */
+    /* ---------- SECTION HEADERS (bigger by ~2pts) ---------- */
     .section{
       padding: 0 14px 14px;
     }
@@ -208,7 +209,6 @@
       border-top: 1px solid var(--line);
       padding-top: 12px;
     }
-
     .section-head{
       display:flex;
       align-items:center;
@@ -218,10 +218,13 @@
     }
     .section-head h3{
       margin:0;
-      font-size: 12.5px;
-      font-weight: 700;
+      font-size: 14.5px; /* +2pts */
+      font-weight: 750;
       color:#111827;
     }
+
+    /* removed helper text under Opportunity Details (per request) */
+    .section-head .panel-subtitle{ display:none; }
 
     .field-grid{
       display:grid;
@@ -240,14 +243,12 @@
       gap: 10px;
       align-items:center;
     }
-    .field:last-child{
-      border-bottom: 1px solid var(--line);
-    }
+    .field:last-child{ border-bottom: 1px solid var(--line); }
 
     .label{
       font-size: 11.5px;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 650;
     }
     .value{
       font-size: 12.5px;
@@ -269,11 +270,8 @@
       color: var(--blue);
       cursor:pointer;
     }
-    .value-text.link:hover{
-      text-decoration: underline;
-    }
+    .value-text.link:hover{ text-decoration: underline; }
 
-    /* hover pencil (very light grey, pops on hover) */
     .edit{
       opacity: 0;
       transform: translateY(1px);
@@ -296,7 +294,6 @@
     }
     .edit svg{ width: 14px; height: 14px; display:block; }
 
-    /* inline editor input */
     .inline-input{
       width:100%;
       font-family: var(--font);
@@ -353,9 +350,12 @@
       flex: 0 0 auto;
     }
     .collapsible[data-open="true"] .chev{ transform: rotate(90deg); }
+
+    /* Property Information header bigger by +2 already via section header,
+       but collapsible title needs its own bump */
     .collapsible-title{
-      font-size: 12.5px;
-      font-weight: 700;
+      font-size: 14.5px; /* +2pts to match request */
+      font-weight: 750;
       color:#111827;
       white-space:nowrap;
       overflow:hidden;
@@ -401,23 +401,40 @@
     .kpi .k{
       font-size: 11px;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: .2px;
     }
     .kpi .v{
       margin-top: 4px;
-      font-size: 14px;
-      font-weight: 750;
-      letter-spacing: .2px;
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: .15px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
 
-    .next-actions{
-      padding: 8px 14px 14px;
+    /* compact Next Actions Banner (less wording, more “datapoints”) */
+    .next-actions{ padding: 8px 14px 14px; }
+
+    .actions-header{
+      padding: 10px 14px 0;
     }
+
+    .actions-fields{
+      padding: 10px 14px 12px;
+    }
+    .actions-fields .field{
+      grid-template-columns: 120px 1fr;
+      padding: 9px 0;
+    }
+
     .actions-list{
       margin-top: 6px;
       display:flex;
       flex-direction:column;
       gap: 8px;
+      padding: 0 14px 14px;
     }
     .action{
       border-top: 1px solid var(--line);
@@ -426,10 +443,7 @@
       align-items:flex-start;
       gap:10px;
     }
-    .action:first-child{
-      border-top: 0;
-      padding-top: 6px;
-    }
+    .action:first-child{ border-top: 0; padding-top: 6px; }
     .chk{
       width: 16px;
       height: 16px;
@@ -450,13 +464,10 @@
       color: var(--good);
     }
     .action.done .chk svg{ opacity: 1; }
-    .action-text{
-      min-width:0;
-      flex: 1;
-    }
+    .action-text{ min-width:0; flex: 1; }
     .action-title{
       font-size: 12.5px;
-      font-weight: 700;
+      font-weight: 750;
       margin: 0;
       line-height: 1.3;
     }
@@ -478,9 +489,7 @@
     }
 
     /* ---------- RELATED CONTACTS TABLE ---------- */
-    .table-wrap{
-      padding: 0 14px 14px;
-    }
+    .table-wrap{ padding: 0 14px 14px; overflow:auto; }
     table{
       width:100%;
       border-collapse: collapse;
@@ -489,12 +498,13 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow:hidden;
+      min-width: 980px; /* keeps columns readable; wrapper scrolls */
     }
     thead th{
       text-align:left;
       font-size: 11.5px;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 850;
       padding: 10px 10px;
       background: #fafbfc;
       border-bottom: 1px solid var(--line);
@@ -511,11 +521,10 @@
     .td-link{
       color: var(--blue);
       cursor:pointer;
-      font-weight: 650;
+      font-weight: 700;
     }
     .td-link:hover{ text-decoration: underline; }
 
-    /* tiny status dot */
     .status{
       display:inline-flex;
       align-items:center;
@@ -530,7 +539,6 @@
     .dot.good{ background: rgba(46,132,74,.95); }
     .dot.warn{ background: rgba(185,80,0,.95); }
 
-    /* ---------- FOOTER HELP ---------- */
     .hint{
       padding: 10px 14px 14px;
       color: var(--muted);
@@ -538,24 +546,19 @@
       border-top: 1px solid var(--line);
       background: #fbfcfe;
     }
-
-    /* Utility */
-    .sr-only{
-      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
-      overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-    }
   </style>
 </head>
 
 <body>
   <div class="app">
-    <!-- TOP HEADER (minimal lightning-like) -->
+    <!-- TOP HEADER -->
     <div class="topbar">
       <div class="record-title">
         <div class="record-badge">DP</div>
-        <div style="min-width:0">
-          <h1 id="recordName">123 MAIN ST — Deal Record</h1>
-          <p class="record-sub" id="recordSubtitle">Owner: John Doe • Stage: Prospecting • Board Item ID: <span class="td-muted">—</span></p>
+
+        <!-- Centered address title (subheader removed) -->
+        <div class="record-title-main">
+          <h1 id="recordAddress">123 Main Street</h1>
         </div>
       </div>
 
@@ -589,7 +592,6 @@
               <div class="section-head">
                 <div>
                   <h3>Opportunity Details</h3>
-                  <div class="panel-subtitle">Column type on the left, value on the right, with light grey dividers.</div>
                 </div>
               </div>
 
@@ -830,10 +832,7 @@
             <!-- Related Contacts -->
             <div class="section">
               <div class="section-head">
-                <div>
-                  <h3>Related Contacts</h3>
-                  <div class="panel-subtitle">Quick summary of subitems related to this deal (minimal table).</div>
-                </div>
+                <div><h3>Related Contacts</h3></div>
               </div>
 
               <div class="table-wrap">
@@ -852,15 +851,13 @@
                       <th>Phone 3 Status</th>
                     </tr>
                   </thead>
-                  <tbody id="contactsTbody">
-                    <!-- populated by JS -->
-                  </tbody>
+                  <tbody id="contactsTbody"></tbody>
                 </table>
               </div>
             </div>
 
             <div class="hint">
-              Tip: This is self-contained HTML/CSS/JS. Replace the sample data + wire it to monday.com (item + subitems) where marked in the JS.
+              Wiring note: each field block has a <code>data-field</code> you can map to monday column IDs or webhook keys later.
             </div>
           </div>
 
@@ -868,10 +865,7 @@
           <div class="tab-pane" id="pane-research" role="tabpanel" aria-labelledby="tab-research">
             <div class="section">
               <div class="section-head">
-                <div>
-                  <h3>Deep Research</h3>
-                  <div class="panel-subtitle">Drop in research notes, liens, probate context, entity links, etc.</div>
-                </div>
+                <div><h3>Deep Research</h3></div>
               </div>
 
               <div class="field-grid">
@@ -934,7 +928,7 @@
             </div>
 
             <div class="hint">
-              Keep this pane “dense” and scannable like Lightning: short fields, crisp dividers, no bubbles.
+              Keep this pane dense and scannable—short fields, crisp dividers, no bubbles.
             </div>
           </div>
 
@@ -942,10 +936,7 @@
           <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
             <div class="section">
               <div class="section-head">
-                <div>
-                  <h3>Activity</h3>
-                  <div class="panel-subtitle">Log calls, follow-ups, notes, attachments (wire to monday updates).</div>
-                </div>
+                <div><h3>Activity</h3></div>
               </div>
 
               <div class="field-grid">
@@ -1008,7 +999,7 @@
             </div>
 
             <div class="hint">
-              If you want the Lightning “related” quick links rail like in your screenshot, add another right panel block for links.
+              Wire this pane to monday updates + files if you want a true “activity” feed.
             </div>
           </div>
         </div>
@@ -1016,54 +1007,70 @@
 
       <!-- RIGHT: SIDEBAR -->
       <div class="sidebar-stack">
-        <div class="panel">
+        <!-- NEXT ACTIONS BANNER -->
+        <div class="panel" id="nextActionsPanel">
           <div class="panel-header">
-            <div>
-              <div class="panel-title">Next Actions Banner</div>
-              <div class="panel-subtitle">Interactive checklist + quick KPIs</div>
-            </div>
+            <div class="panel-title">Next Actions</div>
             <button class="btn mini" id="btnAddAction" type="button" title="Add Action">+ Add</button>
           </div>
 
-          <div class="kpi-row">
-            <div class="kpi">
-              <div class="k">Stage</div>
-              <div class="v" id="kpiStage">Prospecting</div>
+          <!-- structured datapoints (webhook-friendly) -->
+          <div class="actions-fields">
+            <div class="field" data-field="na_followup_date">
+              <div class="label">Follow Up Date</div>
+              <div class="value">
+                <span class="value-text" data-editable="true" data-key="follow_up_date">2026-02-08</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
             </div>
-            <div class="kpi">
-              <div class="k">Probability</div>
-              <div class="v" id="kpiProb">10%</div>
+
+            <div class="field" data-field="na_next_action_step">
+              <div class="label">Next Action Step</div>
+              <div class="value">
+                <span class="value-text" data-editable="true" data-key="next_action_step">Text + voicemail to heir #2</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
             </div>
-            <div class="kpi">
-              <div class="k">Follow-up</div>
-              <div class="v" id="kpiFollowup">Today</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Owner Status</div>
-              <div class="v" id="kpiOwner">Active</div>
+
+            <div class="field" data-field="na_stalled_reason">
+              <div class="label">Stalled Reason</div>
+              <div class="value">
+                <span class="value-text" data-editable="true" data-key="stalled_reason">Waiting on payoff estimates</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="next-actions">
-            <div class="actions-list" id="actionsList">
-              <!-- populated by JS -->
-            </div>
-          </div>
+          <!-- optional checklist stays (still “Lightning-like”) -->
+          <div class="actions-list" id="actionsList"></div>
         </div>
 
-        <div class="panel">
+        <!-- PROPERTY CONDITION (replaces Account Details) -->
+        <div class="panel" id="propertyConditionPanel">
           <div class="panel-header">
-            <div>
-              <div class="panel-title">Account Details</div>
-              <div class="panel-subtitle">Right-rail summary block</div>
-            </div>
+            <div class="panel-title">Property Condition</div>
           </div>
 
           <div class="section" style="padding-top: 4px;">
-            <div class="field" data-field="account_industry">
-              <div class="label">Industry</div>
+            <div class="field" data-field="lead_type">
+              <div class="label">Lead Type</div>
               <div class="value">
-                <span class="value-text" data-editable="true">Communications</span>
+                <span class="value-text" data-editable="true">Tax Delinquent</span>
                 <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1073,10 +1080,10 @@
               </div>
             </div>
 
-            <div class="field" data-field="account_annual_revenue">
-              <div class="label">Annual Revenue</div>
+            <div class="field" data-field="owed_amount">
+              <div class="label">Owed Amount</div>
               <div class="value">
-                <span class="value-text" data-editable="true">$18,000,000</span>
+                <span class="value-text" data-editable="true">$23,450</span>
                 <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1086,10 +1093,10 @@
               </div>
             </div>
 
-            <div class="field" data-field="account_phone">
-              <div class="label">Phone</div>
+            <div class="field" data-field="taxes">
+              <div class="label">Taxes</div>
               <div class="value">
-                <span class="value-text" data-editable="true">(700) 555-8801</span>
+                <span class="value-text" data-editable="true">$9,800</span>
                 <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1099,10 +1106,10 @@
               </div>
             </div>
 
-            <div class="field" data-field="account_website">
-              <div class="label">Website</div>
+            <div class="field" data-field="condition">
+              <div class="label">Condition</div>
               <div class="value">
-                <span class="value-text link" data-editable="true">https://example.com</span>
+                <span class="value-text" data-editable="true">Fair</span>
                 <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1112,10 +1119,23 @@
               </div>
             </div>
 
-            <div class="field" data-field="account_billing">
-              <div class="label">Billing Address</div>
+            <div class="field" data-field="occupancy">
+              <div class="label">Occupancy</div>
               <div class="value">
-                <span class="value-text" data-editable="true">632 US Highway 46, Fairfield NJ 7004, USA</span>
+                <span class="value-text" data-editable="true">Unknown</span>
+                <span class="edit" title="Edit">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div class="field" data-field="total_equity">
+              <div class="label">Total Equity</div>
+              <div class="value">
+                <span class="value-text" data-editable="true">$112,000</span>
                 <span class="edit" title="Edit">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1133,7 +1153,49 @@
 
   <script>
     /*****************************************************************
-     * DATA (replace these with monday item/column + subitems payloads)
+     * WEBHOOK / FUTURE DATA HOOKS
+     * - You can later call: window.RecordPage.applyData(payload)
+     * - payload keys map to elements with matching data-field OR data-key
+     *****************************************************************/
+    window.RecordPage = {
+      applyData(payload){
+        if (!payload || typeof payload !== "object") return;
+
+        // 1) Address title
+        if (payload.address) {
+          const el = document.getElementById("recordAddress");
+          el.textContent = payload.address;
+        }
+
+        // 2) Field values by data-field
+        for (const [key, value] of Object.entries(payload)) {
+          // support both "field keys" and nested "next_actions" object
+          if (key === "next_actions" && value && typeof value === "object") continue;
+
+          const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
+          if (node) node.textContent = formatValue(value);
+        }
+
+        // 3) Next actions object mapping (if you send it nested)
+        if (payload.next_actions && typeof payload.next_actions === "object") {
+          const na = payload.next_actions;
+
+          // map by data-key (webhook friendly)
+          for (const [k,v] of Object.entries(na)) {
+            const node = document.querySelector(`.value-text[data-key="${cssEscape(k)}"]`);
+            if (node) node.textContent = formatValue(v);
+          }
+        }
+
+        // 4) Contacts table
+        if (Array.isArray(payload.related_contacts)) {
+          renderContacts(payload.related_contacts);
+        }
+      }
+    };
+
+    /*****************************************************************
+     * SAMPLE CONTACTS (replace with payload.related_contacts)
      *****************************************************************/
     const sampleContacts = [
       {
@@ -1162,10 +1224,13 @@
       }
     ];
 
+    /*****************************************************************
+     * NEXT ACTIONS CHECKLIST (optional)
+     *****************************************************************/
     let actions = [
-      { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today", "Owner: John Doe"], done: false },
-      { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days", "Docs"], done: false },
-      { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week", "Follow-up"], done: true }
+      { id: crypto.randomUUID(), title: "Confirm occupancy + verify mailing address", meta: ["Due today"], done: false },
+      { id: crypto.randomUUID(), title: "Order payoff estimate(s) + taxes", meta: ["Due in 2 days"], done: false },
+      { id: crypto.randomUUID(), title: "Contact unresponsive heir (text + voicemail)", meta: ["Due this week"], done: true }
     ];
 
     /*****************************************************************
@@ -1178,10 +1243,8 @@
       tab.addEventListener("click", () => {
         tabs.forEach(t => t.setAttribute("aria-selected", "false"));
         panes.forEach(p => p.classList.remove("active"));
-
         tab.setAttribute("aria-selected", "true");
-        const pane = document.getElementById(tab.getAttribute("aria-controls"));
-        pane.classList.add("active");
+        document.getElementById(tab.getAttribute("aria-controls")).classList.add("active");
       });
     });
 
@@ -1192,8 +1255,7 @@
     const toggleCollapsible = () => {
       const isOpen = collapsible.getAttribute("data-open") === "true";
       collapsible.setAttribute("data-open", String(!isOpen));
-      const head = collapsible.querySelector(".collapsible-head");
-      head.setAttribute("aria-expanded", String(!isOpen));
+      collapsible.querySelector(".collapsible-head").setAttribute("aria-expanded", String(!isOpen));
     };
     collapsible.querySelector(".collapsible-head").addEventListener("click", toggleCollapsible);
     collapsible.querySelector(".collapsible-head").addEventListener("keydown", (e) => {
@@ -1201,7 +1263,7 @@
     });
 
     /*****************************************************************
-     * RENDER: RELATED CONTACTS TABLE
+     * RENDER: RELATED CONTACTS
      *****************************************************************/
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
@@ -1216,26 +1278,28 @@
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
 
-    function renderContacts(){
+    function renderContacts(contacts){
       const tbody = document.getElementById("contactsTbody");
-      tbody.innerHTML = sampleContacts.map(c => `
+      const rows = (contacts || []).map(c => `
         <tr>
-          <td><span class="td-link">${escapeHtml(c.name)}</span></td>
+          <td><span class="td-link">${escapeHtml(c.name ?? "—")}</span></td>
           <td>${statusCell(c.leadStatus)}</td>
-          <td>${escapeHtml(c.followupDate)}</td>
-          <td class="td-muted">${escapeHtml(c.relationship)}</td>
-          <td>${escapeHtml(c.phone1)}</td>
+          <td>${escapeHtml(c.followupDate ?? "—")}</td>
+          <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
+          <td>${escapeHtml(c.phone1 ?? "—")}</td>
           <td>${statusCell(c.phone1Status)}</td>
-          <td>${escapeHtml(c.phone2)}</td>
+          <td>${escapeHtml(c.phone2 ?? "—")}</td>
           <td>${statusCell(c.phone2Status)}</td>
-          <td>${escapeHtml(c.phone3)}</td>
+          <td>${escapeHtml(c.phone3 ?? "—")}</td>
           <td>${statusCell(c.phone3Status)}</td>
         </tr>
       `).join("");
+
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No related contacts.</td></tr>`;
     }
 
     /*****************************************************************
-     * RENDER: NEXT ACTIONS
+     * RENDER: NEXT ACTIONS LIST
      *****************************************************************/
     function renderActions(){
       const list = document.getElementById("actionsList");
@@ -1255,7 +1319,6 @@
         </div>
       `).join("");
 
-      // toggle listeners
       list.querySelectorAll(".action .chk").forEach(chk => {
         chk.addEventListener("click", () => {
           const row = chk.closest(".action");
@@ -1277,24 +1340,19 @@
     });
 
     /*****************************************************************
-     * INLINE EDIT (hover pencil → click → inline input + save/cancel)
-     * - This is UI-only. Hook into monday API where noted below.
+     * INLINE EDIT (pencil hover)
      *****************************************************************/
-    const pencilClicks = Array.from(document.querySelectorAll(".field .edit"));
-    pencilClicks.forEach(pencil => {
+    Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
         const field = pencil.closest(".field");
         const valueText = field.querySelector(".value-text");
         const editable = valueText.getAttribute("data-editable") === "true";
         if (!editable) return;
-
-        // If already editing, ignore
         if (field.querySelector(".inline-input")) return;
 
         const oldValue = valueText.textContent.trim();
 
-        // Build inline editor
         const valueWrap = field.querySelector(".value");
         valueText.style.display = "none";
         pencil.style.display = "none";
@@ -1319,7 +1377,6 @@
         actionsWrap.appendChild(btnOk);
         actionsWrap.appendChild(btnCancel);
 
-        // Insert editor
         const left = document.createElement("div");
         left.style.flex = "1";
         left.style.minWidth = "0";
@@ -1342,18 +1399,9 @@
           const newValue = input.value.trim() || "—";
           valueText.textContent = newValue;
 
-          // TODO: WIRE TO MONDAY
-          // Example:
+          // TODO: WIRE TO MONDAY / WEBHOOK
           // const fieldKey = field.getAttribute("data-field");
-          // await monday.api(`mutation { change_column_value(item_id:..., column_id:"${fieldKey}", value:"${JSON.stringify(newValue)}") { id } }`);
-
-          // update a couple of KPIs as a sample linkage
-          if (field.getAttribute("data-field") === "stage") {
-            document.getElementById("kpiStage").textContent = newValue;
-          }
-          if (field.getAttribute("data-field") === "probability") {
-            document.getElementById("kpiProb").textContent = newValue;
-          }
+          // send { [fieldKey]: newValue } to your endpoint or change_column_value mutation
 
           cleanup();
         };
@@ -1369,15 +1417,13 @@
     });
 
     /*****************************************************************
-     * HEADER BUTTONS (placeholders)
+     * HEADER BUTTONS
      *****************************************************************/
     document.getElementById("btnRefresh").addEventListener("click", () => {
-      // TODO: re-fetch monday item/subitems and rerender
-      alert("Refresh placeholder — wire this to monday item/subitem fetch.");
+      alert("Refresh placeholder — wire to monday item/subitem fetch.");
     });
     document.getElementById("btnSaveAll").addEventListener("click", () => {
-      // TODO: commit any staged edits
-      alert("Save placeholder — inline edits already apply immediately in this demo.");
+      alert("Save placeholder — inline edits apply immediately in this demo.");
     });
 
     /*****************************************************************
@@ -1391,12 +1437,35 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
+    function formatValue(v){
+      if (v === null || v === undefined) return "—";
+      if (typeof v === "number") return String(v);
+      if (typeof v === "boolean") return v ? "Yes" : "No";
+      return String(v);
+    }
+    function cssEscape(s){
+      // minimal escape for attribute selectors
+      return String(s).replaceAll('"', '\\"');
+    }
 
     /*****************************************************************
      * INIT
      *****************************************************************/
-    renderContacts();
+    renderContacts(sampleContacts);
     renderActions();
+
+    // Example: future webhook usage:
+    // window.RecordPage.applyData({
+    //   address: "987 Westheimer Rd",
+    //   lead_type: "Probate",
+    //   total_equity: "$154,000",
+    //   next_actions: {
+    //     follow_up_date: "2026-03-01",
+    //     next_action_step: "Send offer packet",
+    //     stalled_reason: "Waiting on signature"
+    //   },
+    //   related_contacts: [...]
+    // });
   </script>
 </body>
 </html>
