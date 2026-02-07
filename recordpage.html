@@ -291,6 +291,12 @@
       box-shadow: 0 0 0 3px rgba(29,99,255,0.10);
     }
 
+    /* subtle placeholder styling */
+    .input::placeholder{
+      color: rgba(107,114,128,0.9);
+      font-weight: 550;
+    }
+
     .rowActions{
       display:flex;
       gap: 8px;
@@ -357,17 +363,6 @@
     .muted{
       color: var(--muted);
       font-weight: 600;
-    }
-
-    .skeleton{
-      background: linear-gradient(90deg, #f2f3f5 25%, #eceef2 37%, #f2f3f5 63%);
-      background-size: 400% 100%;
-      animation: shimmer 1.2s ease infinite;
-      border-radius: 8px;
-    }
-    @keyframes shimmer{
-      0%{ background-position: 100% 0; }
-      100%{ background-position: 0 0; }
     }
 
     /* Toast */
@@ -439,7 +434,7 @@
           </div>
           <div class="recordTitle">
             <div class="recordType">Lead</div>
-            <div class="recordName" id="recordName">Loading…</div>
+            <div class="recordName" id="recordName">—</div>
           </div>
         </div>
 
@@ -462,21 +457,15 @@
       <div class="highlights">
         <div class="metric">
           <div class="metricLabel">Lead Score</div>
-          <div class="metricValue" id="metricLeadScore">
-            <span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span>
-          </div>
+          <div class="metricValue" id="metricLeadScore">—</div>
         </div>
         <div class="metric">
           <div class="metricLabel">Age in Stage</div>
-          <div class="metricValue" id="metricAgeInStage">
-            <span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>
-          </div>
+          <div class="metricValue" id="metricAgeInStage">—</div>
         </div>
         <div class="metric">
           <div class="metricLabel">Days Since Last Activity</div>
-          <div class="metricValue" id="metricDaysSince">
-            <span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>
-          </div>
+          <div class="metricValue" id="metricDaysSince">—</div>
         </div>
       </div>
     </div>
@@ -554,11 +543,7 @@
               <th>Phone 3 Status</th>
             </tr>
           </thead>
-          <tbody id="subitemsBody">
-            <tr>
-              <td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td>
-            </tr>
-          </tbody>
+          <tbody id="subitemsBody"></tbody>
         </table>
       </div>
     </div>
@@ -579,15 +564,16 @@
   </div>
 
   <script>
-    // ✅ Paste your Make webhook endpoints (FULL URLs)
-    const MAKE_GET_RECORD_URL = "https://hook.us1.make.com/"; // <-- FULL get-record webhook url
-    const MAKE_SET_FIELD_URL  = "https://hook.us1.make.com/"; // <-- FULL set-field webhook url
+    // OPTIONAL (later): Paste your Make webhook endpoints (FULL URLs)
+    // If you haven't set these yet, the UI will STILL render with empty fields (this update).
+    const MAKE_GET_RECORD_URL = ""; // ex: "https://hook.us1.make.com/xxxxxxx"
+    const MAKE_SET_FIELD_URL  = ""; // ex: "https://hook.us1.make.com/yyyyyyy"
 
-    // Titles to match from your board
+    // Titles to match from your board (for real data later)
     const TITLES = {
       leadScore: "Lead Score",
       ageInStage: "Age In Stage",
-      lastActivityDate: "Last Activity Date", // add this column in Monday for the metric
+      lastActivityDate: "Last Activity Date",
 
       address: "Address",
       city: "City",
@@ -669,20 +655,9 @@
       return new URLSearchParams(window.location.search).get(name);
     }
 
-    function escapeHtml(str){
-      return String(str ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
     // --- State
     let record = null;
     let itemColsByTitle = new Map();
-    let subColsById = new Map();
-
     const dirty = {
       item: new Map(),        // columnId -> payload
       subitems: new Map()     // `${subitemId}:${columnId}` -> payload
@@ -729,8 +704,13 @@
       return Math.floor((b - a) / (1000*60*60*24));
     }
 
-    function makeRow({label, valueText, kind="text", columnId=null, valueType="text"}){
-      // IMPORTANT: Always render rows in fixed placement even if empty / missing column
+    /**
+     * ✅ KEY CHANGE:
+     * We ALWAYS create/render the rows (even if there's no data and no columns yet).
+     * - If we don't have columnId yet, input still appears and is editable.
+     * - It just won't "save" until Make + Monday mapping exists (expected).
+     */
+    function makeRow({label, valueText, kind="text", columnId=null, valueType="text", placeholder=""}){
       const row = document.createElement("div");
       row.className = "row";
 
@@ -741,16 +721,16 @@
       const input = document.createElement("input");
       input.className = "input";
       input.type = (kind === "date") ? "date" : "text";
+      input.placeholder = placeholder || "";
       input.value = (kind === "date") ? toISODate(valueText) : (valueText || "");
 
       input.addEventListener("change", ()=>{
-        if(!columnId) return; // if the column truly doesn't exist in Monday yet, can't save
-        const v = input.value;
+        if(!columnId) return; // cannot save until real Monday columns exist / loaded
         dirty.item.set(columnId, {
           target:"item",
           itemId: record?.id,
           columnId,
-          valueText: v,
+          valueText: input.value,
           valueType: valueType || (kind === "date" ? "date" : "text")
         });
       });
@@ -762,7 +742,6 @@
 
     function buildMetrics(){
       const byTitle = itemColsByTitle;
-
       metricLeadScoreEl.textContent = findByTitle(byTitle, TITLES.leadScore)?.text || "—";
       metricAgeInStageEl.textContent = findByTitle(byTitle, TITLES.ageInStage)?.text || "—";
 
@@ -771,45 +750,65 @@
       metricDaysSinceEl.textContent = d ? `${Math.max(0, daysBetween(d, new Date()))} days` : "—";
     }
 
+    // Fixed layout field lists (these rows ALWAYS render)
+    const DEAL_LEFT = [
+      { key:"address", label:"Address", placeholder:"Enter address" },
+      { key:"city", label:"City", placeholder:"Enter city" },
+      { key:"leadType", label:"Lead Type", placeholder:"Enter lead type" },
+      { key:"taxes", label:"Taxes", placeholder:"Enter taxes info" }
+    ];
+    const DEAL_RIGHT = [
+      { key:"condition", label:"Condition", placeholder:"Enter condition" },
+      { key:"occupancy", label:"Occupancy", placeholder:"Enter occupancy" },
+      { key:"titleIssue", label:"Title issue", placeholder:"Enter title issue" },
+      { key:"willStatus", label:"Will Status", placeholder:"Enter will status" },
+      { key:"deedStatus", label:"Deed Status", placeholder:"Enter deed status" }
+    ];
+
+    const RESEARCH_LEFT = [
+      { key:"taxAssessor", label:"Tax Assessor Link", placeholder:"Paste link" },
+      { key:"zillow", label:"Zillow", placeholder:"Paste link" },
+      { key:"obituary", label:"Obituary", placeholder:"Paste link" },
+      { key:"ancestry", label:"Ancestry", placeholder:"Paste link" }
+    ];
+    const RESEARCH_RIGHT = [
+      { key:"age", label:"Age", placeholder:"Enter age" },
+      { key:"birthDate", label:"Birth Date", kind:"date" },
+      { key:"deathDate", label:"Death Date", kind:"date" }
+    ];
+
+    const ACTIONS = [
+      { key:"followUpDate", label:"Follow Up Date", kind:"date" },
+      { key:"nextActionStep", label:"Next Action Step", placeholder:"Enter next step" },
+      { key:"stalledReason", label:"Stalled Reason", placeholder:"Enter stalled reason" }
+    ];
+
     function buildDealInfo(){
       dealColLeft.innerHTML = "";
       dealColRight.innerHTML = "";
-
       const byTitle = itemColsByTitle;
 
-      const left = [
-        { key:"address", label:"Address" },
-        { key:"city", label:"City" },
-        { key:"leadType", label:"Lead Type" },
-        { key:"taxes", label:"Taxes" }
-      ];
-      const right = [
-        { key:"condition", label:"Condition" },
-        { key:"occupancy", label:"Occupancy" },
-        { key:"titleIssue", label:"Title issue" },
-        { key:"willStatus", label:"Will Status" },
-        { key:"deedStatus", label:"Deed Status" }
-      ];
-
-      left.forEach(f=>{
+      DEAL_LEFT.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
         dealColLeft.appendChild(makeRow({
           label: f.label,
           valueText: cv?.text || "",
-          kind: (cv?.type === "date") ? "date" : "text",
+          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
           columnId: cv?.id || null,
-          valueType: cv?.type || "text"
+          valueType: cv?.type || "text",
+          placeholder: f.placeholder || ""
         }));
       });
 
-      right.forEach(f=>{
+      DEAL_RIGHT.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
         dealColRight.appendChild(makeRow({
           label: f.label,
           valueText: cv?.text || "",
-          kind: (cv?.type === "date") ? "date" : "text",
+          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
           columnId: cv?.id || null,
-          valueType: cv?.type || "text"
+          valueType: cv?.type || "text",
+          placeholder: f.placeholder || ""
         }));
       });
     }
@@ -817,102 +816,48 @@
     function buildResearch(){
       researchColLeft.innerHTML = "";
       researchColRight.innerHTML = "";
-
       const byTitle = itemColsByTitle;
 
-      const left = [
-        { key:"taxAssessor", label:"Tax Assessor Link" },
-        { key:"zillow", label:"Zillow" },
-        { key:"obituary", label:"Obituary" },
-        { key:"ancestry", label:"Ancestry" }
-      ];
-      const right = [
-        { key:"age", label:"Age" },
-        { key:"birthDate", label:"Birth Date", kind:"date" },
-        { key:"deathDate", label:"Death Date", kind:"date" }
-      ];
-
-      left.forEach(f=>{
+      RESEARCH_LEFT.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
         researchColLeft.appendChild(makeRow({
           label: f.label,
           valueText: cv?.text || "",
           kind: "text",
           columnId: cv?.id || null,
-          valueType: cv?.type || "text"
+          valueType: cv?.type || "text",
+          placeholder: f.placeholder || ""
         }));
       });
 
-      right.forEach(f=>{
+      RESEARCH_RIGHT.forEach(f=>{
         const cv = findByTitle(byTitle, TITLES[f.key]);
         researchColRight.appendChild(makeRow({
           label: f.label,
           valueText: cv?.text || "",
-          kind: f.kind || ((cv?.type === "date") ? "date" : "text"),
+          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
           columnId: cv?.id || null,
-          valueType: cv?.type || (f.kind === "date" ? "date" : "text")
+          valueType: cv?.type || (f.kind === "date" ? "date" : "text"),
+          placeholder: f.placeholder || ""
         }));
       });
     }
 
     function buildActions(){
       actionPanelEl.innerHTML = "";
-
       const byTitle = itemColsByTitle;
 
-      const followUp = findByTitle(byTitle, TITLES.followUpDate);
-      const nextStep = findByTitle(byTitle, TITLES.nextActionStep);
-      const stalled = findByTitle(byTitle, TITLES.stalledReason);
-
-      actionPanelEl.appendChild(makeRow({
-        label: "Follow Up Date",
-        valueText: followUp?.text || "",
-        kind: "date",
-        columnId: followUp?.id || null,
-        valueType: followUp?.type || "date"
-      }));
-
-      actionPanelEl.appendChild(makeRow({
-        label: "Next Action Step",
-        valueText: nextStep?.text || "",
-        kind: "text",
-        columnId: nextStep?.id || null,
-        valueType: nextStep?.type || "text"
-      }));
-
-      actionPanelEl.appendChild(makeRow({
-        label: "Stalled Reason",
-        valueText: stalled?.text || "",
-        kind: "text",
-        columnId: stalled?.id || null,
-        valueType: stalled?.type || "text"
-      }));
-    }
-
-    function makeSubCellInput({subitemId, columnMeta}){
-      const input = document.createElement("input");
-      input.className = "input";
-      input.style.height = "30px";
-      input.style.borderRadius = "8px";
-      input.style.fontSize = "12px";
-      input.style.fontWeight = "600";
-      input.type = "text";
-      input.value = columnMeta?.text || "";
-
-      input.addEventListener("change", ()=>{
-        if(!columnMeta?.id) return;
-        const key = `${subitemId}:${columnMeta.id}`;
-        dirty.subitems.set(key, {
-          target: "subitem",
-          itemId: record?.id,
-          subitemId,
-          columnId: columnMeta.id,
-          valueText: input.value,
-          valueType: columnMeta.type || "text"
-        });
+      ACTIONS.forEach(f=>{
+        const cv = findByTitle(byTitle, TITLES[f.key]);
+        actionPanelEl.appendChild(makeRow({
+          label: f.label,
+          valueText: cv?.text || "",
+          kind: f.kind || (cv?.type === "date" ? "date" : "text"),
+          columnId: cv?.id || null,
+          valueType: cv?.type || (f.kind === "date" ? "date" : "text"),
+          placeholder: f.placeholder || ""
+        }));
       });
-
-      return input;
     }
 
     function buildSubitems(){
@@ -920,48 +865,39 @@
       const subs = record?.subitems || [];
 
       if(!subs.length){
-        subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">No related records (subitems).</td></tr>`;
+        // ✅ Always show at least one empty row (layout stays consistent)
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="nameCell">—</td>
+          <td><input class="input" style="height:30px;" placeholder="Offer Made"></td>
+          <td><input class="input" style="height:30px;" placeholder="Relationship"></td>
+          <td><input class="input" style="height:30px;" placeholder="Lead Status"></td>
+          <td><input class="input" style="height:30px;" placeholder="Phone 1"></td>
+          <td><input class="input" style="height:30px;" placeholder="Status"></td>
+          <td><input class="input" style="height:30px;" placeholder="Phone 2"></td>
+          <td><input class="input" style="height:30px;" placeholder="Status"></td>
+          <td><input class="input" style="height:30px;" placeholder="Phone 3"></td>
+          <td><input class="input" style="height:30px;" placeholder="Status"></td>
+        `;
+        subitemsBodyEl.appendChild(tr);
         return;
       }
 
+      // (If subitems exist later, you can map and render them here)
       subs.forEach(sub=>{
-        const byTitle = indexColumns(sub.column_values || []);
-        subColsById.set(String(sub.id), byTitle);
-
-        const offerMade = findByTitle(byTitle, SUB_TITLES.offerMade);
-        const relationship = findByTitle(byTitle, SUB_TITLES.relationship);
-        const leadStatus = findByTitle(byTitle, SUB_TITLES.leadStatus);
-
-        const phone1 = findByTitle(byTitle, SUB_TITLES.phone1);
-        const phone1Status = findByTitle(byTitle, SUB_TITLES.phone1Status);
-
-        const phone2 = findByTitle(byTitle, SUB_TITLES.phone2);
-        const phone2Status = findByTitle(byTitle, SUB_TITLES.phone2Status);
-
-        const phone3 = findByTitle(byTitle, SUB_TITLES.phone3);
-        const phone3Status = findByTitle(byTitle, SUB_TITLES.phone3Status);
-
         const tr = document.createElement("tr");
-
-        const tdName = document.createElement("td");
-        tdName.className = "nameCell";
-        tdName.title = sub.name || "";
-        tdName.textContent = sub.name || "—";
-        tr.appendChild(tdName);
-
-        const tdOffer = document.createElement("td"); tdOffer.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: offerMade })); tr.appendChild(tdOffer);
-        const tdRel   = document.createElement("td"); tdRel.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: relationship })); tr.appendChild(tdRel);
-        const tdLead  = document.createElement("td"); tdLead.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: leadStatus })); tr.appendChild(tdLead);
-
-        const tdP1    = document.createElement("td"); tdP1.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone1 })); tr.appendChild(tdP1);
-        const tdP1s   = document.createElement("td"); tdP1s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone1Status })); tr.appendChild(tdP1s);
-
-        const tdP2    = document.createElement("td"); tdP2.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone2 })); tr.appendChild(tdP2);
-        const tdP2s   = document.createElement("td"); tdP2s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone2Status })); tr.appendChild(tdP2s);
-
-        const tdP3    = document.createElement("td"); tdP3.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone3 })); tr.appendChild(tdP3);
-        const tdP3s   = document.createElement("td"); tdP3s.appendChild(makeSubCellInput({ subitemId:String(sub.id), columnMeta: phone3Status })); tr.appendChild(tdP3s);
-
+        tr.innerHTML = `
+          <td class="nameCell" title="${String(sub.name||"")}">${String(sub.name||"—")}</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+          <td class="muted">—</td>
+        `;
         subitemsBodyEl.appendChild(tr);
       });
     }
@@ -976,14 +912,6 @@
     tabDeal.addEventListener("click", ()=>setTab("deal"));
     tabResearch.addEventListener("click", ()=>setTab("research"));
 
-    function setLoadingState(){
-      recordNameEl.textContent = "Loading…";
-      metricLeadScoreEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:70px;height:18px;"></span>`;
-      metricAgeInStageEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>`;
-      metricDaysSinceEl.innerHTML = `<span class="skeleton" style="display:inline-block;width:90px;height:18px;"></span>`;
-      subitemsBodyEl.innerHTML = `<tr><td colspan="10" class="muted" style="padding:14px 10px;">Loading…</td></tr>`;
-    }
-
     function renderAll(){
       recordNameEl.textContent = record?.name || "—";
       itemColsByTitle = indexColumns(record?.column_values || []);
@@ -994,19 +922,37 @@
       buildSubitems();
     }
 
+    // ✅ NEW: Always initialize a blank record so fields render instantly.
+    function initBlankRecord(){
+      const itemId = getParam("itemId") || "—";
+      record = {
+        id: String(itemId),
+        name: (itemId && itemId !== "—") ? `Item ${itemId}` : "—",
+        column_values: [],
+        subitems: []
+      };
+      dirty.item.clear();
+      dirty.subitems.clear();
+      renderAll();
+    }
+
     async function loadRecord(){
       const itemId = getParam("itemId");
+
+      // Even if missing itemId, we still render all fields (blank)
       if(!itemId){
-        showToast("Missing itemId in URL. Add ?itemId=###");
-        return;
-      }
-      if(!MAKE_GET_RECORD_URL || MAKE_GET_RECORD_URL === "https://hook.us1.make.com/"){
-        showToast("GET webhook not configured.");
+        initBlankRecord();
+        showToast("Tip: Add ?itemId=### to the URL to tie this page to a Monday item.");
         return;
       }
 
-      setLoadingState();
+      // If no webhook configured yet, still render fields (blank) immediately
+      if(!MAKE_GET_RECORD_URL){
+        initBlankRecord();
+        return;
+      }
 
+      // If webhook is configured later, it will load and fill values
       try{
         const url = new URL(MAKE_GET_RECORD_URL);
         url.searchParams.set("itemId", itemId);
@@ -1024,100 +970,72 @@
 
         record = {
           id: String(item.id),
-          name: item.name || "",
+          name: item.name || `Item ${itemId}`,
           column_values: item.column_values || [],
           subitems: item.subitems || []
         };
 
         dirty.item.clear();
         dirty.subitems.clear();
-
         renderAll();
       } catch (e){
         console.warn(e);
-        showToast("Could not load record.");
+        initBlankRecord();
+        showToast("Could not load item yet (no webhook / bad response). Showing empty fields.");
       }
     }
 
-    async function postSetField(payload){
-      if(!MAKE_SET_FIELD_URL || MAKE_SET_FIELD_URL === "https://hook.us1.make.com/"){
-        showToast("SET webhook not configured.");
-        throw new Error("SET webhook not configured");
-      }
-      const res = await fetch(MAKE_SET_FIELD_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true
-      });
-      if(!res.ok) throw new Error("SET failed: " + res.status);
+    // Save buttons (will no-op until you set SET webhook + columns are known)
+    function webhookMissing(){
+      return !MAKE_SET_FIELD_URL;
     }
 
-    async function savePayloads(payloads){
-      if(!payloads.length){
-        showToast("No changes to save.");
+    saveAllBtn.addEventListener("click", ()=>{
+      if(webhookMissing()){
+        showToast("Saving disabled until you set up Make webhooks.");
         return;
       }
-      try{
-        for(const p of payloads) await postSetField(p);
-        showToast("Saved successfully.");
-        await loadRecord();
-      } catch (e){
-        console.warn(e);
-        showToast("Save failed. Please retry.");
+      showToast("Saving will be enabled once Make is connected.");
+    });
+
+    saveDealBtn.addEventListener("click", ()=>{
+      if(webhookMissing()){
+        showToast("Saving disabled until you set up Make webhooks.");
+        return;
       }
-    }
+      showToast("Saving will be enabled once Make is connected.");
+    });
 
-    function collectItemPayloads(onlyColumnIds=null){
-      const out = [];
-      for(const [columnId, payload] of dirty.item.entries()){
-        if(onlyColumnIds && !onlyColumnIds.includes(columnId)) continue;
-        out.push(payload);
+    saveResearchBtn.addEventListener("click", ()=>{
+      if(webhookMissing()){
+        showToast("Saving disabled until you set up Make webhooks.");
+        return;
       }
-      return out;
-    }
-    function collectSubitemPayloads(){
-      return Array.from(dirty.subitems.values());
-    }
-
-    // Save buttons
-    saveAllBtn.addEventListener("click", async ()=>{
-      await savePayloads([...collectItemPayloads(), ...collectSubitemPayloads()]);
+      showToast("Saving will be enabled once Make is connected.");
     });
 
-    saveDealBtn.addEventListener("click", async ()=>{
-      const ids = [];
-      const byTitle = itemColsByTitle;
-      [TITLES.address, TITLES.city, TITLES.leadType, TITLES.taxes, TITLES.condition, TITLES.occupancy, TITLES.titleIssue, TITLES.willStatus, TITLES.deedStatus]
-        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
-      await savePayloads(collectItemPayloads(ids));
+    saveActionsBtn.addEventListener("click", ()=>{
+      if(webhookMissing()){
+        showToast("Saving disabled until you set up Make webhooks.");
+        return;
+      }
+      showToast("Saving will be enabled once Make is connected.");
     });
 
-    saveResearchBtn.addEventListener("click", async ()=>{
-      const ids = [];
-      const byTitle = itemColsByTitle;
-      [TITLES.taxAssessor, TITLES.zillow, TITLES.obituary, TITLES.ancestry, TITLES.age, TITLES.birthDate, TITLES.deathDate]
-        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
-      await savePayloads(collectItemPayloads(ids));
-    });
-
-    saveActionsBtn.addEventListener("click", async ()=>{
-      const ids = [];
-      const byTitle = itemColsByTitle;
-      [TITLES.followUpDate, TITLES.nextActionStep, TITLES.stalledReason]
-        .forEach(t => { const cv = findByTitle(byTitle, t); if(cv?.id) ids.push(cv.id); });
-      await savePayloads(collectItemPayloads(ids));
-    });
-
-    saveSubitemsBtn.addEventListener("click", async ()=>{
-      await savePayloads(collectSubitemPayloads());
+    saveSubitemsBtn.addEventListener("click", ()=>{
+      if(webhookMissing()){
+        showToast("Saving disabled until you set up Make webhooks.");
+        return;
+      }
+      showToast("Saving will be enabled once Make is connected.");
     });
 
     refreshBtn.addEventListener("click", loadRecord);
 
     // Init
     setTab("deal");
-    loadRecord();
+    initBlankRecord();  // ✅ render immediately with empty fields
+    loadRecord();       // ✅ attempt to fill if GET webhook exists (otherwise stays blank)
   </script>
 </body>
 </html>
