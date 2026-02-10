@@ -9,14 +9,12 @@
     :root{
       --bg: #f3f4f6;
       --surface: #ffffff;
-      --surface-2: #f7f8fa;
       --line: #e5e7eb;
       --line-2: #dbe0e6;
       --text: #1f2937;
       --muted: #6b7280;
       --muted-2: #9aa3af;
       --blue: #0176d3;
-      --blue-2: #0b5cab;
 
       /* stalled emphasis */
       --stalled-bg: rgba(185, 28, 28, .06);
@@ -46,90 +44,10 @@
       padding: 14px 14px 18px;
     }
 
-    /* ---------- TOP BAR ---------- */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 12px 14px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      gap: 12px;
-    }
-
-    .record-title{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-    .record-badge{
-      width: 36px;   /* +1pt-ish overall sizing */
-      height: 36px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, rgba(1,118,211,.15), rgba(1,118,211,.05));
-      border: 1px solid rgba(1,118,211,.25);
-      display:grid;
-      place-items:center;
-      color: var(--blue);
-      font-weight: 700;
-      font-size: 14px;
-      flex: 0 0 auto;
-    }
-
-    .record-title-main{
-      min-width: 0;
-      flex: 1 1 auto;
-      display:flex;
-      justify-content:flex-start;
-    }
-
-    /* Address in header +2pts, allow full address (wrap) */
-    .record-title-main h1{
-      margin:0;
-      font-size: 19px; /* was 17px */
-      font-weight: 650; /* less bulky */
-      letter-spacing: .1px;
-      text-align: left;
-      white-space: normal;      /* allow wrapping */
-      overflow: visible;
-      text-overflow: unset;
-      line-height: 1.15;
-    }
-
-    .topbar-actions{
-      display:flex;
-      gap:8px;
-      flex: 0 0 auto;
-    }
-    .btn{
-      border: 1px solid var(--line-2);
-      background: #fff;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 13px; /* +1pt */
-      padding: 9px 11px; /* +1pt-ish */
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background .12s ease, border-color .12s ease, transform .08s ease;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      white-space: nowrap;
-    }
-    .btn:hover{ background:#fafafa; border-color:#cfd6df; }
-    .btn:active{ transform: translateY(1px); }
-
-    /* ---------- LAYOUT ---------- */
     .layout{
-      margin-top: 12px;
       display:grid;
-      grid-template-columns: 1fr; /* remove right side entirely */
+      grid-template-columns: 1fr;
       gap: 12px;
-      align-items:start;
       width: 100%;
     }
 
@@ -141,42 +59,34 @@
       overflow:hidden;
     }
 
-    /* headers +1pt overall, and lighter weight */
-    .panel-header{
-      padding: 11px 14px; /* +1pt */
-      border-bottom: 1px solid var(--line);
+    /* ---------- TAB BAR + REFRESH ---------- */
+    .tabsbar{
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
-      gap:10px;
-    }
-    .panel-title{
-      margin:0;
-      font-size: 15.5px; /* +1pt */
-      font-weight: 600;  /* less rigid */
-      color: #111827;
-      letter-spacing: .08px;
-    }
-
-    /* ---------- TABS ---------- */
-    .tabs{
-      display:flex;
-      gap: 36px; /* increased spacing */
-      padding: 9px 14px 0; /* +1pt */
+      gap: 12px;
+      padding: 0 14px;
       border-bottom: 1px solid var(--line);
       background: var(--surface);
     }
+
+    .tabs{
+      display:flex;
+      gap: 36px;
+      padding: 9px 0 0;
+    }
+
     .tab{
       appearance:none;
       border: 0;
       background: transparent;
       font-family: var(--font);
-      font-size: 16.5px;  /* +1pt */
-      padding: 13px 0 13px; /* +1pt */
+      font-size: 16.5px;
+      padding: 13px 0 13px;
       color: var(--muted);
       cursor:pointer;
       position:relative;
-      font-weight: 500; /* unbolden/cleaner */
+      font-weight: 500;
     }
     .tab[aria-selected="true"]{ color: var(--text); }
     .tab[aria-selected="true"]::after{
@@ -189,13 +99,43 @@
       background: var(--blue);
     }
     .tab:focus{ outline: none; }
-    .tab:focus-visible{ outline: 2px solid rgba(1,118,211,.25); outline-offset: 2px; border-radius: 8px; }
+    .tab:focus-visible{
+      outline: 2px solid rgba(1,118,211,.25);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
 
-    .tab-content{ padding: 13px 0 0; } /* +1pt */
+    .tabs-actions{
+      padding-bottom: 8px; /* aligns with tab underline region */
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .btn{
+      border: 1px solid var(--line-2);
+      background: #fff;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      padding: 9px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space: nowrap;
+    }
+    .btn:hover{ background:#fafafa; border-color:#cfd6df; }
+    .btn:active{ transform: translateY(1px); }
+
+    /* ---------- CONTENT ---------- */
+    .tab-content{ padding: 13px 0 0; }
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- SECTIONS ---------- */
     .section{
       padding: 0 14px 14px;
     }
@@ -208,12 +148,12 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 9px 0 11px; /* +1pt */
+      padding: 9px 0 11px;
     }
     .section-head h3{
       margin:0;
-      font-size: 18.5px; /* +1pt */
-      font-weight: 600;  /* less bulky */
+      font-size: 18.5px;
+      font-weight: 600;
       color:#111827;
       letter-spacing: .08px;
     }
@@ -221,30 +161,29 @@
     .field-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 11px 18px; /* +1pt vertical */
+      gap: 11px 18px;
     }
     @media (max-width: 820px){
       .field-grid{ grid-template-columns: 1fr; }
     }
 
-    /* fields +1pt overall */
     .field{
       border-top: 1px solid var(--line);
-      padding: 11px 0; /* +1pt */
+      padding: 11px 0;
       display:grid;
-      grid-template-columns: 170px 1fr; /* a touch wider for labels */
+      grid-template-columns: 170px 1fr;
       gap: 10px;
       align-items:center;
     }
     .field:last-child{ border-bottom: 1px solid var(--line); }
 
     .label{
-      font-size: 15px; /* +1pt */
+      font-size: 15px;
       color: var(--muted);
-      font-weight: 600; /* less rigid */
+      font-weight: 600;
     }
     .value{
-      font-size: 16px; /* +1pt */
+      font-size: 16px;
       color: var(--text);
       display:flex;
       align-items:center;
@@ -288,7 +227,6 @@
     }
     .edit svg{ width: 14px; height: 14px; display:block; }
 
-    /* inline editing (auto-save, no Save button) */
     .inline-input{
       width:100%;
       font-family: var(--font);
@@ -302,19 +240,24 @@
       border-color: rgba(1,118,211,.55);
       box-shadow: 0 0 0 3px rgba(1,118,211,.12);
     }
-    .inline-actions{
-      display:flex;
-      gap:6px;
-      margin-left: 10px;
-      flex: 0 0 auto;
-    }
-    .mini{
-      font-size: 13px;
-      padding: 7px 9px;
-      border-radius: 8px;
-    }
 
-    /* ---------- CHARACTERISTICS DROPDOWN (grey banner) ---------- */
+    /* stalled reason highlight */
+    .field.stalled .value-text{
+      color: var(--stalled-text);
+      font-weight: 650;
+    }
+    .field.stalled{
+      background: var(--stalled-bg);
+      border-top: 1px solid var(--stalled-border);
+      border-bottom: 1px solid var(--stalled-border);
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 10px;
+      margin: 6px 0;
+    }
+    .field.stalled + .field{ border-top: 0; }
+
+    /* ---------- CHARACTERISTICS DROPDOWN ---------- */
     .inline-toggle{
       padding: 0 14px 14px;
       border-top: 1px solid var(--line);
@@ -324,10 +267,10 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 10px 12px;          /* slightly padded */
+      padding: 10px 12px;
       cursor:pointer;
       user-select:none;
-      background: #f4f6f9;          /* grey banner */
+      background: #f4f6f9;
       border: 1px solid var(--line);
       border-radius: 10px;
       margin: 8px 0 10px;
@@ -348,13 +291,13 @@
     .inline-toggle[data-open="true"] .chev{ transform: rotate(90deg); }
 
     .toggle-title{
-      font-size: 18.5px; /* match section header size */
-      font-weight: 600;  /* less bulky */
+      font-size: 18.5px;
+      font-weight: 600;
       color:#111827;
+      letter-spacing: .08px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      letter-spacing: .08px;
     }
     .toggle-meta{
       font-size: 15px;
@@ -367,28 +310,12 @@
     }
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
-    /* stalled reason highlight */
-    .field.stalled .value-text{
-      color: var(--stalled-text);
-      font-weight: 650;
-    }
-    .field.stalled{
-      background: var(--stalled-bg);
-      border-top: 1px solid var(--stalled-border);
-      border-bottom: 1px solid var(--stalled-border);
-      padding-left: 10px;
-      padding-right: 10px;
-      border-radius: 10px;
-      margin: 6px 0;
-    }
-    .field.stalled + .field{ border-top: 0; } /* avoid double line look */
-
     /* ---------- RELATED CONTACTS TABLE ---------- */
     .table-wrap{ padding: 0 14px 14px; overflow:auto; }
     table{
       width:100%;
       border-collapse: collapse;
-      font-size: 16px; /* +1pt */
+      font-size: 16px;
       background: #fff;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -397,9 +324,9 @@
     }
     thead th{
       text-align:left;
-      font-size: 15px; /* +1pt */
+      font-size: 15px;
       color: var(--muted);
-      font-weight: 650; /* lighter */
+      font-weight: 650;
       padding: 12px 10px;
       background: #fafbfc;
       border-bottom: 1px solid var(--line);
@@ -446,32 +373,22 @@
 
 <body>
   <div class="app">
-    <!-- TOP HEADER -->
-    <div class="topbar">
-      <div class="record-title">
-        <div class="record-badge">DP</div>
-        <div class="record-title-main">
-          <!-- Full address can be long; wraps now -->
-          <h1 id="recordAddress">123 Main Street, Houston, TX 77002</h1>
-        </div>
-      </div>
-
-      <div class="topbar-actions">
-        <button class="btn" id="btnRefresh" type="button" title="Refresh">
-          <span aria-hidden="true">⟳</span>
-          Refresh
-        </button>
-      </div>
-    </div>
-
-    <!-- MAIN -->
     <div class="layout">
       <div class="panel">
-        <!-- Tabs -->
-        <div class="tabs" role="tablist" aria-label="Record Tabs">
-          <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
-          <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
-          <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
+        <!-- Tabs + Refresh (right side) -->
+        <div class="tabsbar" role="group" aria-label="Tabs and actions">
+          <div class="tabs" role="tablist" aria-label="Record Tabs">
+            <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
+            <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
+            <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
+          </div>
+
+          <div class="tabs-actions">
+            <button class="btn" id="btnRefresh" type="button" title="Refresh">
+              <span aria-hidden="true">⟳</span>
+              Refresh
+            </button>
+          </div>
         </div>
 
         <div class="tab-content">
@@ -551,7 +468,7 @@
                   </div>
                 </div>
 
-                <!-- RIGHT COLUMN (re-ordered) -->
+                <!-- RIGHT COLUMN -->
                 <div>
                   <div class="field" data-field="next_action_step">
                     <div class="label">Next Action Step</div>
@@ -604,16 +521,11 @@
                       </span>
                     </div>
                   </div>
-
-                  <div class="field" data-field="owner_details_extra" style="visibility:hidden;">
-                    <div class="label">—</div>
-                    <div class="value"><span class="value-text">—</span></div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Characteristics dropdown with grey banner -->
+            <!-- Characteristics dropdown -->
             <div class="inline-toggle" id="characteristicsToggle" data-open="true">
               <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
                 <div class="toggle-left">
@@ -627,7 +539,6 @@
 
               <div class="toggle-body" id="characteristicsBody">
                 <div class="field-grid">
-                  <!-- Left -->
                   <div>
                     <div class="field" data-field="equity">
                       <div class="label">Equity</div>
@@ -695,7 +606,6 @@
                     </div>
                   </div>
 
-                  <!-- Right -->
                   <div>
                     <div class="field" data-field="condition">
                       <div class="label">Condition</div>
@@ -794,7 +704,7 @@
             </div>
 
             <div class="hint">
-              Auto-save behavior: edits commit on blur / Enter. Each field is keyed by <code>data-field</code> for webhook mapping.
+              Auto-save: edits commit on blur / Enter. Fields are keyed by <code>data-field</code> for webhook mapping.
             </div>
           </div>
 
@@ -819,115 +729,10 @@
                       </span>
                     </div>
                   </div>
-
+                </div>
+                <div>
                   <div class="field" data-field="death_date">
                     <div class="label">Death Date</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="ancestry">
-                    <div class="label">Ancestry</div>
-                    <div class="value">
-                      <span class="value-text link" data-editable="true">Open Ancestry</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="birth_date">
-                    <div class="label">Birth Date</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="google_maps">
-                    <div class="label">Google Maps</div>
-                    <div class="value">
-                      <span class="value-text link" data-editable="true">Open Map</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="field" data-field="age">
-                    <div class="label">Age</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="appraisal">
-                    <div class="label">Appraisal</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="tax_percent">
-                    <div class="label">Tax %</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="owner_count">
-                    <div class="label">Owner Count</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="owners_contacted">
-                    <div class="label">Owners Contacted</div>
                     <div class="value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
@@ -942,9 +747,7 @@
               </div>
             </div>
 
-            <div class="hint">
-              Auto-save behavior: edits commit on blur / Enter.
-            </div>
+            <div class="hint">Add your remaining research fields here (kept short for readability).</div>
           </div>
 
           <!-- ACTIVITY -->
@@ -987,9 +790,7 @@
               </div>
             </div>
 
-            <div class="hint">
-              Wire this pane to monday updates + files if you want a true activity feed.
-            </div>
+            <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
         </div>
       </div>
@@ -997,21 +798,10 @@
   </div>
 
   <script>
-    /*****************************************************************
-     * WEBHOOK / FUTURE DATA HOOKS
-     * - Call: window.RecordPage.applyData(payload)
-     * - Address supports full string via payload.full_address or payload.address
-     *****************************************************************/
+    // Apply data (future webhook mapping)
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
-
-        // Prefer full_address for the header (supports full address string)
-        if (payload.full_address) {
-          document.getElementById("recordAddress").textContent = payload.full_address;
-        } else if (payload.address) {
-          document.getElementById("recordAddress").textContent = payload.address;
-        }
 
         for (const [key, value] of Object.entries(payload)) {
           const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
@@ -1095,7 +885,7 @@
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No related contacts.</td></tr>`;
     }
 
-    // Inline Edit (auto-save on blur / Enter)
+    // Inline edit (auto-save on blur / Enter)
     Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1124,12 +914,6 @@
         const commit = () => {
           const newValue = input.value.trim() || "—";
           valueText.textContent = newValue;
-
-          // If user edits the Address field, update header too (full string allowed)
-          if (field.getAttribute("data-field") === "address") {
-            document.getElementById("recordAddress").textContent = newValue;
-          }
-
           left.remove();
           valueText.style.display = "";
           pencil.style.display = "";
@@ -1152,7 +936,7 @@
       });
     });
 
-    // Header refresh
+    // Refresh button
     document.getElementById("btnRefresh").addEventListener("click", () => {
       alert("Refresh placeholder — wire to monday item/subitem fetch.");
     });
@@ -1176,7 +960,7 @@
       return String(s).replaceAll('"', '\\"');
     }
 
-    // Init
+    // init
     renderContacts(sampleContacts);
   </script>
 </body>
