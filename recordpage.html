@@ -59,66 +59,75 @@
       overflow:hidden;
     }
 
-    /* ---------- TOP SUMMARY (Property Details / Deal Insights) ---------- */
-    .topSummary{
-      padding: 12px 14px;
+    /* ---------- TOP SNAPSHOT (match screenshot: no cards, light grey bg, divider under header) ---------- */
+    .topSnapshot{
+      background: var(--bg);
+      padding: 18px 18px 16px;
       border-bottom: 1px solid var(--line);
-      background: var(--surface);
     }
-    .topSummaryGrid{
+
+    .snapshotGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 48px;
+      align-items:start;
     }
     @media (max-width: 920px){
-      .topSummaryGrid{ grid-template-columns: 1fr; }
+      .snapshotGrid{ grid-template-columns: 1fr; gap: 18px; }
     }
-    .summaryBlock{
-      padding: 10px 12px 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcfe;
-    }
-    .summaryTitle{
+
+    .snapshotSection{ min-width: 0; }
+
+    .snapshotTitle{
       font-size: 13px;
       letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--muted);
       font-weight: 700;
-      padding: 2px 0 10px;
+      margin: 0 0 10px 0;
     }
-    .summaryFields{
+
+    .snapshotDivider{
+      height: 1px;
+      background: var(--line);
+      width: 100%;
+      margin: 0 0 14px 0;
+    }
+
+    .snapshotFields{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px 18px;
+      gap: 18px 56px; /* similar spacing to screenshot */
     }
-    @media (max-width: 520px){
-      .summaryFields{ grid-template-columns: 1fr; }
+    @media (max-width: 620px){
+      .snapshotFields{ grid-template-columns: 1fr; gap: 14px; }
     }
-    .sfield .slabel{
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 650;
-      margin-bottom: 5px;
+
+    .sfield{ min-width: 0; }
+    .slabel{
+      font-size: 12px;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      letter-spacing: .02em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
     }
-    .sfield .svalue{
+    .svalue{
       font-size: 16px;
       color: var(--text);
       font-weight: 600;
-      line-height: 1.2;
+      line-height: 1.25;
       min-width:0;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    .sfield .svalue.link{
+    .svalue.link{
       color: var(--blue);
       cursor:pointer;
       font-weight: 650;
     }
-    .sfield .svalue.link:hover{ text-decoration: underline; }
+    .svalue.link:hover{ text-decoration: underline; }
 
     /* ---------- TAB BAR + REFRESH ---------- */
     .tabsbar{
@@ -167,7 +176,7 @@
     }
 
     .tabs-actions{
-      padding-bottom: 8px; /* aligns with tab underline region */
+      padding-bottom: 8px;
       display:flex;
       align-items:center;
       gap: 8px;
@@ -318,7 +327,7 @@
     }
     .field.stalled + .field{ border-top: 0; }
 
-    /* ---------- CHARACTERISTICS DROPDOWN (embedded in Owner Details) ---------- */
+    /* ---------- CHARACTERISTICS DROPDOWN ---------- */
     .inline-toggle{
       margin-top: 10px;
     }
@@ -436,29 +445,33 @@
     <div class="layout">
       <div class="panel">
 
-        <!-- ✅ NEW: TOP SUMMARY -->
-        <div class="topSummary" aria-label="Top Summary">
-          <div class="topSummaryGrid">
-            <!-- LEFT -->
-            <div class="summaryBlock" aria-label="Property Details">
-              <div class="summaryTitle">Property Details</div>
-              <div class="summaryFields">
+        <!-- TOP SNAPSHOT (match screenshot) -->
+        <div class="topSnapshot" aria-label="Top Snapshot">
+          <div class="snapshotGrid">
+
+            <section class="snapshotSection" aria-label="Property Details">
+              <h2 class="snapshotTitle">Property Details</h2>
+              <div class="snapshotDivider"></div>
+
+              <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Parcel ID</div>
                   <div class="svalue">123-456-789</div>
                 </div>
                 <div class="sfield">
-                  <div class="slabel">County</div>
-                  <div class="svalue">Harris</div>
+                  <div class="slabel">Owner Name</div>
+                  <div class="svalue">John Doe</div>
                 </div>
+
                 <div class="sfield">
                   <div class="slabel">Address</div>
-                  <div class="svalue">123 Main St.</div>
+                  <div class="svalue">133 Bay St. San Francisco, CA 94133</div>
                 </div>
                 <div class="sfield">
-                  <div class="slabel">City / Zip</div>
-                  <div class="svalue">Houston, 77002</div>
+                  <div class="slabel">Zillow</div>
+                  <div class="svalue link">Open Zillow</div>
                 </div>
+
                 <div class="sfield">
                   <div class="slabel">Tax Status</div>
                   <div class="svalue">Delinquent — Lawsuit</div>
@@ -468,16 +481,22 @@
                   <div class="svalue link">Open Assessor</div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            <!-- RIGHT -->
-            <div class="summaryBlock" aria-label="Deal Insights">
-              <div class="summaryTitle">Deal Insights</div>
-              <div class="summaryFields">
+            <section class="snapshotSection" aria-label="Deal Insights">
+              <h2 class="snapshotTitle">Deal Insights</h2>
+              <div class="snapshotDivider"></div>
+
+              <div class="snapshotFields">
                 <div class="sfield">
-                  <div class="slabel">Stage</div>
+                  <div class="slabel">Current Stage</div>
                   <div class="svalue">Active Follow-Up</div>
                 </div>
+                <div class="sfield">
+                  <div class="slabel">Einstein Score</div>
+                  <div class="svalue">95%</div>
+                </div>
+
                 <div class="sfield">
                   <div class="slabel">Stalled Reason</div>
                   <div class="svalue">Waiting on payoff estimates</div>
@@ -486,20 +505,18 @@
                   <div class="slabel">Follow-Up Date</div>
                   <div class="svalue">2026-02-08</div>
                 </div>
+
                 <div class="sfield">
                   <div class="slabel">Owners Contacted</div>
-                  <div class="svalue">2 / 5</div>
+                  <div class="svalue">2</div>
                 </div>
                 <div class="sfield">
-                  <div class="slabel">Offer Sent</div>
-                  <div class="svalue">No</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Einstein Score</div>
-                  <div class="svalue">94</div>
+                  <div class="slabel">Owners Remaining</div>
+                  <div class="svalue">3</div>
                 </div>
               </div>
-            </div>
+            </section>
+
           </div>
         </div>
 
@@ -652,7 +669,7 @@
                 </div>
               </div>
 
-              <!-- ✅ MOVED: Characteristics collapsible INSIDE Owner Details -->
+              <!-- Characteristics dropdown (still within Deal Information tab) -->
               <div class="inline-toggle" id="characteristicsToggle" data-open="true">
                 <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
                   <div class="toggle-left">
@@ -802,7 +819,6 @@
                   </div>
                 </div>
               </div>
-              <!-- /Characteristics -->
             </div>
 
             <!-- Related Contacts -->
@@ -943,7 +959,7 @@
       }
     };
 
-    // Characteristics dropdown (now embedded)
+    // Characteristics dropdown
     const characteristics = document.getElementById("characteristicsToggle");
     const toggleCharacteristics = () => {
       const isOpen = characteristics.getAttribute("data-open") === "true";
