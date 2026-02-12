@@ -139,7 +139,7 @@
     /* ---------- TOP SNAPSHOT (Property Details / Deal Insights) ---------- */
     .topSnapshot{
       background: var(--bg);
-      padding: 18px 18px 22px; /* ✅ increased bottom padding */
+      padding: 18px 18px 22px; /* increased bottom padding */
       border-bottom: 1px solid var(--line);
     }
     .topSnapshotGrid{
@@ -158,7 +158,7 @@
       letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--muted);
-      font-weight: 600; /* ✅ unbolden */
+      font-weight: 600; /* unboldened */
       margin: 0 0 10px 0;
     }
     .snapshotDivider{
@@ -182,8 +182,8 @@
       font-size: 12px;
       letter-spacing: .06em;
       text-transform: uppercase;
-      color: #a0a7b6;       /* ✅ lighter tint */
-      font-weight: 600;     /* ✅ unbolden */
+      color: #a0a7b6;       /* lighter tint */
+      font-weight: 600;     /* unboldened */
       margin-bottom: 6px;
       display:flex;
       align-items:center;
@@ -198,7 +198,7 @@
 
     .svalue{
       font-size: 16px;
-      color: #122349;       /* ✅ main field color */
+      color: #122349;       /* main field color */
       font-weight: 600;
       line-height: 1.25;
       min-width:0;
@@ -233,7 +233,7 @@
       margin:0;
       font-size: 18.5px;
       font-weight: 600;
-      color:#122349; /* ✅ main header color */
+      color:#122349; /* main header color */
       letter-spacing: .08px;
     }
 
@@ -454,6 +454,85 @@
   <div class="app">
     <div class="layout">
       <div class="panel">
+
+        <!-- ✅ Top snapshot FIRST (tabs stay with Owner Details section below) -->
+        <div class="topSnapshot" aria-label="Top Snapshot">
+          <div class="topSnapshotGrid">
+            <!-- LEFT: Property Details -->
+            <div class="snapshotBlock">
+              <div class="snapshotTitle">PROPERTY DETAILS</div>
+              <div class="snapshotDivider"></div>
+
+              <div class="snapshotFields">
+                <div class="sfield">
+                  <div class="slabel">PHONE (2) <span class="caret">▼</span></div>
+                  <div class="svalue">1 (415) 223-1998</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">EMAIL</div>
+                  <div class="svalue link">rachel.adams@gmail.com</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">ADDRESS</div>
+                  <div class="svalue" title="133 Bay St., San Francisco, CA 94133">
+                    133 Bay St., San Francisco, CA 94133
+                  </div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">AGE</div>
+                  <div class="svalue">35</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">EMPLOYER</div>
+                  <div class="svalue">RAD Designs</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: Deal Insights -->
+            <div class="snapshotBlock">
+              <div class="snapshotTitle">DEAL INSIGHTS</div>
+              <div class="snapshotDivider"></div>
+
+              <div class="snapshotFields">
+                <div class="sfield">
+                  <div class="slabel">CUSTOMER SINCE</div>
+                  <div class="svalue">07/06/2009</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">CLIENT SEGMENT</div>
+                  <div class="svalue">Sophisticated Opportunist</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">MARITAL STATUS</div>
+                  <div class="svalue">Married</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">CREDIT RATING</div>
+                  <div class="svalue ok">95%</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">CHILDREN</div>
+                  <div class="svalue">2</div>
+                </div>
+
+                <div class="sfield">
+                  <div class="slabel">PROFILE COMPLETENESS</div>
+                  <div class="svalue ok">80%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tabs + Refresh (right side) -->
         <div class="tabsbar" role="group" aria-label="Tabs and actions">
           <div class="tabs" role="tablist" aria-label="Record Tabs">
@@ -473,85 +552,6 @@
         <div class="tab-content">
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
-
-            <!-- ✅ Top snapshot area -->
-            <div class="topSnapshot" aria-label="Top Snapshot">
-              <div class="topSnapshotGrid">
-                <!-- LEFT: Property Details -->
-                <div class="snapshotBlock">
-                  <div class="snapshotTitle">PROPERTY DETAILS</div>
-                  <div class="snapshotDivider"></div>
-
-                  <div class="snapshotFields">
-                    <div class="sfield">
-                      <div class="slabel">PHONE (2) <span class="caret">▼</span></div>
-                      <div class="svalue">1 (415) 223-1998</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">EMAIL</div>
-                      <div class="svalue link">rachel.adams@gmail.com</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">ADDRESS</div>
-                      <div class="svalue" title="133 Bay St. San Francisco, CA 94133">
-                        133 Bay St.<br/>San Francisco,<br/>CA 94133
-                      </div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">AGE</div>
-                      <div class="svalue">35</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">EMPLOYER</div>
-                      <div class="svalue">RAD Designs</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- RIGHT: Deal Insights -->
-                <div class="snapshotBlock">
-                  <div class="snapshotTitle">DEAL INSIGHTS</div>
-                  <div class="snapshotDivider"></div>
-
-                  <div class="snapshotFields">
-                    <div class="sfield">
-                      <div class="slabel">CUSTOMER SINCE</div>
-                      <div class="svalue">07/06/2009</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">CLIENT SEGMENT</div>
-                      <div class="svalue">Sophisticated Opportunist</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">MARITAL STATUS</div>
-                      <div class="svalue">Married</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">CREDIT RATING</div>
-                      <div class="svalue ok">95%</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">CHILDREN</div>
-                      <div class="svalue">2</div>
-                    </div>
-
-                    <div class="sfield">
-                      <div class="slabel">PROFILE COMPLETENESS</div>
-                      <div class="svalue ok">80%</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div class="section">
               <div class="section-head">
                 <div><h3>Owner Details</h3></div>
