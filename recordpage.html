@@ -59,76 +59,6 @@
       overflow:hidden;
     }
 
-    /* ---------- TOP SNAPSHOT (match screenshot: no cards, light grey bg, divider under header) ---------- */
-    .topSnapshot{
-      background: var(--bg);
-      padding: 18px 18px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .snapshotGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items:start;
-    }
-    @media (max-width: 920px){
-      .snapshotGrid{ grid-template-columns: 1fr; gap: 18px; }
-    }
-
-    .snapshotSection{ min-width: 0; }
-
-    .snapshotTitle{
-      font-size: 13px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 700;
-      margin: 0 0 10px 0;
-    }
-
-    .snapshotDivider{
-      height: 1px;
-      background: var(--line);
-      width: 100%;
-      margin: 0 0 14px 0;
-    }
-
-    .snapshotFields{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 56px; /* similar spacing to screenshot */
-    }
-    @media (max-width: 620px){
-      .snapshotFields{ grid-template-columns: 1fr; gap: 14px; }
-    }
-
-    .sfield{ min-width: 0; }
-    .slabel{
-      font-size: 12px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .svalue{
-      font-size: 16px;
-      color: var(--text);
-      font-weight: 600;
-      line-height: 1.25;
-      min-width:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .svalue.link{
-      color: var(--blue);
-      cursor:pointer;
-      font-weight: 650;
-    }
-    .svalue.link:hover{ text-decoration: underline; }
-
     /* ---------- TAB BAR + REFRESH ---------- */
     .tabsbar{
       display:flex;
@@ -176,7 +106,7 @@
     }
 
     .tabs-actions{
-      padding-bottom: 8px;
+      padding-bottom: 8px; /* aligns with tab underline region */
       display:flex;
       align-items:center;
       gap: 8px;
@@ -206,6 +136,85 @@
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
+    /* ---------- TOP SNAPSHOT (Property Details / Deal Insights) ---------- */
+    .topSnapshot{
+      background: var(--bg);
+      padding: 18px 18px 22px; /* ✅ increased bottom padding */
+      border-bottom: 1px solid var(--line);
+    }
+    .topSnapshotGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 900px){
+      .topSnapshotGrid{ grid-template-columns: 1fr; gap: 18px; }
+    }
+
+    .snapshotBlock{ min-width: 0; }
+
+    .snapshotTitle{
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600; /* ✅ unbolden */
+      margin: 0 0 10px 0;
+    }
+    .snapshotDivider{
+      height:1px;
+      background: var(--line);
+      margin: 0 0 12px 0;
+    }
+
+    .snapshotFields{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 34px;
+    }
+    @media (max-width: 520px){
+      .snapshotFields{ grid-template-columns: 1fr; }
+    }
+
+    .sfield{ min-width:0; }
+
+    .slabel{
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #a0a7b6;       /* ✅ lighter tint */
+      font-weight: 600;     /* ✅ unbolden */
+      margin-bottom: 6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .slabel .caret{
+      font-size: 11px;
+      color: #a0a7b6;
+      transform: translateY(-1px);
+    }
+
+    .svalue{
+      font-size: 16px;
+      color: #122349;       /* ✅ main field color */
+      font-weight: 600;
+      line-height: 1.25;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .svalue.link{
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .svalue.link:hover{ text-decoration: underline; }
+
+    .svalue.ok{ color: rgba(46,132,74,.95); font-weight: 650; }
+
+    /* ---------- SECTIONS ---------- */
     .section{
       padding: 0 14px 14px;
     }
@@ -224,7 +233,7 @@
       margin:0;
       font-size: 18.5px;
       font-weight: 600;
-      color:#111827;
+      color:#122349; /* ✅ main header color */
       letter-spacing: .08px;
     }
 
@@ -329,7 +338,8 @@
 
     /* ---------- CHARACTERISTICS DROPDOWN ---------- */
     .inline-toggle{
-      margin-top: 10px;
+      padding: 0 14px 14px;
+      border-top: 1px solid var(--line);
     }
     .toggle-head{
       display:flex;
@@ -444,82 +454,6 @@
   <div class="app">
     <div class="layout">
       <div class="panel">
-
-        <!-- TOP SNAPSHOT (match screenshot) -->
-        <div class="topSnapshot" aria-label="Top Snapshot">
-          <div class="snapshotGrid">
-
-            <section class="snapshotSection" aria-label="Property Details">
-              <h2 class="snapshotTitle">Property Details</h2>
-              <div class="snapshotDivider"></div>
-
-              <div class="snapshotFields">
-                <div class="sfield">
-                  <div class="slabel">Parcel ID</div>
-                  <div class="svalue">123-456-789</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Owner Name</div>
-                  <div class="svalue">John Doe</div>
-                </div>
-
-                <div class="sfield">
-                  <div class="slabel">Address</div>
-                  <div class="svalue">133 Bay St. San Francisco, CA 94133</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Zillow</div>
-                  <div class="svalue link">Open Zillow</div>
-                </div>
-
-                <div class="sfield">
-                  <div class="slabel">Tax Status</div>
-                  <div class="svalue">Delinquent — Lawsuit</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Assessor</div>
-                  <div class="svalue link">Open Assessor</div>
-                </div>
-              </div>
-            </section>
-
-            <section class="snapshotSection" aria-label="Deal Insights">
-              <h2 class="snapshotTitle">Deal Insights</h2>
-              <div class="snapshotDivider"></div>
-
-              <div class="snapshotFields">
-                <div class="sfield">
-                  <div class="slabel">Current Stage</div>
-                  <div class="svalue">Active Follow-Up</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Einstein Score</div>
-                  <div class="svalue">95%</div>
-                </div>
-
-                <div class="sfield">
-                  <div class="slabel">Stalled Reason</div>
-                  <div class="svalue">Waiting on payoff estimates</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Follow-Up Date</div>
-                  <div class="svalue">2026-02-08</div>
-                </div>
-
-                <div class="sfield">
-                  <div class="slabel">Owners Contacted</div>
-                  <div class="svalue">2</div>
-                </div>
-                <div class="sfield">
-                  <div class="slabel">Owners Remaining</div>
-                  <div class="svalue">3</div>
-                </div>
-              </div>
-            </section>
-
-          </div>
-        </div>
-
         <!-- Tabs + Refresh (right side) -->
         <div class="tabsbar" role="group" aria-label="Tabs and actions">
           <div class="tabs" role="tablist" aria-label="Record Tabs">
@@ -539,6 +473,85 @@
         <div class="tab-content">
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
+
+            <!-- ✅ Top snapshot area -->
+            <div class="topSnapshot" aria-label="Top Snapshot">
+              <div class="topSnapshotGrid">
+                <!-- LEFT: Property Details -->
+                <div class="snapshotBlock">
+                  <div class="snapshotTitle">PROPERTY DETAILS</div>
+                  <div class="snapshotDivider"></div>
+
+                  <div class="snapshotFields">
+                    <div class="sfield">
+                      <div class="slabel">PHONE (2) <span class="caret">▼</span></div>
+                      <div class="svalue">1 (415) 223-1998</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">EMAIL</div>
+                      <div class="svalue link">rachel.adams@gmail.com</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">ADDRESS</div>
+                      <div class="svalue" title="133 Bay St. San Francisco, CA 94133">
+                        133 Bay St.<br/>San Francisco,<br/>CA 94133
+                      </div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">AGE</div>
+                      <div class="svalue">35</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">EMPLOYER</div>
+                      <div class="svalue">RAD Designs</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT: Deal Insights -->
+                <div class="snapshotBlock">
+                  <div class="snapshotTitle">DEAL INSIGHTS</div>
+                  <div class="snapshotDivider"></div>
+
+                  <div class="snapshotFields">
+                    <div class="sfield">
+                      <div class="slabel">CUSTOMER SINCE</div>
+                      <div class="svalue">07/06/2009</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">CLIENT SEGMENT</div>
+                      <div class="svalue">Sophisticated Opportunist</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">MARITAL STATUS</div>
+                      <div class="svalue">Married</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">CREDIT RATING</div>
+                      <div class="svalue ok">95%</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">CHILDREN</div>
+                      <div class="svalue">2</div>
+                    </div>
+
+                    <div class="sfield">
+                      <div class="slabel">PROFILE COMPLETENESS</div>
+                      <div class="svalue ok">80%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="section">
               <div class="section-head">
                 <div><h3>Owner Details</h3></div>
@@ -668,152 +681,152 @@
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Characteristics dropdown (still within Deal Information tab) -->
-              <div class="inline-toggle" id="characteristicsToggle" data-open="true">
-                <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
-                  <div class="toggle-left">
-                    <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <div class="toggle-title">Characteristics</div>
-                  </div>
-                  <div class="toggle-meta" id="characteristicsSummary">Equity • Taxes • Occupancy • Links</div>
+            <!-- Characteristics dropdown -->
+            <div class="inline-toggle" id="characteristicsToggle" data-open="true">
+              <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
+                <div class="toggle-left">
+                  <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="toggle-title">Characteristics</div>
                 </div>
+                <div class="toggle-meta" id="characteristicsSummary">Equity • Taxes • Occupancy • Links</div>
+              </div>
 
-                <div class="toggle-body" id="characteristicsBody">
-                  <div class="field-grid">
-                    <div>
-                      <div class="field" data-field="equity">
-                        <div class="label">Equity</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">$112,000</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="field" data-field="lead_type">
-                        <div class="label">Lead Type</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Tax Delinquent</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="field" data-field="owed_amount">
-                        <div class="label">Owed Amount</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">$23,450</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="field" data-field="tax_status">
-                        <div class="label">Tax Status</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Delinquent — Lawsuit</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="field" data-field="occupancy">
-                        <div class="label">Occupancy</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Unknown</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+              <div class="toggle-body" id="characteristicsBody">
+                <div class="field-grid">
+                  <div>
+                    <div class="field" data-field="equity">
+                      <div class="label">Equity</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">$112,000</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
                     </div>
 
-                    <div>
-                      <div class="field" data-field="condition">
-                        <div class="label">Condition</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Fair</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+                    <div class="field" data-field="lead_type">
+                      <div class="label">Lead Type</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Tax Delinquent</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
+                    </div>
 
-                      <div class="field" data-field="deed_status">
-                        <div class="label">Deed Status</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Verified</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+                    <div class="field" data-field="owed_amount">
+                      <div class="label">Owed Amount</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">$23,450</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
+                    </div>
 
-                      <div class="field" data-field="will_status">
-                        <div class="label">Will Status</div>
-                        <div class="value">
-                          <span class="value-text" data-editable="true">Unknown</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+                    <div class="field" data-field="tax_status">
+                      <div class="label">Tax Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Delinquent — Lawsuit</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
+                    </div>
 
-                      <div class="field" data-field="zillow_link">
-                        <div class="label">Zillow Link</div>
-                        <div class="value">
-                          <span class="value-text link" data-editable="true">Open Zillow</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+                    <div class="field" data-field="occupancy">
+                      <div class="label">Occupancy</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Unknown</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
+                    </div>
+                  </div>
 
-                      <div class="field" data-field="tax_assessor_link">
-                        <div class="label">Tax Assessor Link</div>
-                        <div class="value">
-                          <span class="value-text link" data-editable="true">Open Assessor</span>
-                          <span class="edit" title="Edit">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </span>
-                        </div>
+                  <div>
+                    <div class="field" data-field="condition">
+                      <div class="label">Condition</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Fair</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="deed_status">
+                      <div class="label">Deed Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Verified</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="will_status">
+                      <div class="label">Will Status</div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">Unknown</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="zillow_link">
+                      <div class="label">Zillow Link</div>
+                      <div class="value">
+                        <span class="value-text link" data-editable="true">Open Zillow</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="field" data-field="tax_assessor_link">
+                      <div class="label">Tax Assessor Link</div>
+                      <div class="value">
+                        <span class="value-text link" data-editable="true">Open Assessor</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
                     </div>
                   </div>
