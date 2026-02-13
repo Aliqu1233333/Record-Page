@@ -360,10 +360,35 @@
       gap:10px;
       min-width:0;
     }
+
+    /* Small round Salesforce-style toggle button */
+    .toggle-btn{
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid #cfd6df;
+      background: #fff;
+      color: #122349; /* dark blue SF accent used in your UI */
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 0;
+      cursor:pointer;
+      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+      flex: 0 0 auto;
+    }
+    .toggle-btn:hover{ background:#fafafa; border-color:#bfc8d4; }
+    .toggle-btn:active{ transform: translateY(1px); }
+    .toggle-btn:focus{ outline:none; }
+    .toggle-btn:focus-visible{
+      outline: 2px solid rgba(1,118,211,.25);
+      outline-offset: 2px;
+    }
+
     .chev{
-      width: 18px;
-      height: 18px;
-      color: var(--muted);
+      width: 16px;
+      height: 16px;
+      color: currentColor;
       transition: transform .14s ease;
       flex: 0 0 auto;
     }
@@ -552,144 +577,16 @@
         <div class="tab-content">
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
-            <div class="section">
-              <div class="section-head">
-                <div><h3>Owner Details</h3></div>
-              </div>
 
-              <div class="field-grid" id="ownerDetailsGrid">
-                <!-- LEFT COLUMN -->
-                <div>
-                  <div class="field" data-field="lead_name">
-                    <div class="label">Lead Name</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">John Doe</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="address">
-                    <div class="label">Address</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">123 Main Street</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="city">
-                    <div class="label">City</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">Houston</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="zip">
-                    <div class="label">Zip</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">77002</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="length_of_inactivity">
-                    <div class="label">Length of Inactivity</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">12 days</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- RIGHT COLUMN -->
-                <div>
-                  <div class="field" data-field="next_action_step">
-                    <div class="label">Next Action Step</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">Text + voicemail to heir #2</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="received_offer">
-                    <div class="label">Received Offer</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">No</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field" data-field="follow_up_date">
-                    <div class="label">Follow Up Date</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">2026-02-08</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="field stalled" data-field="stalled_reason">
-                    <div class="label">Stalled Reason</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">Waiting on payoff estimates</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Characteristics dropdown -->
+            <!-- Characteristics dropdown (moved up under Deal Information; Owner Details removed) -->
             <div class="inline-toggle" id="characteristicsToggle" data-open="true">
               <div class="toggle-head" role="button" tabindex="0" aria-expanded="true" aria-controls="characteristicsBody">
                 <div class="toggle-left">
-                  <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <button class="toggle-btn" type="button" aria-label="Toggle Characteristics">
+                    <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
                   <div class="toggle-title">Characteristics</div>
                 </div>
                 <div class="toggle-meta" id="characteristicsSummary">Equity • Taxes • Occupancy • Links</div>
