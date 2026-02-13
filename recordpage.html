@@ -169,8 +169,9 @@
 
     .snapshotFields{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 12px;
+      grid-template-columns: max-content max-content;
+      row-gap: 18px;
+      column-gap: 16px;
     }
     @media (max-width: 520px){
       .snapshotFields{ grid-template-columns: 1fr; }
