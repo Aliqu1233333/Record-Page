@@ -169,8 +169,8 @@
 
     .snapshotFields{
       display:grid;
-      grid-template-columns: 1fr 1fr;   /* use the container width */
-      column-gap: 18px;                 /* THIS will now visibly change */
+      grid-template-columns: minmax(0, 260px) minmax(0, 260px);
+      column-gap: 16px;
       row-gap: 26px;
     }
     @media (max-width: 520px){
