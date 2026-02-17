@@ -412,6 +412,75 @@
     }
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
+    /* ---------- MILESTONES TIMELINE ---------- */
+    .timeline-wrap{
+      padding: 0 14px 14px;
+    }
+    .timeline{
+      padding: 8px 0 4px;
+    }
+    .titem{
+      position: relative;
+      display:grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 12px;
+      padding: 12px 0;
+      align-items:start;
+    }
+    .titem + .titem{ border-top: 1px solid rgba(229,231,235,.6); }
+    .tcol{
+      position:relative;
+      width:28px;
+      height: 100%;
+      display:flex;
+      justify-content:center;
+    }
+    .tcol::before{
+      content:"";
+      position:absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width:2px;
+      transform: translateX(-1px);
+      background: var(--line);
+    }
+    .titem:first-child .tcol::before{ top: 14px; }
+    .titem:last-child .tcol::before{ bottom: calc(100% - 14px); }
+
+    .tdot{
+      position: relative;
+      z-index: 1;
+      margin-top: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #fff;
+      border: 2px solid var(--blue);
+      box-shadow: 0 0 0 3px rgba(1,118,211,.10);
+    }
+
+    .tmain{ min-width:0; }
+    .ttitle{
+      font-size: 16px;
+      font-weight: 650;
+      color: #122349;
+      line-height: 1.2;
+      margin: 0 0 4px 0;
+    }
+    .tsub{
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.25;
+    }
+    .tmeta{
+      font-size: 13px;
+      color: var(--muted);
+      white-space:nowrap;
+      padding-top: 2px;
+    }
+
     /* ---------- RELATED CONTACTS TABLE ---------- */
     .table-wrap{ padding: 0 14px 14px; overflow:auto; }
     table{
@@ -562,6 +631,7 @@
             <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
             <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
             <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
+            <button class="tab" role="tab" id="tab-milestones" aria-selected="false" aria-controls="pane-milestones" type="button">Milestones</button>
           </div>
 
           <div class="tabs-actions">
@@ -845,6 +915,21 @@
 
             <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
+
+          <!-- MILESTONES -->
+          <div class="tab-pane" id="pane-milestones" role="tabpanel" aria-labelledby="tab-milestones">
+            <div class="section">
+              <div class="section-head">
+                <div><h3>Milestones</h3></div>
+              </div>
+            </div>
+
+            <div class="timeline-wrap">
+              <div class="timeline" id="milestonesTimeline"></div>
+            </div>
+
+            <div class="hint">Milestones timeline (Salesforce-style layout). Wire dates/status to your monday item data when ready.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -938,6 +1023,31 @@
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No related contacts.</td></tr>`;
     }
 
+    // Milestones timeline
+    const milestones = [
+      { title: "Lead Creation", sub: "Milestone recorded", meta: "—" },
+      { title: "Identify Heir/s", sub: "Milestone recorded", meta: "—" },
+      { title: "First Heir Contact", sub: "Milestone recorded", meta: "—" },
+      { title: "First Offer Presented", sub: "Milestone recorded", meta: "—" },
+      { title: "First Offer Accepted", sub: "Milestone recorded", meta: "—" },
+      { title: "Capture ownership in property", sub: "Milestone recorded", meta: "—" }
+    ];
+
+    function renderMilestones(list){
+      const root = document.getElementById("milestonesTimeline");
+      const html = (list || []).map(m => `
+        <div class="titem">
+          <div class="tcol"><span class="tdot" aria-hidden="true"></span></div>
+          <div class="tmain">
+            <div class="ttitle">${escapeHtml(m.title)}</div>
+            <div class="tsub">${escapeHtml(m.sub ?? "")}</div>
+          </div>
+          <div class="tmeta">${escapeHtml(m.meta ?? "—")}</div>
+        </div>
+      `).join("");
+      root.innerHTML = html || `<div class="td-muted">No milestones.</div>`;
+    }
+
     // Inline edit (auto-save on blur / Enter)
     Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
@@ -1015,6 +1125,7 @@
 
     // init
     renderContacts(sampleContacts);
+    renderMilestones(milestones);
   </script>
 </body>
 </html>
