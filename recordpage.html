@@ -1002,7 +1002,7 @@
               <!-- Sub-tabs for Confirmed Owners vs Other Contacts -->
               <div class="sub-tabs-bar" role="tablist" aria-label="Contact Tabs">
                 <button class="sub-tab" role="tab" id="subtab-confirmed" aria-selected="true" aria-controls="subpane-confirmed" type="button">Confirmed Owners</button>
-                <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Related Contacts</button>
+                <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Contacts</button>
               </div>
 
               <!-- Confirmed Owners Table -->
@@ -1024,10 +1024,10 @@
                 </div>
               </div>
 
-              <!-- Other Related Contacts Table -->
+              <!-- Other Contacts Table -->
               <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
                 <div class="table-wrap">
-                  <table aria-label="Other Related Contacts Table">
+                  <table aria-label="Other Contacts Table">
                     <thead>
                       <tr>
                         <th>Name</th>
@@ -1473,7 +1473,7 @@
           <td>${statusCell(c.phone3Status)}</td>
         </tr>
       `).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No other related contacts.</td></tr>`;
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No other contacts.</td></tr>`;
     }
 
     // Sub-tabs functionality
