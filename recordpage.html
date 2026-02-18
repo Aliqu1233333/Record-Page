@@ -1665,26 +1665,41 @@
 
     // Extract board ID and pulse ID from URL
     function extractIdsFromUrl() {
-      // URL format: ?18395630812/pulses/11004380444
-      // or: ?boardId=18395630812&pulseId=11004380444
+      // URL format examples:
+      // ?18395630812/pulses/11004380444
+      // ? 18395630812/pulses/11004380444 (with space)
+      // ?boardId=18395630812&pulseId=11004380444
       
-      const urlParams = window.location.search.substring(1); // Remove the '?'
+      const fullUrl = window.location.href;
+      console.log('Full URL:', fullUrl);
+      
+      let urlParams = window.location.search;
+      console.log('Query string:', urlParams);
+      
+      if (!urlParams || urlParams === '?') {
+        console.error('No query parameters found in URL');
+        return { boardId: null, pulseId: null };
+      }
+      
+      // Remove the '?' and trim any whitespace
+      urlParams = urlParams.substring(1).trim();
+      console.log('Cleaned params:', urlParams);
       
       // Check if it's path format (18395630812/pulses/11004380444)
       if (urlParams.includes('/pulses/')) {
         const parts = urlParams.split('/pulses/');
-        return {
-          boardId: parts[0],
-          pulseId: parts[1]
-        };
+        const boardId = parts[0].trim();
+        const pulseId = parts[1] ? parts[1].trim() : null;
+        console.log('Extracted from path format - Board ID:', boardId, 'Pulse ID:', pulseId);
+        return { boardId, pulseId };
       }
       
-      // Otherwise try query param format
-      const params = new URLSearchParams(window.location.search);
-      return {
-        boardId: params.get('boardId') || params.get('board_id'),
-        pulseId: params.get('pulseId') || params.get('pulse_id')
-      };
+      // Otherwise try query param format (?boardId=xxx&pulseId=yyy)
+      const params = new URLSearchParams(urlParams);
+      const boardId = params.get('boardId') || params.get('board_id');
+      const pulseId = params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id');
+      console.log('Extracted from query params - Board ID:', boardId, 'Pulse ID:', pulseId);
+      return { boardId, pulseId };
     }
 
     // Fetch data from Make.com webhook
@@ -1696,7 +1711,10 @@
       
       if (!boardId || !pulseId) {
         console.error('Missing board ID or pulse ID in URL');
-        alert('Error: Missing board ID or pulse ID in URL. Expected format: ?boardId/pulses/pulseId');
+        console.error('Found - Board ID:', boardId, 'Pulse ID:', pulseId);
+        console.error('Current URL:', window.location.href);
+        console.error('Expected format: https://yourpage.html?18395630812/pulses/11004380444');
+        alert(`Error: Missing board ID or pulse ID in URL.\n\nFound:\n- Board ID: ${boardId || 'MISSING'}\n- Pulse ID: ${pulseId || 'MISSING'}\n\nExpected format: ?boardId/pulses/pulseId\n\nCheck browser console for details.`);
         return;
       }
       
