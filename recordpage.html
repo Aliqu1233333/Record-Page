@@ -753,10 +753,73 @@
     .milestone-item + .milestone-item{
       border-top: none;
     }
+
+    /* ---------- LOADING OVERLAY ---------- */
+    #loadingOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(243,244,246,.72);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+    }
+    #loadingOverlay[aria-hidden="false"]{ display:flex; }
+    .loadingCard{
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(17,24,39,.12);
+      padding: 18px 18px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 260px;
+      max-width: 520px;
+    }
+    .spinner{
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 3px solid rgba(1,118,211,.18);
+      border-top-color: rgba(1,118,211,.9);
+      animation: spin .9s linear infinite;
+      flex: 0 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loadingText{
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .loadingTitle{
+      font-size: 14.5px;
+      font-weight: 650;
+      color: #111827;
+      letter-spacing: .01em;
+    }
+    .loadingSub{
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
   </style>
 </head>
 
 <body>
+  <div id="loadingOverlay" aria-hidden="true">
+    <div class="loadingCard" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="loadingText">
+        <div class="loadingTitle">Loading record…</div>
+        <div class="loadingSub">Pulling data from your webhook.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="layout">
       <div class="panel">
@@ -772,24 +835,23 @@
               <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Lead Name </div>
-                  <div class="svalue">Maria Resendez</div>
+                  <div class="svalue"></div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Deal Score</div>
-                  <div class="svalue">76</div>
+                  <div class="svalue"></div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">ADDRESS</div>
-                  <div class="svalue" title="1251 Forester St">
-                    1251 Forester St
+                  <div class="svalue" title="">
                   </div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
-                  <div class="svalue">$15,591</div>
+                  <div class="svalue"></div>
                 </div>
               </div>
             </div>
@@ -806,22 +868,22 @@
                     <span class="info-badge in-progress" title="Identification in progress"></span>
                     <!-- To show complete: <span class="info-badge complete" title="All owners identified"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span> -->
                   </div>
-                  <div class="svalue">5</div>
+                  <div class="svalue"></div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue">2</div>
+                  <div class="svalue"></div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue">1</div>
+                  <div class="svalue"></div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Purchased</div>
-                  <div class="svalue ok">1</div>
+                  <div class="svalue ok"></div>
                 </div>
               </div>
             </div>
@@ -860,7 +922,7 @@
                   <div class="field" data-field="lead_type">
                     <div class="label">Lead Type</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Tax Delinquent</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -873,7 +935,7 @@
                   <div class="field" data-field="tax_status">
                     <div class="label">Tax Status</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">3-4 years unpaid</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -886,7 +948,7 @@
                   <div class="field" data-field="occupancy">
                     <div class="label">Occupancy</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Unknown</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -899,7 +961,7 @@
                   <div class="field" data-field="will_status">
                     <div class="label">Will Status</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Unknown</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -912,7 +974,7 @@
                   <div class="field" data-field="days_of_inactivity">
                     <div class="label">Days of Inactivity</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">10 days</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -927,7 +989,7 @@
                   <div class="field" data-field="total_equity">
                     <div class="label">Total Equity</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">$112,000</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -940,7 +1002,7 @@
                   <div class="field" data-field="condition">
                     <div class="label">Condition</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Fair</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -953,7 +1015,7 @@
                   <div class="field" data-field="title_issue">
                     <div class="label">Title Issue</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -966,7 +1028,7 @@
                   <div class="field" data-field="deed_status">
                     <div class="label">Deed Status</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">Verified</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -999,7 +1061,7 @@
                     <div class="field" data-field="next_action_step">
                       <div class="label">Next Action Step</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">Follow up on offer</span>
+                        <span class="value-text" data-editable="true"></span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1012,7 +1074,7 @@
                     <div class="field" data-field="stalled_reason">
                       <div class="label">Stalled Reason</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">—</span>
+                        <span class="value-text" data-editable="true"></span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1027,7 +1089,7 @@
                     <div class="field" data-field="follow_up_date">
                       <div class="label">Follow-up Date</div>
                       <div class="value">
-                        <span class="value-text" data-editable="true">Feb 8, 2026</span>
+                        <span class="value-text" data-editable="true"></span>
                         <span class="edit" title="Edit">
                           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1114,7 +1176,7 @@
                   <div class="field" data-field="obituary_link">
                     <div class="label">Obituary Link</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Open Obituary</span>
+                      <span class="value-text link" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1127,7 +1189,7 @@
                   <div class="field" data-field="ancestry_link">
                     <div class="label">Ancestry Link</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Open Ancestry</span>
+                      <span class="value-text link" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1140,7 +1202,7 @@
                   <div class="field" data-field="zillow_link">
                     <div class="label">Zillow Link</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Open Zillow</span>
+                      <span class="value-text link" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1153,7 +1215,7 @@
                   <div class="field" data-field="tax_assessor_link">
                     <div class="label">Tax Assessor Link</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Open Assessor</span>
+                      <span class="value-text link" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1166,7 +1228,7 @@
                   <div class="field" data-field="google_maps_link">
                     <div class="label">Google Maps Link</div>
                     <div class="value">
-                      <span class="value-text link" data-editable="true">Open Maps</span>
+                      <span class="value-text link" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1181,7 +1243,7 @@
                   <div class="field" data-field="birth_date">
                     <div class="label">Birth Date</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1194,7 +1256,7 @@
                   <div class="field" data-field="death_date">
                     <div class="label">Death Date</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1207,7 +1269,7 @@
                   <div class="field" data-field="age">
                     <div class="label">Age</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1220,7 +1282,7 @@
                   <div class="field" data-field="creation_log">
                     <div class="label">Creation Log</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1246,7 +1308,7 @@
                   <div class="field" data-field="last_contacted">
                     <div class="label">Last Contacted</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1261,7 +1323,7 @@
                   <div class="field" data-field="activity_notes">
                     <div class="label">Notes</div>
                     <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                      <span class="value-text" data-editable="true"></span>
                       <span class="edit" title="Edit">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                           <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1299,10 +1361,10 @@
                   <div class="milestone-body">
                     <div class="milestone-title">Lead Creation</div>
                     <div class="milestone-meta">
-                      <span class="milestone-date">Jan 14, 2026</span>
+                      <span class="milestone-date"></span>
                       <span class="milestone-badge badge-complete">Completed</span>
                     </div>
-                    <div class="milestone-note">Lead record created from tax delinquent list.</div>
+                    <div class="milestone-note"></div>
                   </div>
                 </div>
 
@@ -1316,10 +1378,10 @@
                   <div class="milestone-body">
                     <div class="milestone-title">Identify Heir/s</div>
                     <div class="milestone-meta">
-                      <span class="milestone-date">Jan 19, 2026</span>
+                      <span class="milestone-date"></span>
                       <span class="milestone-badge badge-complete">Completed</span>
                     </div>
-                    <div class="milestone-note">5 heirs identified through probate records.</div>
+                    <div class="milestone-note"></div>
                   </div>
                 </div>
 
@@ -1333,10 +1395,10 @@
                   <div class="milestone-body">
                     <div class="milestone-title">First Heir Contact</div>
                     <div class="milestone-meta">
-                      <span class="milestone-date">Jan 28, 2026</span>
+                      <span class="milestone-date"></span>
                       <span class="milestone-badge badge-complete">Completed</span>
                     </div>
-                    <div class="milestone-note">Initial contact made with Rebeca McCrory.</div>
+                    <div class="milestone-note"></div>
                   </div>
                 </div>
 
@@ -1352,10 +1414,10 @@
                   <div class="milestone-body">
                     <div class="milestone-title">First Offer Presented</div>
                     <div class="milestone-meta">
-                      <span class="milestone-date">Feb 7, 2026</span>
+                      <span class="milestone-date"></span>
                       <span class="milestone-badge badge-active">In Progress</span>
                     </div>
-                    <div class="milestone-note">Offer presented to 1 of 5 heirs. Awaiting response.</div>
+                    <div class="milestone-note"></div>
                   </div>
                 </div>
 
@@ -1445,31 +1507,9 @@
     });
 
     // Contacts
-    const sampleConfirmedOwners = [
-      {
-        name: "Rebeca McCrory",
-        leadStatus: { text: "Active", tone: "good" },
-        followupDate: "2026-02-08",
-        offerStatus: true,
-        phone: "832-555-1122",
-        nextAction: "Follow up on offer"
-      }
-    ];
+    const sampleConfirmedOwners = [];
 
-    const sampleOtherContacts = [
-      {
-        name: "Rebeca McCrory",
-        leadStatus: { text: "Active", tone: "good" },
-        followupDate: "2026-02-08",
-        relationship: "Heir",
-        phone1: "832-555-1122",
-        phone1Status: { text: "Correct Number", tone: "good" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        phone3: "—",
-        phone3Status: { text: "—", tone: "muted" }
-      }
-    ];
+    const sampleOtherContacts = [];
 
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
@@ -1477,9 +1517,9 @@
       return "dot";
     }
     function statusCell(statusObj){
-      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
+      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted"></span>`;
       const dot = toneDotClass(statusObj.tone);
-      const text = statusObj.text ?? "—";
+      const text = statusObj.text ?? "";
       const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
@@ -1488,7 +1528,7 @@
       if (offerStatus === true) {
         return `<span style="color: rgba(46,132,74,.95); font-size: 18px;">✓</span>`;
       }
-      return `<span class="td-muted">—</span>`;
+      return `<span class="td-muted"></span>`;
     }
 
     // Phone Status Dropdown Options
@@ -1500,11 +1540,11 @@
     ];
 
     function phoneStatusCell(statusObj, rowIndex, phoneField) {
-      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
+      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted"></span>`;
       const dot = toneDotClass(statusObj.tone);
-      const text = statusObj.text ?? "—";
+      const text = statusObj.text ?? "";
       const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
-      
+
       return `
         <div class="status-dropdown-container">
           <span class="status status-clickable ${mutedClass}" data-row="${rowIndex}" data-field="${phoneField}">
@@ -1521,21 +1561,21 @@
       const container = element.closest('.status-dropdown-container');
       const dropdown = document.createElement('div');
       dropdown.className = 'status-dropdown';
-      
+
       phoneStatusOptions.forEach(option => {
         const optionEl = document.createElement('div');
         optionEl.className = 'status-dropdown-option';
         if (option.text === currentValue) {
           optionEl.classList.add('selected');
         }
-        
+
         const dot = document.createElement('span');
         dot.className = toneDotClass(option.tone);
         optionEl.appendChild(dot);
-        
+
         const text = document.createTextNode(option.text);
         optionEl.appendChild(text);
-        
+
         optionEl.addEventListener('click', (e) => {
           e.stopPropagation();
           // Update the status
@@ -1544,12 +1584,12 @@
           renderOtherContacts(sampleOtherContacts);
           dropdown.remove();
         });
-        
+
         dropdown.appendChild(optionEl);
       });
-      
+
       container.appendChild(dropdown);
-      
+
       // Close dropdown when clicking outside
       setTimeout(() => {
         document.addEventListener('click', function closeDropdown(e) {
@@ -1565,12 +1605,12 @@
       const tbody = document.getElementById("confirmedOwnersTbody");
       const rows = (contacts || []).map(c => `
         <tr>
-          <td><span class="td-link">${escapeHtml(c.name ?? "—")}</span></td>
+          <td><span class="td-link">${escapeHtml(c.name ?? "")}</span></td>
           <td>${statusCell(c.leadStatus)}</td>
-          <td>${escapeHtml(c.followupDate ?? "—")}</td>
+          <td>${escapeHtml(c.followupDate ?? "")}</td>
           <td>${offerStatusCell(c.offerStatus)}</td>
-          <td>${escapeHtml(c.phone ?? "—")}</td>
-          <td class="td-muted">${escapeHtml(c.nextAction ?? "—")}</td>
+          <td>${escapeHtml(c.phone ?? "")}</td>
+          <td class="td-muted">${escapeHtml(c.nextAction ?? "")}</td>
         </tr>
       `).join("");
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="6">No confirmed owners.</td></tr>`;
@@ -1580,15 +1620,15 @@
       const tbody = document.getElementById("otherContactsTbody");
       const rows = (contacts || []).map(c => `
         <tr>
-          <td><span class="td-link">${escapeHtml(c.name ?? "—")}</span></td>
+          <td><span class="td-link">${escapeHtml(c.name ?? "")}</span></td>
           <td>${statusCell(c.leadStatus)}</td>
-          <td>${escapeHtml(c.followupDate ?? "—")}</td>
-          <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
-          <td>${escapeHtml(c.phone1 ?? "—")}</td>
+          <td>${escapeHtml(c.followupDate ?? "")}</td>
+          <td class="td-muted">${escapeHtml(c.relationship ?? "")}</td>
+          <td>${escapeHtml(c.phone1 ?? "")}</td>
           <td>${statusCell(c.phone1Status)}</td>
-          <td>${escapeHtml(c.phone2 ?? "—")}</td>
+          <td>${escapeHtml(c.phone2 ?? "")}</td>
           <td>${statusCell(c.phone2Status)}</td>
-          <td>${escapeHtml(c.phone3 ?? "—")}</td>
+          <td>${escapeHtml(c.phone3 ?? "")}</td>
           <td>${statusCell(c.phone3Status)}</td>
         </tr>
       `).join("");
@@ -1634,7 +1674,7 @@
         valueWrap.insertBefore(left, valueWrap.firstChild);
 
         const commit = () => {
-          const newValue = input.value.trim() || "—";
+          const newValue = input.value.trim() || "";
           valueText.textContent = newValue;
           left.remove();
           valueText.style.display = "";
@@ -1663,28 +1703,38 @@
       fetchDataFromMake();
     });
 
+    // Loading overlay helpers
+    function showLoading(){
+      const overlay = document.getElementById("loadingOverlay");
+      if (overlay) overlay.setAttribute("aria-hidden", "false");
+    }
+    function hideLoading(){
+      const overlay = document.getElementById("loadingOverlay");
+      if (overlay) overlay.setAttribute("aria-hidden", "true");
+    }
+
     // Extract board ID and pulse ID from URL
     function extractIdsFromUrl() {
       // URL format examples:
       // ?18395630812/pulses/11004380444
       // ? 18395630812/pulses/11004380444 (with space)
       // ?boardId=18395630812&pulseId=11004380444
-      
+
       const fullUrl = window.location.href;
       console.log('Full URL:', fullUrl);
-      
+
       let urlParams = window.location.search;
       console.log('Query string:', urlParams);
-      
+
       if (!urlParams || urlParams === '?') {
         console.error('No query parameters found in URL');
         return { boardId: null, pulseId: null };
       }
-      
+
       // Remove the '?' and trim any whitespace
       urlParams = urlParams.substring(1).trim();
       console.log('Cleaned params:', urlParams);
-      
+
       // Check if it's path format (18395630812/pulses/11004380444)
       if (urlParams.includes('/pulses/')) {
         const parts = urlParams.split('/pulses/');
@@ -1693,7 +1743,7 @@
         console.log('Extracted from path format - Board ID:', boardId, 'Pulse ID:', pulseId);
         return { boardId, pulseId };
       }
-      
+
       // Otherwise try query param format (?boardId=xxx&pulseId=yyy)
       const params = new URLSearchParams(urlParams);
       const boardId = params.get('boardId') || params.get('board_id');
@@ -1705,22 +1755,25 @@
     // Fetch data from Make.com webhook
     async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/279nauvfnkw4qxda1vqoj2kxo66qs37s';
-      
+
+      showLoading();
+
       // Extract IDs from URL
       const { boardId, pulseId } = extractIdsFromUrl();
-      
+
       if (!boardId || !pulseId) {
         console.error('Missing board ID or pulse ID in URL');
         console.error('Found - Board ID:', boardId, 'Pulse ID:', pulseId);
         console.error('Current URL:', window.location.href);
         console.error('Expected format: https://yourpage.html?18395630812/pulses/11004380444');
         alert(`Error: Missing board ID or pulse ID in URL.\n\nFound:\n- Board ID: ${boardId || 'MISSING'}\n- Pulse ID: ${pulseId || 'MISSING'}\n\nExpected format: ?boardId/pulses/pulseId\n\nCheck browser console for details.`);
+        hideLoading();
         return;
       }
-      
+
       console.log('Board ID:', boardId);
       console.log('Pulse ID:', pulseId);
-      
+
       try {
         console.log('Fetching data from Make.com...');
         const response = await fetch(webhookURL, {
@@ -1740,14 +1793,16 @@
 
         const data = await response.json();
         console.log('Received data from Make.com:', data);
-        
+
         // Apply the data to the UI
         window.RecordPage.applyData(data);
-        
+
         console.log('Data applied successfully!');
       } catch (error) {
         console.error('Error fetching data from Make.com:', error);
         alert('Failed to refresh data. Check console for details.');
+      } finally {
+        hideLoading();
       }
     }
 
@@ -1766,7 +1821,7 @@
         .replaceAll("'","&#039;");
     }
     function formatValue(v){
-      if (v === null || v === undefined) return "—";
+      if (v === null || v === undefined) return "";
       if (typeof v === "number") return String(v);
       if (typeof v === "boolean") return v ? "Yes" : "No";
       return String(v);
