@@ -1663,17 +1663,57 @@
       fetchDataFromMake();
     });
 
+    // Extract board ID and pulse ID from URL
+    function extractIdsFromUrl() {
+      // URL format: ?18395630812/pulses/11004380444
+      // or: ?boardId=18395630812&pulseId=11004380444
+      
+      const urlParams = window.location.search.substring(1); // Remove the '?'
+      
+      // Check if it's path format (18395630812/pulses/11004380444)
+      if (urlParams.includes('/pulses/')) {
+        const parts = urlParams.split('/pulses/');
+        return {
+          boardId: parts[0],
+          pulseId: parts[1]
+        };
+      }
+      
+      // Otherwise try query param format
+      const params = new URLSearchParams(window.location.search);
+      return {
+        boardId: params.get('boardId') || params.get('board_id'),
+        pulseId: params.get('pulseId') || params.get('pulse_id')
+      };
+    }
+
     // Fetch data from Make.com webhook
     async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/279nauvfnkw4qxda1vqoj2kxo66qs37s';
       
+      // Extract IDs from URL
+      const { boardId, pulseId } = extractIdsFromUrl();
+      
+      if (!boardId || !pulseId) {
+        console.error('Missing board ID or pulse ID in URL');
+        alert('Error: Missing board ID or pulse ID in URL. Expected format: ?boardId/pulses/pulseId');
+        return;
+      }
+      
+      console.log('Board ID:', boardId);
+      console.log('Pulse ID:', pulseId);
+      
       try {
         console.log('Fetching data from Make.com...');
         const response = await fetch(webhookURL, {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({
+            boardId: boardId,
+            pulseId: pulseId
+          })
         });
 
         if (!response.ok) {
