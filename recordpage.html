@@ -238,6 +238,52 @@
       }
     }
 
+    /* Status Dropdown Styles */
+    .status-dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+    .status-clickable {
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .status-clickable:hover {
+      background: rgba(1, 118, 211, 0.08);
+    }
+    .status-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 9999;
+      min-width: 160px;
+      overflow: hidden;
+    }
+    .status-dropdown-option {
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      font-size: 14px;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dropdown-option:hover {
+      background: #f3f4f6;
+    }
+    .status-dropdown-option.selected {
+      background: #eff6ff;
+      color: #0176d3;
+      font-weight: 600;
+    }
+
     .svalue{
       font-size: 16px;
       color: #122349;
@@ -454,7 +500,11 @@
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
     /* ---------- RELATED CONTACTS TABLE ---------- */
-    .table-wrap{ padding: 0 14px 14px; overflow:auto; }
+    .table-wrap{ 
+      padding: 0 14px 14px; 
+      overflow-x: auto;
+      overflow-y: visible;
+    }
     table{
       width:100%;
       border-collapse: collapse;
@@ -716,7 +766,7 @@
           <div class="topSnapshotGrid">
             <!-- LEFT: Property Details -->
             <div class="snapshotBlock">
-              <div class="snapshotTitle">KEY INFORMATION</div>
+              <div class="snapshotTitle">PROPERTY DETAILS</div>
               <div class="snapshotDivider"></div>
 
               <div class="snapshotFields">
@@ -944,7 +994,6 @@
               </div>
 
               <div class="toggle-body" id="characteristicsBody">
-              <div class="toggle-body" id="characteristicsBody">
                 <div class="field-grid">
                   <div>
                     <div class="field" data-field="next_action_step">
@@ -1002,7 +1051,7 @@
               <!-- Sub-tabs for Confirmed Owners vs Other Contacts -->
               <div class="sub-tabs-bar" role="tablist" aria-label="Contact Tabs">
                 <button class="sub-tab" role="tab" id="subtab-confirmed" aria-selected="true" aria-controls="subpane-confirmed" type="button">Confirmed Owners</button>
-                <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Contacts</button>
+                <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Related Contacts</button>
               </div>
 
               <!-- Confirmed Owners Table -->
@@ -1024,10 +1073,10 @@
                 </div>
               </div>
 
-              <!-- Other Contacts Table -->
+              <!-- Other Related Contacts Table -->
               <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
                 <div class="table-wrap">
-                  <table aria-label="Other Contacts Table">
+                  <table aria-label="Other Related Contacts Table">
                     <thead>
                       <tr>
                         <th>Name</th>
@@ -1414,7 +1463,7 @@
         followupDate: "2026-02-08",
         relationship: "Heir",
         phone1: "832-555-1122",
-        phone1Status: { text: "Valid", tone: "good" },
+        phone1Status: { text: "Correct Number", tone: "good" },
         phone2: "—",
         phone2Status: { text: "—", tone: "muted" },
         phone3: "—",
@@ -1440,6 +1489,76 @@
         return `<span style="color: rgba(46,132,74,.95); font-size: 18px;">✓</span>`;
       }
       return `<span class="td-muted">—</span>`;
+    }
+
+    // Phone Status Dropdown Options
+    const phoneStatusOptions = [
+      { value: 'valid', text: 'Correct Number', tone: 'good' },
+      { value: 'wrong', text: 'Wrong Number', tone: 'warn' },
+      { value: 'disconnected', text: 'Disconnected', tone: 'warn' },
+      { value: 'dial_na', text: 'Dial NA', tone: 'muted' }
+    ];
+
+    function phoneStatusCell(statusObj, rowIndex, phoneField) {
+      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
+      const dot = toneDotClass(statusObj.tone);
+      const text = statusObj.text ?? "—";
+      const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
+      
+      return `
+        <div class="status-dropdown-container">
+          <span class="status status-clickable ${mutedClass}" data-row="${rowIndex}" data-field="${phoneField}">
+            <span class="${dot}"></span>${escapeHtml(text)}
+          </span>
+        </div>
+      `;
+    }
+
+    function showPhoneStatusDropdown(element, currentValue, rowIndex, phoneField) {
+      // Remove any existing dropdowns
+      document.querySelectorAll('.status-dropdown').forEach(d => d.remove());
+
+      const container = element.closest('.status-dropdown-container');
+      const dropdown = document.createElement('div');
+      dropdown.className = 'status-dropdown';
+      
+      phoneStatusOptions.forEach(option => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'status-dropdown-option';
+        if (option.text === currentValue) {
+          optionEl.classList.add('selected');
+        }
+        
+        const dot = document.createElement('span');
+        dot.className = toneDotClass(option.tone);
+        optionEl.appendChild(dot);
+        
+        const text = document.createTextNode(option.text);
+        optionEl.appendChild(text);
+        
+        optionEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Update the status
+          const newStatus = { text: option.text, tone: option.tone };
+          sampleOtherContacts[rowIndex][phoneField] = newStatus;
+          renderOtherContacts(sampleOtherContacts);
+          dropdown.remove();
+        });
+        
+        dropdown.appendChild(optionEl);
+      });
+      
+      container.appendChild(dropdown);
+      
+      // Close dropdown when clicking outside
+      setTimeout(() => {
+        document.addEventListener('click', function closeDropdown(e) {
+          if (!dropdown.contains(e.target)) {
+            dropdown.remove();
+            document.removeEventListener('click', closeDropdown);
+          }
+        });
+      }, 0);
     }
 
     function renderConfirmedOwners(contacts){
@@ -1473,7 +1592,7 @@
           <td>${statusCell(c.phone3Status)}</td>
         </tr>
       `).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No other contacts.</td></tr>`;
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="10">No other related contacts.</td></tr>`;
     }
 
     // Sub-tabs functionality
@@ -1541,7 +1660,42 @@
 
     // Refresh button
     document.getElementById("btnRefresh").addEventListener("click", () => {
-      alert("Refresh placeholder — wire to monday item/subitem fetch.");
+      fetchDataFromMake();
+    });
+
+    // Fetch data from Make.com webhook
+    async function fetchDataFromMake() {
+      const webhookURL = 'https://hook.us1.make.com/279nauvfnkw4qxda1vqoj2kxo66qs37s';
+      
+      try {
+        console.log('Fetching data from Make.com...');
+        const response = await fetch(webhookURL, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Received data from Make.com:', data);
+        
+        // Apply the data to the UI
+        window.RecordPage.applyData(data);
+        
+        console.log('Data applied successfully!');
+      } catch (error) {
+        console.error('Error fetching data from Make.com:', error);
+        alert('Failed to refresh data. Check console for details.');
+      }
+    }
+
+    // Fetch data on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchDataFromMake();
     });
 
     // Utils
