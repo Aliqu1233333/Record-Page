@@ -806,6 +806,45 @@
       color: var(--muted);
       line-height: 1.35;
     }
+    /* ---------- ACTION REQUIRED BANNER ---------- */
+    #actionBanner{
+      margin: 10px 14px 0;
+      border-radius: 8px;
+      border: 1px solid rgba(185, 28, 28, .35);
+      background: rgba(185, 28, 28, .08);
+      color: #7f1d1d;
+      padding: 12px 14px;
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: max-height .22s ease, opacity .18s ease, transform .18s ease, margin-top .22s ease;
+    }
+    #actionBanner.show{
+      max-height: 160px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 10px;
+    }
+    #actionBanner strong{
+      font-weight: 700;
+      color: #991b1b;
+    }
+    #actionBanner .bannerText{
+      font-size: 14.5px;
+      line-height: 1.35;
+      color: #7f1d1d;
+    }
+
+    /* ---------- RELATED CONTACTS SUMMARY ---------- */
+    .section-head .section-meta{
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
   </style>
 </head>
 
@@ -906,6 +945,11 @@
               Refresh
             </button>
           </div>
+        </div>
+
+        <!-- Action Required Banner (shown only when a Follow-up Date is overdue) -->
+        <div id="actionBanner" aria-live="polite" aria-atomic="true" role="status">
+          <div class="bannerText" id="actionBannerText">—</div>
         </div>
 
         <div class="tab-content">
@@ -1108,6 +1152,7 @@
             <div class="section">
               <div class="section-head">
                 <div><h3>Related Contacts</h3></div>
+                <div class="section-meta" id="contactsSummary">—</div>
               </div>
 
               <!-- Sub-tabs for Confirmed Owners vs Other Contacts -->
@@ -1475,10 +1520,14 @@
 
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
+          updateActionBannerFromContacts(payload.confirmed_owners);
+        } else {
+          updateActionBannerFromContacts([]);
         }
         if (Array.isArray(payload.other_contacts)) {
           renderOtherContacts(payload.other_contacts);
         }
+        computeContactsSummary(payload);
       }
     };
 
@@ -1736,6 +1785,115 @@
       if (overlay) overlay.setAttribute("aria-hidden", "true");
     }
 
+
+    // Action Required banner + Related Contacts summary
+    function startOfDay(d){
+      const x = new Date(d);
+      x.setHours(0,0,0,0);
+      return x;
+    }
+
+    function parseFlexibleDate(input){
+      if (!input) return null;
+      if (input instanceof Date) return isNaN(input) ? null : input;
+
+      const s = String(input).trim();
+      if (!s || s === "—") return null;
+
+      // Prefer ISO (YYYY-MM-DD)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const d = new Date(s + "T00:00:00");
+        return isNaN(d) ? null : d;
+      }
+
+      // Try native Date.parse for formats like "Feb 8, 2026"
+      const t = Date.parse(s);
+      if (!isNaN(t)) return new Date(t);
+
+      return null;
+    }
+
+    function updateActionBannerFromContacts(confirmedOwners){
+      const banner = document.getElementById("actionBanner");
+      const textNode = document.getElementById("actionBannerText");
+      if (!banner || !textNode) return;
+
+      const today = startOfDay(new Date());
+
+      // Find the most overdue follow-up
+      let best = null; // { name, daysOverdue, nextAction }
+      (confirmedOwners || []).forEach(c => {
+        const d = parseFlexibleDate(c?.followupDate);
+        if (!d) return;
+
+        const due = startOfDay(d);
+        const diffDays = Math.floor((today - due) / (1000*60*60*24));
+
+        if (diffDays > 0) {
+          const candidate = {
+            name: String(c?.name ?? "—").trim() || "—",
+            daysOverdue: diffDays,
+            nextAction: String(c?.nextAction ?? "").trim()
+          };
+          if (!best || candidate.daysOverdue > best.daysOverdue) best = candidate;
+        }
+      });
+
+      if (!best) {
+        banner.classList.remove("show");
+        textNode.textContent = "—";
+        return;
+      }
+
+      const plural = best.daysOverdue === 1 ? "" : "s";
+      const base = `Action Required: Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
+      const full = best.nextAction ? `${base} Next step: ${best.nextAction}.` : base;
+
+      textNode.textContent = full;
+      banner.classList.add("show");
+    }
+
+    function normalizeStatusText(s){
+      return String(s ?? "").trim().toLowerCase();
+    }
+
+    function computeContactsSummary(payload){
+      const el = document.getElementById("contactsSummary");
+      if (!el) return;
+
+      const confirmed = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
+      const other = Array.isArray(payload?.other_contacts) ? payload.other_contacts : [];
+
+      // Prefer explicit counts if present in payload (more reliable)
+      const explicitTotal = payload?.heirs_identified;
+      const explicitContacted = payload?.heirs_contacted;
+
+      if (Number.isFinite(explicitTotal) && Number.isFinite(explicitContacted)) {
+        const total = Math.max(0, Number(explicitTotal));
+        const contacted = Math.max(0, Math.min(total, Number(explicitContacted)));
+        const uncontacted = Math.max(0, total - contacted);
+        el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
+        return;
+      }
+
+      // Otherwise derive from contact records
+      const heirOthers = other.filter(c => normalizeStatusText(c?.relationship).includes("heir"));
+      const allHeirs = [...confirmed, ...heirOthers];
+
+      const total = allHeirs.length;
+
+      // Heuristic: contacted if leadStatus indicates active/contacted/etc (not dial na/uncontacted)
+      const contacted = allHeirs.filter(c => {
+        const t = normalizeStatusText(c?.leadStatus?.text);
+        if (!t) return false;
+        if (t.includes("dial na") || t.includes("uncontacted") || t.includes("not contacted")) return false;
+        if (t.includes("contact") || t.includes("active") || t.includes("in progress") || t.includes("respond")) return true;
+        return false;
+      }).length;
+
+      const uncontacted = Math.max(0, total - contacted);
+      el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
+    }
     // Extract board ID and pulse ID from URL
     function extractIdsFromUrl() {
       // URL format examples:
@@ -1856,6 +2014,8 @@
     // init
     renderConfirmedOwners(sampleConfirmedOwners);
     renderOtherContacts(sampleOtherContacts);
+    updateActionBannerFromContacts(sampleConfirmedOwners);
+    computeContactsSummary({ confirmed_owners: sampleConfirmedOwners, other_contacts: sampleOtherContacts });
   </script>
 </body>
 </html>
