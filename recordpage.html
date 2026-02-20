@@ -16,6 +16,7 @@
       --muted-2: #9aa3af;
       --blue: #0176d3;
 
+      /* stalled emphasis */
       --stalled-bg: rgba(185, 28, 28, .06);
       --stalled-border: rgba(185, 28, 28, .22);
       --stalled-text: #8b1a1a;
@@ -135,7 +136,7 @@
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- TOP SNAPSHOT ---------- */
+    /* ---------- TOP SNAPSHOT (Property Details / Deal Insights) ---------- */
     .topSnapshot{
       background: var(--bg);
       padding: 18px 18px 22px;
@@ -187,6 +188,55 @@
       gap:6px;
       white-space:nowrap;
     }
+    .slabel .caret{
+      font-size: 11px;
+      color: #a0a7b6;
+      transform: translateY(-1px);
+    }
+
+    /* Badge Styles */
+    .info-badge{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Complete State - Green with glow */
+    .info-badge.complete{
+      color: #10b981;
+      filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
+    }
+    .info-badge.complete:hover{
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
+    }
+
+    /* In Progress State - Yellow */
+    .info-badge.in-progress{
+      width: 8px;
+      height: 8px;
+      background: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+      animation: pulse-warning 2s ease-in-out infinite;
+    }
+    .info-badge.in-progress:hover{
+      transform: scale(1.2);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+    }
+
+    @keyframes pulse-warning {
+      0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+      }
+      50% { 
+        opacity: 0.8;
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+      }
+    }
 
     /* Heir Identification Status Badges */
     .heir-status-badge{
@@ -218,6 +268,12 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
+    .svalue.link{
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .svalue.link:hover{ text-decoration: underline; }
+
     .svalue.ok{ color: rgba(46,132,74,.95); font-weight: 650; }
 
     /* ---------- SECTIONS ---------- */
@@ -326,6 +382,7 @@
       box-shadow: 0 0 0 3px rgba(1,118,211,.12);
     }
 
+    /* stalled reason highlight */
     .field.stalled .value-text{
       color: var(--stalled-text);
       font-weight: 650;
@@ -417,7 +474,7 @@
     }
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
-    /* ---------- RELATED CONTACTS TABLE ---------- */
+    /* ---------- RELATED CONTACTS TABLE - MODERN STYLING ---------- */
     .table-wrap{ 
       padding: 0 0 14px; 
       overflow-x: auto;
@@ -468,9 +525,15 @@
       font-weight: 600;
       font-size: 16.5px;
     }
-    .td-link:hover{ text-decoration: underline; }
-    a.td-link{ text-decoration: none; }
-    a.td-link:hover{ text-decoration: underline; }
+    .td-link:hover{ 
+      text-decoration: underline; 
+    }
+    a.td-link{
+      text-decoration: none;
+    }
+    a.td-link:hover{
+      text-decoration: underline;
+    }
 
     .status{
       display:inline-flex;
@@ -489,6 +552,7 @@
     .dot.good{ background: #10b981; }
     .dot.warn{ background: #f59e0b; }
 
+    /* Motivation badges */
     .motivation-badge{
       display: inline-block;
       padding: 4px 10px;
@@ -497,14 +561,44 @@
       font-weight: 600;
       text-align: center;
     }
-    .motivation-warm{ background: #fef3c7; color: #92400e; }
-    .motivation-cold{ background: #f3f4f6; color: #6b7280; }
-    .motivation-unknown{ background: #f3f4f6; color: #9ca3af; }
+    .motivation-warm{
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .motivation-cold{
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .motivation-unknown{
+      background: #f3f4f6;
+      color: #9ca3af;
+    }
 
-    .quick-actions{ display: flex; gap: 6px; }
-    .quick-actions .btn{ font-size: 14.5px; padding: 6px 10px; border-radius: 6px; }
+    /* Quick action buttons */
+    .quick-actions{
+      display: flex;
+      gap: 6px;
+    }
+    .quick-actions .btn{
+      font-size: 14.5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
 
-    /* Add Note Modal */
+    /* Click-to-call phone links */
+    .phone-link{
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .phone-link:hover{
+      text-decoration: underline;
+      color: #0176d3;
+    }
+
+    /* Add Note Modal - Floating Popup */
     .note-modal-overlay{
       position: fixed;
       inset: 0;
@@ -517,6 +611,7 @@
       display: block;
       pointer-events: auto;
     }
+    
     .note-modal{
       position: absolute;
       background: white;
@@ -528,6 +623,8 @@
       flex-direction: column;
       z-index: 10001;
     }
+    
+    /* Arrow pointing down to button */
     .note-modal::after{
       content: '';
       position: absolute;
@@ -541,6 +638,7 @@
       border-top: 8px solid white;
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
     }
+    
     .note-modal-header{
       padding: 14px 16px;
       border-bottom: 1px solid #e5e7eb;
@@ -548,45 +646,114 @@
       align-items: center;
       justify-content: space-between;
     }
-    .note-modal-title{ font-size: 16px; font-weight: 600; color: #111827; }
+    
+    .note-modal-title{
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+    }
+    
     .note-modal-close{
-      width: 28px; height: 28px; border-radius: 6px; border: none;
-      background: transparent; color: #6b7280; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s ease; padding: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      padding: 0;
     }
-    .note-modal-close:hover{ background: #f3f4f6; color: #111827; }
-    .note-modal-body{ padding: 16px; overflow-y: auto; flex: 1; }
+    .note-modal-close:hover{
+      background: #f3f4f6;
+      color: #111827;
+    }
+    
+    .note-modal-body{
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
     .note-contact-info{
-      background: #f9fafb; padding: 10px 12px; border-radius: 6px;
-      margin-bottom: 12px; font-size: 13px; color: #6b7280;
+      background: #f9fafb;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #6b7280;
     }
-    .note-contact-name{ font-weight: 600; color: #111827; font-size: 14px; }
+    .note-contact-name{
+      font-weight: 600;
+      color: #111827;
+      font-size: 14px;
+    }
+    
     .note-textarea{
-      width: 100%; min-height: 120px; padding: 10px;
-      border: 1px solid #d1d5db; border-radius: 6px;
-      font-family: var(--font); font-size: 14px; resize: vertical; outline: none;
+      width: 100%;
+      min-height: 120px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .note-textarea:focus{
       border-color: #0176d3;
       box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.1);
     }
+    
     .note-modal-footer{
-      padding: 12px 16px; border-top: 1px solid #e5e7eb;
-      display: flex; justify-content: flex-end; gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
     }
+    
     .note-btn{
-      padding: 8px 16px; border-radius: 6px; font-family: var(--font);
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: all 0.15s ease; border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
     }
-    .note-btn-cancel{ background: white; color: #6b7280; border: 1px solid #d1d5db; }
-    .note-btn-cancel:hover{ background: #f9fafb; border-color: #9ca3af; }
-    .note-btn-save{ background: #0176d3; color: white; }
-    .note-btn-save:hover{ background: #0161b3; }
-    .note-btn-save:disabled{ background: #9ca3af; cursor: not-allowed; }
-    .note-char-count{ text-align: right; margin-top: 6px; font-size: 11px; color: #9ca3af; }
+    .note-btn-cancel{
+      background: white;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+    }
+    .note-btn-cancel:hover{
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+    .note-btn-save{
+      background: #0176d3;
+      color: white;
+    }
+    .note-btn-save:hover{
+      background: #0161b3;
+    }
+    .note-btn-save:disabled{
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    
+    .note-char-count{
+      text-align: right;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
 
     .hint{
       padding: 10px 14px 14px;
@@ -596,80 +763,175 @@
       background: #fbfcfe;
     }
 
-    /* ---------- SUB-TABS ---------- */
+    /* ---------- SUB-TABS (for Related Contacts) ---------- */
     .sub-tabs-bar{
-      display: flex; gap: 24px; padding: 0 0 8px 0;
-      border-bottom: 1px solid var(--line); margin-bottom: 14px;
+      display: flex;
+      gap: 24px;
+      padding: 0 0 8px 0;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
     }
+
     .sub-tab{
-      appearance: none; border: 0; background: transparent;
-      font-family: var(--font); font-size: 14.5px; padding: 8px 0;
-      color: var(--muted); cursor: pointer; position: relative;
-      font-weight: 500; transition: color .12s ease;
+      appearance: none;
+      border: 0;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 14.5px;
+      padding: 8px 0;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+      font-weight: 500;
+      transition: color .12s ease;
     }
-    .sub-tab[aria-selected="true"]{ color: var(--text); font-weight: 600; }
+    .sub-tab[aria-selected="true"]{ 
+      color: var(--text); 
+      font-weight: 600;
+    }
     .sub-tab[aria-selected="true"]::after{
-      content: ""; position: absolute; left: 0; right: 0;
-      bottom: -9px; height: 2px; background: var(--blue);
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -9px;
+      height: 2px;
+      background: var(--blue);
     }
     .sub-tab:hover{ color: var(--text); }
     .sub-tab:focus{ outline: none; }
     .sub-tab:focus-visible{
       outline: 2px solid rgba(1,118,211,.25);
-      outline-offset: 2px; border-radius: 4px;
+      outline-offset: 2px;
+      border-radius: 4px;
     }
+
     .sub-tab-pane{ display: none; }
     .sub-tab-pane.active{ display: block; }
-    #subpane-confirmed table{ min-width: 1100px; }
+
+    #subpane-confirmed table{
+      min-width: 1100px;
+    }
 
     /* ---------- LOADING OVERLAY ---------- */
     #loadingOverlay{
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(243,244,246,.85);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center;
-      z-index: 10000; padding: 24px; animation: fadeIn 0.3s ease;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      animation: fadeIn 0.3s ease;
     }
     #loadingOverlay[aria-hidden="false"]{ display:flex; }
-    #loadingOverlay.fade-out{ animation: fadeOut 0.5s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .loadingCard{ display: flex; flex-direction: column; align-items: center; gap: 20px; }
-    .spinner{
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 5px solid rgba(1,118,211,.15); border-top-color: #0176d3;
-      animation: spin 0.8s linear infinite; flex: 0 0 auto;
+    #loadingOverlay.fade-out{
+      animation: fadeOut 0.5s ease forwards;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loadingText{ display:flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
-    .loadingTitle{ font-size: 18px; font-weight: 650; color: #111827; letter-spacing: -0.01em; }
-    .loadingSub{ font-size: 14px; color: #6b7280; line-height: 1.4; }
-
-    /* ---------- ACTION REQUIRED BANNER ---------- */
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .loadingCard{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .spinner{
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 5px solid rgba(1,118,211,.15);
+      border-top-color: #0176d3;
+      animation: spin 0.8s linear infinite;
+      flex: 0 0 auto;
+    }
+    @keyframes spin { 
+      to { transform: rotate(360deg); } 
+    }
+    
+    .loadingText{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      text-align: center;
+    }
+    .loadingTitle{
+      font-size: 18px;
+      font-weight: 650;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+    .loadingSub{
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+    
+    /* ---------- ACTION REQUIRED BANNER - MODERN ---------- */
     #actionBanner{
       margin: 10px 14px 0;
-      border-radius: 6px; border: 1px solid #fecaca;
-      background: #fef2f2; color: #7f1d1d;
+      border-radius: 6px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #7f1d1d;
       padding: 14px 16px 14px 18px;
       box-shadow: 0 1px 2px rgba(0,0,0,.04);
-      overflow: hidden; max-height: 0; opacity: 0;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
       transform: translateY(-6px);
       transition: max-height .22s ease, opacity .18s ease, transform .18s ease, margin-top .22s ease;
       position: relative;
     }
     #actionBanner::before{
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 4px; background: #dc2626;
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #dc2626;
     }
-    #actionBanner.show{ max-height: 160px; opacity: 1; transform: translateY(0); margin-top: 10px; }
-    #actionBanner strong{ font-weight: 700; }
-    #actionBanner .bannerText{ font-size: 14px; line-height: 1.5; color: #1f2937; letter-spacing: -0.01em; }
-    #actionBanner .bannerText strong:first-child{ color: #dc2626; }
+    #actionBanner.show{
+      max-height: 160px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 10px;
+    }
+    #actionBanner strong{
+      font-weight: 700;
+    }
+    #actionBanner .bannerText{
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1f2937;
+      letter-spacing: -0.01em;
+    }
+    #actionBanner .bannerText strong:first-child{
+      color: #dc2626;
+    }
 
+    /* ---------- RELATED CONTACTS SUMMARY ---------- */
     .section-head .section-meta{
-      font-size: 14px; color: var(--muted); font-weight: 600; white-space: nowrap;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
     }
+
   </style>
 </head>
 
@@ -688,77 +950,70 @@
     <div class="layout">
       <div class="panel">
 
-        <!-- ===== TOP SNAPSHOT ===== -->
+        <!-- Top snapshot FIRST -->
         <div class="topSnapshot" aria-label="Top Snapshot">
           <div class="topSnapshotGrid">
-
             <!-- LEFT: Property Details -->
             <div class="snapshotBlock">
               <div class="snapshotTitle">PROPERTY DETAILS</div>
               <div class="snapshotDivider"></div>
-              <div class="snapshotFields">
 
+              <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Deceased Owner</div>
-                  <div class="svalue" id="snap-deceased-owner">—</div>
+                  <div class="svalue">Maria Resendez Estate</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Last Contact</div>
-                  <div class="svalue" style="display:flex;flex-direction:column;gap:2px;">
-                    <span id="snap-last-contact-days" style="font-weight:700;font-size:17px;color:#6b7280;">—</span>
-                    <span id="snap-last-contact-date" style="font-size:13px;color:#6b7280;font-weight:500;">—</span>
+                  <div class="svalue" style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; font-size: 17px; color: #f59e0b;">6 days ago</span>
+                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Feb 13, 2026</span>
                   </div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Deal Score</div>
-                  <div class="svalue" id="snap-deal-score">—</div>
+                  <div class="svalue">72</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
-                  <div class="svalue" id="snap-taxes-owed">—</div>
+                  <div class="svalue">$8,400</div>
                 </div>
-
               </div>
             </div>
-
-            <!-- RIGHT: Deal Insights -->
             <div class="snapshotBlock">
               <div class="snapshotTitle">DEAL INSIGHTS</div>
               <div class="snapshotDivider"></div>
-              <div class="snapshotFields">
 
+              <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">
                     Heirs Identified
-                    <span class="heir-status-badge heir-status-complete" id="snap-heirs-badge">—</span>
+                    <span class="heir-status-badge heir-status-complete">Complete</span>
                   </div>
-                  <div class="svalue" id="snap-heirs-total">—</div>
+                  <div class="svalue">5</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue" id="snap-heirs-contacted">—</div>
+                  <div class="svalue">3 of 5</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue" id="snap-heirs-offered">—</div>
+                  <div class="svalue">1 of 5</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
-                  <div class="svalue ok" id="snap-ownership-secured">—</div>
+                  <div class="svalue ok">20% (1 of 5)</div>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
-        <!-- ===== END TOP SNAPSHOT ===== -->
 
         <!-- Tabs + Refresh -->
         <div class="tabsbar" role="group" aria-label="Tabs and actions">
@@ -768,6 +1023,7 @@
             <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
             <button class="tab" role="tab" id="tab-milestones" aria-selected="false" aria-controls="pane-milestones" type="button">Milestones</button>
           </div>
+
           <div class="tabs-actions">
             <button class="btn" id="btnRefresh" type="button" title="Refresh">
               <span aria-hidden="true">⟳</span>
@@ -776,64 +1032,147 @@
           </div>
         </div>
 
-        <!-- Action Required Banner -->
+        <!-- Action Required Banner - MODERNIZED -->
         <div id="actionBanner" aria-live="polite" aria-atomic="true" role="status">
           <div class="bannerText" id="actionBannerText">—</div>
         </div>
 
         <div class="tab-content">
-
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
+
+            <!-- Property Details Section -->
             <div class="section">
               <div class="section-head">
                 <div><h3>Property Details</h3></div>
               </div>
+
               <div class="field-grid">
                 <div>
                   <div class="field" data-field="lead_type">
                     <div class="label">Lead Type</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="tax_status">
                     <div class="label">Tax Status</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="condition">
                     <div class="label">Condition</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="occupancy">
                     <div class="label">Occupancy</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
-                  <div class="field" data-field="length_of_inactivity">
+
+                  <div class="field" data-field="days_of_inactivity">
                     <div class="label">Days of Inactivity</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
+
                 <div>
-                  <div class="field" data-field="equity">
+                  <div class="field" data-field="total_equity">
                     <div class="label">Equity</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="deed_status">
                     <div class="label">Deed Status</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="will_status">
                     <div class="label">Will Status</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="title_issue">
                     <div class="label">Title Issue</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Update Activity (collapsible) -->
+
+            <!-- Update Activity (collapsible, closed by default) -->
             <div class="inline-toggle" id="characteristicsToggle" data-open="false">
               <div class="toggle-head" role="button" tabindex="0" aria-expanded="false" aria-controls="characteristicsBody">
                 <div class="toggle-left">
@@ -845,38 +1184,69 @@
                   <div class="toggle-title">Update Activity</div>
                 </div>
               </div>
+
               <div class="toggle-body" id="characteristicsBody">
                 <div class="field-grid">
                   <div>
                     <div class="field" data-field="next_action_step">
                       <div class="label">Next Action Step</div>
-                      <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">—</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
                     </div>
+
                     <div class="field" data-field="stalled_reason">
                       <div class="label">Stalled Reason</div>
-                      <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">—</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
                     </div>
                   </div>
+
                   <div>
                     <div class="field" data-field="follow_up_date">
                       <div class="label">Follow-up Date</div>
-                      <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                      <div class="value">
+                        <span class="value-text" data-editable="true">—</span>
+                        <span class="edit" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Related Contacts -->
+            <!-- Related Contacts - MODERNIZED -->
             <div class="section">
               <div class="section-head">
                 <div><h3>Related Contacts</h3></div>
                 <div class="section-meta" id="contactsSummary">—</div>
               </div>
+
+              <!-- Sub-tabs for Confirmed Owners vs Other Contacts -->
               <div class="sub-tabs-bar" role="tablist" aria-label="Contact Tabs">
                 <button class="sub-tab" role="tab" id="subtab-confirmed" aria-selected="true" aria-controls="subpane-confirmed" type="button">Confirmed Owners</button>
                 <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Related Contacts</button>
               </div>
+
+              <!-- Confirmed Owners Table - OPTIMIZED COLUMNS -->
               <div class="sub-tab-pane active" id="subpane-confirmed" role="tabpanel" aria-labelledby="subtab-confirmed">
                 <div class="table-wrap">
                   <table aria-label="Confirmed Owners Table">
@@ -896,6 +1266,8 @@
                   </table>
                 </div>
               </div>
+
+              <!-- Other Related Contacts Table - OPTIMIZED COLUMNS -->
               <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
                 <div class="table-wrap">
                   <table aria-label="Other Related Contacts Table">
@@ -925,46 +1297,129 @@
           <!-- RESEARCH -->
           <div class="tab-pane" id="pane-research" role="tabpanel" aria-labelledby="tab-research">
             <div class="section">
-              <div class="section-head"><div><h3>Research</h3></div></div>
+              <div class="section-head">
+                <div><h3>Research</h3></div>
+              </div>
+
               <div class="field-grid">
                 <div>
                   <div class="field" data-field="obituary_link">
                     <div class="label">Obituary Link</div>
-                    <div class="value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="ancestry_link">
                     <div class="label">Ancestry Link</div>
-                    <div class="value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="zillow_link">
                     <div class="label">Zillow Link</div>
-                    <div class="value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="tax_assessor_link">
                     <div class="label">Tax Assessor Link</div>
-                    <div class="value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="google_maps_link">
                     <div class="label">Google Maps Link</div>
-                    <div class="value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text link" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
+
                 <div>
                   <div class="field" data-field="birth_date">
                     <div class="label">Birth Date</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="death_date">
                     <div class="label">Death Date</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="age">
                     <div class="label">Age</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
+
                   <div class="field" data-field="creation_log">
                     <div class="label">Creation Log</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -974,29 +1429,52 @@
           <!-- ACTIVITY -->
           <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
             <div class="section">
-              <div class="section-head"><div><h3>Activity</h3></div></div>
+              <div class="section-head">
+                <div><h3>Activity</h3></div>
+              </div>
+
               <div class="field-grid">
                 <div>
                   <div class="field" data-field="last_contacted">
                     <div class="label">Last Contacted</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
+
                 <div>
                   <div class="field" data-field="activity_notes">
                     <div class="label">Notes</div>
-                    <div class="value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                    <div class="value">
+                      <span class="value-text" data-editable="true">—</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
             <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
 
           <!-- MILESTONES -->
           <div class="tab-pane" id="pane-milestones" role="tabpanel" aria-labelledby="tab-milestones">
             <div class="section">
-              <div class="section-head"><div><h3>Milestones</h3></div></div>
+              <div class="section-head">
+                <div><h3>Milestones</h3></div>
+              </div>
             </div>
           </div>
 
@@ -1022,8 +1500,15 @@
           <div class="note-contact-name" id="noteContactName">—</div>
           <div id="noteContactRelation">—</div>
         </div>
-        <textarea class="note-textarea" id="noteTextarea" placeholder="Add your note here..." maxlength="5000"></textarea>
-        <div class="note-char-count"><span id="noteCharCount">0</span> / 5000 characters</div>
+        <textarea 
+          class="note-textarea" 
+          id="noteTextarea" 
+          placeholder="Add your note here..."
+          maxlength="5000"
+        ></textarea>
+        <div class="note-char-count">
+          <span id="noteCharCount">0</span> / 5000 characters
+        </div>
       </div>
       <div class="note-modal-footer">
         <button class="note-btn note-btn-cancel" id="noteBtnCancel">Cancel</button>
@@ -1033,165 +1518,16 @@
   </div>
 
   <script>
-    // ============================================================
-    //  UTILITIES
-    // ============================================================
-    function escapeHtml(str){
-      return String(str ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;")
-        .replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-    }
-    function formatValue(v){
-      if (v === null || v === undefined || v === "") return "—";
-      if (typeof v === "number") return String(v);
-      if (typeof v === "boolean") return v ? "Yes" : "No";
-      return String(v);
-    }
-    function cssEscape(s){ return String(s).replaceAll('"', '\\"'); }
-
-    function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
-
-    function parseFlexibleDate(input){
-      if (!input) return null;
-      if (input instanceof Date) return isNaN(input) ? null : input;
-      const s = String(input).trim();
-      if (!s || s === "—") return null;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)){
-        const d = new Date(s + "T00:00:00");
-        return isNaN(d) ? null : d;
-      }
-      const t = Date.parse(s);
-      if (!isNaN(t)) return new Date(t);
-      return null;
-    }
-
-    // ============================================================
-    //  TOP SNAPSHOT POPULATION
-    // ============================================================
-    function populateSnapshot(payload){
-      // --- Deceased owner ---
-      setSnap("snap-deceased-owner", payload.deceased_owner);
-
-      // --- Deal score ---
-      setSnap("snap-deal-score", payload.deal_score);
-
-      // --- Taxes owed: format as currency if it's a raw number ---
-      const taxRaw = payload.taxes_owed;
-      let taxDisplay = "—";
-      if (taxRaw !== null && taxRaw !== undefined && taxRaw !== "" && taxRaw !== "—") {
-        const num = parseFloat(String(taxRaw).replace(/[^0-9.]/g, ""));
-        taxDisplay = isNaN(num) ? String(taxRaw) : "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-      }
-      setSnap("snap-taxes-owed", taxDisplay);
-
-      // --- Last contact: calculate days ago from last_contacted ---
-      const lastContactDate = parseFlexibleDate(payload.last_contacted);
-      const snapDate = document.getElementById("snap-last-contact-date");
-      const snapDays = document.getElementById("snap-last-contact-days");
-      if (lastContactDate && snapDate && snapDays) {
-        const today = startOfDay(new Date());
-        const contactDay = startOfDay(lastContactDate);
-        const diffDays = Math.floor((today - contactDay) / (1000 * 60 * 60 * 24));
-
-        // Format the date nicely
-        const dateStr = lastContactDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        snapDate.textContent = dateStr;
-
-        // Color-code days ago
-        let daysText, daysColor;
-        if (diffDays === 0) {
-          daysText = "Today";
-          daysColor = "#10b981";
-        } else if (diffDays === 1) {
-          daysText = "Yesterday";
-          daysColor = "#10b981";
-        } else if (diffDays <= 5) {
-          daysText = diffDays + " days ago";
-          daysColor = "#10b981";
-        } else if (diffDays <= 11) {
-          daysText = diffDays + " days ago";
-          daysColor = "#f59e0b";
-        } else {
-          daysText = diffDays + " days ago";
-          daysColor = "#dc2626";
-        }
-        snapDays.textContent = daysText;
-        snapDays.style.color = daysColor;
-      } else {
-        if (snapDate) snapDate.textContent = "—";
-        if (snapDays) { snapDays.textContent = "—"; snapDays.style.color = "#6b7280"; }
-      }
-
-      // --- Deal Insights from confirmed_owners array ---
-      const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
-      const total = owners.length;
-
-      // Heirs contacted = those with a last_contact date
-      const contacted = owners.filter(o => {
-        const d = parseFlexibleDate(o.last_contact || o.lastContact);
-        return d !== null;
-      }).length;
-
-      // Heirs offered = those with offer_made = true
-      const offered = owners.filter(o => o.offer_made === true || o.offerMade === true).length;
-
-      // Ownership secured = sum of ownership_percent where offer made
-      let ownershipPct = 0;
-      owners.forEach(o => {
-        if (o.offer_made === true || o.offerMade === true) {
-          const raw = String(o.ownership_percent || o.ownershipPercent || "0").replace(/[^0-9.]/g, "");
-          const num = parseFloat(raw);
-          if (!isNaN(num)) ownershipPct += num;
-        }
-      });
-
-      setSnap("snap-heirs-total", total > 0 ? String(total) : "—");
-      setSnap("snap-heirs-contacted", total > 0 ? contacted + " of " + total : "—");
-      setSnap("snap-heirs-offered", total > 0 ? offered + " of " + total : "—");
-
-      const securedText = total > 0
-        ? (ownershipPct > 0 ? ownershipPct + "% (" + offered + " of " + total + ")" : "0% (0 of " + total + ")")
-        : "—";
-      setSnap("snap-ownership-secured", securedText);
-
-      // Heirs badge
-      const badge = document.getElementById("snap-heirs-badge");
-      if (badge) {
-        if (total === 0) {
-          badge.textContent = "—";
-          badge.className = "heir-status-badge heir-status-in-progress";
-        } else if (contacted === total) {
-          badge.textContent = "Complete";
-          badge.className = "heir-status-badge heir-status-complete";
-        } else {
-          badge.textContent = "In Progress";
-          badge.className = "heir-status-badge heir-status-in-progress";
-        }
-      }
-    }
-
-    function setSnap(id, value){
-      const el = document.getElementById(id);
-      if (el) el.textContent = formatValue(value);
-    }
-
-    // ============================================================
-    //  FIELD POPULATION (data-field pattern)
-    // ============================================================
+    // Apply test data immediately on load
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
 
-        // Populate all data-field elements
         for (const [key, value] of Object.entries(payload)) {
           const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) node.textContent = formatValue(value);
         }
 
-        // Populate top snapshot
-        populateSnapshot(payload);
-
-        // Render contacts
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
           updateActionBannerFromContacts(payload.confirmed_owners);
@@ -1201,20 +1537,130 @@
         if (Array.isArray(payload.other_contacts)) {
           renderOtherContacts(payload.other_contacts);
         }
-
         computeContactsSummary(payload);
       }
     };
 
-    // ============================================================
-    //  CONTACTS RENDERING
-    // ============================================================
+    // Characteristics dropdown
+    const characteristics = document.getElementById("characteristicsToggle");
+
+    // Contacts - TEST DATA (must be defined BEFORE testData)
+    const sampleConfirmedOwners = [
+      {
+        name: "Rebeca McCrory",
+        relationship: "Daughter",
+        ownershipPercent: "20%",
+        motivation: "Warm",
+        lastContact: "Feb 11, 2026",
+        lastContactDaysAgo: "6 days ago",
+        contactOutcome: "Interested",
+        contactOutcomeDetail: "Wants written offer",
+        followupDate: "Feb 15, 2026",
+        offerMade: true,
+        offerAmount: "$3,000",
+        phone: "(832) 555-1122",
+        nextAction: "Put Together Offer",
+        mondayUrl: "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"
+      },
+      {
+        name: "John McCrory",
+        relationship: "Son",
+        ownershipPercent: "20%",
+        motivation: "Unknown",
+        lastContact: null,
+        lastContactDaysAgo: null,
+        contactOutcome: null,
+        contactOutcomeDetail: null,
+        followupDate: "—",
+        offerMade: false,
+        phone: "(832) 555-9234",
+        mondayItemId: "11004380445"
+      },
+      {
+        name: "Sarah McCrory",
+        relationship: "Daughter",
+        ownershipPercent: "20%",
+        motivation: "Unknown",
+        lastContact: null,
+        lastContactDaysAgo: null,
+        contactOutcome: null,
+        contactOutcomeDetail: null,
+        followupDate: "—",
+        offerMade: false,
+        phone: "(832) 555-8847",
+        mondayItemId: "11004380446"
+      },
+      {
+        name: "Michael McCrory",
+        relationship: "Son",
+        ownershipPercent: "20%",
+        motivation: "Unknown",
+        lastContact: null,
+        lastContactDaysAgo: null,
+        contactOutcome: null,
+        contactOutcomeDetail: null,
+        followupDate: "—",
+        offerMade: false,
+        phone: "(832) 555-4421",
+        mondayItemId: "11004380447"
+      },
+      {
+        name: "Lisa McCrory",
+        relationship: "Daughter",
+        ownershipPercent: "20%",
+        motivation: "Unknown",
+        lastContact: null,
+        lastContactDaysAgo: null,
+        contactOutcome: null,
+        contactOutcomeDetail: null,
+        followupDate: "—",
+        offerMade: false,
+        phone: "(832) 555-7733",
+        mondayItemId: "11004380448"
+      }
+    ];
+
+    const sampleOtherContacts = [
+      {
+        name: "Patricia Franklin",
+        relationship: "Cousin",
+        leadStatus: { text: "Contacted", tone: "good" },
+        contactOutcome: "Referred us to Rebeca",
+        phone1: "(713) 555-2341",
+        phone1Status: { text: "Correct Number", tone: "good" },
+        phone2: "(281) 555-8821",
+        phone2Status: { text: "Disconnected", tone: "warn" },
+        mondayItemId: "11004380450"
+      },
+      {
+        name: "Robert Martinez",
+        relationship: "Neighbor",
+        leadStatus: { text: "Contacted", tone: "good" },
+        contactOutcome: "Provided family info",
+        phone1: "(832) 555-9012",
+        phone1Status: { text: "Correct Number", tone: "good" },
+        phone2: "—",
+        phone2Status: { text: "—", tone: "muted" },
+        mondayItemId: "11004380451"
+      },
+      {
+        name: "Jennifer Davis",
+        relationship: "Friend",
+        leadStatus: { text: "Dial NA", tone: "muted" },
+        contactOutcome: "—",
+        phone1: "(713) 555-4432",
+        phone1Status: { text: "Wrong Number", tone: "warn" },
+        phone2: "—",
+        phone2Status: { text: "—", tone: "muted" },
+        mondayItemId: "11004380452"
+      }
+    ];
+
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
       if (tone === "warn") return "dot warn";
       return "dot";
     }
-
     function statusCell(statusObj){
       if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
       const dot = toneDotClass(statusObj.tone);
@@ -1222,6 +1668,77 @@
       const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
+
+    // NOW define testData AFTER sample arrays are initialized
+    const testData = {
+      // Top Snapshot - Property Details
+      lead_name: "Maria Resendez Estate",
+      deal_score: "72",
+      address: "1251 Forester St, Houston, TX 77022",
+      taxes_owed: "$8,400",
+      
+      // Top Snapshot - Deal Insights (these get computed from contacts)
+      heirs_identified: 5,
+      heirs_contacted: 3,
+      
+      // Property Details
+      lead_type: "Taxes Under Suit",
+      tax_status: "3-4 years unpaid",
+      occupancy: "Vacant",
+      will_status: "Not Filed",
+      days_of_inactivity: "4 days",
+      total_equity: "$112,000",
+      condition: "Fair",
+      title_issue: "None",
+      deed_status: "Verified",
+      
+      // Update Activity
+      next_action_step: "Put Together Offer",
+      stalled_reason: "Waiting on heir response",
+      follow_up_date: "Feb 15, 2026",
+      
+      // Research
+      obituary_link: "https://www.legacy.com/obituaries/name/maria-resendez",
+      ancestry_link: "https://www.ancestry.com/search",
+      zillow_link: "https://www.zillow.com/homedetails/1251-Forester-St",
+      tax_assessor_link: "https://hcad.org/property-search",
+      google_maps_link: "https://maps.google.com/?q=1251+Forester+St+Houston+TX",
+      birth_date: "March 15, 1945",
+      death_date: "January 8, 2026",
+      age: "80",
+      creation_log: "Created on Jan 12, 2026 by John Smith",
+      
+      // Activity
+      last_contacted: "Feb 11, 2026",
+      activity_notes: "Spoke with Rebeca - very interested in selling",
+      
+      // Contacts
+      confirmed_owners: sampleConfirmedOwners,
+      other_contacts: sampleOtherContacts
+    };
+
+    // Now setup event listeners AFTER data is defined
+    const toggleCharacteristics = () => {
+      const isOpen = characteristics.getAttribute("data-open") === "true";
+      characteristics.setAttribute("data-open", String(!isOpen));
+      characteristics.querySelector(".toggle-head").setAttribute("aria-expanded", String(!isOpen));
+    };
+    characteristics.querySelector(".toggle-head").addEventListener("click", toggleCharacteristics);
+    characteristics.querySelector(".toggle-head").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCharacteristics(); }
+    });
+
+    // Tabs
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const panes = Array.from(document.querySelectorAll(".tab-pane"));
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.setAttribute("aria-selected", "false"));
+        panes.forEach(p => p.classList.remove("active"));
+        tab.setAttribute("aria-selected", "true");
+        document.getElementById(tab.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
 
     function motivationBadge(motivation){
       if (!motivation) return `<span class="motivation-badge motivation-unknown">Unknown</span>`;
@@ -1231,177 +1748,255 @@
       return `<span class="motivation-badge motivation-unknown">Unknown</span>`;
     }
 
-    function leadStatusTone(text){
-      if (!text) return "muted";
-      const t = String(text).toLowerCase();
-      if (t.includes("contacted") || t.includes("correct") || t.includes("alive") || t.includes("active")) return "good";
-      if (t.includes("dial na") || t.includes("attempt") || t.includes("no answer") || t.includes("wrong")) return "warn";
-      return "muted";
-    }
-
-    function extractBoardIdFromUrl(){
-      const urlParams = window.location.search;
-      if (!urlParams || urlParams === '?') return '';
-      const cleaned = urlParams.substring(1).trim();
-      if (cleaned.includes('/pulses/')) {
-        const parts = cleaned.split('/pulses/');
-        return parts[0].trim();
-      }
-      const params = new URLSearchParams(cleaned);
-      return params.get('boardId') || params.get('board_id') || '';
+    function formatPhoneForTel(phone){
+      // Strip all non-numeric characters for tel: link
+      if (!phone) return '';
+      return phone.replace(/\D/g, '');
     }
 
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
       const rows = (contacts || []).map((c, index) => {
-
-        // Last contact display
-        const lastContactRaw = c.last_contact || c.lastContact;
-        const lastContactDate = parseFlexibleDate(lastContactRaw);
-        let lastContactCell = `<span class="td-muted">Not contacted</span>`;
-        if (lastContactDate) {
-          const today = startOfDay(new Date());
-          const diffDays = Math.floor((today - startOfDay(lastContactDate)) / (1000*60*60*24));
-          const dateStr = lastContactDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-          let daysColor = "#374151";
-          let daysText = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : diffDays + " days ago";
-          if (diffDays >= 12) daysColor = "#dc2626";
-          else if (diffDays >= 6) daysColor = "#f59e0b";
-          else daysColor = "#10b981";
-          lastContactCell = `<div style="font-weight:600;">${escapeHtml(dateStr)}</div><div style="font-size:12px;color:${daysColor};">${daysText}</div>`;
-        }
-
-        // Lead status from contact_outcome or lead_status
-        const leadStatusText = c.lead_status || c.contactOutcome || c.contact_outcome || "—";
-        const leadTone = leadStatusTone(leadStatusText);
-        const leadStatusCell = `<span class="status"><span class="${toneDotClass(leadTone)}"></span>${escapeHtml(leadStatusText)}</span>`;
-
-        // Follow-up date
-        const followupRaw = c.follow_up_date || c.followupDate;
-        const followupDate = parseFlexibleDate(followupRaw);
-        let followupCell = `<span class="td-muted">—</span>`;
-        if (followupDate) {
-          const today = startOfDay(new Date());
-          const diffDays = Math.floor((today - startOfDay(followupDate)) / (1000*60*60*24));
-          const dateStr = followupDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-          if (diffDays > 0) {
-            followupCell = `<div style="font-weight:600;background:#fef2f2;padding:2px 6px;border-radius:4px;">${escapeHtml(dateStr)}</div><div style="font-size:12px;color:#dc2626;">${diffDays} day${diffDays===1?'':'s'} overdue</div>`;
-          } else {
-            followupCell = `<div style="font-weight:600;">${escapeHtml(dateStr)}</div>`;
+        const isOverdue = c.followupDate && c.followupDate !== "—" && new Date(c.followupDate) < new Date();
+        const followupStyle = isOverdue ? 'style="background: #fef2f2;"' : '';
+        const followupText = isOverdue ? `<div style="font-weight: 600;">${c.followupDate}</div><div style="font-size: 12px; color: #dc2626;">4 days overdue</div>` : (c.followupDate || "—");
+        
+        // Determine Last Contact color based on days ago
+        let lastContactColor = '#374151'; // default
+        if (c.lastContactDaysAgo) {
+          const daysAgoMatch = c.lastContactDaysAgo.match(/(\d+)/);
+          if (daysAgoMatch) {
+            const days = parseInt(daysAgoMatch[1]);
+            if (days >= 12) {
+              lastContactColor = '#dc2626'; // red for 12+ days
+            } else if (days >= 6) {
+              lastContactColor = '#f59e0b'; // orange for 6-11 days
+            }
           }
         }
-
-        // Offer status
-        const offerMade = c.offer_made === true || c.offerMade === true;
-        const offerAmount = c.offer_amount || c.offerAmount || "";
-        const offerCell = offerMade
-          ? `<div style="font-weight:600;">Presented</div><div style="font-size:12px;color:#6b7280;">${escapeHtml(offerAmount)}</div>`
-          : `<span class="td-muted">No offer</span>`;
-
-        // Name link
-        const mondayUrl = c.monday_url || c.mondayUrl || "";
-        const nameCell = mondayUrl
-          ? `<a href="${escapeHtml(mondayUrl)}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-          : `<span>${escapeHtml(c.name ?? "—")}</span>`;
-
-        const relationship = c.relationship || "";
-        const ownershipPercent = c.ownership_percent || c.ownershipPercent || "—";
-        const motivation = c.motivation || "";
-
+        
         return `
-          <tr>
-            <td>
-              ${nameCell}
-              ${relationship ? `<div style="font-size:13px;color:#9ca3af;margin-top:2px;">${escapeHtml(relationship)}</div>` : ""}
-            </td>
-            <td style="font-weight:600;">${escapeHtml(String(ownershipPercent))}</td>
-            <td>${motivationBadge(motivation)}</td>
-            <td>${lastContactCell}</td>
-            <td>${leadStatusCell}</td>
-            <td>${followupCell}</td>
-            <td>${offerCell}</td>
-            <td>
-              <div class="quick-actions">
-                <button class="btn add-note-btn" data-contact-index="${index}">Add Note</button>
-              </div>
-            </td>
-          </tr>`;
+        <tr>
+          <td>
+            ${c.mondayUrl || c.mondayItemId
+              ? `<a href="${c.mondayUrl || `https://monday.com/boards/${extractBoardIdFromUrl()}/pulses/${c.mondayItemId}`}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
+              : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
+            }
+            ${c.relationship ? `<div style="font-size: 13px; color: #9ca3af; margin-top: 2px;">${escapeHtml(c.relationship)}</div>` : ''}
+          </td>
+          <td style="font-weight: 600;">${escapeHtml(c.ownershipPercent ?? "—")}</td>
+          <td>${motivationBadge(c.motivation)}</td>
+          <td>
+            ${c.lastContact ? `<div style="font-weight: 600;">${escapeHtml(c.lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${c.lastContactDaysAgo || ''}</div>` : `<span class="td-muted">Not contacted</span>`}
+          </td>
+          <td>${c.contactOutcome ? `<div style="font-weight: 600; color: #059669;">${escapeHtml(c.contactOutcome)}</div><div style="font-size: 12px; color: #6b7280;">${c.contactOutcomeDetail || ''}</div>` : `<span class="td-muted">—</span>`}</td>
+          <td ${followupStyle}>${followupText}</td>
+          <td>
+            ${c.offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">${c.offerAmount || '—'}</div>` : `<span class="td-muted">No offer</span>`}
+          </td>
+          <td>
+            <div class="quick-actions">
+              <button class="btn add-note-btn" data-contact-index="${index}">Add Note</button>
+            </div>
+          </td>
+        </tr>
+      `;
       }).join("");
-
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Owners Identified Yet</td></tr>`;
-
+      
+      // Add event listeners to Add Note buttons
       document.querySelectorAll('.add-note-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const idx = parseInt(e.target.getAttribute('data-contact-index'));
-          openNoteModal((contacts || [])[idx], idx, e.target);
+          const contactIndex = parseInt(e.target.getAttribute('data-contact-index'));
+          openNoteModal(contacts[contactIndex], contactIndex, e.target);
         });
       });
     }
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
-      const rows = (contacts || []).map(c => {
-        const mondayUrl = c.monday_url || c.mondayUrl || "";
-        const nameCell = mondayUrl
-          ? `<a href="${escapeHtml(mondayUrl)}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-          : `<span>${escapeHtml(c.name ?? "—")}</span>`;
-
-        // Support both object {text, tone} and plain string for leadStatus
-        const leadStatusRaw = c.lead_status || c.leadStatus;
-        const leadStatusObj = typeof leadStatusRaw === "object" && leadStatusRaw !== null
-          ? leadStatusRaw
-          : { text: leadStatusRaw || "—", tone: leadStatusTone(leadStatusRaw) };
-
-        const phone1Raw = c.phone_1 || c.phone1 || "—";
-        const phone2Raw = c.phone_2 || c.phone2 || "—";
-
-        const phone1StatusRaw = c.phone_1_status || c.phone1Status;
-        const phone1StatusObj = typeof phone1StatusRaw === "object" && phone1StatusRaw !== null
-          ? phone1StatusRaw
-          : { text: phone1StatusRaw || "—", tone: leadStatusTone(phone1StatusRaw) };
-
-        const phone2StatusRaw = c.phone_2_status || c.phone2Status;
-        const phone2StatusObj = typeof phone2StatusRaw === "object" && phone2StatusRaw !== null
-          ? phone2StatusRaw
-          : { text: phone2StatusRaw || "—", tone: leadStatusTone(phone2StatusRaw) };
-
-        return `
-          <tr>
-            <td>${nameCell}</td>
-            <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
-            <td>${statusCell(leadStatusObj)}</td>
-            <td>${escapeHtml(c.contact_outcome || c.contactOutcome || "—")}</td>
-            <td>${escapeHtml(phone1Raw)}</td>
-            <td>${statusCell(phone1StatusObj)}</td>
-            <td>${escapeHtml(phone2Raw)}</td>
-            <td>${statusCell(phone2StatusObj)}</td>
-          </tr>`;
-      }).join("");
-
+      const rows = (contacts || []).map(c => `
+        <tr>
+          <td>
+            ${c.mondayUrl || c.mondayItemId
+              ? `<a href="${c.mondayUrl || `https://monday.com/boards/${extractBoardIdFromUrl()}/pulses/${c.mondayItemId}`}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
+              : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
+            }
+          </td>
+          <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
+          <td>${statusCell(c.leadStatus)}</td>
+          <td>${escapeHtml(c.contactOutcome ?? "—")}</td>
+          <td>${escapeHtml(c.phone1 ?? "—")}</td>
+          <td>${statusCell(c.phone1Status)}</td>
+          <td>${escapeHtml(c.phone2 ?? "—")}</td>
+          <td>${statusCell(c.phone2Status)}</td>
+        </tr>
+      `).join("");
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No other related contacts.</td></tr>`;
     }
 
-    // ============================================================
-    //  ACTION BANNER
-    // ============================================================
+    // Sub-tabs functionality
+    const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
+    const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
+    subTabs.forEach(subTab => {
+      subTab.addEventListener("click", () => {
+        subTabs.forEach(t => t.setAttribute("aria-selected", "false"));
+        subPanes.forEach(p => p.classList.remove("active"));
+        subTab.setAttribute("aria-selected", "true");
+        document.getElementById(subTab.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
+
+    // Inline edit (auto-save on blur / Enter)
+    Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
+      pencil.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const field = pencil.closest(".field");
+        const valueText = field.querySelector(".value-text");
+        const editable = valueText.getAttribute("data-editable") === "true";
+        if (!editable) return;
+        if (field.querySelector(".inline-input")) return;
+
+        const oldValue = valueText.textContent.trim();
+        const valueWrap = field.querySelector(".value");
+        valueText.style.display = "none";
+        pencil.style.display = "none";
+
+        const input = document.createElement("input");
+        input.className = "inline-input";
+        input.value = oldValue;
+
+        const left = document.createElement("div");
+        left.style.flex = "1";
+        left.style.minWidth = "0";
+        left.appendChild(input);
+
+        valueWrap.insertBefore(left, valueWrap.firstChild);
+
+        const commit = () => {
+          const newValue = input.value.trim() || "—";
+          valueText.textContent = newValue;
+          left.remove();
+          valueText.style.display = "";
+          pencil.style.display = "";
+        };
+
+        const cancel = () => {
+          left.remove();
+          valueText.style.display = "";
+          pencil.style.display = "";
+        };
+
+        input.addEventListener("blur", commit);
+        input.addEventListener("keydown", (ke) => {
+          if (ke.key === "Enter") commit();
+          if (ke.key === "Escape") cancel();
+        });
+
+        input.focus();
+        input.select();
+      });
+    });
+
+    // Click-to-open for Research links
+    Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
+      node.addEventListener('click', () => {
+        const raw = (node.textContent || '').trim();
+        if (!raw || raw === '—') return;
+
+        let url = raw;
+        if (!/^https?:\/\//i.test(url)) {
+          if (/\./.test(url) || url.startsWith('www.') || url.includes('/')) {
+            url = 'https://' + url.replace(/^www\./i, 'www.');
+          }
+        }
+        if (!/^https?:\/\//i.test(url)) return;
+
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    });
+
+    // Refresh button
+    document.getElementById("btnRefresh").addEventListener("click", () => {
+      fetchDataFromMake();
+    });
+
+    // Loading overlay helpers - ensures minimum 1.5 second display
+    let loadingStartTime = null;
+    const MIN_LOADING_TIME = 1500; // 1.5 seconds
+    
+    function showLoading(){
+      const overlay = document.getElementById("loadingOverlay");
+      if (overlay) {
+        overlay.setAttribute("aria-hidden", "false");
+        overlay.classList.remove('fade-out');
+        loadingStartTime = Date.now();
+      }
+    }
+    
+    function hideLoading(){
+      const overlay = document.getElementById("loadingOverlay");
+      if (!overlay || !loadingStartTime) return;
+      
+      const elapsedTime = Date.now() - loadingStartTime;
+      const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+      
+      setTimeout(() => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+          overlay.setAttribute("aria-hidden", "true");
+          overlay.classList.remove('fade-out');
+          loadingStartTime = null;
+        }, 500); // Wait for fade-out animation
+      }, remainingTime);
+    }
+
+
+    // Action Required banner + Related Contacts summary
+    function startOfDay(d){
+      const x = new Date(d);
+      x.setHours(0,0,0,0);
+      return x;
+    }
+
+    function parseFlexibleDate(input){
+      if (!input) return null;
+      if (input instanceof Date) return isNaN(input) ? null : input;
+
+      const s = String(input).trim();
+      if (!s || s === "—") return null;
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const d = new Date(s + "T00:00:00");
+        return isNaN(d) ? null : d;
+      }
+
+      const t = Date.parse(s);
+      if (!isNaN(t)) return new Date(t);
+
+      return null;
+    }
+
     function updateActionBannerFromContacts(confirmedOwners){
       const banner = document.getElementById("actionBanner");
       const textNode = document.getElementById("actionBannerText");
       if (!banner || !textNode) return;
 
       const today = startOfDay(new Date());
-      let best = null;
 
+      let best = null;
       (confirmedOwners || []).forEach(c => {
-        const d = parseFlexibleDate(c?.follow_up_date || c?.followupDate);
+        const d = parseFlexibleDate(c?.followupDate);
         if (!d) return;
+
         const due = startOfDay(d);
         const diffDays = Math.floor((today - due) / (1000*60*60*24));
+
         if (diffDays > 0) {
           const candidate = {
             name: String(c?.name ?? "—").trim() || "—",
             daysOverdue: diffDays,
-            nextAction: String(c?.next_action || c?.nextAction ?? "").trim()
+            nextAction: String(c?.nextAction ?? "").trim()
           };
           if (!best || candidate.daysOverdue > best.daysOverdue) best = candidate;
         }
@@ -1414,101 +2009,284 @@
       }
 
       const plural = best.daysOverdue === 1 ? "" : "s";
-      const base = `<strong>Action Required:</strong> Follow-up with ${escapeHtml(best.name)} is ${best.daysOverdue} day${plural} overdue.`;
-      const full = best.nextAction ? `${base} <strong>Next step:</strong> ${escapeHtml(best.nextAction)}.` : base;
+      const base = `<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
+      const full = best.nextAction ? `${base} <strong>Next step:</strong> ${best.nextAction}.` : base;
+
       textNode.innerHTML = full;
       banner.classList.add("show");
     }
 
-    // ============================================================
-    //  CONTACTS SUMMARY
-    // ============================================================
-    function normalizeStatusText(s){ return String(s ?? "").trim().toLowerCase(); }
+    function normalizeStatusText(s){
+      return String(s ?? "").trim().toLowerCase();
+    }
 
     function computeContactsSummary(payload){
       const el = document.getElementById("contactsSummary");
       if (!el) return;
 
-      const owners = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
-      const total = owners.length;
-      const contacted = owners.filter(o => parseFlexibleDate(o.last_contact || o.lastContact) !== null).length;
-      const uncontacted = Math.max(0, total - contacted);
+      const confirmed = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
+      const other = Array.isArray(payload?.other_contacts) ? payload.other_contacts : [];
 
-      el.textContent = total > 0
-        ? `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`
-        : "No heirs identified";
+      const explicitTotal = payload?.heirs_identified;
+      const explicitContacted = payload?.heirs_contacted;
+
+      if (Number.isFinite(explicitTotal) && Number.isFinite(explicitContacted)) {
+        const total = Math.max(0, Number(explicitTotal));
+        const contacted = Math.max(0, Math.min(total, Number(explicitContacted)));
+        const uncontacted = Math.max(0, total - contacted);
+        el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
+        return;
+      }
+
+      const heirOthers = other.filter(c => normalizeStatusText(c?.relationship).includes("heir"));
+      const allHeirs = [...confirmed, ...heirOthers];
+
+      const total = allHeirs.length;
+
+      const contacted = allHeirs.filter(c => {
+        const t = normalizeStatusText(c?.leadStatus?.text);
+        if (!t) return false;
+        if (t.includes("dial na") || t.includes("uncontacted") || t.includes("not contacted")) return false;
+        if (t.includes("contact") || t.includes("active") || t.includes("in progress") || t.includes("respond")) return true;
+        return false;
+      }).length;
+
+      const uncontacted = Math.max(0, total - contacted);
+      el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
+    }
+    
+    // Extract board ID from current URL for Monday.com links
+    function extractBoardIdFromUrl() {
+      const urlParams = window.location.search;
+      if (!urlParams || urlParams === '?') return '';
+      
+      const cleaned = urlParams.substring(1).trim();
+      
+      // Path format: 18395630812/pulses/11004380444
+      if (cleaned.includes('/pulses/')) {
+        const parts = cleaned.split('/pulses/');
+        return parts[0].trim();
+      }
+      
+      // Query param format
+      const params = new URLSearchParams(cleaned);
+      return params.get('boardId') || params.get('board_id') || '';
     }
 
-    // ============================================================
-    //  URL PARSING
-    // ============================================================
-    function extractIdsFromUrl(){
+    // Extract board ID from URL for Monday.com links
+    function extractIdsFromUrl() {
       const fullUrl = window.location.href;
       console.log('Full URL:', fullUrl);
+
       let urlParams = window.location.search;
+      console.log('Query string:', urlParams);
+
       if (!urlParams || urlParams === '?') {
         console.error('No query parameters found in URL');
         return { boardId: null, pulseId: null };
       }
+
       urlParams = urlParams.substring(1).trim();
+      console.log('Cleaned params:', urlParams);
+
       if (urlParams.includes('/pulses/')) {
         const parts = urlParams.split('/pulses/');
-        return { boardId: parts[0].trim(), pulseId: parts[1] ? parts[1].trim() : null };
+        const boardId = parts[0].trim();
+        const pulseId = parts[1] ? parts[1].trim() : null;
+        console.log('Extracted from path format - Board ID:', boardId, 'Pulse ID:', pulseId);
+        return { boardId, pulseId };
       }
+
       const params = new URLSearchParams(urlParams);
-      return {
-        boardId: params.get('boardId') || params.get('board_id'),
-        pulseId: params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id')
-      };
+      const boardId = params.get('boardId') || params.get('board_id');
+      const pulseId = params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id');
+      console.log('Extracted from query params - Board ID:', boardId, 'Pulse ID:', pulseId);
+      return { boardId, pulseId };
     }
 
-    // ============================================================
-    //  LOADING OVERLAY
-    // ============================================================
-    let loadingStartTime = null;
-    const MIN_LOADING_TIME = 1500;
-
-    function showLoading(){
-      const overlay = document.getElementById("loadingOverlay");
-      if (overlay){ overlay.setAttribute("aria-hidden","false"); overlay.classList.remove('fade-out'); loadingStartTime = Date.now(); }
-    }
-
-    function hideLoading(){
-      const overlay = document.getElementById("loadingOverlay");
-      if (!overlay || !loadingStartTime) return;
-      const elapsed = Date.now() - loadingStartTime;
-      const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
-      setTimeout(() => {
-        overlay.classList.add('fade-out');
-        setTimeout(() => { overlay.setAttribute("aria-hidden","true"); overlay.classList.remove('fade-out'); loadingStartTime = null; }, 500);
-      }, remaining);
-    }
-
-    // ============================================================
-    //  MAKE.COM FETCH
-    // ============================================================
-    async function fetchDataFromMake(){
+    // Fetch data from Make.com webhook
+    // 
+    // MONDAY.COM BACKEND INTEGRATION GUIDE:
+    // =====================================
+    // 
+    // WEBHOOK URL: https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf
+    // 
+    // REQUEST PAYLOAD (from this page):
+    // {
+    //   "boardId": "18395630812",    // Extracted from URL
+    //   "pulseId": "11004380444"     // Extracted from URL
+    // }
+    // 
+    // RESPONSE PAYLOAD (from Make.com - all fields mapped):
+    // {
+    //   // TOP SNAPSHOT - Property Details
+    //   "deceased_owner": "Maria Resendez Estate",
+    //   "last_contact_date": "Feb 13, 2026",
+    //   "last_contact_days_ago": 6,               // Calculate: today - last_contact_date
+    //   "deal_score": "72",
+    //   "taxes_owed": "$8,400",
+    //   
+    //   // TOP SNAPSHOT - Deal Insights
+    //   "heirs_identified": 5,                    // Count of confirmed_owners
+    //   "heirs_contacted": 3,                     // Count where lastContact exists
+    //   "heirs_offered": 1,                       // Count where offerMade = true
+    //   "ownership_secured_percent": "20%",       // Sum of ownership% where offerMade = true
+    //   "ownership_secured_count": "1 of 5",      // Count offered / total heirs
+    //   
+    //   // PROPERTY DETAILS SECTION - Left Column
+    //   "lead_type": "Taxes Under Suit",
+    //   "tax_status": "3-4 years unpaid",
+    //   "condition": "Fair",
+    //   "occupancy": "Vacant",
+    //   "days_of_inactivity": "4 days",
+    //   
+    //   // PROPERTY DETAILS SECTION - Right Column
+    //   "total_equity": "$112,000",
+    //   "deed_status": "Verified",
+    //   "will_status": "Not Filed",
+    //   "title_issue": "None",
+    //   
+    //   // UPDATE ACTIVITY SECTION
+    //   "next_action_step": "Put Together Offer",
+    //   "stalled_reason": "Waiting on heir response",
+    //   "follow_up_date": "Feb 15, 2026",
+    //   
+    //   // RESEARCH SECTION
+    //   "obituary_link": "https://...",
+    //   "ancestry_link": "https://...",
+    //   "zillow_link": "https://...",
+    //   "tax_assessor_link": "https://...",
+    //   "google_maps_link": "https://...",
+    //   "birth_date": "March 15, 1945",
+    //   "death_date": "January 8, 2026",
+    //   "age": "80",
+    //   "creation_log": "Created on Jan 12, 2026 by John Smith",
+    //   
+    //   // ACTIVITY SECTION
+    //   "last_contacted": "Feb 11, 2026",
+    //   "activity_notes": "Spoke with Rebeca - very interested in selling",
+    //   
+    //   // CONFIRMED OWNERS TABLE (array of subitems)
+    //   "confirmed_owners": [
+    //     {
+    //       "name": "Rebeca McCrory",
+    //       "relationship": "Daughter",                    // From Monday.com "Relationship" column
+    //       "ownershipPercent": "20%",                     // From "Ownership %" column
+    //       "motivation": "Warm",                          // From "Seller Motivation" column
+    //       "lastContact": "Feb 11, 2026",                 // From "Contacted date" column
+    //       "lastContactDaysAgo": "6 days ago",            // Calculate: today - lastContact
+    //       "contactOutcome": "Interested",                // From "Contact Outcome" column (main text)
+    //       "contactOutcomeDetail": "Wants written offer", // From "Contact Outcome" column (detail)
+    //       "followupDate": "Feb 15, 2026",                // From "Follow-Up Date" column
+    //       "offerMade": true,                             // From "Offer Made?" column (boolean)
+    //       "offerAmount": "$3,000",                       // From "Offer Amount" column
+    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"  // Construct from board + subitem IDs
+    //     }
+    //     // ... more heirs
+    //   ],
+    //   
+    //   // OTHER RELATED CONTACTS TABLE (array of non-owner contacts)
+    //   "other_contacts": [
+    //     {
+    //       "name": "Patricia Franklin",
+    //       "relationship": "Cousin",                      // From "Relationship" column
+    //       "leadStatus": {                                // From "Lead Status" column
+    //         "text": "Contacted",
+    //         "tone": "good"                               // good/warn/muted based on status
+    //       },
+    //       "contactOutcome": "Referred us to Rebeca",     // From "Contact Outcome" column
+    //       "phone1": "(713) 555-2341",                    // From "Phone 1" column
+    //       "phone1Status": {                              // From "Phone 1 status" column
+    //         "text": "Correct Number",
+    //         "tone": "good"
+    //       },
+    //       "phone2": "(281) 555-8821",                    // From "Phone 2" column
+    //       "phone2Status": {                              // From "Phone 2 status" column
+    //         "text": "Disconnected",
+    //         "tone": "warn"
+    //       },
+    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004380450"
+    //     }
+    //     // ... more contacts
+    //   ]
+    // }
+    //
+    // MONDAY.COM COLUMN MAPPING:
+    // ==========================
+    // Main Item Columns:
+    //   - Name → deceased_owner
+    //   - Deal Score → deal_score
+    //   - Taxes Owed → taxes_owed
+    //   - Lead Type → lead_type
+    //   - Tax Status → tax_status
+    //   - Occupancy → occupancy
+    //   - Will Status → will_status
+    //   - Days of Inactivity → days_of_inactivity
+    //   - Total Equity → total_equity
+    //   - Condition → condition
+    //   - Title Issue → title_issue
+    //   - Deed Status → deed_status
+    //   - Next Action Step → next_action_step
+    //   - Stalled Reason → stalled_reason
+    //   - Follow-up Date → follow_up_date
+    //   - Last Contacted → last_contacted
+    //   - Notes → activity_notes
+    //
+    // Subitem Columns (Heirs/Contacts):
+    //   - Subitems Name → name
+    //   - Relationship → relationship
+    //   - Ownership % → ownershipPercent
+    //   - Seller Motivation → motivation
+    //   - Contacted date → lastContact
+    //   - Contact Outcome → contactOutcome + contactOutcomeDetail
+    //   - Follow-Up Date → followupDate
+    //   - Offer Made? → offerMade (boolean)
+    //   - Offer Amount → offerAmount
+    //   - Lead Status → leadStatus (with tone calculation)
+    //   - Phone 1 → phone1
+    //   - Phone 1 status → phone1Status (with tone)
+    //   - Phone 2 → phone2
+    //   - Phone 2 status → phone2Status (with tone)
+    //
+    async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
+
       showLoading();
 
       const { boardId, pulseId } = extractIdsFromUrl();
-      if (!boardId || !pulseId){
+
+      if (!boardId || !pulseId) {
         console.error('Missing board ID or pulse ID in URL');
         alert(`Error: Missing board ID or pulse ID in URL.\n\nFound:\n- Board ID: ${boardId || 'MISSING'}\n- Pulse ID: ${pulseId || 'MISSING'}`);
         hideLoading();
         return;
       }
 
+      console.log('Board ID:', boardId);
+      console.log('Pulse ID:', pulseId);
+
       try {
+        console.log('Fetching data from Make.com...');
         const response = await fetch(webhookURL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ boardId, pulseId })
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            boardId: boardId,
+            pulseId: pulseId
+          })
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Received data from Make.com:', data);
+
         window.RecordPage.applyData(data);
+
         console.log('Data applied successfully!');
       } catch (error) {
         console.error('Error fetching data from Make.com:', error);
@@ -1518,164 +2296,147 @@
       }
     }
 
-    // ============================================================
-    //  TABS
-    // ============================================================
-    const tabs = Array.from(document.querySelectorAll(".tab"));
-    const panes = Array.from(document.querySelectorAll(".tab-pane"));
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.setAttribute("aria-selected","false"));
-        panes.forEach(p => p.classList.remove("active"));
-        tab.setAttribute("aria-selected","true");
-        document.getElementById(tab.getAttribute("aria-controls")).classList.add("active");
-      });
+    // Fetch data on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchDataFromMake();
     });
 
-    const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
-    const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
-    subTabs.forEach(subTab => {
-      subTab.addEventListener("click", () => {
-        subTabs.forEach(t => t.setAttribute("aria-selected","false"));
-        subPanes.forEach(p => p.classList.remove("active"));
-        subTab.setAttribute("aria-selected","true");
-        document.getElementById(subTab.getAttribute("aria-controls")).classList.add("active");
-      });
-    });
+    // Utils
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function formatValue(v){
+      if (v === null || v === undefined || v === "") return "—";
+      if (typeof v === "number") return String(v);
+      if (typeof v === "boolean") return v ? "Yes" : "No";
+      return String(v);
+    }
+    function cssEscape(s){
+      return String(s).replaceAll('"', '\\"');
+    }
 
-    // ============================================================
-    //  COLLAPSIBLE TOGGLE
-    // ============================================================
-    const characteristics = document.getElementById("characteristicsToggle");
-    const toggleCharacteristics = () => {
-      const isOpen = characteristics.getAttribute("data-open") === "true";
-      characteristics.setAttribute("data-open", String(!isOpen));
-      characteristics.querySelector(".toggle-head").setAttribute("aria-expanded", String(!isOpen));
-    };
-    characteristics.querySelector(".toggle-head").addEventListener("click", toggleCharacteristics);
-    characteristics.querySelector(".toggle-head").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggleCharacteristics(); }
-    });
+    // init - Load test data
+    window.RecordPage.applyData(testData);
+    renderConfirmedOwners(sampleConfirmedOwners);
+    renderOtherContacts(sampleOtherContacts);
+    updateActionBannerFromContacts(sampleConfirmedOwners);
+    computeContactsSummary(testData);
 
-    // ============================================================
-    //  INLINE EDIT
-    // ============================================================
-    Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
-      pencil.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const field = pencil.closest(".field");
-        const valueText = field.querySelector(".value-text");
-        if (valueText.getAttribute("data-editable") !== "true") return;
-        if (field.querySelector(".inline-input")) return;
-
-        const oldValue = valueText.textContent.trim();
-        const valueWrap = field.querySelector(".value");
-        valueText.style.display = "none";
-        pencil.style.display = "none";
-
-        const input = document.createElement("input");
-        input.className = "inline-input";
-        input.value = oldValue;
-        const left = document.createElement("div");
-        left.style.flex = "1"; left.style.minWidth = "0";
-        left.appendChild(input);
-        valueWrap.insertBefore(left, valueWrap.firstChild);
-
-        const commit = () => { valueText.textContent = input.value.trim() || "—"; left.remove(); valueText.style.display = ""; pencil.style.display = ""; };
-        const cancel = () => { left.remove(); valueText.style.display = ""; pencil.style.display = ""; };
-
-        input.addEventListener("blur", commit);
-        input.addEventListener("keydown", (ke) => {
-          if (ke.key === "Enter") commit();
-          if (ke.key === "Escape") cancel();
-        });
-        input.focus(); input.select();
-      });
-    });
-
-    // ============================================================
-    //  RESEARCH LINK CLICK-TO-OPEN
-    // ============================================================
-    Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
-      node.addEventListener('click', () => {
-        const raw = (node.textContent || '').trim();
-        if (!raw || raw === '—') return;
-        let url = raw;
-        if (!/^https?:\/\//i.test(url)){
-          if (/\./.test(url) || url.startsWith('www.') || url.includes('/')) url = 'https://' + url.replace(/^www\./i, 'www.');
-        }
-        if (!/^https?:\/\//i.test(url)) return;
-        window.open(url, '_blank', 'noopener,noreferrer');
-      });
-    });
-
-    // ============================================================
-    //  REFRESH BUTTON
-    // ============================================================
-    document.getElementById("btnRefresh").addEventListener("click", () => { fetchDataFromMake(); });
-
-    // ============================================================
-    //  NOTE MODAL
-    // ============================================================
+    // Note Modal functionality
     let currentNoteContact = null;
     let currentNoteContactIndex = null;
 
-    function openNoteModal(contact, contactIndex, buttonElement){
+    function openNoteModal(contact, contactIndex, buttonElement) {
       currentNoteContact = contact;
       currentNoteContactIndex = contactIndex;
+      
       document.getElementById('noteContactName').textContent = contact.name || '—';
-      document.getElementById('noteContactRelation').textContent = contact.relationship
-        ? `${contact.relationship} • ${contact.ownership_percent || contact.ownershipPercent || '—'} ownership`
-        : contact.ownership_percent || contact.ownershipPercent || '—';
+      document.getElementById('noteContactRelation').textContent = contact.relationship 
+        ? `${contact.relationship} • ${contact.ownershipPercent || '—'} ownership`
+        : contact.ownershipPercent || '—';
+      
       document.getElementById('noteTextarea').value = '';
       document.getElementById('noteCharCount').textContent = '0';
-
+      
       const overlay = document.getElementById('noteModalOverlay');
       const modal = overlay.querySelector('.note-modal');
+      
       overlay.classList.add('active');
-
+      
+      // Position modal above the button
       const buttonRect = buttonElement.getBoundingClientRect();
-      const modalHeight = 500, modalWidth = 400;
-      let top = buttonRect.top - modalHeight - 16;
+      const modalHeight = 500; // max-height from CSS
+      const modalWidth = 400;
+      
+      // Calculate position (centered above button with some spacing)
+      let top = buttonRect.top - modalHeight - 16; // 16px gap above button
       let left = buttonRect.left + (buttonRect.width / 2) - (modalWidth / 2);
-      if (top < 10) top = buttonRect.bottom + 16;
+      
+      // Keep within viewport bounds
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      
+      // If modal would go off top of screen, show below button instead
+      if (top < 10) {
+        top = buttonRect.bottom + 16;
+        // Flip arrow to point up
+        modal.style.setProperty('--arrow-direction', 'up');
+      } else {
+        modal.style.setProperty('--arrow-direction', 'down');
+      }
+      
+      // Keep within horizontal bounds
       if (left < 10) left = 10;
-      if (left + modalWidth > window.innerWidth - 10) left = window.innerWidth - modalWidth - 10;
+      if (left + modalWidth > viewportWidth - 10) left = viewportWidth - modalWidth - 10;
+      
       modal.style.top = top + 'px';
       modal.style.left = left + 'px';
-
-      setTimeout(() => { document.getElementById('noteTextarea').focus(); }, 100);
+      
+      // Focus textarea
+      setTimeout(() => {
+        document.getElementById('noteTextarea').focus();
+      }, 100);
     }
 
-    function closeNoteModal(){
+    function closeNoteModal() {
       document.getElementById('noteModalOverlay').classList.remove('active');
       currentNoteContact = null;
       currentNoteContactIndex = null;
     }
 
-    async function saveNote(){
+    async function saveNote() {
       const noteText = document.getElementById('noteTextarea').value.trim();
-      if (!noteText){ alert('Please enter a note before saving.'); return; }
-      if (!currentNoteContact){ alert('Error: No contact selected.'); return; }
+      
+      if (!noteText) {
+        alert('Please enter a note before saving.');
+        return;
+      }
+      
+      if (!currentNoteContact) {
+        alert('Error: No contact selected.');
+        return;
+      }
 
+      // Disable save button
       const saveBtn = document.getElementById('noteBtnSave');
       saveBtn.disabled = true;
       saveBtn.textContent = 'Saving...';
 
       try {
-        const { boardId, pulseId } = extractIdsFromUrl();
+        // TODO: Send to Make.com webhook to update Monday.com subitem
+        const webhookURL = 'YOUR_MAKE_WEBHOOK_URL_FOR_NOTES';
+        
         const payload = {
           contactName: currentNoteContact.name,
           contactIndex: currentNoteContactIndex,
           note: noteText,
           timestamp: new Date().toISOString(),
-          boardId: boardId || '',
-          pulseId: pulseId || ''
+          boardId: 'BOARD_ID', // Extract from URL
+          pulseId: 'PULSE_ID'  // Extract from URL
         };
+
+        // Uncomment when webhook is ready:
+        // const response = await fetch(webhookURL, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(payload)
+        // });
+        // 
+        // if (!response.ok) throw new Error('Failed to save note');
+
         console.log('Note to save:', payload);
+        
+        // Simulate success
         await new Promise(resolve => setTimeout(resolve, 500));
+        
         alert(`Note saved for ${currentNoteContact.name}!`);
         closeNoteModal();
+        
       } catch (error) {
         console.error('Error saving note:', error);
         alert('Failed to save note. Please try again.');
@@ -1685,18 +2446,28 @@
       }
     }
 
+    // Modal event listeners
     document.getElementById('noteModalClose').addEventListener('click', closeNoteModal);
     document.getElementById('noteBtnCancel').addEventListener('click', closeNoteModal);
     document.getElementById('noteBtnSave').addEventListener('click', saveNote);
-    document.getElementById('noteModalOverlay').addEventListener('click', (e) => { if (e.target.id === 'noteModalOverlay') closeNoteModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('noteModalOverlay').classList.contains('active')) closeNoteModal(); });
-    document.getElementById('noteTextarea').addEventListener('input', (e) => { document.getElementById('noteCharCount').textContent = e.target.value.length; });
-
-    // ============================================================
-    //  INIT — fetch live data on load
-    // ============================================================
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchDataFromMake();
+    
+    // Close on overlay click (outside modal)
+    document.getElementById('noteModalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'noteModalOverlay') {
+        closeNoteModal();
+      }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('noteModalOverlay').classList.contains('active')) {
+        closeNoteModal();
+      }
+    });
+    
+    // Character counter
+    document.getElementById('noteTextarea').addEventListener('input', (e) => {
+      document.getElementById('noteCharCount').textContent = e.target.value.length;
     });
   </script>
 </body>
