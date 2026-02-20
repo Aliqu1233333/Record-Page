@@ -817,53 +817,67 @@
     #loadingOverlay{
       position: fixed;
       inset: 0;
-      background: rgba(243,244,246,.72);
-      backdrop-filter: blur(6px);
+      background: rgba(243,244,246,.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 10000;
       padding: 24px;
+      animation: fadeIn 0.3s ease;
     }
     #loadingOverlay[aria-hidden="false"]{ display:flex; }
-    .loadingCard{
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(17,24,39,.12);
-      padding: 18px 18px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 260px;
-      max-width: 520px;
+    #loadingOverlay.fade-out{
+      animation: fadeOut 0.5s ease forwards;
     }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .loadingCard{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    
     .spinner{
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      border: 3px solid rgba(1,118,211,.18);
-      border-top-color: rgba(1,118,211,.9);
-      animation: spin .9s linear infinite;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 5px solid rgba(1,118,211,.15);
+      border-top-color: #0176d3;
+      animation: spin 0.8s linear infinite;
       flex: 0 0 auto;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { 
+      to { transform: rotate(360deg); } 
+    }
+    
     .loadingText{
-      min-width: 0;
       display:flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 6px;
+      align-items: center;
+      text-align: center;
     }
     .loadingTitle{
-      font-size: 14.5px;
+      font-size: 18px;
       font-weight: 650;
       color: #111827;
-      letter-spacing: .01em;
+      letter-spacing: -0.01em;
     }
     .loadingSub{
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.35;
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.4;
     }
     
     /* ---------- ACTION REQUIRED BANNER - MODERN ---------- */
@@ -927,7 +941,7 @@
       <div class="spinner" aria-hidden="true"></div>
       <div class="loadingText">
         <div class="loadingTitle">Loading record…</div>
-        <div class="loadingSub">Pulling data from your webhook.</div>
+        <div class="loadingSub">Fetching data from Monday.com</div>
       </div>
     </div>
   </div>
@@ -1907,14 +1921,34 @@
       fetchDataFromMake();
     });
 
-    // Loading overlay helpers
+    // Loading overlay helpers - ensures minimum 1.5 second display
+    let loadingStartTime = null;
+    const MIN_LOADING_TIME = 1500; // 1.5 seconds
+    
     function showLoading(){
       const overlay = document.getElementById("loadingOverlay");
-      if (overlay) overlay.setAttribute("aria-hidden", "false");
+      if (overlay) {
+        overlay.setAttribute("aria-hidden", "false");
+        overlay.classList.remove('fade-out');
+        loadingStartTime = Date.now();
+      }
     }
+    
     function hideLoading(){
       const overlay = document.getElementById("loadingOverlay");
-      if (overlay) overlay.setAttribute("aria-hidden", "true");
+      if (!overlay || !loadingStartTime) return;
+      
+      const elapsedTime = Date.now() - loadingStartTime;
+      const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+      
+      setTimeout(() => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+          overlay.setAttribute("aria-hidden", "true");
+          overlay.classList.remove('fade-out');
+          loadingStartTime = null;
+        }, 500); // Wait for fade-out animation
+      }, remainingTime);
     }
 
 
@@ -2071,6 +2105,149 @@
     }
 
     // Fetch data from Make.com webhook
+    // 
+    // MONDAY.COM BACKEND INTEGRATION GUIDE:
+    // =====================================
+    // 
+    // WEBHOOK URL: https://hook.us1.make.com/279nauvfnkw4qxda1vqoj2kxo66qs37s
+    // 
+    // REQUEST PAYLOAD (from this page):
+    // {
+    //   "boardId": "18395630812",    // Extracted from URL
+    //   "pulseId": "11004380444"     // Extracted from URL
+    // }
+    // 
+    // RESPONSE PAYLOAD (from Make.com - all fields mapped):
+    // {
+    //   // TOP SNAPSHOT - Property Details
+    //   "deceased_owner": "Maria Resendez Estate",
+    //   "last_contact_date": "Feb 13, 2026",
+    //   "last_contact_days_ago": 6,               // Calculate: today - last_contact_date
+    //   "deal_score": "72",
+    //   "taxes_owed": "$8,400",
+    //   
+    //   // TOP SNAPSHOT - Deal Insights
+    //   "heirs_identified": 5,                    // Count of confirmed_owners
+    //   "heirs_contacted": 3,                     // Count where lastContact exists
+    //   "heirs_offered": 1,                       // Count where offerMade = true
+    //   "ownership_secured_percent": "20%",       // Sum of ownership% where offerMade = true
+    //   "ownership_secured_count": "1 of 5",      // Count offered / total heirs
+    //   
+    //   // PROPERTY DETAILS SECTION - Left Column
+    //   "lead_type": "Taxes Under Suit",
+    //   "tax_status": "3-4 years unpaid",
+    //   "condition": "Fair",
+    //   "occupancy": "Vacant",
+    //   "days_of_inactivity": "4 days",
+    //   
+    //   // PROPERTY DETAILS SECTION - Right Column
+    //   "total_equity": "$112,000",
+    //   "deed_status": "Verified",
+    //   "will_status": "Not Filed",
+    //   "title_issue": "None",
+    //   
+    //   // UPDATE ACTIVITY SECTION
+    //   "next_action_step": "Put Together Offer",
+    //   "stalled_reason": "Waiting on heir response",
+    //   "follow_up_date": "Feb 15, 2026",
+    //   
+    //   // RESEARCH SECTION
+    //   "obituary_link": "https://...",
+    //   "ancestry_link": "https://...",
+    //   "zillow_link": "https://...",
+    //   "tax_assessor_link": "https://...",
+    //   "google_maps_link": "https://...",
+    //   "birth_date": "March 15, 1945",
+    //   "death_date": "January 8, 2026",
+    //   "age": "80",
+    //   "creation_log": "Created on Jan 12, 2026 by John Smith",
+    //   
+    //   // ACTIVITY SECTION
+    //   "last_contacted": "Feb 11, 2026",
+    //   "activity_notes": "Spoke with Rebeca - very interested in selling",
+    //   
+    //   // CONFIRMED OWNERS TABLE (array of subitems)
+    //   "confirmed_owners": [
+    //     {
+    //       "name": "Rebeca McCrory",
+    //       "relationship": "Daughter",                    // From Monday.com "Relationship" column
+    //       "ownershipPercent": "20%",                     // From "Ownership %" column
+    //       "motivation": "Warm",                          // From "Seller Motivation" column
+    //       "lastContact": "Feb 11, 2026",                 // From "Contacted date" column
+    //       "lastContactDaysAgo": "6 days ago",            // Calculate: today - lastContact
+    //       "contactOutcome": "Interested",                // From "Contact Outcome" column (main text)
+    //       "contactOutcomeDetail": "Wants written offer", // From "Contact Outcome" column (detail)
+    //       "followupDate": "Feb 15, 2026",                // From "Follow-Up Date" column
+    //       "offerMade": true,                             // From "Offer Made?" column (boolean)
+    //       "offerAmount": "$3,000",                       // From "Offer Amount" column
+    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"  // Construct from board + subitem IDs
+    //     }
+    //     // ... more heirs
+    //   ],
+    //   
+    //   // OTHER RELATED CONTACTS TABLE (array of non-owner contacts)
+    //   "other_contacts": [
+    //     {
+    //       "name": "Patricia Franklin",
+    //       "relationship": "Cousin",                      // From "Relationship" column
+    //       "leadStatus": {                                // From "Lead Status" column
+    //         "text": "Contacted",
+    //         "tone": "good"                               // good/warn/muted based on status
+    //       },
+    //       "contactOutcome": "Referred us to Rebeca",     // From "Contact Outcome" column
+    //       "phone1": "(713) 555-2341",                    // From "Phone 1" column
+    //       "phone1Status": {                              // From "Phone 1 status" column
+    //         "text": "Correct Number",
+    //         "tone": "good"
+    //       },
+    //       "phone2": "(281) 555-8821",                    // From "Phone 2" column
+    //       "phone2Status": {                              // From "Phone 2 status" column
+    //         "text": "Disconnected",
+    //         "tone": "warn"
+    //       },
+    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004380450"
+    //     }
+    //     // ... more contacts
+    //   ]
+    // }
+    //
+    // MONDAY.COM COLUMN MAPPING:
+    // ==========================
+    // Main Item Columns:
+    //   - Name → deceased_owner
+    //   - Deal Score → deal_score
+    //   - Taxes Owed → taxes_owed
+    //   - Lead Type → lead_type
+    //   - Tax Status → tax_status
+    //   - Occupancy → occupancy
+    //   - Will Status → will_status
+    //   - Days of Inactivity → days_of_inactivity
+    //   - Total Equity → total_equity
+    //   - Condition → condition
+    //   - Title Issue → title_issue
+    //   - Deed Status → deed_status
+    //   - Next Action Step → next_action_step
+    //   - Stalled Reason → stalled_reason
+    //   - Follow-up Date → follow_up_date
+    //   - Last Contacted → last_contacted
+    //   - Notes → activity_notes
+    //
+    // Subitem Columns (Heirs/Contacts):
+    //   - Subitems Name → name
+    //   - Relationship → relationship
+    //   - Ownership % → ownershipPercent
+    //   - Seller Motivation → motivation
+    //   - Contacted date → lastContact
+    //   - Contact Outcome → contactOutcome + contactOutcomeDetail
+    //   - Follow-Up Date → followupDate
+    //   - Offer Made? → offerMade (boolean)
+    //   - Offer Amount → offerAmount
+    //   - Lead Status → leadStatus (with tone calculation)
+    //   - Phone 1 → phone1
+    //   - Phone 1 status → phone1Status (with tone)
+    //   - Phone 2 → phone2
+    //   - Phone 2 status → phone2Status (with tone)
+    //
     async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/279nauvfnkw4qxda1vqoj2kxo66qs37s';
 
@@ -2119,10 +2296,10 @@
       }
     }
 
-    // Fetch data on page load (DISABLED FOR TEST DATA - uncomment to enable webhook)
-    // window.addEventListener('DOMContentLoaded', () => {
-    //   fetchDataFromMake();
-    // });
+    // Fetch data on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchDataFromMake();
+    });
 
     // Utils
     function escapeHtml(str){
