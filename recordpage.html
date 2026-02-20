@@ -961,25 +961,25 @@
               <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Deceased Owner</div>
-                  <div class="svalue">Maria Resendez Estate</div>
+                  <div class="svalue" data-snapshot="true" data-field="lead_name">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Last Contact</div>
                   <div class="svalue" style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="font-weight: 700; font-size: 17px; color: #f59e0b;">6 days ago</span>
-                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Feb 13, 2026</span>
+                    <span style="font-weight: 700; font-size: 17px; color: #f59e0b;" data-snapshot="true" data-field="last_contact_days_ago">—</span>
+                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;" data-snapshot="true" data-field="last_contact_date">—</span>
                   </div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Deal Score</div>
-                  <div class="svalue">72</div>
+                  <div class="svalue" data-snapshot="true" data-field="deal_score">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
-                  <div class="svalue">$8,400</div>
+                  <div class="svalue" data-snapshot="true" data-field="taxes_owed">—</div>
                 </div>
               </div>
             </div>
@@ -991,24 +991,24 @@
                 <div class="sfield">
                   <div class="slabel">
                     Heirs Identified
-                    <span class="heir-status-badge heir-status-complete">Complete</span>
+                    <span class="heir-status-badge heir-status-in-progress" data-snapshot="true" data-field="heirs_identified_status">—</span>
                   </div>
-                  <div class="svalue">5</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_identified">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue">3 of 5</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_contacted">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue">1 of 5</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_offered">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
-                  <div class="svalue ok">20% (1 of 5)</div>
+                  <div class="svalue ok" data-snapshot="true" data-field="ownership_secured">—</div>
                 </div>
               </div>
             </div>
@@ -1518,7 +1518,7 @@
   </div>
 
   <script>
-    // Apply test data immediately on load
+    // Apply data (webhook mapping)
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
@@ -1527,6 +1527,13 @@
           const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) node.textContent = formatValue(value);
         }
+
+        // Top snapshot mapping (header fields)
+        for (const [key, value] of Object.entries(payload)) {
+          const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
+          if (snap) snap.textContent = formatValue(value);
+        }
+
 
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
@@ -1545,116 +1552,9 @@
     const characteristics = document.getElementById("characteristicsToggle");
 
     // Contacts - TEST DATA (must be defined BEFORE testData)
-    const sampleConfirmedOwners = [
-      {
-        name: "Rebeca McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Warm",
-        lastContact: "Feb 11, 2026",
-        lastContactDaysAgo: "6 days ago",
-        contactOutcome: "Interested",
-        contactOutcomeDetail: "Wants written offer",
-        followupDate: "Feb 15, 2026",
-        offerMade: true,
-        offerAmount: "$3,000",
-        phone: "(832) 555-1122",
-        nextAction: "Put Together Offer",
-        mondayUrl: "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"
-      },
-      {
-        name: "John McCrory",
-        relationship: "Son",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-9234",
-        mondayItemId: "11004380445"
-      },
-      {
-        name: "Sarah McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-8847",
-        mondayItemId: "11004380446"
-      },
-      {
-        name: "Michael McCrory",
-        relationship: "Son",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-4421",
-        mondayItemId: "11004380447"
-      },
-      {
-        name: "Lisa McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-7733",
-        mondayItemId: "11004380448"
-      }
-    ];
+    const sampleConfirmedOwners = [];
 
-    const sampleOtherContacts = [
-      {
-        name: "Patricia Franklin",
-        relationship: "Cousin",
-        leadStatus: { text: "Contacted", tone: "good" },
-        contactOutcome: "Referred us to Rebeca",
-        phone1: "(713) 555-2341",
-        phone1Status: { text: "Correct Number", tone: "good" },
-        phone2: "(281) 555-8821",
-        phone2Status: { text: "Disconnected", tone: "warn" },
-        mondayItemId: "11004380450"
-      },
-      {
-        name: "Robert Martinez",
-        relationship: "Neighbor",
-        leadStatus: { text: "Contacted", tone: "good" },
-        contactOutcome: "Provided family info",
-        phone1: "(832) 555-9012",
-        phone1Status: { text: "Correct Number", tone: "good" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        mondayItemId: "11004380451"
-      },
-      {
-        name: "Jennifer Davis",
-        relationship: "Friend",
-        leadStatus: { text: "Dial NA", tone: "muted" },
-        contactOutcome: "—",
-        phone1: "(713) 555-4432",
-        phone1Status: { text: "Wrong Number", tone: "warn" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        mondayItemId: "11004380452"
-      }
-    ];
+    const sampleOtherContacts = [];
 
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
@@ -1670,53 +1570,6 @@
     }
 
     // NOW define testData AFTER sample arrays are initialized
-    const testData = {
-      // Top Snapshot - Property Details
-      lead_name: "Maria Resendez Estate",
-      deal_score: "72",
-      address: "1251 Forester St, Houston, TX 77022",
-      taxes_owed: "$8,400",
-      
-      // Top Snapshot - Deal Insights (these get computed from contacts)
-      heirs_identified: 5,
-      heirs_contacted: 3,
-      
-      // Property Details
-      lead_type: "Taxes Under Suit",
-      tax_status: "3-4 years unpaid",
-      occupancy: "Vacant",
-      will_status: "Not Filed",
-      days_of_inactivity: "4 days",
-      total_equity: "$112,000",
-      condition: "Fair",
-      title_issue: "None",
-      deed_status: "Verified",
-      
-      // Update Activity
-      next_action_step: "Put Together Offer",
-      stalled_reason: "Waiting on heir response",
-      follow_up_date: "Feb 15, 2026",
-      
-      // Research
-      obituary_link: "https://www.legacy.com/obituaries/name/maria-resendez",
-      ancestry_link: "https://www.ancestry.com/search",
-      zillow_link: "https://www.zillow.com/homedetails/1251-Forester-St",
-      tax_assessor_link: "https://hcad.org/property-search",
-      google_maps_link: "https://maps.google.com/?q=1251+Forester+St+Houston+TX",
-      birth_date: "March 15, 1945",
-      death_date: "January 8, 2026",
-      age: "80",
-      creation_log: "Created on Jan 12, 2026 by John Smith",
-      
-      // Activity
-      last_contacted: "Feb 11, 2026",
-      activity_notes: "Spoke with Rebeca - very interested in selling",
-      
-      // Contacts
-      confirmed_owners: sampleConfirmedOwners,
-      other_contacts: sampleOtherContacts
-    };
-
     // Now setup event listeners AFTER data is defined
     const toggleCharacteristics = () => {
       const isOpen = characteristics.getAttribute("data-open") === "true";
@@ -2120,18 +1973,18 @@
     // RESPONSE PAYLOAD (from Make.com - all fields mapped):
     // {
     //   // TOP SNAPSHOT - Property Details
-    //   "deceased_owner": "Maria Resendez Estate",
-    //   "last_contact_date": "Feb 13, 2026",
+    //   "deceased_owner": "—",
+    //   "last_contact_date": "—",
     //   "last_contact_days_ago": 6,               // Calculate: today - last_contact_date
     //   "deal_score": "72",
-    //   "taxes_owed": "$8,400",
+    //   "taxes_owed": "—",
     //   
     //   // TOP SNAPSHOT - Deal Insights
     //   "heirs_identified": 5,                    // Count of confirmed_owners
     //   "heirs_contacted": 3,                     // Count where lastContact exists
     //   "heirs_offered": 1,                       // Count where offerMade = true
     //   "ownership_secured_percent": "20%",       // Sum of ownership% where offerMade = true
-    //   "ownership_secured_count": "1 of 5",      // Count offered / total heirs
+    //   "ownership_secured_count": "—",      // Count offered / total heirs
     //   
     //   // PROPERTY DETAILS SECTION - Left Column
     //   "lead_type": "Taxes Under Suit",
@@ -2174,7 +2027,7 @@
     //       "ownershipPercent": "20%",                     // From "Ownership %" column
     //       "motivation": "Warm",                          // From "Seller Motivation" column
     //       "lastContact": "Feb 11, 2026",                 // From "Contacted date" column
-    //       "lastContactDaysAgo": "6 days ago",            // Calculate: today - lastContact
+    //       "lastContactDaysAgo": "—",            // Calculate: today - lastContact
     //       "contactOutcome": "Interested",                // From "Contact Outcome" column (main text)
     //       "contactOutcomeDetail": "Wants written offer", // From "Contact Outcome" column (detail)
     //       "followupDate": "Feb 15, 2026",                // From "Follow-Up Date" column
@@ -2321,7 +2174,6 @@
     }
 
     // init - Load test data
-    window.RecordPage.applyData(testData);
     renderConfirmedOwners(sampleConfirmedOwners);
     renderOtherContacts(sampleOtherContacts);
     updateActionBannerFromContacts(sampleConfirmedOwners);
