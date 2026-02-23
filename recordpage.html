@@ -961,25 +961,25 @@
               <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Deceased Owner</div>
-                  <div class="svalue" id="snapshotDeceasedOwner">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="lead_name">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Last Contact</div>
-                  <div class="svalue" id="snapshotLastContact" style="display: flex; flex-direction: column; gap: 2px;">
-                    <span id="snapshotLastContactDays" style="font-weight: 700; font-size: 17px; color: #f59e0b;">—</span>
-                    <span id="snapshotLastContactDate" style="font-size: 13px; color: #6b7280; font-weight: 500;">—</span>
+                  <div class="svalue" style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; font-size: 17px; color: #f59e0b;" data-snapshot="true" data-field="last_contact_days_ago">—</span>
+                    <span style="font-size: 13px; color: #6b7280; font-weight: 500;" data-snapshot="true" data-field="last_contact_date">—</span>
                   </div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Deal Score</div>
-                  <div class="svalue" id="snapshotDealScore">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="deal_score">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
-                  <div class="svalue" id="snapshotTaxesOwed">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="taxes_owed">—</div>
                 </div>
               </div>
             </div>
@@ -991,24 +991,24 @@
                 <div class="sfield">
                   <div class="slabel">
                     Heirs Identified
-                    <span class="heir-status-badge heir-status-complete" id="heirsIdentifiedBadge" style="display: none;">Complete</span>
+                    <span class="heir-status-badge heir-status-in-progress" data-snapshot="true" data-field="heirs_identified_status">—</span>
                   </div>
-                  <div class="svalue" id="snapshotHeirsIdentified">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_identified">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue" id="snapshotHeirsContacted">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_contacted">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue" id="snapshotHeirsOffered">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="heirs_offered">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
-                  <div class="svalue ok" id="snapshotOwnershipSecured">—</div>
+                  <div class="svalue ok" data-snapshot="true" data-field="ownership_secured">—</div>
                 </div>
               </div>
             </div>
@@ -1518,7 +1518,7 @@
   </div>
 
   <script>
-    // Apply test data immediately on load
+    // Apply data (webhook mapping)
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
@@ -1528,114 +1528,76 @@
           if (node) node.textContent = formatValue(value);
         }
 
-        // UPDATE SNAPSHOT FIELDS - PROPERTY DETAILS
-        if (payload.deceased_owner) {
-          const deceasedOwnerEl = document.getElementById('snapshotDeceasedOwner');
-          if (deceasedOwnerEl) deceasedOwnerEl.textContent = payload.deceased_owner;
+        // Top snapshot mapping (header fields)
+        for (const [key, value] of Object.entries(payload)) {
+          const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
+          if (snap) snap.textContent = formatValue(value);
         }
 
-        if (payload.deal_score) {
-          const dealScoreEl = document.getElementById('snapshotDealScore');
-          if (dealScoreEl) dealScoreEl.textContent = payload.deal_score;
-        }
+        // ── Deal Insight metrics computed from confirmed_owners ──────────────
+        const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
 
-        if (payload.taxes_owed) {
-          const taxesOwedEl = document.getElementById('snapshotTaxesOwed');
-          if (taxesOwedEl) taxesOwedEl.textContent = payload.taxes_owed;
-        }
+        // Heirs Identified: owner_status === "Yes"
+        const confirmedOwners = owners.filter(o =>
+          String(o.owner_status || o.ownerStatus || "").trim().toLowerCase() === "yes"
+        );
+        const heirsIdentified = confirmedOwners.length;
 
-        // Last Contact - with date calculation and color coding
-        if (payload.last_contacted) {
-          const lastContactDateEl = document.getElementById('snapshotLastContactDate');
-          if (lastContactDateEl) lastContactDateEl.textContent = payload.last_contacted;
-        }
+        // Heirs Contacted: owner_status === "Yes" AND contacted_date is not empty
+        const heirsContacted = confirmedOwners.filter(o => {
+          const d = o.contacted_date || o.lastContact || o.last_contact || "";
+          return d !== "" && d !== "—" && d !== null && d !== undefined;
+        }).length;
 
-        // Calculate days ago from date if not provided
-        let daysAgo = payload.last_contact_days_ago;
-        if (!daysAgo && payload.last_contacted) {
-          // Parse date and calculate days
-          const lastContactDate = new Date(payload.last_contacted);
-          const today = new Date();
-          const diffTime = Math.abs(today - lastContactDate);
-          daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
+        // Heirs Offered: owner_status === "Yes" AND offer_made is not empty
+        const heirsOffered = confirmedOwners.filter(o => {
+          const raw = o.offer_made !== undefined ? o.offer_made : o.offerMade;
+          if (typeof raw === "boolean") return raw === true;
+          if (typeof raw === "string") return raw.trim() !== "" && raw.trim() !== "—";
+          return false;
+        }).length;
 
-        if (daysAgo !== null && daysAgo !== undefined) {
-          const lastContactDaysEl = document.getElementById('snapshotLastContactDays');
-          if (lastContactDaysEl) {
-            lastContactDaysEl.textContent = daysAgo + ' days ago';
-            
-            // Color code: <8 = green, 8-14 = yellow, 15+ = red
-            const days = parseInt(daysAgo);
-            if (days < 8) {
-              lastContactDaysEl.style.color = '#059669'; // Green
-            } else if (days <= 14) {
-              lastContactDaysEl.style.color = '#f59e0b'; // Yellow
-            } else {
-              lastContactDaysEl.style.color = '#ef4444'; // Red
-            }
-          }
-        }
+        // Ownership Secured: owner_status === "Yes" AND lead_status === "Closed" → sum ownership %
+        const closedOwners = confirmedOwners.filter(o =>
+          String(o.lead_status || o.leadStatus || "").trim().toLowerCase() === "closed"
+        );
+        let ownershipPct = 0;
+        closedOwners.forEach(o => {
+          const num = parseFloat(String(o.ownership_percent || o.ownershipPercent || "0").replace(/[^0-9.]/g, ""));
+          if (!isNaN(num)) ownershipPct += num;
+        });
 
-        // DEAL INSIGHTS - Calculate from confirmed_owners array
-        // First, split into confirmed owners (owner_status = Yes) vs other contacts
-        let confirmedOwners = [];
-        let otherContacts = [];
-        
+        const setSnap = (field, val) => {
+          const el = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
+          if (el) el.textContent = val;
+        };
+
+        setSnap("heirs_identified", heirsIdentified > 0 ? String(heirsIdentified) : "—");
+        setSnap("heirs_contacted",  heirsIdentified > 0 ? `${heirsContacted} of ${heirsIdentified}` : "—");
+        setSnap("heirs_offered",    heirsIdentified > 0 ? `${heirsOffered} of ${heirsIdentified}` : "—");
+        setSnap("ownership_secured",
+          heirsIdentified > 0
+            ? `${ownershipPct}% (${closedOwners.length} of ${heirsIdentified})`
+            : "—"
+        );
+
+        // Badge: Complete when all confirmed owners have been contacted
+        const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
+        if (badge) {
+          const isComplete = heirsIdentified > 0 && heirsContacted === heirsIdentified;
+          badge.textContent = isComplete ? "Complete" : "In Progress";
+          badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
+        }
+        // ── End Deal Insight metrics ─────────────────────────────────────────
+
         if (Array.isArray(payload.confirmed_owners)) {
-          payload.confirmed_owners.forEach(contact => {
-            if (contact.owner_status === 'Yes' || contact.owner_status === true) {
-              confirmedOwners.push(contact);
-            } else {
-              otherContacts.push(contact);
-            }
-          });
-          
-          // Heirs Identified - count all with owner_status = Yes
-          const heirsIdentified = confirmedOwners.length;
-          
-          const heirsIdentifiedEl = document.getElementById('snapshotHeirsIdentified');
-          if (heirsIdentifiedEl) heirsIdentifiedEl.textContent = heirsIdentified;
-          
-          // Show "Complete" badge if all identified
-          const heirsBadgeEl = document.getElementById('heirsIdentifiedBadge');
-          if (heirsBadgeEl && heirsIdentified > 0) {
-            heirsBadgeEl.style.display = 'inline-flex';
-          }
-          
-          // Heirs Contacted - count where contacted_date exists
-          const heirsContacted = confirmedOwners.filter(h => h.contacted_date).length;
-          const heirsContactedEl = document.getElementById('snapshotHeirsContacted');
-          if (heirsContactedEl) heirsContactedEl.textContent = `${heirsContacted} of ${heirsIdentified}`;
-          
-          // Heirs Offered - count where offer_made = true
-          const heirsOffered = confirmedOwners.filter(h => h.offer_made === true).length;
-          const heirsOfferedEl = document.getElementById('snapshotHeirsOffered');
-          if (heirsOfferedEl) heirsOfferedEl.textContent = `${heirsOffered} of ${heirsIdentified}`;
-          
-          // Ownership Secured - sum ownership_percent where lead_status = "Closed"
-          const securedOwners = confirmedOwners.filter(h => h.lead_status === 'Closed');
-          
-          const ownershipPercent = securedOwners.reduce((sum, h) => {
-            const percent = parseInt(h.ownership_percent) || 0;
-            return sum + percent;
-          }, 0);
-          
-          const ownershipSecuredEl = document.getElementById('snapshotOwnershipSecured');
-          if (ownershipSecuredEl) {
-            ownershipSecuredEl.textContent = `${ownershipPercent}% (${securedOwners.length} of ${heirsIdentified})`;
-          }
-        }
-
-        // Render tables with split data
-        if (confirmedOwners.length > 0) {
-          renderConfirmedOwners(confirmedOwners);
-          updateActionBannerFromContacts(confirmedOwners);
+          renderConfirmedOwners(payload.confirmed_owners);
+          updateActionBannerFromContacts(payload.confirmed_owners);
         } else {
           updateActionBannerFromContacts([]);
         }
-        if (otherContacts.length > 0) {
-          renderOtherContacts(otherContacts);
+        if (Array.isArray(payload.other_contacts)) {
+          renderOtherContacts(payload.other_contacts);
         }
         computeContactsSummary(payload);
       }
@@ -1645,116 +1607,9 @@
     const characteristics = document.getElementById("characteristicsToggle");
 
     // Contacts - TEST DATA (must be defined BEFORE testData)
-    const sampleConfirmedOwners = [
-      {
-        name: "Rebeca McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Warm",
-        lastContact: "Feb 11, 2026",
-        lastContactDaysAgo: "6 days ago",
-        contactOutcome: "Interested",
-        contactOutcomeDetail: "Wants written offer",
-        followupDate: "Feb 15, 2026",
-        offerMade: true,
-        offerAmount: "$3,000",
-        phone: "(832) 555-1122",
-        nextAction: "Put Together Offer",
-        mondayUrl: "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"
-      },
-      {
-        name: "John McCrory",
-        relationship: "Son",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-9234",
-        mondayItemId: "11004380445"
-      },
-      {
-        name: "Sarah McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-8847",
-        mondayItemId: "11004380446"
-      },
-      {
-        name: "Michael McCrory",
-        relationship: "Son",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-4421",
-        mondayItemId: "11004380447"
-      },
-      {
-        name: "Lisa McCrory",
-        relationship: "Daughter",
-        ownershipPercent: "20%",
-        motivation: "Unknown",
-        lastContact: null,
-        lastContactDaysAgo: null,
-        contactOutcome: null,
-        contactOutcomeDetail: null,
-        followupDate: "—",
-        offerMade: false,
-        phone: "(832) 555-7733",
-        mondayItemId: "11004380448"
-      }
-    ];
+    const sampleConfirmedOwners = [];
 
-    const sampleOtherContacts = [
-      {
-        name: "Patricia Franklin",
-        relationship: "Cousin",
-        leadStatus: { text: "Contacted", tone: "good" },
-        contactOutcome: "Referred us to Rebeca",
-        phone1: "(713) 555-2341",
-        phone1Status: { text: "Correct Number", tone: "good" },
-        phone2: "(281) 555-8821",
-        phone2Status: { text: "Disconnected", tone: "warn" },
-        mondayItemId: "11004380450"
-      },
-      {
-        name: "Robert Martinez",
-        relationship: "Neighbor",
-        leadStatus: { text: "Contacted", tone: "good" },
-        contactOutcome: "Provided family info",
-        phone1: "(832) 555-9012",
-        phone1Status: { text: "Correct Number", tone: "good" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        mondayItemId: "11004380451"
-      },
-      {
-        name: "Jennifer Davis",
-        relationship: "Friend",
-        leadStatus: { text: "Dial NA", tone: "muted" },
-        contactOutcome: "—",
-        phone1: "(713) 555-4432",
-        phone1Status: { text: "Wrong Number", tone: "warn" },
-        phone2: "—",
-        phone2Status: { text: "—", tone: "muted" },
-        mondayItemId: "11004380452"
-      }
-    ];
+    const sampleOtherContacts = [];
 
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
@@ -1770,53 +1625,6 @@
     }
 
     // NOW define testData AFTER sample arrays are initialized
-    const testData = {
-      // Top Snapshot - Property Details
-      lead_name: "Maria Resendez Estate",
-      deal_score: "72",
-      address: "1251 Forester St, Houston, TX 77022",
-      taxes_owed: "$8,400",
-      
-      // Top Snapshot - Deal Insights (these get computed from contacts)
-      heirs_identified: 5,
-      heirs_contacted: 3,
-      
-      // Property Details
-      lead_type: "Taxes Under Suit",
-      tax_status: "3-4 years unpaid",
-      occupancy: "Vacant",
-      will_status: "Not Filed",
-      days_of_inactivity: "4 days",
-      total_equity: "$112,000",
-      condition: "Fair",
-      title_issue: "None",
-      deed_status: "Verified",
-      
-      // Update Activity
-      next_action_step: "Put Together Offer",
-      stalled_reason: "Waiting on heir response",
-      follow_up_date: "Feb 15, 2026",
-      
-      // Research
-      obituary_link: "https://www.legacy.com/obituaries/name/maria-resendez",
-      ancestry_link: "https://www.ancestry.com/search",
-      zillow_link: "https://www.zillow.com/homedetails/1251-Forester-St",
-      tax_assessor_link: "https://hcad.org/property-search",
-      google_maps_link: "https://maps.google.com/?q=1251+Forester+St+Houston+TX",
-      birth_date: "March 15, 1945",
-      death_date: "January 8, 2026",
-      age: "80",
-      creation_log: "Created on Jan 12, 2026 by John Smith",
-      
-      // Activity
-      last_contacted: "Feb 11, 2026",
-      activity_notes: "Spoke with Rebeca - very interested in selling",
-      
-      // Contacts
-      confirmed_owners: sampleConfirmedOwners,
-      other_contacts: sampleOtherContacts
-    };
-
     // Now setup event listeners AFTER data is defined
     const toggleCharacteristics = () => {
       const isOpen = characteristics.getAttribute("data-open") === "true";
@@ -1854,45 +1662,69 @@
       return phone.replace(/\D/g, '');
     }
 
+    function calcDaysAgo(dateStr){
+      if (!dateStr || dateStr === "—") return null;
+      const d = parseFlexibleDate(dateStr);
+      if (!d) return null;
+      const days = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+      if (days === 0) return "Today";
+      if (days === 1) return "1 day ago";
+      return `${days} days ago`;
+    }
+
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
       const rows = (contacts || []).map((c, index) => {
-        const isOverdue = c.followupDate && c.followupDate !== "—" && new Date(c.followupDate) < new Date();
-        const followupStyle = isOverdue ? 'style="background: #fef2f2;"' : '';
-        const followupText = isOverdue ? `<div style="font-weight: 600;">${c.followupDate}</div><div style="font-size: 12px; color: #dc2626;">4 days overdue</div>` : (c.followupDate || "—");
-        
-        // Determine Last Contact color based on days ago
-        let lastContactColor = '#374151'; // default
-        if (c.lastContactDaysAgo) {
-          const daysAgoMatch = c.lastContactDaysAgo.match(/(\d+)/);
-          if (daysAgoMatch) {
-            const days = parseInt(daysAgoMatch[1]);
-            if (days >= 12) {
-              lastContactColor = '#dc2626'; // red for 12+ days
-            } else if (days >= 6) {
-              lastContactColor = '#f59e0b'; // orange for 6-11 days
-            }
+        // Support both camelCase (test data) and snake_case (Make.com)
+        const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
+        const motivation       = c.seller_motivation ?? c.motivation ?? null;
+        const lastContact      = c.contacted_date ?? c.lastContact ?? null;
+        const contactOutcome   = c.contact_outcome ?? c.contactOutcome ?? null;
+        const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
+        const offerMade        = c.offer_made ?? c.offerMade ?? false;
+        const offerAmount      = c.offer_amount ?? c.offerAmount ?? "—";
+        const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
+
+        // Calculate days ago from contacted_date
+        const daysAgo = calcDaysAgo(lastContact);
+        let lastContactColor = '#374151';
+        if (daysAgo) {
+          const match = daysAgo.match(/(\d+)/);
+          if (match) {
+            const days = parseInt(match[1]);
+            if (days >= 12) lastContactColor = '#dc2626';
+            else if (days >= 6) lastContactColor = '#f59e0b';
           }
         }
-        
+
+        // Follow-up overdue check
+        const isOverdue = followupDate && followupDate !== "—" && new Date(followupDate) < new Date();
+        const followupStyle = isOverdue ? 'style="background: #fef2f2;"' : '';
+        const overdueDays = isOverdue ? Math.floor((Date.now() - new Date(followupDate).getTime()) / (1000*60*60*24)) : 0;
+        const followupText = isOverdue
+          ? `<div style="font-weight: 600;">${followupDate}</div><div style="font-size: 12px; color: #dc2626;">${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue</div>`
+          : (followupDate || "—");
+
         return `
         <tr>
           <td>
-            ${c.mondayUrl || c.mondayItemId
-              ? `<a href="${c.mondayUrl || `https://monday.com/boards/${extractBoardIdFromUrl()}/pulses/${c.mondayItemId}`}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
+            ${mondayUrl
+              ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
               : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
             }
             ${c.relationship ? `<div style="font-size: 13px; color: #9ca3af; margin-top: 2px;">${escapeHtml(c.relationship)}</div>` : ''}
           </td>
-          <td style="font-weight: 600;">${escapeHtml(c.ownershipPercent ?? "—")}</td>
-          <td>${motivationBadge(c.motivation)}</td>
+          <td style="font-weight: 600;">${escapeHtml(String(ownershipPercent))}%</td>
+          <td>${motivationBadge(motivation)}</td>
           <td>
-            ${c.lastContact ? `<div style="font-weight: 600;">${escapeHtml(c.lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${c.lastContactDaysAgo || ''}</div>` : `<span class="td-muted">Not contacted</span>`}
+            ${lastContact && lastContact !== "—"
+              ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
+              : `<span class="td-muted">Not contacted</span>`}
           </td>
-          <td>${c.contactOutcome ? `<div style="font-weight: 600; color: #059669;">${escapeHtml(c.contactOutcome)}</div><div style="font-size: 12px; color: #6b7280;">${c.contactOutcomeDetail || ''}</div>` : `<span class="td-muted">—</span>`}</td>
+          <td>${contactOutcome && contactOutcome !== "—" ? `<div style="font-weight: 600; color: #059669;">${escapeHtml(contactOutcome)}</div>` : `<span class="td-muted">—</span>`}</td>
           <td ${followupStyle}>${followupText}</td>
           <td>
-            ${c.offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">${c.offerAmount || '—'}</div>` : `<span class="td-muted">No offer</span>`}
+            ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">$${escapeHtml(String(offerAmount))}</div>` : `<span class="td-muted">No offer</span>`}
           </td>
           <td>
             <div class="quick-actions">
@@ -1915,23 +1747,44 @@
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
-      const rows = (contacts || []).map(c => `
+      const rows = (contacts || []).map(c => {
+        // Support both camelCase (test data) and snake_case (Make.com)
+        const mondayUrl      = c.monday_url ?? c.mondayUrl ?? null;
+        const leadStatus     = c.lead_status ?? c.leadStatus ?? null;
+        const contactOutcome = c.contact_outcome ?? c.contactOutcome ?? "—";
+        const phone1         = c.phone_1 ?? c.phone1 ?? "—";
+        const phone1Status   = c.phone_1_status ?? c.phone1Status ?? null;
+        const phone2         = c.phone_2 ?? c.phone2 ?? "—";
+        const phone2Status   = c.phone_2_status ?? c.phone2Status ?? null;
+
+        // Build a simple status cell from a plain string (Make.com sends strings, not objects)
+        const simpleStatusCell = (val) => {
+          if (!val || val === "—") return `<span class="td-muted">—</span>`;
+          if (typeof val === "object") return statusCell(val);
+          const v = val.toLowerCase();
+          let tone = "dot";
+          if (v.includes("correct") || v.includes("good") || v.includes("contacted")) tone = "dot good";
+          else if (v.includes("dial na") || v.includes("wrong") || v.includes("disconnected")) tone = "dot warn";
+          return `<span class="status"><span class="${tone}"></span>${escapeHtml(val)}</span>`;
+        };
+
+        return `
         <tr>
           <td>
-            ${c.mondayUrl || c.mondayItemId
-              ? `<a href="${c.mondayUrl || `https://monday.com/boards/${extractBoardIdFromUrl()}/pulses/${c.mondayItemId}`}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
+            ${mondayUrl
+              ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
               : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
             }
           </td>
           <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
-          <td>${statusCell(c.leadStatus)}</td>
-          <td>${escapeHtml(c.contactOutcome ?? "—")}</td>
-          <td>${escapeHtml(c.phone1 ?? "—")}</td>
-          <td>${statusCell(c.phone1Status)}</td>
-          <td>${escapeHtml(c.phone2 ?? "—")}</td>
-          <td>${statusCell(c.phone2Status)}</td>
+          <td>${simpleStatusCell(leadStatus)}</td>
+          <td>${escapeHtml(contactOutcome)}</td>
+          <td>${escapeHtml(phone1)}</td>
+          <td>${simpleStatusCell(phone1Status)}</td>
+          <td>${escapeHtml(phone2)}</td>
+          <td>${simpleStatusCell(phone2Status)}</td>
         </tr>
-      `).join("");
+      `}).join("");
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No other related contacts.</td></tr>`;
     }
 
@@ -2086,7 +1939,7 @@
 
       let best = null;
       (confirmedOwners || []).forEach(c => {
-        const d = parseFlexibleDate(c?.followupDate);
+        const d = parseFlexibleDate(c?.follow_up_date ?? c?.followupDate);
         if (!d) return;
 
         const due = startOfDay(d);
@@ -2096,7 +1949,7 @@
           const candidate = {
             name: String(c?.name ?? "—").trim() || "—",
             daysOverdue: diffDays,
-            nextAction: String(c?.nextAction ?? "").trim()
+            nextAction: String(c?.next_action ?? c?.nextAction ?? "").trim()
           };
           if (!best || candidate.daysOverdue > best.daysOverdue) best = candidate;
         }
@@ -2220,18 +2073,18 @@
     // RESPONSE PAYLOAD (from Make.com - all fields mapped):
     // {
     //   // TOP SNAPSHOT - Property Details
-    //   "deceased_owner": "Maria Resendez Estate",
-    //   "last_contact_date": "Feb 13, 2026",
+    //   "deceased_owner": "—",
+    //   "last_contact_date": "—",
     //   "last_contact_days_ago": 6,               // Calculate: today - last_contact_date
     //   "deal_score": "72",
-    //   "taxes_owed": "$8,400",
+    //   "taxes_owed": "—",
     //   
     //   // TOP SNAPSHOT - Deal Insights
     //   "heirs_identified": 5,                    // Count of confirmed_owners
     //   "heirs_contacted": 3,                     // Count where lastContact exists
     //   "heirs_offered": 1,                       // Count where offerMade = true
     //   "ownership_secured_percent": "20%",       // Sum of ownership% where offerMade = true
-    //   "ownership_secured_count": "1 of 5",      // Count offered / total heirs
+    //   "ownership_secured_count": "—",      // Count offered / total heirs
     //   
     //   // PROPERTY DETAILS SECTION - Left Column
     //   "lead_type": "Taxes Under Suit",
@@ -2274,7 +2127,7 @@
     //       "ownershipPercent": "20%",                     // From "Ownership %" column
     //       "motivation": "Warm",                          // From "Seller Motivation" column
     //       "lastContact": "Feb 11, 2026",                 // From "Contacted date" column
-    //       "lastContactDaysAgo": "6 days ago",            // Calculate: today - lastContact
+    //       "lastContactDaysAgo": "—",            // Calculate: today - lastContact
     //       "contactOutcome": "Interested",                // From "Contact Outcome" column (main text)
     //       "contactOutcomeDetail": "Wants written offer", // From "Contact Outcome" column (detail)
     //       "followupDate": "Feb 15, 2026",                // From "Follow-Up Date" column
@@ -2378,26 +2231,12 @@
           })
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response status text:', response.statusText);
-        
-        const responseText = await response.text();
-        console.log('Raw response from Make.com:', responseText);
-
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        let data;
-        try {
-          data = JSON.parse(responseText);
-          console.log('Parsed JSON data:', data);
-        } catch (parseError) {
-          console.error('JSON Parse Error:', parseError);
-          console.error('Response text was:', responseText);
-          alert(`Make.com returned invalid JSON.\n\nResponse: "${responseText.substring(0, 100)}..."\n\nThis usually means:\n1. The scenario is not activated\n2. There's an error in the scenario\n3. Check Make.com execution history`);
-          throw new Error(`Invalid JSON from webhook: ${responseText.substring(0, 200)}`);
-        }
+        const data = await response.json();
+        console.log('Received data from Make.com:', data);
 
         window.RecordPage.applyData(data);
 
@@ -2435,7 +2274,6 @@
     }
 
     // init - Load test data
-    window.RecordPage.applyData(testData);
     renderConfirmedOwners(sampleConfirmedOwners);
     renderOtherContacts(sampleOtherContacts);
     updateActionBannerFromContacts(sampleConfirmedOwners);
@@ -2450,9 +2288,10 @@
       currentNoteContactIndex = contactIndex;
       
       document.getElementById('noteContactName').textContent = contact.name || '—';
+      const ownerPct = contact.ownership_percent ?? contact.ownershipPercent ?? '—';
       document.getElementById('noteContactRelation').textContent = contact.relationship 
-        ? `${contact.relationship} • ${contact.ownershipPercent || '—'} ownership`
-        : contact.ownershipPercent || '—';
+        ? `${contact.relationship} • ${ownerPct}% ownership`
+        : `${ownerPct}% ownership`;
       
       document.getElementById('noteTextarea').value = '';
       document.getElementById('noteCharCount').textContent = '0';
