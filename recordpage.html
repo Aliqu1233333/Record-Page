@@ -1601,12 +1601,10 @@
 
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
+          renderOtherContacts(payload.confirmed_owners);
           updateActionBannerFromContacts(payload.confirmed_owners);
         } else {
           updateActionBannerFromContacts([]);
-        }
-        if (Array.isArray(payload.other_contacts)) {
-          renderOtherContacts(payload.other_contacts);
         }
         computeContactsSummary(payload);
       }
@@ -2338,39 +2336,15 @@
       
       const overlay = document.getElementById('noteModalOverlay');
       const modal = overlay.querySelector('.note-modal');
+
+      // Center modal in viewport — works reliably inside iframes
+      modal.style.position = 'fixed';
+      modal.style.top = '50%';
+      modal.style.left = '50%';
+      modal.style.transform = 'translate(-50%, -50%)';
       
       overlay.classList.add('active');
       
-      // Position modal above the button
-      const buttonRect = buttonElement.getBoundingClientRect();
-      const modalHeight = 500; // max-height from CSS
-      const modalWidth = 400;
-      
-      // Calculate position (centered above button with some spacing)
-      let top = buttonRect.top - modalHeight - 16; // 16px gap above button
-      let left = buttonRect.left + (buttonRect.width / 2) - (modalWidth / 2);
-      
-      // Keep within viewport bounds
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      
-      // If modal would go off top of screen, show below button instead
-      if (top < 10) {
-        top = buttonRect.bottom + 16;
-        // Flip arrow to point up
-        modal.style.setProperty('--arrow-direction', 'up');
-      } else {
-        modal.style.setProperty('--arrow-direction', 'down');
-      }
-      
-      // Keep within horizontal bounds
-      if (left < 10) left = 10;
-      if (left + modalWidth > viewportWidth - 10) left = viewportWidth - modalWidth - 10;
-      
-      modal.style.top = top + 'px';
-      modal.style.left = left + 'px';
-      
-      // Focus textarea
       setTimeout(() => {
         document.getElementById('noteTextarea').focus();
       }, 100);
