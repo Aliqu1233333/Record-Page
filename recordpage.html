@@ -974,12 +974,12 @@
 
                 <div class="sfield">
                   <div class="slabel">Deal Score</div>
-                  <div class="svalue">72</div>
+                  <div class="svalue" id="snapshotDealScore">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
-                  <div class="svalue">$8,400</div>
+                  <div class="svalue" id="snapshotTaxesOwed">—</div>
                 </div>
               </div>
             </div>
@@ -991,24 +991,24 @@
                 <div class="sfield">
                   <div class="slabel">
                     Heirs Identified
-                    <span class="heir-status-badge heir-status-complete">Complete</span>
+                    <span class="heir-status-badge heir-status-complete" id="heirsIdentifiedBadge" style="display: none;">Complete</span>
                   </div>
-                  <div class="svalue">5</div>
+                  <div class="svalue" id="snapshotHeirsIdentified">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue">3 of 5</div>
+                  <div class="svalue" id="snapshotHeirsContacted">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue">1 of 5</div>
+                  <div class="svalue" id="snapshotHeirsOffered">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
-                  <div class="svalue ok">20% (1 of 5)</div>
+                  <div class="svalue ok" id="snapshotOwnershipSecured">—</div>
                 </div>
               </div>
             </div>
@@ -1528,31 +1528,97 @@
           if (node) node.textContent = formatValue(value);
         }
 
-        // UPDATE SNAPSHOT FIELDS
+        // UPDATE SNAPSHOT FIELDS - PROPERTY DETAILS
         if (payload.deceased_owner) {
           const deceasedOwnerEl = document.getElementById('snapshotDeceasedOwner');
           if (deceasedOwnerEl) deceasedOwnerEl.textContent = payload.deceased_owner;
         }
 
+        if (payload.deal_score) {
+          const dealScoreEl = document.getElementById('snapshotDealScore');
+          if (dealScoreEl) dealScoreEl.textContent = payload.deal_score;
+        }
+
+        if (payload.taxes_owed) {
+          const taxesOwedEl = document.getElementById('snapshotTaxesOwed');
+          if (taxesOwedEl) taxesOwedEl.textContent = payload.taxes_owed;
+        }
+
+        // Last Contact - with date calculation and color coding
         if (payload.last_contacted) {
           const lastContactDateEl = document.getElementById('snapshotLastContactDate');
           if (lastContactDateEl) lastContactDateEl.textContent = payload.last_contacted;
         }
 
-        if (payload.last_contact_days_ago) {
+        // Calculate days ago from date if not provided
+        let daysAgo = payload.last_contact_days_ago;
+        if (!daysAgo && payload.last_contacted) {
+          // Parse date and calculate days
+          const lastContactDate = new Date(payload.last_contacted);
+          const today = new Date();
+          const diffTime = Math.abs(today - lastContactDate);
+          daysAgo = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        if (daysAgo !== null && daysAgo !== undefined) {
           const lastContactDaysEl = document.getElementById('snapshotLastContactDays');
           if (lastContactDaysEl) {
-            lastContactDaysEl.textContent = payload.last_contact_days_ago + ' days ago';
+            lastContactDaysEl.textContent = daysAgo + ' days ago';
             
-            // Color code based on recency
-            const days = parseInt(payload.last_contact_days_ago);
-            if (days <= 3) {
-              lastContactDaysEl.style.color = '#059669'; // Green - recent
-            } else if (days <= 7) {
-              lastContactDaysEl.style.color = '#f59e0b'; // Yellow - moderate
+            // Color code: <8 = green, 8-14 = yellow, 15+ = red
+            const days = parseInt(daysAgo);
+            if (days < 8) {
+              lastContactDaysEl.style.color = '#059669'; // Green
+            } else if (days <= 14) {
+              lastContactDaysEl.style.color = '#f59e0b'; // Yellow
             } else {
-              lastContactDaysEl.style.color = '#ef4444'; // Red - stale
+              lastContactDaysEl.style.color = '#ef4444'; // Red
             }
+          }
+        }
+
+        // DEAL INSIGHTS - Calculate from confirmed_owners array
+        if (Array.isArray(payload.confirmed_owners)) {
+          const owners = payload.confirmed_owners;
+          
+          // Heirs Identified - count where owner_status = true/yes
+          const heirsIdentified = owners.filter(h => 
+            h.owner_status === true || h.owner_status === 'Yes' || h.owner_status === 'yes'
+          ).length;
+          
+          const heirsIdentifiedEl = document.getElementById('snapshotHeirsIdentified');
+          if (heirsIdentifiedEl) heirsIdentifiedEl.textContent = heirsIdentified;
+          
+          // Show "Complete" badge if all identified
+          const heirsBadgeEl = document.getElementById('heirsIdentifiedBadge');
+          if (heirsBadgeEl && heirsIdentified === owners.length) {
+            heirsBadgeEl.style.display = 'inline-flex';
+          }
+          
+          // Heirs Contacted - count where lastContact is not null
+          const heirsContacted = owners.filter(h => h.lastContact).length;
+          const heirsContactedEl = document.getElementById('snapshotHeirsContacted');
+          if (heirsContactedEl) heirsContactedEl.textContent = `${heirsContacted} of ${heirsIdentified}`;
+          
+          // Heirs Offered - count where offer_made = true
+          const heirsOffered = owners.filter(h => h.offerMade === true).length;
+          const heirsOfferedEl = document.getElementById('snapshotHeirsOffered');
+          if (heirsOfferedEl) heirsOfferedEl.textContent = `${heirsOffered} of ${heirsIdentified}`;
+          
+          // Ownership Secured - sum ownership% where owner_status = true AND leadStatus = "Closed"
+          const securedOwners = owners.filter(h => 
+            (h.owner_status === true || h.owner_status === 'Yes' || h.owner_status === 'yes') &&
+            (h.leadStatus?.text === 'Closed' || h.leadStatus === 'Closed')
+          );
+          
+          const ownershipPercent = securedOwners.reduce((sum, h) => {
+            const percent = parseInt(h.ownershipPercent) || 0;
+            return sum + percent;
+          }, 0);
+          
+          const ownershipSecuredEl = document.getElementById('snapshotOwnershipSecured');
+          if (ownershipSecuredEl) {
+            ownershipSecuredEl.textContent = `${ownershipPercent}% (${securedOwners.length} of ${heirsIdentified})`;
           }
         }
 
