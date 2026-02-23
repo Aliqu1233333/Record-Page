@@ -602,7 +602,7 @@
     .note-modal-overlay{
       position: fixed;
       inset: 0;
-      background: transparent;
+      background: rgba(0,0,0,0.15);
       display: none;
       z-index: 10000;
       pointer-events: none;
@@ -961,7 +961,7 @@
               <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Deceased Owner</div>
-                  <div class="svalue" data-snapshot="true" data-field="lead_name">—</div>
+                  <div class="svalue" data-snapshot="true" data-field="deceased_owner">—</div>
                 </div>
 
                 <div class="sfield">
@@ -1534,6 +1534,15 @@
           if (snap) snap.textContent = formatValue(value);
         }
 
+        // Last Contact snapshot — calculate days ago from last_contacted
+        if (payload.last_contacted && payload.last_contacted !== "—") {
+          const daysAgo = calcDaysAgo(payload.last_contacted);
+          const dateEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_date"]');
+          const daysEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_days_ago"]');
+          if (dateEl) dateEl.textContent = payload.last_contacted;
+          if (daysEl) daysEl.textContent = daysAgo || payload.last_contacted;
+        }
+
         // ── Deal Insight metrics computed from confirmed_owners ──────────────
         const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
 
@@ -1674,8 +1683,11 @@
 
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
-      const rows = (contacts || []).map((c, index) => {
-        // Support both camelCase (test data) and snake_case (Make.com)
+      // Only show owner_status === "Yes" in this tab
+      const confirmed = (contacts || []).filter(c =>
+        String(c.owner_status || "").trim().toLowerCase() === "yes"
+      );
+      const rows = confirmed.map((c, index) => {
         const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
         const motivation       = c.seller_motivation ?? c.motivation ?? null;
         const lastContact      = c.contacted_date ?? c.lastContact ?? null;
@@ -1697,20 +1709,43 @@
           }
         }
 
-        // Follow-up overdue check
-        const isOverdue = followupDate && followupDate !== "—" && new Date(followupDate) < new Date();
-        const followupStyle = isOverdue ? 'style="background: #fef2f2;"' : '';
-        const overdueDays = isOverdue ? Math.floor((Date.now() - new Date(followupDate).getTime()) / (1000*60*60*24)) : 0;
-        const followupText = isOverdue
-          ? `<div style="font-weight: 600;">${followupDate}</div><div style="font-size: 12px; color: #dc2626;">${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue</div>`
-          : (followupDate || "—");
+        // Follow-up overdue / upcoming
+        let followupCell = `<span class="td-muted">—</span>`;
+        if (followupDate && followupDate !== "—") {
+          const fpDate = parseFlexibleDate(followupDate);
+          if (fpDate) {
+            const today = startOfDay(new Date());
+            const fp = startOfDay(fpDate);
+            const diffDays = Math.floor((fp - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) {
+              const overdue = Math.abs(diffDays);
+              followupCell = `
+                <div style="background:#fef2f2; padding: 6px 8px; border-radius: 6px;">
+                  <div style="font-weight: 600; color: #dc2626;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #dc2626;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div>
+                </div>`;
+            } else if (diffDays === 0) {
+              followupCell = `
+                <div>
+                  <div style="font-weight: 600;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #f59e0b;">Due today</div>
+                </div>`;
+            } else {
+              followupCell = `
+                <div>
+                  <div style="font-weight: 600;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #6b7280;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div>
+                </div>`;
+            }
+          }
+        }
 
         return `
         <tr>
           <td>
             ${mondayUrl
               ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-              : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
+              : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
             }
             ${c.relationship ? `<div style="font-size: 13px; color: #9ca3af; margin-top: 2px;">${escapeHtml(c.relationship)}</div>` : ''}
           </td>
@@ -1722,33 +1757,48 @@
               : `<span class="td-muted">Not contacted</span>`}
           </td>
           <td>${contactOutcome && contactOutcome !== "—" ? `<div style="font-weight: 600; color: #059669;">${escapeHtml(contactOutcome)}</div>` : `<span class="td-muted">—</span>`}</td>
-          <td ${followupStyle}>${followupText}</td>
+          <td>${followupCell}</td>
           <td>
             ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">$${escapeHtml(String(offerAmount))}</div>` : `<span class="td-muted">No offer</span>`}
           </td>
           <td>
             <div class="quick-actions">
-              <button class="btn add-note-btn" data-contact-index="${index}">Add Note</button>
+              <button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button>
             </div>
           </td>
         </tr>
       `;
       }).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Owners Identified Yet</td></tr>`;
-      
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
+
       // Add event listeners to Add Note buttons
-      document.querySelectorAll('.add-note-btn').forEach(btn => {
+      tbody.querySelectorAll('.add-note-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           const contactIndex = parseInt(e.target.getAttribute('data-contact-index'));
-          openNoteModal(contacts[contactIndex], contactIndex, e.target);
+          openNoteModal(confirmed[contactIndex], contactIndex, e.target);
         });
       });
     }
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
-      const rows = (contacts || []).map(c => {
-        // Support both camelCase (test data) and snake_case (Make.com)
+      // Show subitems where owner_status is NOT "Yes"
+      const others = (contacts || []).filter(c =>
+        String(c.owner_status || "").trim().toLowerCase() !== "yes"
+      );
+
+      const simpleStatusCell = (val) => {
+        if (!val || val === "—") return `<span class="td-muted">—</span>`;
+        if (typeof val === "object") return statusCell(val);
+        const v = val.toLowerCase();
+        let tone = "dot";
+        if (v.includes("correct") || v.includes("good") || v.includes("contacted")) tone = "dot good";
+        else if (v.includes("dial na") || v.includes("wrong") || v.includes("disconnected")) tone = "dot warn";
+        return `<span class="status"><span class="${tone}"></span>${escapeHtml(val)}</span>`;
+      };
+
+      const rows = others.map(c => {
         const mondayUrl      = c.monday_url ?? c.mondayUrl ?? null;
         const leadStatus     = c.lead_status ?? c.leadStatus ?? null;
         const contactOutcome = c.contact_outcome ?? c.contactOutcome ?? "—";
@@ -1757,23 +1807,12 @@
         const phone2         = c.phone_2 ?? c.phone2 ?? "—";
         const phone2Status   = c.phone_2_status ?? c.phone2Status ?? null;
 
-        // Build a simple status cell from a plain string (Make.com sends strings, not objects)
-        const simpleStatusCell = (val) => {
-          if (!val || val === "—") return `<span class="td-muted">—</span>`;
-          if (typeof val === "object") return statusCell(val);
-          const v = val.toLowerCase();
-          let tone = "dot";
-          if (v.includes("correct") || v.includes("good") || v.includes("contacted")) tone = "dot good";
-          else if (v.includes("dial na") || v.includes("wrong") || v.includes("disconnected")) tone = "dot warn";
-          return `<span class="status"><span class="${tone}"></span>${escapeHtml(val)}</span>`;
-        };
-
         return `
         <tr>
           <td>
             ${mondayUrl
               ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-              : `<span class="td-link" style="cursor: default;">${escapeHtml(c.name ?? "—")}</span>`
+              : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
             }
           </td>
           <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
@@ -1784,7 +1823,8 @@
           <td>${escapeHtml(phone2)}</td>
           <td>${simpleStatusCell(phone2Status)}</td>
         </tr>
-      `}).join("");
+      `;
+      }).join("");
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No other related contacts.</td></tr>`;
     }
 
