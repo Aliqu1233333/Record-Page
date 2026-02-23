@@ -1578,41 +1578,46 @@
         }
 
         // DEAL INSIGHTS - Calculate from confirmed_owners array
+        // First, split into confirmed owners (owner_status = Yes) vs other contacts
+        let confirmedOwners = [];
+        let otherContacts = [];
+        
         if (Array.isArray(payload.confirmed_owners)) {
-          const owners = payload.confirmed_owners;
+          payload.confirmed_owners.forEach(contact => {
+            if (contact.owner_status === 'Yes' || contact.owner_status === true) {
+              confirmedOwners.push(contact);
+            } else {
+              otherContacts.push(contact);
+            }
+          });
           
-          // Heirs Identified - count where owner_status = true/yes
-          const heirsIdentified = owners.filter(h => 
-            h.owner_status === true || h.owner_status === 'Yes' || h.owner_status === 'yes'
-          ).length;
+          // Heirs Identified - count all with owner_status = Yes
+          const heirsIdentified = confirmedOwners.length;
           
           const heirsIdentifiedEl = document.getElementById('snapshotHeirsIdentified');
           if (heirsIdentifiedEl) heirsIdentifiedEl.textContent = heirsIdentified;
           
           // Show "Complete" badge if all identified
           const heirsBadgeEl = document.getElementById('heirsIdentifiedBadge');
-          if (heirsBadgeEl && heirsIdentified === owners.length) {
+          if (heirsBadgeEl && heirsIdentified > 0) {
             heirsBadgeEl.style.display = 'inline-flex';
           }
           
-          // Heirs Contacted - count where lastContact is not null
-          const heirsContacted = owners.filter(h => h.lastContact).length;
+          // Heirs Contacted - count where contacted_date exists
+          const heirsContacted = confirmedOwners.filter(h => h.contacted_date).length;
           const heirsContactedEl = document.getElementById('snapshotHeirsContacted');
           if (heirsContactedEl) heirsContactedEl.textContent = `${heirsContacted} of ${heirsIdentified}`;
           
           // Heirs Offered - count where offer_made = true
-          const heirsOffered = owners.filter(h => h.offerMade === true).length;
+          const heirsOffered = confirmedOwners.filter(h => h.offer_made === true).length;
           const heirsOfferedEl = document.getElementById('snapshotHeirsOffered');
           if (heirsOfferedEl) heirsOfferedEl.textContent = `${heirsOffered} of ${heirsIdentified}`;
           
-          // Ownership Secured - sum ownership% where owner_status = true AND leadStatus = "Closed"
-          const securedOwners = owners.filter(h => 
-            (h.owner_status === true || h.owner_status === 'Yes' || h.owner_status === 'yes') &&
-            (h.leadStatus?.text === 'Closed' || h.leadStatus === 'Closed')
-          );
+          // Ownership Secured - sum ownership_percent where lead_status = "Closed"
+          const securedOwners = confirmedOwners.filter(h => h.lead_status === 'Closed');
           
           const ownershipPercent = securedOwners.reduce((sum, h) => {
-            const percent = parseInt(h.ownershipPercent) || 0;
+            const percent = parseInt(h.ownership_percent) || 0;
             return sum + percent;
           }, 0);
           
@@ -1622,14 +1627,15 @@
           }
         }
 
-        if (Array.isArray(payload.confirmed_owners)) {
-          renderConfirmedOwners(payload.confirmed_owners);
-          updateActionBannerFromContacts(payload.confirmed_owners);
+        // Render tables with split data
+        if (confirmedOwners.length > 0) {
+          renderConfirmedOwners(confirmedOwners);
+          updateActionBannerFromContacts(confirmedOwners);
         } else {
           updateActionBannerFromContacts([]);
         }
-        if (Array.isArray(payload.other_contacts)) {
-          renderOtherContacts(payload.other_contacts);
+        if (otherContacts.length > 0) {
+          renderOtherContacts(otherContacts);
         }
         computeContactsSummary(payload);
       }
