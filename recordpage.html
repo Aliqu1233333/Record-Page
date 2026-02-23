@@ -1838,17 +1838,93 @@
       });
     });
 
-    // Inline edit (auto-save on blur / Enter)
+    // Column ID map — data-field → Monday.com column ID
+    const COLUMN_ID_MAP = {
+      // Property Details
+      "lead_type":          "text16__1",
+      "tax_status":         "dropdown_1_mkm2rj6r",
+      "condition":          "dropdown_mkm2dn8t",
+      "occupancy":          "dropdown_2_mkm2g8p5",
+      "total_equity":       "text_mkr4rctb",
+      "deed_status":        "dropdown_mkxn2crm",
+      "will_status":        "dropdown_mkxn8zvw",
+      "title_issue":        "dropdown_3_mkm2q90p",
+      // Update Activity
+      "next_action_step":   "dropdown_mkzkc600",
+      "stalled_reason":     "dropdown_mkzkq6pk",
+      "follow_up_date":     "date_mkpbazwa",
+      // Research
+      "obituary_link":      "link_mkm1203y",
+      "ancestry_link":      "link_mkn89tj9",
+      "zillow_link":        "link_mkktcawe",
+      "tax_assessor_link":  "dup__of_obituary_mkm13z9",
+      "google_maps_link":   "link_mkxf5hmb",
+      "birth_date":         "text_mkm2b3zj",
+      "death_date":         "text_1_mkm22xph",
+      "age":                "text29__1",
+      // Activity
+      "last_contacted":     "date_Mjj4pmmI",
+      "activity_notes":     "text_activity_notes",
+    };
+
+    const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
+
+    async function saveToMonday(fieldKey, newValue) {
+      const columnId = COLUMN_ID_MAP[fieldKey];
+      if (!columnId) {
+        console.warn(`No column ID mapped for field: ${fieldKey}`);
+        return;
+      }
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if (!boardId || !pulseId) {
+        console.error("Cannot save — missing boardId or pulseId in URL");
+        return;
+      }
+      try {
+        const res = await fetch(SAVE_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ boardId, pulseId, columnId, value: newValue })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        console.log(`✓ Saved ${fieldKey} → ${newValue}`);
+      } catch (err) {
+        console.error(`✗ Failed to save ${fieldKey}:`, err);
+        showSaveToast("error");
+      }
+    }
+
+    function showSaveToast(type) {
+      const existing = document.getElementById("saveToast");
+      if (existing) existing.remove();
+      const toast = document.createElement("div");
+      toast.id = "saveToast";
+      toast.textContent = type === "error" ? "⚠ Save failed — check console" : "✓ Saved";
+      Object.assign(toast.style, {
+        position: "fixed", bottom: "20px", right: "20px",
+        padding: "10px 16px", borderRadius: "8px", fontSize: "14px",
+        fontWeight: "600", zIndex: "99999", transition: "opacity 0.4s ease",
+        background: type === "error" ? "#fef2f2" : "#d1fae5",
+        color: type === "error" ? "#dc2626" : "#065f46",
+        border: `1px solid ${type === "error" ? "#fecaca" : "#6ee7b7"}`,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 400); }, 2500);
+    }
+
+    // Inline edit — saves to Monday on commit
     Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
         const field = pencil.closest(".field");
+        const fieldKey = field.getAttribute("data-field");
         const valueText = field.querySelector(".value-text");
         const editable = valueText.getAttribute("data-editable") === "true";
         if (!editable) return;
         if (field.querySelector(".inline-input")) return;
 
-        const oldValue = valueText.textContent.trim();
+        const oldValue = valueText.textContent.trim() === "—" ? "" : valueText.textContent.trim();
         const valueWrap = field.querySelector(".value");
         valueText.style.display = "none";
         pencil.style.display = "none";
@@ -1861,18 +1937,27 @@
         left.style.flex = "1";
         left.style.minWidth = "0";
         left.appendChild(input);
-
         valueWrap.insertBefore(left, valueWrap.firstChild);
 
-        const commit = () => {
+        let committed = false;
+
+        const commit = async () => {
+          if (committed) return;
+          committed = true;
           const newValue = input.value.trim() || "—";
           valueText.textContent = newValue;
           left.remove();
           valueText.style.display = "";
           pencil.style.display = "";
+          if (newValue !== (oldValue || "—")) {
+            await saveToMonday(fieldKey, newValue === "—" ? "" : newValue);
+            showSaveToast("success");
+          }
         };
 
         const cancel = () => {
+          if (committed) return;
+          committed = true;
           left.remove();
           valueText.style.display = "";
           pencil.style.display = "";
@@ -1880,7 +1965,7 @@
 
         input.addEventListener("blur", commit);
         input.addEventListener("keydown", (ke) => {
-          if (ke.key === "Enter") commit();
+          if (ke.key === "Enter") { ke.preventDefault(); commit(); }
           if (ke.key === "Escape") cancel();
         });
 
