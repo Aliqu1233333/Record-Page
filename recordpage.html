@@ -339,6 +339,7 @@
       text-overflow:ellipsis;
       white-space:nowrap;
       padding-right: 4px;
+      font-size: 15.5px;
     }
     .value-text.link{
       color: var(--blue);
@@ -552,27 +553,25 @@
     .dot.good{ background: #10b981; }
     .dot.warn{ background: #f59e0b; }
 
-    /* Motivation badges */
+    /* Motivation - clean dot style */
     .motivation-badge{
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 14.5px;
-      font-weight: 600;
-      text-align: center;
+      font-weight: 500;
+      color: #374151;
     }
-    .motivation-warm{
-      background: #fef3c7;
-      color: #92400e;
+    .motivation-badge::before{
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
-    .motivation-cold{
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-    .motivation-unknown{
-      background: #f3f4f6;
-      color: #9ca3af;
-    }
+    .motivation-warm::before{ background: #10b981; }
+    .motivation-cold::before{ background: #9ca3af; }
+    .motivation-unknown::before{ background: #d1d5db; }
 
     /* Quick action buttons */
     .quick-actions{
@@ -993,22 +992,22 @@
                     Heirs Identified
                     <span class="heir-status-badge heir-status-in-progress" data-snapshot="true" data-field="heirs_identified_status">—</span>
                   </div>
-                  <div class="svalue" data-snapshot="true" data-field="heirs_identified">—</div>
+                  <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_identified">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
-                  <div class="svalue" data-snapshot="true" data-field="heirs_contacted">—</div>
+                  <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_contacted">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
-                  <div class="svalue" data-snapshot="true" data-field="heirs_offered">—</div>
+                  <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_offered">—</div>
                 </div>
 
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
-                  <div class="svalue ok" data-snapshot="true" data-field="ownership_secured">—</div>
+                  <div class="svalue ok" style="font-size: 16.5px;" data-snapshot="true" data-field="ownership_secured">—</div>
                 </div>
               </div>
             </div>
@@ -1253,7 +1252,6 @@
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>Ownership %</th>
                         <th>Motivation</th>
                         <th>Last Contact</th>
                         <th>Lead Status</th>
@@ -1613,11 +1611,6 @@
     // Characteristics dropdown
     const characteristics = document.getElementById("characteristicsToggle");
 
-    // Contacts - TEST DATA (must be defined BEFORE testData)
-    const sampleConfirmedOwners = [];
-
-    const sampleOtherContacts = [];
-
     function toneDotClass(tone){
       if (tone === "good") return "dot good";
       if (tone === "warn") return "dot warn";
@@ -1631,8 +1624,7 @@
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
 
-    // NOW define testData AFTER sample arrays are initialized
-    // Now setup event listeners AFTER data is defined
+    // Now setup event listeners
     const toggleCharacteristics = () => {
       const isOpen = characteristics.getAttribute("data-open") === "true";
       characteristics.setAttribute("data-open", String(!isOpen));
@@ -1718,21 +1710,21 @@
             if (diffDays < 0) {
               const overdue = Math.abs(diffDays);
               followupCell = `
-                <div style="background:#fef2f2; padding: 6px 8px; border-radius: 6px;">
-                  <div style="font-weight: 600; color: #dc2626;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #dc2626;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div>
+                <div>
+                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #dc2626; font-weight: 500;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div>
                 </div>`;
             } else if (diffDays === 0) {
               followupCell = `
                 <div>
-                  <div style="font-weight: 600;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #f59e0b;">Due today</div>
+                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #f59e0b; font-weight: 500;">Due today</div>
                 </div>`;
             } else {
               followupCell = `
                 <div>
-                  <div style="font-weight: 600;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #6b7280;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div>
+                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
+                  <div style="font-size: 12px; color: #9ca3af;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div>
                 </div>`;
             }
           }
@@ -1745,16 +1737,19 @@
               ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
               : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
             }
-            ${c.relationship ? `<div style="font-size: 13px; color: #9ca3af; margin-top: 2px;">${escapeHtml(c.relationship)}</div>` : ''}
+            <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
+              ${c.relationship ? `<span style="font-size: 12px; color: #9ca3af;">${escapeHtml(c.relationship)}</span>` : ''}
+              ${c.relationship && ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 11px; color: #cbd5e1;">·</span>` : ''}
+              ${ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 12px; font-weight: 700; color: #0176d3;">${escapeHtml(String(ownershipPercent))}%</span>` : ''}
+            </div>
           </td>
-          <td style="font-weight: 600;">${escapeHtml(String(ownershipPercent))}%</td>
           <td>${motivationBadge(motivation)}</td>
           <td>
             ${lastContact && lastContact !== "—"
               ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
               : `<span class="td-muted">Not contacted</span>`}
           </td>
-          <td>${contactOutcome && contactOutcome !== "—" ? `<div style="font-weight: 600; color: #059669;">${escapeHtml(contactOutcome)}</div>` : `<span class="td-muted">—</span>`}</td>
+          <td>${contactOutcome && contactOutcome !== "—" ? `<div style="font-weight: 600; color: #111827;">${escapeHtml(contactOutcome)}</div>` : `<span class="td-muted">—</span>`}</td>
           <td>${followupCell}</td>
           <td>
             ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">$${escapeHtml(String(offerAmount))}</div>` : `<span class="td-muted">No offer</span>`}
@@ -1767,7 +1762,7 @@
         </tr>
       `;
       }).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="7">No Confirmed Owners</td></tr>`;
 
       // Add event listeners to Add Note buttons
       tbody.querySelectorAll('.add-note-btn').forEach(btn => {
@@ -2396,11 +2391,7 @@
       return String(s).replaceAll('"', '\\"');
     }
 
-    // init - Load test data
-    renderConfirmedOwners(sampleConfirmedOwners);
-    renderOtherContacts(sampleOtherContacts);
-    updateActionBannerFromContacts(sampleConfirmedOwners);
-    computeContactsSummary(testData);
+
 
     // Note Modal functionality
     let currentNoteContact = null;
