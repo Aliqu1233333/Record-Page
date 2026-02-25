@@ -1257,6 +1257,7 @@
                         <th>Lead Status</th>
                         <th>Next Follow-up</th>
                         <th>Offer Status</th>
+                        <th>Number</th>
                         <th>Quick Actions</th>
                       </tr>
                     </thead>
@@ -1656,9 +1657,17 @@
     }
 
     function formatPhoneForTel(phone){
-      // Strip all non-numeric characters for tel: link
       if (!phone) return '';
       return phone.replace(/\D/g, '');
+    }
+
+    function formatPhoneDisplay(phone){
+      if (!phone || phone === "—") return null;
+      const digits = String(phone).replace(/\D/g, '');
+      // Strip leading 1 if 11 digits
+      const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
+      if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+      return phone; // return as-is if not a standard number
     }
 
     function calcDaysAgo(dateStr){
@@ -1682,10 +1691,12 @@
         const motivation       = c.seller_motivation ?? c.motivation ?? null;
         const lastContact      = c.contacted_date ?? c.lastContact ?? null;
         const contactOutcome   = c.contact_outcome ?? c.contactOutcome ?? null;
+        const leadStatus       = c.lead_status ?? c.leadStatus ?? null;
         const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
         const offerMade        = c.offer_made ?? c.offerMade ?? false;
         const offerAmount      = c.offer_amount ?? c.offerAmount ?? "—";
         const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
+        const phone1           = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
 
         // Calculate days ago from contacted_date
         const daysAgo = calcDaysAgo(lastContact);
@@ -1749,11 +1760,12 @@
               ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
               : `<span class="td-muted">Not contacted</span>`}
           </td>
-          <td>${contactOutcome && contactOutcome !== "—" ? `<div style="font-weight: 600; color: #111827;">${escapeHtml(contactOutcome)}</div>` : `<span class="td-muted">—</span>`}</td>
+          <td>${leadStatus && leadStatus !== "—" ? `<div style="font-weight: 500; color: #374151;">${escapeHtml(leadStatus)}</div>` : `<span class="td-muted">—</span>`}</td>
           <td>${followupCell}</td>
           <td>
             ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">$${escapeHtml(String(offerAmount))}</div>` : `<span class="td-muted">No offer</span>`}
           </td>
+          <td>${phone1 ? `<span style="font-weight: 500; color: #374151;">${escapeHtml(phone1)}</span>` : `<span class="td-muted">—</span>`}</td>
           <td>
             <div class="quick-actions">
               <button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button>
@@ -1762,7 +1774,7 @@
         </tr>
       `;
       }).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="7">No Confirmed Owners</td></tr>`;
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
 
       // Add event listeners to Add Note buttons
       tbody.querySelectorAll('.add-note-btn').forEach(btn => {
@@ -1795,9 +1807,9 @@
         const mondayUrl      = c.monday_url ?? c.mondayUrl ?? null;
         const leadStatus     = c.lead_status ?? c.leadStatus ?? null;
         const contactOutcome = c.contact_outcome ?? c.contactOutcome ?? "—";
-        const phone1         = c.phone_1 ?? c.phone1 ?? "—";
+        const phone1         = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
         const phone1Status   = c.phone_1_status ?? c.phone1Status ?? null;
-        const phone2         = c.phone_2 ?? c.phone2 ?? "—";
+        const phone2         = formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null);
         const phone2Status   = c.phone_2_status ?? c.phone2Status ?? null;
 
         return `
@@ -1811,9 +1823,9 @@
           <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
           <td>${simpleStatusCell(leadStatus)}</td>
           <td>${escapeHtml(contactOutcome)}</td>
-          <td>${escapeHtml(phone1)}</td>
+          <td>${phone1 ? `<span style="font-weight:500; color:#374151;">${escapeHtml(phone1)}</span>` : `<span class="td-muted">—</span>`}</td>
           <td>${simpleStatusCell(phone1Status)}</td>
-          <td>${escapeHtml(phone2)}</td>
+          <td>${phone2 ? `<span style="font-weight:500; color:#374151;">${escapeHtml(phone2)}</span>` : `<span class="td-muted">—</span>`}</td>
           <td>${simpleStatusCell(phone2Status)}</td>
         </tr>
       `;
@@ -1992,34 +2004,23 @@
       fetchDataFromMake();
     });
 
-    // Loading overlay helpers - ensures minimum 1.5 second display
-    let loadingStartTime = null;
-    const MIN_LOADING_TIME = 1500; // 1.5 seconds
-    
+    // Loading overlay helpers
     function showLoading(){
       const overlay = document.getElementById("loadingOverlay");
       if (overlay) {
         overlay.setAttribute("aria-hidden", "false");
         overlay.classList.remove('fade-out');
-        loadingStartTime = Date.now();
       }
     }
     
     function hideLoading(){
       const overlay = document.getElementById("loadingOverlay");
-      if (!overlay || !loadingStartTime) return;
-      
-      const elapsedTime = Date.now() - loadingStartTime;
-      const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
-      
+      if (!overlay) return;
+      overlay.classList.add('fade-out');
       setTimeout(() => {
-        overlay.classList.add('fade-out');
-        setTimeout(() => {
-          overlay.setAttribute("aria-hidden", "true");
-          overlay.classList.remove('fade-out');
-          loadingStartTime = null;
-        }, 500); // Wait for fade-out animation
-      }, remainingTime);
+        overlay.setAttribute("aria-hidden", "true");
+        overlay.classList.remove('fade-out');
+      }, 300);
     }
 
 
