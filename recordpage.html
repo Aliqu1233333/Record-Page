@@ -553,26 +553,6 @@
     .dot.good{ background: #10b981; }
     .dot.warn{ background: #f59e0b; }
 
-    /* Motivation - clean dot style */
-    .motivation-badge{
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14.5px;
-      font-weight: 500;
-      color: #374151;
-    }
-    .motivation-badge::before{
-      content: '';
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .motivation-warm::before{ background: #10b981; }
-    .motivation-cold::before{ background: #9ca3af; }
-    .motivation-unknown::before{ background: #d1d5db; }
-
     /* Quick action buttons */
     .quick-actions{
       display: flex;
@@ -1252,9 +1232,9 @@
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>Motivation</th>
+                        <th>Status</th>
                         <th>Last Contact</th>
-                        <th>Lead Status</th>
+                        <th>Contact Outcome</th>
                         <th>Next Follow-up</th>
                         <th>Offer Status</th>
                         <th>Number</th>
@@ -1648,12 +1628,23 @@
       });
     });
 
-    function motivationBadge(motivation){
-      if (!motivation) return `<span class="motivation-badge motivation-unknown">Unknown</span>`;
-      const m = String(motivation).toLowerCase();
-      if (m.includes('warm')) return `<span class="motivation-badge motivation-warm">Warm</span>`;
-      if (m.includes('cold')) return `<span class="motivation-badge motivation-cold">Cold</span>`;
-      return `<span class="motivation-badge motivation-unknown">Unknown</span>`;
+    function leadStatusDot(status){
+      if (!status || status === "—") return `<span class="td-muted">—</span>`;
+      const s = String(status).toLowerCase().trim();
+      let color = '#d1d5db';
+      if (s.includes('re-skiptrace'))            color = '#d1d5db';
+      else if (s.includes('attempt 1'))          color = '#9ca3af';
+      else if (s.includes('attempt 2'))          color = '#6b7280';
+      else if (s.includes('attempt 3'))          color = '#93c5fd';
+      else if (s.includes('contacted'))          color = '#60a5fa';
+      else if (s.includes('interested'))         color = '#3b82f6';
+      else if (s.includes('negotiation') || s.includes('review')) color = '#2563eb';
+      else if (s.includes('accepted'))           color = '#1d4ed8';
+      else if (s.includes('closed'))             color = '#1e3a8a';
+      return `<span style="display:inline-flex; align-items:center; gap:7px; font-size:14.5px; font-weight:500; color:#374151;">
+        <span style="width:9px; height:9px; border-radius:50%; background:${color}; flex-shrink:0; display:inline-block;"></span>
+        ${escapeHtml(status)}
+      </span>`;
     }
 
     function formatPhoneForTel(phone){
@@ -1754,7 +1745,7 @@
               ${ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 12px; font-weight: 700; color: #0176d3;">${escapeHtml(String(ownershipPercent))}%</span>` : ''}
             </div>
           </td>
-          <td>${motivationBadge(motivation)}</td>
+          <td>${leadStatusDot(leadStatus)}</td>
           <td>
             ${lastContact && lastContact !== "—"
               ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
@@ -1821,7 +1812,7 @@
             }
           </td>
           <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
-          <td>${simpleStatusCell(leadStatus)}</td>
+          <td>${leadStatusDot(leadStatus)}</td>
           <td>${escapeHtml(contactOutcome)}</td>
           <td>${phone1 ? `<span style="font-weight:500; color:#374151;">${escapeHtml(phone1)}</span>` : `<span class="td-muted">—</span>`}</td>
           <td>${simpleStatusCell(phone1Status)}</td>
