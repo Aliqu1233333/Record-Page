@@ -1539,10 +1539,11 @@
         );
         const heirsIdentified = confirmedOwners.length;
 
-        // Heirs Contacted: owner_status === "Yes" AND contacted_date is not empty
+        // Heirs Contacted: owner_status === "Yes" AND lead_status is Contacted or beyond
+        const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
         const heirsContacted = confirmedOwners.filter(o => {
-          const d = o.contacted_date || o.lastContact || o.last_contact || "";
-          return d !== "" && d !== "—" && d !== null && d !== undefined;
+          const s = String(o.lead_status || o.leadStatus || "").trim().toLowerCase();
+          return contactedStatuses.some(cs => s.includes(cs));
         }).length;
 
         // Heirs Offered: owner_status === "Yes" AND offer_made is not empty
