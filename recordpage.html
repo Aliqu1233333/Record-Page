@@ -1713,7 +1713,21 @@
       const confirmed = (contacts || []).filter(c =>
         String(c.owner_status || "").trim().toLowerCase() === "yes"
       );
-      const rows = confirmed.map((c, index) => {
+      // Sort by lead status — closest to Closed first
+      const STATUS_ORDER = [
+        "closed", "accepted offer", "negotiations", "review",
+        "interested in selling", "contacted", "attempt 3",
+        "attempt 2", "attempt 1", "re-skiptrace"
+      ];
+      const statusRank = (s) => {
+        const v = String(s || "").toLowerCase().trim();
+        const idx = STATUS_ORDER.findIndex(k => v.includes(k));
+        return idx === -1 ? STATUS_ORDER.length : idx;
+      };
+      const sorted = [...confirmed].sort((a, b) =>
+        statusRank(a.lead_status || a.leadStatus) - statusRank(b.lead_status || b.leadStatus)
+      );
+      const rows = sorted.map((c, index) => {
         const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
         const motivation       = c.seller_motivation ?? c.motivation ?? null;
         const lastContact      = c.contacted_date ?? c.lastContact ?? null;
@@ -1768,18 +1782,22 @@
           }
         }
 
+        const isClosed = String(c.lead_status || "").trim().toLowerCase() === "closed";
+        const closedBadge = isClosed ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:6px;vertical-align:middle;"><svg style="width:9px;height:9px;" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></span>` : '';
+
         return `
         <tr>
           <td>
-            ${mondayUrl
-              ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-              : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
-            }
+            <div style="display:flex;align-items:center;gap:0;">
+              ${mondayUrl
+                ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
+                : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
+              }${closedBadge}
+            </div>
             <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
               ${c.relationship ? `<span style="font-size: 12px; color: #9ca3af;">${escapeHtml(c.relationship)}</span>` : ''}
               ${c.relationship && ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 11px; color: #cbd5e1;">·</span>` : ''}
               ${ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 12px; font-weight: 700; color: #0176d3;">${escapeHtml(String(ownershipPercent))}%</span>` : ''}
-              ${String(c.lead_status || "").trim().toLowerCase() === "closed" ? `<svg style="width:13px;height:13px;flex-shrink:0;" viewBox="0 0 20 20" fill="#16a34a" aria-label="Closed"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg>` : ''}
             </div>
           </td>
           <td>${leadStatusDot(leadStatus)}</td>
@@ -1809,7 +1827,7 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const contactIndex = parseInt(e.target.getAttribute('data-contact-index'));
-          openNoteModal(confirmed[contactIndex], contactIndex, e.target);
+          openNoteModal(sorted[contactIndex], contactIndex, e.target);
         });
       });
     }
@@ -2124,35 +2142,28 @@
       const el = document.getElementById("contactsSummary");
       if (!el) return;
 
-      const confirmed = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
-      const other = Array.isArray(payload?.other_contacts) ? payload.other_contacts : [];
+      const allSubitems = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
 
-      const explicitTotal = payload?.heirs_identified;
-      const explicitContacted = payload?.heirs_contacted;
+      // Confirmed owners = owner_status "Yes"
+      const confirmedOwners = allSubitems.filter(c =>
+        String(c.owner_status || "").trim().toLowerCase() === "yes"
+      );
 
-      if (Number.isFinite(explicitTotal) && Number.isFinite(explicitContacted)) {
-        const total = Math.max(0, Number(explicitTotal));
-        const contacted = Math.max(0, Math.min(total, Number(explicitContacted)));
-        const uncontacted = Math.max(0, total - contacted);
-        el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
-        return;
-      }
-
-      const heirOthers = other.filter(c => normalizeStatusText(c?.relationship).includes("heir"));
-      const allHeirs = [...confirmed, ...heirOthers];
-
-      const total = allHeirs.length;
-
-      const contacted = allHeirs.filter(c => {
-        const t = normalizeStatusText(c?.leadStatus?.text);
-        if (!t) return false;
-        if (t.includes("dial na") || t.includes("uncontacted") || t.includes("not contacted")) return false;
-        if (t.includes("contact") || t.includes("active") || t.includes("in progress") || t.includes("respond")) return true;
-        return false;
+      // Contacted = lead_status is Contacted or further along
+      const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
+      const contacted = confirmedOwners.filter(c => {
+        const s = String(c.lead_status || "").trim().toLowerCase();
+        return contactedStatuses.some(cs => s.includes(cs));
       }).length;
 
-      const uncontacted = Math.max(0, total - contacted);
-      el.textContent = `${total} heirs total · ${contacted} contacted · ${uncontacted} uncontacted`;
+      // Unrelated = owner_status is NOT "Yes"
+      const unrelated = allSubitems.filter(c =>
+        String(c.owner_status || "").trim().toLowerCase() !== "yes"
+      ).length;
+
+      const total = payload?.heirs_total ?? allSubitems.length;
+
+      el.textContent = `${total} Heirs Total · ${contacted} Contacted · ${unrelated} Unrelated Contacts`;
     }
     
     // Extract board ID from current URL for Monday.com links
