@@ -1513,14 +1513,22 @@
           if (snap) snap.textContent = formatValue(value);
         }
 
-        // Last Contact snapshot — calculate days ago from last_contacted
-        if (payload.last_contacted && payload.last_contacted !== "—") {
-          const daysAgo = calcDaysAgo(payload.last_contacted);
-          const dateEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_date"]');
-          const daysEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_days_ago"]');
-          if (dateEl) dateEl.textContent = payload.last_contacted;
-          if (daysEl) daysEl.textContent = daysAgo || payload.last_contacted;
-        }
+        // Format currency fields
+        const formatCurrency = (val) => {
+          if (!val || val === "—") return "—";
+          const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
+          if (isNaN(num)) return val;
+          return "$" + Math.round(num).toLocaleString("en-US");
+        };
+        ["taxes_owed", "equity", "appraisal"].forEach(field => {
+          const el = document.querySelector(`.field[data-field="${field}"] .value-text`);
+          if (el && payload[field]) el.textContent = formatCurrency(payload[field]);
+        });
+        // Also format snapshot appraisal/taxes if present
+        ["taxes_owed", "appraisal"].forEach(field => {
+          const snap = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
+          if (snap && payload[field]) snap.textContent = formatCurrency(payload[field]);
+        });
 
         // ── Deal Insight metrics computed from confirmed_owners ──────────────
         const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
@@ -1577,6 +1585,24 @@
           badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
         }
         // ── End Deal Insight metrics ─────────────────────────────────────────
+
+        // ── Last Contact — most recent contacted_date across all subitems ────
+        let mostRecentDate = null;
+        (owners || []).forEach(o => {
+          const raw = o.contacted_date || o.lastContact || "";
+          if (!raw || raw === "—") return;
+          const d = parseFlexibleDate(raw);
+          if (d && (!mostRecentDate || d > mostRecentDate)) mostRecentDate = d;
+        });
+        if (mostRecentDate) {
+          const formatted = mostRecentDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          const daysAgoStr = calcDaysAgo(mostRecentDate);
+          const dateEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_date"]');
+          const daysEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_days_ago"]');
+          if (dateEl) dateEl.textContent = formatted;
+          if (daysEl) daysEl.textContent = daysAgoStr || formatted;
+        }
+        // ── End Last Contact ─────────────────────────────────────────────────
 
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
@@ -1814,9 +1840,9 @@
           <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
           <td>${leadStatusDot(leadStatus)}</td>
           <td>${escapeHtml(contactOutcome)}</td>
-          <td>${phone1 ? `<span style="font-weight:500; color:#374151;">${escapeHtml(phone1)}</span>` : `<span class="td-muted">—</span>`}</td>
+          <td>${phone1 ? `<a href="tel:${formatPhoneForTel(phone1)}" style="font-weight:500; color:#0176d3; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone1)}</a>` : `<span class="td-muted">—</span>`}</td>
           <td>${simpleStatusCell(phone1Status)}</td>
-          <td>${phone2 ? `<span style="font-weight:500; color:#374151;">${escapeHtml(phone2)}</span>` : `<span class="td-muted">—</span>`}</td>
+          <td>${phone2 ? `<a href="tel:${formatPhoneForTel(phone2)}" style="font-weight:500; color:#0176d3; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone2)}</a>` : `<span class="td-muted">—</span>`}</td>
           <td>${simpleStatusCell(phone2Status)}</td>
         </tr>
       `;
