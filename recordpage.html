@@ -1667,8 +1667,7 @@
         // Badge: Complete when all confirmed owners have been contacted
         const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
         if (badge) {
-         const ownershipMapComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
-         const isComplete = ownershipMapComplete || (heirsIdentified > 0 && heirsContacted === heirsIdentified);
+         const isComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
          badge.textContent = isComplete ? "Complete" : "In Progress";
          badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
          syncOwnershipTreeButton(isComplete);
