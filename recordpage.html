@@ -911,6 +911,71 @@
       white-space: nowrap;
     }
 
+    /* ---------- MARK OWNERSHIP TREE COMPLETE BUTTON ---------- */
+    #ownershipTreeBtn{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+      letter-spacing: 0.01em;
+    }
+    #ownershipTreeBtn:hover{
+      background: #dbeafe;
+      border-color: #93c5fd;
+      box-shadow: 0 2px 6px rgba(29, 78, 216, 0.12);
+    }
+    #ownershipTreeBtn:active{
+      transform: translateY(1px);
+    }
+    #ownershipTreeBtn svg{
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    /* Ownership tree complete — celebration flash on the pill */
+    @keyframes ownershipCelebrate {
+      0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(16,185,129,0); background: #d1fae5; color: #065f46; }
+      20%  { transform: scale(1.18); box-shadow: 0 0 0 8px rgba(16,185,129,0.25); background: #6ee7b7; color: #064e3b; }
+      50%  { transform: scale(1.10); box-shadow: 0 0 0 14px rgba(16,185,129,0.10); background: #a7f3d0; color: #064e3b; }
+      80%  { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(16,185,129,0.06); }
+      100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(16,185,129,0); background: #d1fae5; color: #065f46; }
+    }
+    .ownership-celebrate{
+      animation: ownershipCelebrate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+    }
+
+    /* Confetti burst overlay */
+    #ownershipConfetti{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99999;
+      overflow: hidden;
+    }
+    .confetti-piece{
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      80%  { opacity: 0.8; }
+      100% { opacity: 0; transform: translateY(260px) rotate(540deg) scale(0.5); }
+    }
   </style>
 </head>
 
@@ -924,6 +989,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Confetti container -->
+  <div id="ownershipConfetti" aria-hidden="true"></div>
 
   <div class="app">
     <div class="layout">
@@ -1147,6 +1215,15 @@
                       </span>
                     </div>
                   </div>
+
+                  <!-- Mark Ownership Tree Complete button — hidden once complete -->
+                  <button id="ownershipTreeBtn" type="button" style="display:none;" aria-label="Mark Ownership Tree Complete">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 3v3M5.636 5.636l2.122 2.122M3 12h3m-.364 6.364 2.122-2.122M12 21v-3m6.364.364-2.122-2.122M21 12h-3m.364-6.364-2.122 2.122" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Mark Ownership Tree Complete
+                  </button>
                 </div>
               </div>
             </div>
@@ -1593,6 +1670,8 @@
           const isComplete = heirsIdentified > 0 && heirsContacted === heirsIdentified;
           badge.textContent = isComplete ? "Complete" : "In Progress";
           badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
+          // Show/hide the ownership tree button based on pill state
+          syncOwnershipTreeButton(isComplete);
         }
         // ── End Deal Insight metrics ─────────────────────────────────────────
 
@@ -1624,6 +1703,132 @@
         computeContactsSummary(payload);
       }
     };
+
+    // ── Ownership Tree Button logic ──────────────────────────────────────────
+
+    /**
+     * Show the button only when the pill is NOT yet complete.
+     * If already complete, hide the button (tree is already mapped out).
+     */
+    function syncOwnershipTreeButton(isComplete) {
+      const btn = document.getElementById("ownershipTreeBtn");
+      if (!btn) return;
+      btn.style.display = isComplete ? "none" : "inline-flex";
+    }
+
+    /**
+     * Fire the confetti burst originating near the Heirs Identified pill.
+     */
+    function fireOwnershipConfetti() {
+      const container = document.getElementById("ownershipConfetti");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
+      let originX = window.innerWidth / 2;
+      let originY = 100;
+      if (badge) {
+        const r = badge.getBoundingClientRect();
+        originX = r.left + r.width / 2;
+        originY = r.top + r.height / 2;
+      }
+
+      const colors = ["#10b981", "#34d399", "#6ee7b7", "#0176d3", "#60a5fa", "#fbbf24", "#a78bfa"];
+      const count = 38;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.className = "confetti-piece";
+
+        const angle = (Math.random() * 360);
+        const distance = 60 + Math.random() * 180;
+        const rad = (angle * Math.PI) / 180;
+        const tx = Math.cos(rad) * distance;
+        const ty = Math.sin(rad) * distance - 60; // bias upward
+        const duration = 0.55 + Math.random() * 0.55;
+        const delay = Math.random() * 0.18;
+        const size = 6 + Math.random() * 6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const shapes = ["2px", "50%", "0px"];
+        const borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+
+        Object.assign(el.style, {
+          left: `${originX}px`,
+          top: `${originY}px`,
+          width: `${size}px`,
+          height: `${size}px`,
+          background: color,
+          borderRadius: borderRadius,
+          animationDuration: `${duration}s`,
+          animationDelay: `${delay}s`,
+          transform: `translate(${tx}px, ${ty}px)`,
+        });
+
+        // Override the keyframe end position via a custom approach
+        el.style.setProperty("--tx", `${tx}px`);
+        el.style.setProperty("--ty", `${ty}px`);
+
+        container.appendChild(el);
+      }
+
+      // Clean up after animation
+      setTimeout(() => { container.innerHTML = ""; }, 1400);
+    }
+
+    /**
+     * Celebrate: animate the pill, fire confetti, update Monday, hide button.
+     */
+    async function markOwnershipTreeComplete() {
+      const btn = document.getElementById("ownershipTreeBtn");
+      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
+
+      // Optimistically update the pill UI
+      if (badge) {
+        badge.textContent = "Complete";
+        badge.className = "heir-status-badge heir-status-complete";
+        // Trigger celebration animation
+        badge.classList.remove("ownership-celebrate");
+        void badge.offsetWidth; // force reflow
+        badge.classList.add("ownership-celebrate");
+        setTimeout(() => badge.classList.remove("ownership-celebrate"), 1000);
+      }
+
+      // Confetti burst
+      fireOwnershipConfetti();
+
+      // Hide the button immediately
+      if (btn) {
+        btn.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+        btn.style.opacity = "0";
+        btn.style.transform = "scale(0.85)";
+        setTimeout(() => { btn.style.display = "none"; }, 320);
+      }
+
+      // Send to Monday via the same save webhook
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if (boardId && pulseId) {
+        try {
+          const res = await fetch(SAVE_WEBHOOK, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              boardId,
+              pulseId,
+              columnId: "dropdown_mm1aybze",
+              value: "Complete"
+            })
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          console.log("✓ Ownership Map marked Complete in Monday");
+        } catch (err) {
+          console.error("✗ Failed to update Ownership Map:", err);
+        }
+      }
+    }
+
+    document.getElementById("ownershipTreeBtn").addEventListener("click", markOwnershipTreeComplete);
+
+    // ── End Ownership Tree Button logic ─────────────────────────────────────
 
     // Characteristics dropdown
     const characteristics = document.getElementById("characteristicsToggle");
@@ -2215,150 +2420,6 @@
       return { boardId, pulseId };
     }
 
-    // Fetch data from Make.com webhook
-    // 
-    // MONDAY.COM BACKEND INTEGRATION GUIDE:
-    // =====================================
-    // 
-    // WEBHOOK URL: https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf
-    // 
-    // REQUEST PAYLOAD (from this page):
-    // {
-    //   "boardId": "18395630812",    // Extracted from URL
-    //   "pulseId": "11004380444"     // Extracted from URL
-    // }
-    // 
-    // RESPONSE PAYLOAD (from Make.com - all fields mapped):
-    // {
-    //   // TOP SNAPSHOT - Property Details
-    //   "deceased_owner": "—",
-    //   "last_contact_date": "—",
-    //   "last_contact_days_ago": 6,               // Calculate: today - last_contact_date
-    //   "deal_score": "72",
-    //   "taxes_owed": "—",
-    //   
-    //   // TOP SNAPSHOT - Deal Insights
-    //   "heirs_identified": 5,                    // Count of confirmed_owners
-    //   "heirs_contacted": 3,                     // Count where lastContact exists
-    //   "heirs_offered": 1,                       // Count where offerMade = true
-    //   "ownership_secured_percent": "20%",       // Sum of ownership% where offerMade = true
-    //   "ownership_secured_count": "—",      // Count offered / total heirs
-    //   
-    //   // PROPERTY DETAILS SECTION - Left Column
-    //   "lead_type": "Taxes Under Suit",
-    //   "tax_status": "3-4 years unpaid",
-    //   "condition": "Fair",
-    //   "occupancy": "Vacant",
-    //   "days_of_inactivity": "4 days",
-    //   
-    //   // PROPERTY DETAILS SECTION - Right Column
-    //   "total_equity": "$112,000",
-    //   "deed_status": "Verified",
-    //   "will_status": "Not Filed",
-    //   "title_issue": "None",
-    //   
-    //   // UPDATE ACTIVITY SECTION
-    //   "next_action_step": "Put Together Offer",
-    //   "stalled_reason": "Waiting on heir response",
-    //   "follow_up_date": "Feb 15, 2026",
-    //   
-    //   // RESEARCH SECTION
-    //   "obituary_link": "https://...",
-    //   "ancestry_link": "https://...",
-    //   "zillow_link": "https://...",
-    //   "tax_assessor_link": "https://...",
-    //   "google_maps_link": "https://...",
-    //   "birth_date": "March 15, 1945",
-    //   "death_date": "January 8, 2026",
-    //   "age": "80",
-    //   "creation_log": "Created on Jan 12, 2026 by John Smith",
-    //   
-    //   // ACTIVITY SECTION
-    //   "last_contacted": "Feb 11, 2026",
-    //   "activity_notes": "Spoke with Rebeca - very interested in selling",
-    //   
-    //   // CONFIRMED OWNERS TABLE (array of subitems)
-    //   "confirmed_owners": [
-    //     {
-    //       "name": "Rebeca McCrory",
-    //       "relationship": "Daughter",                    // From Monday.com "Relationship" column
-    //       "ownershipPercent": "20%",                     // From "Ownership %" column
-    //       "motivation": "Warm",                          // From "Seller Motivation" column
-    //       "lastContact": "Feb 11, 2026",                 // From "Contacted date" column
-    //       "lastContactDaysAgo": "—",            // Calculate: today - lastContact
-    //       "contactOutcome": "Interested",                // From "Contact Outcome" column (main text)
-    //       "contactOutcomeDetail": "Wants written offer", // From "Contact Outcome" column (detail)
-    //       "followupDate": "Feb 15, 2026",                // From "Follow-Up Date" column
-    //       "offerMade": true,                             // From "Offer Made?" column (boolean)
-    //       "offerAmount": "$3,000",                       // From "Offer Amount" column
-    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004399133"  // Construct from board + subitem IDs
-    //     }
-    //     // ... more heirs
-    //   ],
-    //   
-    //   // OTHER RELATED CONTACTS TABLE (array of non-owner contacts)
-    //   "other_contacts": [
-    //     {
-    //       "name": "Patricia Franklin",
-    //       "relationship": "Cousin",                      // From "Relationship" column
-    //       "leadStatus": {                                // From "Lead Status" column
-    //         "text": "Contacted",
-    //         "tone": "good"                               // good/warn/muted based on status
-    //       },
-    //       "contactOutcome": "Referred us to Rebeca",     // From "Contact Outcome" column
-    //       "phone1": "(713) 555-2341",                    // From "Phone 1" column
-    //       "phone1Status": {                              // From "Phone 1 status" column
-    //         "text": "Correct Number",
-    //         "tone": "good"
-    //       },
-    //       "phone2": "(281) 555-8821",                    // From "Phone 2" column
-    //       "phone2Status": {                              // From "Phone 2 status" column
-    //         "text": "Disconnected",
-    //         "tone": "warn"
-    //       },
-    //       "mondayUrl": "https://transparencyfunding.monday.com/boards/18395630812/pulses/11004380450"
-    //     }
-    //     // ... more contacts
-    //   ]
-    // }
-    //
-    // MONDAY.COM COLUMN MAPPING:
-    // ==========================
-    // Main Item Columns:
-    //   - Name → deceased_owner
-    //   - Deal Score → deal_score
-    //   - Taxes Owed → taxes_owed
-    //   - Lead Type → lead_type
-    //   - Tax Status → tax_status
-    //   - Occupancy → occupancy
-    //   - Will Status → will_status
-    //   - Days of Inactivity → days_of_inactivity
-    //   - Total Equity → total_equity
-    //   - Condition → condition
-    //   - Title Issue → title_issue
-    //   - Deed Status → deed_status
-    //   - Next Action Step → next_action_step
-    //   - Stalled Reason → stalled_reason
-    //   - Follow-up Date → follow_up_date
-    //   - Last Contacted → last_contacted
-    //   - Notes → activity_notes
-    //
-    // Subitem Columns (Heirs/Contacts):
-    //   - Subitems Name → name
-    //   - Relationship → relationship
-    //   - Ownership % → ownershipPercent
-    //   - Seller Motivation → motivation
-    //   - Contacted date → lastContact
-    //   - Contact Outcome → contactOutcome + contactOutcomeDetail
-    //   - Follow-Up Date → followupDate
-    //   - Offer Made? → offerMade (boolean)
-    //   - Offer Amount → offerAmount
-    //   - Lead Status → leadStatus (with tone calculation)
-    //   - Phone 1 → phone1
-    //   - Phone 1 status → phone1Status (with tone)
-    //   - Phone 2 → phone2
-    //   - Phone 2 status → phone2Status (with tone)
-    //
     async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
 
