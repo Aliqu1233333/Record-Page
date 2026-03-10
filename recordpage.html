@@ -1667,11 +1667,11 @@
         // Badge: Complete when all confirmed owners have been contacted
         const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
         if (badge) {
-          const isComplete = heirsIdentified > 0 && heirsContacted === heirsIdentified;
-          badge.textContent = isComplete ? "Complete" : "In Progress";
-          badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
-          // Show/hide the ownership tree button based on pill state
-          syncOwnershipTreeButton(isComplete);
+         const ownershipMapComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
+         const isComplete = ownershipMapComplete || (heirsIdentified > 0 && heirsContacted === heirsIdentified);
+         badge.textContent = isComplete ? "Complete" : "In Progress";
+         badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
+         syncOwnershipTreeButton(isComplete);
         }
         // ── End Deal Insight metrics ─────────────────────────────────────────
 
