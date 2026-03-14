@@ -1237,7 +1237,7 @@
             <div class="section">
               <div class="section-head">
                 <div style="display:flex; align-items:center; gap:10px;">
-                  <img src="contact_120.png" alt="" aria-hidden="true" style="width:28px; height:28px; object-fit:contain; flex-shrink:0; border-radius:5px;">
+                  <img src="https://raw.githubusercontent.com/Aliqu1233333/Record-Page/main/contact_120.png" alt="" aria-hidden="true" style="width:28px; height:28px; object-fit:contain; flex-shrink:0; border-radius:5px;">
                   <h3 style="margin:0;">Related Contacts</h3>
                 </div>
                 <div class="section-meta" id="contactsSummary">—</div>
@@ -2272,72 +2272,7 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const testData = {
-        confirmed_owners: [
-          {
-            name: "Robert J. Hargrove",
-            owner_status: "yes",
-            relationship: "Son",
-            ownership_percent: "40",
-            lead_status: "Interested in Selling",
-            last_contact: "Mar 6, 2026",
-            follow_up_date: "Mar 18, 2026",
-            offer_made: false,
-            offer_amount: "",
-            phone_1: "8326741092",
-            monday_url: ""
-          },
-          {
-            name: "Patricia A. Hargrove",
-            owner_status: "yes",
-            relationship: "Daughter",
-            ownership_percent: "35",
-            lead_status: "Contacted",
-            last_contact: "Feb 28, 2026",
-            follow_up_date: "Mar 10, 2026",
-            offer_made: false,
-            offer_amount: "",
-            phone_1: "7135559021",
-            monday_url: ""
-          },
-          {
-            name: "Dennis Hargrove",
-            owner_status: "yes",
-            relationship: "Son",
-            ownership_percent: "25",
-            lead_status: "Not Reached",
-            last_contact: "",
-            follow_up_date: "",
-            offer_made: false,
-            offer_amount: "",
-            phone_1: "2815553847",
-            monday_url: ""
-          },
-          {
-            name: "Carol Simmons",
-            owner_status: "no",
-            relationship: "Neighbor",
-            lead_status: "Referral",
-            phone_1: "9365551234",
-            phone_1_status: "Good",
-            phone_2: "",
-            phone_2_status: ""
-          },
-          {
-            name: "James R. Tatum",
-            owner_status: "no",
-            relationship: "Attorney",
-            lead_status: "In Progress",
-            phone_1: "8325557890",
-            phone_1_status: "Good",
-            phone_2: "7135552211",
-            phone_2_status: "No Answer"
-          }
-        ]
-      };
-      window.RecordPage.applyData(testData);
-    });
+    window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
 
     function escapeHtml(str){
       return String(str ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
