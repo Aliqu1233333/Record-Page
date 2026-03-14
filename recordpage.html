@@ -16,7 +16,6 @@
       --muted-2: #9aa3af;
       --blue: #0176d3;
 
-      /* stalled emphasis */
       --stalled-bg: rgba(185, 28, 28, .06);
       --stalled-border: rgba(185, 28, 28, .22);
       --stalled-text: #8b1a1a;
@@ -41,7 +40,7 @@
       width: 100%;
       max-width: none;
       margin: 0;
-      padding: 14px 14px 18px;
+      padding: 14px 14px 18px 32px;
     }
 
     .layout{
@@ -65,7 +64,7 @@
       align-items:flex-end;
       justify-content:space-between;
       gap: 12px;
-      padding: 0 14px;
+      padding: 0 14px 0 30px;
       border-bottom: 1px solid var(--line);
       background: var(--surface);
     }
@@ -194,7 +193,6 @@
       transform: translateY(-1px);
     }
 
-    /* Badge Styles */
     .info-badge{
       display: inline-flex;
       align-items: center;
@@ -203,7 +201,6 @@
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* Complete State - Green with glow */
     .info-badge.complete{
       color: #10b981;
       filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
@@ -213,7 +210,6 @@
       filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
     }
 
-    /* In Progress State - Yellow */
     .info-badge.in-progress{
       width: 8px;
       height: 8px;
@@ -228,17 +224,10 @@
     }
 
     @keyframes pulse-warning {
-      0%, 100% { 
-        opacity: 1;
-        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-      }
-      50% { 
-        opacity: 0.8;
-        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
-      }
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
+      50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
     }
 
-    /* Heir Identification Status Badges */
     .heir-status-badge{
       display: inline-block;
       padding: 3px 8px;
@@ -249,14 +238,8 @@
       text-transform: uppercase;
       margin-left: 6px;
     }
-    .heir-status-complete{
-      background: #d1fae5;
-      color: #065f46;
-    }
-    .heir-status-in-progress{
-      background: #fef3c7;
-      color: #92400e;
-    }
+    .heir-status-complete{ background: #d1fae5; color: #065f46; }
+    .heir-status-in-progress{ background: #fef3c7; color: #92400e; }
 
     .svalue{
       font-size: 16px;
@@ -268,28 +251,28 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    .svalue.link{
-      color: var(--blue);
-      cursor: pointer;
-    }
+    .svalue.link{ color: var(--blue); cursor: pointer; }
     .svalue.link:hover{ text-decoration: underline; }
-
     .svalue.ok{ color: rgba(46,132,74,.95); font-weight: 650; }
 
-    /* ---------- SECTIONS ---------- */
+    /* =====================================================
+       CRM FIELD LAYOUT — stacked label above value
+       Matches Salesforce record detail style
+       ===================================================== */
+
     .section{
-      padding: 0 14px 14px;
+      padding: 0 16px 8px 30px;
     }
     .section + .section{
       border-top: 1px solid var(--line);
-      padding-top: 12px;
+      padding-top: 0;
     }
     .section-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 9px 0 11px;
+      padding: 4px 0 8px;
     }
     .section-head h3{
       margin:0;
@@ -299,137 +282,313 @@
       letter-spacing: .08px;
     }
 
-    .field-grid{
-      display:grid;
+    /* 2-column grid, each field 50% */
+    .slds-grid {
+      display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 11px 18px;
     }
     @media (max-width: 820px){
-      .field-grid{ grid-template-columns: 1fr; }
+      .slds-grid { grid-template-columns: 1fr; }
     }
 
-    .field{
-      padding: 11px 0;
-      display:grid;
-      grid-template-columns: 170px 1fr;
-      gap: 10px;
-      align-items:center;
-      border-bottom: 1px solid #e5e7eb;
+    /* Field: stacked, label on top */
+    .slds-field {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 0 4px 0;
+      border-bottom: 1px solid #e8e8e8;
+      min-width: 0;
+    }
+    .slds-col-left {
+      padding-right: 20px;
+    }
+    .slds-col-right {
+      padding-left: 24px;
+    }
+    .slds-col-left .slds-field:last-child {
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .slds-col-right .slds-field:last-child {
+      border-bottom: 1px solid #e8e8e8;
     }
 
-    .label{
-      font-size: 15px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .value{
-      font-size: 16px;
-      color: #122348;
+    /* Label: small, light grey, above value */
+    .slds-label {
+      font-size: 12px;
       font-weight: 400;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      color: #5e6470;
+      line-height: 1.3;
+      margin-top: 0;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Value row: text + pencil */
+    .slds-value {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
       min-width: 0;
     }
 
-    .value-text{
-      min-width:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      padding-right: 4px;
-      font-size: 15.5px;
+    /* Value: darker, slightly larger, medium weight */
+    .value-text {
+      font-size: 15px;
+      color: #080707;
+      font-weight: 400;
+      line-height: 1.4;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .value-text.link{
+    .value-text.link {
       color: var(--blue);
-      cursor:pointer;
+      cursor: pointer;
     }
-    .value-text.link:hover{ text-decoration: underline; }
+    .value-text.link:hover { text-decoration: underline; }
 
+    /* Pencil — appears on row hover */
     .edit{
       opacity: 0;
-      transform: translateY(1px);
-      transition: opacity .12s ease, transform .12s ease, color .12s ease;
-      color: var(--muted-2);
-      cursor:pointer;
+      transition: opacity .1s ease, color .1s ease;
+      color: #c4c9d4;
+      cursor: pointer;
       flex: 0 0 auto;
-      display:flex;
-      align-items:center;
-      padding: 2px;
-      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 2px 3px;
+      border-radius: 4px;
     }
-    .field:hover .edit{
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .edit:hover{
-      color: #6b7280;
-      background: rgba(0,0,0,.03);
-    }
-    .edit svg{ width: 14px; height: 14px; display:block; }
+    .slds-field:hover .edit { opacity: 1; }
+    .edit:hover { color: #686D73; background: rgba(0,0,0,.04); }
+    .edit svg { width: 18px; height: 18px; display:block; }
 
     .inline-input{
       width:100%;
       font-family: var(--font);
-      font-size: 16px;
-      padding: 8px 10px;
+      font-size: 15px;
+      padding: 4px 8px;
       border: 1px solid var(--line-2);
-      border-radius: 8px;
+      border-radius: 4px;
       outline:none;
     }
     .inline-input:focus{
       border-color: rgba(1,118,211,.55);
-      box-shadow: 0 0 0 3px rgba(1,118,211,.12);
+      box-shadow: 0 0 0 2px rgba(1,118,211,.12);
     }
 
-    /* stalled reason highlight */
-    .field.stalled .value-text{
+    /* Stalled highlight */
+    .slds-field.stalled .value-text{
       color: var(--stalled-text);
-      font-weight: 650;
+      font-weight: 600;
     }
-    .field.stalled{
+    .slds-field.stalled{
       background: var(--stalled-bg);
       border-top: 1px solid var(--stalled-border);
       border-bottom: 1px solid var(--stalled-border);
-      padding-left: 10px;
-      padding-right: 10px;
-      border-radius: 10px;
-      margin: 6px 0;
+      border-radius: 4px;
+      margin: 2px 0;
     }
-    .field.stalled + .field{ border-top: 0; }
+
+    /* =====================================================
+       OTHER RELATED CONTACTS — Salesforce-style table
+       ===================================================== */
+    .orc-wrap {
+      padding: 0 0 14px;
+    }
+    .orc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      background: #fff;
+      min-width: 820px;
+    }
+    .orc-table thead th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      padding: 9px 14px;
+      background: #fafbfc;
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .orc-table thead th:last-child { border-right: none; }
+    .orc-table thead th:first-child { padding: 9px 6px 9px 16px; }
+    .orc-table tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+      color: #111827;
+      font-size: 15px;
+    }
+    .orc-table tbody td:first-child { padding: 11px 6px 11px 16px; }
+    .orc-table tbody tr:last-child td { border-bottom: 0; }
+    .orc-table tbody tr { background: white; transition: background 0.12s ease; }
+    .orc-table tbody tr:hover { background: #f9fafb; }
+    .orc-table .orc-name {
+      font-weight: 600;
+      color: #0176d3;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .orc-table .orc-name:hover { text-decoration: underline; }
+    .orc-table .orc-name-plain {
+      font-weight: 600;
+      color: #111827;
+    }
+    .orc-table .orc-rel {
+      color: #6b7280;
+      font-size: 13.5px;
+    }
+    .orc-table .orc-phone {
+      color: #0176d3;
+      font-weight: 500;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .orc-table .orc-phone:hover { text-decoration: underline; }
+    .orc-table .orc-empty { color: #9ca3af; }
+
+    /* Row index number */
+    .orc-idx {
+      font-size: 12px;
+      color: #9ca3af;
+      font-weight: 400;
+      text-align: right;
+      min-width: 18px;
+    }
+
+    /* Inline status dropdown */
+    .orc-status-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .orc-status-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      padding: 3px 2px;
+      font-family: var(--font);
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.1s ease;
+      white-space: nowrap;
+    }
+    .orc-status-btn:hover { background: #f3f4f6; }
+    .orc-status-btn .orc-chevron {
+      width: 13px;
+      height: 13px;
+      color: #9ca3af;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+    .orc-status-wrap.open .orc-chevron { transform: rotate(180deg); }
+    .orc-status-btn .orc-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #d1d5db;
+    }
+    .orc-status-btn .orc-status-dot.green  { background: #10b981; }
+    .orc-status-btn .orc-status-dot.amber  { background: #f59e0b; }
+    .orc-status-btn .orc-status-dot.red    { background: #ef4444; }
+    .orc-status-btn .orc-status-dot.blue   { background: #0176d3; }
+    .orc-status-btn .orc-status-dot.purple { background: #7c3aed; }
+    .orc-status-btn .orc-status-dot.none   { background: #d1d5db; }
+
+    /* Dropdown menu */
+    .orc-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 200;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      min-width: 170px;
+      padding: 4px 0;
+      display: none;
+    }
+    .orc-status-wrap.open .orc-dropdown { display: block; }
+    .orc-status-wrap.drop-up .orc-dropdown {
+      top: auto;
+      bottom: calc(100% + 4px);
+    }
+    .orc-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 14px;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #111827;
+      cursor: pointer;
+      transition: background 0.1s ease;
+      white-space: nowrap;
+    }
+    .orc-dropdown-item:hover { background: #f3f4f6; }
+    .orc-dropdown-item.selected { color: #0176d3; }
+    .orc-dropdown-item .orc-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .orc-dropdown-divider {
+      height: 1px;
+      background: #f3f4f6;
+      margin: 4px 0;
+    }
+
+
 
     /* ---------- CHARACTERISTICS DROPDOWN ---------- */
     .inline-toggle{
-      padding: 0 14px 14px;
+      padding: 0 16px 7px 30px;
     }
     .toggle-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       cursor:pointer;
       user-select:none;
-      background: #f4f6f9;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      margin: 8px 0 10px;
+      background: #f8f9fb;
+      border: 1px solid #eaedf1;
+      border-radius: 5px;
+      margin: 4px 0 8px;
     }
     .toggle-left{
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
       min-width:0;
     }
 
     .toggle-btn{
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       border-radius: 999px;
-      border: 1px solid #cfd6df;
+      border: 1px solid #d8dce4;
       background: #fff;
-      color: #122349;
+      color: #3e3e3c;
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -447,8 +606,8 @@
     }
 
     .chev{
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: currentColor;
       transition: transform .14s ease;
       flex: 0 0 auto;
@@ -461,17 +620,10 @@
       color:#111827;
       letter-spacing: .08px;
       white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .toggle-meta{
-      font-size: 15px;
-      color: var(--muted);
-      white-space:nowrap;
     }
     .toggle-body{
       display:none;
-      padding: 0 0 4px;
+      padding: 0 0 2px;
     }
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
@@ -513,28 +665,17 @@
       background: white;
       transition: background 0.15s ease;
     }
-    tbody tr:hover{
-      background: #f9fafb;
-    }
-    .td-muted{ 
-      color: #9ca3af;
-      font-size: 15.5px;
-    }
+    tbody tr:hover{ background: #f9fafb; }
+    .td-muted{ color: #9ca3af; font-size: 15.5px; }
     .td-link{
       color: var(--blue);
       cursor:pointer;
       font-weight: 600;
       font-size: 16.5px;
     }
-    .td-link:hover{ 
-      text-decoration: underline; 
-    }
-    a.td-link{
-      text-decoration: none;
-    }
-    a.td-link:hover{
-      text-decoration: underline;
-    }
+    .td-link:hover{ text-decoration: underline; }
+    a.td-link{ text-decoration: none; }
+    a.td-link:hover{ text-decoration: underline; }
 
     .status{
       display:inline-flex;
@@ -553,18 +694,9 @@
     .dot.good{ background: #10b981; }
     .dot.warn{ background: #f59e0b; }
 
-    /* Quick action buttons */
-    .quick-actions{
-      display: flex;
-      gap: 6px;
-    }
-    .quick-actions .btn{
-      font-size: 14.5px;
-      padding: 6px 10px;
-      border-radius: 6px;
-    }
+    .quick-actions{ display: flex; gap: 6px; }
+    .quick-actions .btn{ font-size: 14.5px; padding: 6px 10px; border-radius: 6px; }
 
-    /* Click-to-call phone links */
     .phone-link{
       color: var(--blue);
       text-decoration: none;
@@ -572,12 +704,9 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .phone-link:hover{
-      text-decoration: underline;
-      color: #0176d3;
-    }
+    .phone-link:hover{ text-decoration: underline; color: #0176d3; }
 
-    /* Add Note Modal - Floating Popup */
+    /* Add Note Modal */
     .note-modal-overlay{
       position: fixed;
       inset: 0;
@@ -586,10 +715,7 @@
       z-index: 10000;
       pointer-events: none;
     }
-    .note-modal-overlay.active{ 
-      display: block;
-      pointer-events: auto;
-    }
+    .note-modal-overlay.active{ display: block; pointer-events: auto; }
     
     .note-modal{
       position: absolute;
@@ -602,8 +728,6 @@
       flex-direction: column;
       z-index: 10001;
     }
-    
-    /* Arrow pointing down to button */
     .note-modal::after{
       content: '';
       position: absolute;
@@ -617,7 +741,6 @@
       border-top: 8px solid white;
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
     }
-    
     .note-modal-header{
       padding: 14px 16px;
       border-bottom: 1px solid #e5e7eb;
@@ -625,13 +748,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    
-    .note-modal-title{
-      font-size: 16px;
-      font-weight: 600;
-      color: #111827;
-    }
-    
+    .note-modal-title{ font-size: 16px; font-weight: 600; color: #111827; }
     .note-modal-close{
       width: 28px;
       height: 28px;
@@ -646,17 +763,8 @@
       transition: all 0.15s ease;
       padding: 0;
     }
-    .note-modal-close:hover{
-      background: #f3f4f6;
-      color: #111827;
-    }
-    
-    .note-modal-body{
-      padding: 16px;
-      overflow-y: auto;
-      flex: 1;
-    }
-    
+    .note-modal-close:hover{ background: #f3f4f6; color: #111827; }
+    .note-modal-body{ padding: 16px; overflow-y: auto; flex: 1; }
     .note-contact-info{
       background: #f9fafb;
       padding: 10px 12px;
@@ -665,12 +773,7 @@
       font-size: 13px;
       color: #6b7280;
     }
-    .note-contact-name{
-      font-weight: 600;
-      color: #111827;
-      font-size: 14px;
-    }
-    
+    .note-contact-name{ font-weight: 600; color: #111827; font-size: 14px; }
     .note-textarea{
       width: 100%;
       min-height: 120px;
@@ -687,7 +790,6 @@
       border-color: #0176d3;
       box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.1);
     }
-    
     .note-modal-footer{
       padding: 12px 16px;
       border-top: 1px solid #e5e7eb;
@@ -695,7 +797,6 @@
       justify-content: flex-end;
       gap: 8px;
     }
-    
     .note-btn{
       padding: 8px 16px;
       border-radius: 6px;
@@ -706,43 +807,22 @@
       transition: all 0.15s ease;
       border: none;
     }
-    .note-btn-cancel{
-      background: white;
-      color: #6b7280;
-      border: 1px solid #d1d5db;
-    }
-    .note-btn-cancel:hover{
-      background: #f9fafb;
-      border-color: #9ca3af;
-    }
-    .note-btn-save{
-      background: #0176d3;
-      color: white;
-    }
-    .note-btn-save:hover{
-      background: #0161b3;
-    }
-    .note-btn-save:disabled{
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-    
-    .note-char-count{
-      text-align: right;
-      margin-top: 6px;
-      font-size: 11px;
-      color: #9ca3af;
-    }
+    .note-btn-cancel{ background: white; color: #6b7280; border: 1px solid #d1d5db; }
+    .note-btn-cancel:hover{ background: #f9fafb; border-color: #9ca3af; }
+    .note-btn-save{ background: #0176d3; color: white; }
+    .note-btn-save:hover{ background: #0161b3; }
+    .note-btn-save:disabled{ background: #9ca3af; cursor: not-allowed; }
+    .note-char-count{ text-align: right; margin-top: 6px; font-size: 11px; color: #9ca3af; }
 
     .hint{
-      padding: 10px 14px 14px;
+      padding: 10px 16px 14px;
       color: var(--muted);
       font-size: 13px;
       border-top: 1px solid var(--line);
       background: #fbfcfe;
     }
 
-    /* ---------- SUB-TABS (for Related Contacts) ---------- */
+    /* ---------- SUB-TABS ---------- */
     .sub-tabs-bar{
       display: flex;
       gap: 24px;
@@ -750,7 +830,6 @@
       border-bottom: 1px solid var(--line);
       margin-bottom: 14px;
     }
-
     .sub-tab{
       appearance: none;
       border: 0;
@@ -764,16 +843,11 @@
       font-weight: 500;
       transition: color .12s ease;
     }
-    .sub-tab[aria-selected="true"]{ 
-      color: var(--text); 
-      font-weight: 600;
-    }
+    .sub-tab[aria-selected="true"]{ color: var(--text); font-weight: 600; }
     .sub-tab[aria-selected="true"]::after{
       content: "";
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -9px;
+      left: 0; right: 0; bottom: -9px;
       height: 2px;
       background: var(--blue);
     }
@@ -784,13 +858,9 @@
       outline-offset: 2px;
       border-radius: 4px;
     }
-
     .sub-tab-pane{ display: none; }
     .sub-tab-pane.active{ display: block; }
-
-    #subpane-confirmed table{
-      min-width: 1100px;
-    }
+    #subpane-confirmed table{ min-width: 1100px; }
 
     /* ---------- LOADING OVERLAY ---------- */
     #loadingOverlay{
@@ -807,109 +877,53 @@
       animation: fadeIn 0.3s ease;
     }
     #loadingOverlay[aria-hidden="false"]{ display:flex; }
-    #loadingOverlay.fade-out{
-      animation: fadeOut 0.5s ease forwards;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    .loadingCard{
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-    
+    #loadingOverlay.fade-out{ animation: fadeOut 0.5s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .loadingCard{ display: flex; flex-direction: column; align-items: center; gap: 20px; }
     .spinner{
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       border-radius: 50%;
       border: 5px solid rgba(1,118,211,.15);
       border-top-color: #0176d3;
       animation: spin 0.8s linear infinite;
       flex: 0 0 auto;
     }
-    @keyframes spin { 
-      to { transform: rotate(360deg); } 
-    }
-    
-    .loadingText{
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      text-align: center;
-    }
-    .loadingTitle{
-      font-size: 18px;
-      font-weight: 650;
-      color: #111827;
-      letter-spacing: -0.01em;
-    }
-    .loadingSub{
-      font-size: 14px;
-      color: #6b7280;
-      line-height: 1.4;
-    }
-    
-    /* ---------- ACTION REQUIRED BANNER - MODERN ---------- */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loadingText{ display:flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+    .loadingTitle{ font-size: 18px; font-weight: 650; color: #111827; letter-spacing: -0.01em; }
+    .loadingSub{ font-size: 14px; color: #6b7280; line-height: 1.4; }
+
+    /* ---------- ACTION REQUIRED BANNER ---------- */
     #actionBanner{
-      margin: 10px 14px 0;
+      margin: 0 14px;
       border-radius: 6px;
       border: 1px solid #fecaca;
       background: #fef2f2;
       color: #7f1d1d;
-      padding: 14px 16px 14px 18px;
+      padding: 0 16px 0 18px;
       box-shadow: 0 1px 2px rgba(0,0,0,.04);
       overflow: hidden;
       max-height: 0;
       opacity: 0;
       transform: translateY(-6px);
-      transition: max-height .22s ease, opacity .18s ease, transform .18s ease, margin-top .22s ease;
+      transition: max-height .22s ease, opacity .18s ease, transform .18s ease, padding .22s ease, margin-top .22s ease;
       position: relative;
     }
     #actionBanner::before{
       content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       width: 4px;
       background: #dc2626;
     }
-    #actionBanner.show{
-      max-height: 160px;
-      opacity: 1;
-      transform: translateY(0);
-      margin-top: 10px;
-    }
-    #actionBanner strong{
-      font-weight: 700;
-    }
-    #actionBanner .bannerText{
-      font-size: 14px;
-      line-height: 1.5;
-      color: #1f2937;
-      letter-spacing: -0.01em;
-    }
-    #actionBanner .bannerText strong:first-child{
-      color: #dc2626;
-    }
+    #actionBanner.show{ max-height: 160px; opacity: 1; transform: translateY(0); margin-top: 10px; padding: 14px 16px 14px 18px; }
+    #actionBanner strong{ font-weight: 700; }
+    #actionBanner .bannerText{ font-size: 14px; line-height: 1.5; color: #1f2937; letter-spacing: -0.01em; }
+    #actionBanner .bannerText strong:first-child{ color: #dc2626; }
 
-    /* ---------- RELATED CONTACTS SUMMARY ---------- */
-    .section-head .section-meta{
-      font-size: 14px;
-      color: var(--muted);
-      font-weight: 600;
-      white-space: nowrap;
-    }
+    /* ---------- SECTION META ---------- */
+    .section-head .section-meta{ font-size: 14px; color: var(--muted); font-weight: 600; white-space: nowrap; }
 
     /* ---------- MARK OWNERSHIP TREE COMPLETE BUTTON ---------- */
     #ownershipTreeBtn{
@@ -929,21 +943,10 @@
       transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
       letter-spacing: 0.01em;
     }
-    #ownershipTreeBtn:hover{
-      background: #dbeafe;
-      border-color: #93c5fd;
-      box-shadow: 0 2px 6px rgba(29, 78, 216, 0.12);
-    }
-    #ownershipTreeBtn:active{
-      transform: translateY(1px);
-    }
-    #ownershipTreeBtn svg{
-      width: 13px;
-      height: 13px;
-      flex-shrink: 0;
-    }
+    #ownershipTreeBtn:hover{ background: #dbeafe; border-color: #93c5fd; box-shadow: 0 2px 6px rgba(29, 78, 216, 0.12); }
+    #ownershipTreeBtn:active{ transform: translateY(1px); }
+    #ownershipTreeBtn svg{ width: 13px; height: 13px; flex-shrink: 0; }
 
-    /* Ownership tree complete — celebration flash on the pill */
     @keyframes ownershipCelebrate {
       0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(16,185,129,0); background: #d1fae5; color: #065f46; }
       20%  { transform: scale(1.18); box-shadow: 0 0 0 8px rgba(16,185,129,0.25); background: #6ee7b7; color: #064e3b; }
@@ -951,22 +954,12 @@
       80%  { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(16,185,129,0.06); }
       100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(16,185,129,0); background: #d1fae5; color: #065f46; }
     }
-    .ownership-celebrate{
-      animation: ownershipCelebrate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
-    }
+    .ownership-celebrate{ animation: ownershipCelebrate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important; }
 
-    /* Confetti burst overlay */
-    #ownershipConfetti{
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 99999;
-      overflow: hidden;
-    }
+    #ownershipConfetti{ position: fixed; inset: 0; pointer-events: none; z-index: 99999; overflow: hidden; }
     .confetti-piece{
       position: absolute;
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 2px;
       opacity: 0;
       animation: confettiFall linear forwards;
@@ -990,7 +983,6 @@
     </div>
   </div>
 
-  <!-- Confetti container -->
   <div id="ownershipConfetti" aria-hidden="true"></div>
 
   <div class="app">
@@ -1000,17 +992,14 @@
         <!-- Top snapshot FIRST -->
         <div class="topSnapshot" aria-label="Top Snapshot">
           <div class="topSnapshotGrid">
-            <!-- LEFT: Property Details -->
             <div class="snapshotBlock">
               <div class="snapshotTitle">PROPERTY DETAILS</div>
               <div class="snapshotDivider"></div>
-
               <div class="snapshotFields">
                 <div class="sfield">
                   <div class="slabel">Deceased Owner</div>
                   <div class="svalue" data-snapshot="true" data-field="deceased_owner">—</div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">Last Contact</div>
                   <div class="svalue" style="display: flex; flex-direction: column; gap: 2px;">
@@ -1018,12 +1007,10 @@
                     <span style="font-size: 13px; color: #6b7280; font-weight: 500;" data-snapshot="true" data-field="last_contact_date">—</span>
                   </div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">✦ Deal Score</div>
                   <div class="svalue" data-snapshot="true" data-field="deal_score">—</div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">Taxes Owed</div>
                   <div class="svalue" data-snapshot="true" data-field="taxes_owed">—</div>
@@ -1031,9 +1018,14 @@
               </div>
             </div>
             <div class="snapshotBlock">
-              <div class="snapshotTitle">DEAL INSIGHTS</div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin: 0 0 10px 0;">
+                <div class="snapshotTitle" style="margin:0;">DEAL INSIGHTS</div>
+                <button id="ownershipTreeBtn" type="button" style="display:none; font-size:11px; padding: 3px 8px; gap: 4px;" aria-label="Mark Ownership Complete">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M5.636 5.636l2.122 2.122M3 12h3m-.364 6.364 2.122-2.122M12 21v-3m6.364.364-2.122-2.122M21 12h-3m.364-6.364-2.122 2.122" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  Mark Ownership Complete
+                </button>
+              </div>
               <div class="snapshotDivider"></div>
-
               <div class="snapshotFields" id="dealInsightsFields">
                 <div class="sfield">
                   <div class="slabel">
@@ -1042,17 +1034,14 @@
                   </div>
                   <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_identified">—</div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">Heirs Contacted</div>
                   <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_contacted">—</div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">Heirs Offered</div>
                   <div class="svalue" style="font-size: 16.5px;" data-snapshot="true" data-field="heirs_offered">—</div>
                 </div>
-
                 <div class="sfield">
                   <div class="slabel">Ownership Secured</div>
                   <div class="svalue ok" style="font-size: 16.5px;" data-snapshot="true" data-field="ownership_secured">—</div>
@@ -1069,9 +1058,7 @@
             <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
             <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
             <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
-            <button class="tab" role="tab" id="tab-milestones" aria-selected="false" aria-controls="pane-milestones" type="button">Milestones</button>
           </div>
-
           <div class="tabs-actions">
             <button class="btn" id="btnRefresh" type="button" title="Refresh">
               <span aria-hidden="true">⟳</span>
@@ -1080,7 +1067,7 @@
           </div>
         </div>
 
-        <!-- Action Required Banner - MODERNIZED -->
+        <!-- Action Required Banner -->
         <div id="actionBanner" aria-live="polite" aria-atomic="true" role="status">
           <div class="bannerText" id="actionBannerText">—</div>
         </div>
@@ -1089,147 +1076,108 @@
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
 
-            <!-- Property Details Section -->
+            <!-- Property Details Section — SLDS layout -->
             <div class="section">
               <div class="section-head">
                 <div><h3>Property Details</h3></div>
               </div>
 
-              <div class="field-grid">
-                <div>
-                  <div class="field" data-field="lead_type">
-                    <div class="label">Lead Type</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+              <div class="slds-grid">
+                <!-- Left column -->
+                <div class="slds-col-left">
+
+                  <div class="slds-field" data-field="lead_type">
+                    <div class="slds-label">Lead Type</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">Probate</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="tax_status">
-                    <div class="label">Tax Status</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="tax_status">
+                    <div class="slds-label">Tax Status</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">Delinquent – 2 Years</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="condition">
-                    <div class="label">Condition</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="condition">
+                    <div class="slds-label">Condition</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">Fair – Needs Repairs</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="occupancy">
-                    <div class="label">Occupancy</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="occupancy">
+                    <div class="slds-label">Occupancy</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">Vacant</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="days_of_inactivity">
-                    <div class="label">Days of Inactivity</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
                 </div>
 
-                <div>
-                  <div class="field" data-field="equity">
-                    <div class="label">Equity</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                <!-- Right column -->
+                <div class="slds-col-right">
+
+                  <div class="slds-field" data-field="equity">
+                    <div class="slds-label">Equity</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">$148,000</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="deed_status">
-                    <div class="label">Deed Status</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="deed_status">
+                    <div class="slds-label">Deed Status</div>
+                    <div class="slds-value">
+                      <a href="https://montgomery.tx.publicsearch.us/doc/236972918" target="_blank" rel="noopener noreferrer" class="value-text link" style="color:#0176d3; text-decoration:none; font-weight:400;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Deed Found</a>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="will_status">
-                    <div class="label">Will Status</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="will_status">
+                    <div class="slds-label">Will Status</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">No Will Found</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="title_issue">
-                    <div class="label">Title Issue</div>
-                    <div class="value">
-                      <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-field" data-field="title_issue">
+                    <div class="slds-label">Title Issue</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">Lien – $4,200</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <!-- Mark Ownership Tree Complete button — hidden once complete -->
-                  <button id="ownershipTreeBtn" type="button" style="display:none;" aria-label="Mark Ownership Tree Complete">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 3v3M5.636 5.636l2.122 2.122M3 12h3m-.364 6.364 2.122-2.122M12 21v-3m6.364.364-2.122-2.122M21 12h-3m.364-6.364-2.122 2.122" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                    Mark Ownership Tree Complete
-                  </button>
+
                 </div>
               </div>
             </div>
 
 
-            <!-- Update Activity (collapsible, closed by default) -->
+            <!-- Update Activity (collapsible) — SLDS layout -->
             <div class="inline-toggle" id="characteristicsToggle" data-open="false">
               <div class="toggle-head" role="button" tabindex="0" aria-expanded="false" aria-controls="characteristicsBody">
                 <div class="toggle-left">
@@ -1243,67 +1191,63 @@
               </div>
 
               <div class="toggle-body" id="characteristicsBody">
-                <div class="field-grid">
-                  <div>
-                    <div class="field" data-field="next_action_step">
-                      <div class="label">Next Action Step</div>
-                      <div class="value">
-                        <span class="value-text" data-editable="true">—</span>
+                <div class="slds-grid">
+                  <div class="slds-col-left">
+
+                    <div class="slds-field" data-field="next_action_step">
+                      <div class="slds-label">Next Action Step</div>
+                      <div class="slds-value">
+                        <span class="value-text" data-editable="true">Follow Up Call – Heir #2</span>
                         <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
                       </div>
                     </div>
 
-                    <div class="field" data-field="stalled_reason">
-                      <div class="label">Stalled Reason</div>
-                      <div class="value">
-                        <span class="value-text" data-editable="true">—</span>
+                    <div class="slds-field" data-field="stalled_reason">
+                      <div class="slds-label">Stalled Reason</div>
+                      <div class="slds-value">
+                        <span class="value-text" data-editable="true">Waiting on Probate Court</span>
                         <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
                       </div>
                     </div>
+
                   </div>
 
-                  <div>
-                    <div class="field" data-field="follow_up_date">
-                      <div class="label">Follow-up Date</div>
-                      <div class="value">
-                        <span class="value-text" data-editable="true">—</span>
+                  <div class="slds-col-right">
+
+                    <div class="slds-field" data-field="follow_up_date">
+                      <div class="slds-label">Follow-up Date</div>
+                      <div class="slds-value">
+                        <span class="value-text" data-editable="true">Mar 18, 2026</span>
                         <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
+                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
                       </div>
                     </div>
+
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Related Contacts - MODERNIZED -->
+            <!-- Related Contacts -->
             <div class="section">
               <div class="section-head">
-                <div><h3>Related Contacts</h3></div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <img src="contact_120.png" alt="" aria-hidden="true" style="width:28px; height:28px; object-fit:contain; flex-shrink:0; border-radius:5px;">
+                  <h3 style="margin:0;">Related Contacts</h3>
+                </div>
                 <div class="section-meta" id="contactsSummary">—</div>
               </div>
 
-              <!-- Sub-tabs for Confirmed Owners vs Other Contacts -->
               <div class="sub-tabs-bar" role="tablist" aria-label="Contact Tabs">
                 <button class="sub-tab" role="tab" id="subtab-confirmed" aria-selected="true" aria-controls="subpane-confirmed" type="button">Confirmed Owners</button>
                 <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Related Contacts</button>
               </div>
 
-              <!-- Confirmed Owners Table - OPTIMIZED COLUMNS -->
               <div class="sub-tab-pane active" id="subpane-confirmed" role="tabpanel" aria-labelledby="subtab-confirmed">
                 <div class="table-wrap">
                   <table aria-label="Confirmed Owners Table">
@@ -1312,7 +1256,6 @@
                         <th>Name</th>
                         <th>Status</th>
                         <th>Last Contact</th>
-                        <th>Contact Outcome</th>
                         <th>Next Follow-up</th>
                         <th>Offer Status</th>
                         <th>Number</th>
@@ -1324,16 +1267,15 @@
                 </div>
               </div>
 
-              <!-- Other Related Contacts Table - OPTIMIZED COLUMNS -->
               <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
-                <div class="table-wrap">
-                  <table aria-label="Other Related Contacts Table">
+                <div class="orc-wrap">
+                  <table class="orc-table" aria-label="Other Related Contacts Table">
                     <thead>
                       <tr>
+                        <th style="width:24px;"></th>
                         <th>Name</th>
                         <th>Relationship</th>
                         <th>Lead Status</th>
-                        <th>Contact Outcome</th>
                         <th>Phone 1</th>
                         <th>Phone 1 Status</th>
                         <th>Phone 2</th>
@@ -1346,9 +1288,6 @@
               </div>
             </div>
 
-            <div class="hint">
-              Auto-save: edits commit on blur / Enter. Fields are keyed by <code>data-field</code> for webhook mapping.
-            </div>
           </div>
 
           <!-- RESEARCH -->
@@ -1358,126 +1297,103 @@
                 <div><h3>Research</h3></div>
               </div>
 
-              <div class="field-grid">
-                <div>
-                  <div class="field" data-field="obituary_link">
-                    <div class="label">Obituary Link</div>
-                    <div class="value">
+              <div class="slds-grid">
+                <div class="slds-col-left">
+
+                  <div class="slds-field" data-field="obituary_link">
+                    <div class="slds-label">Obituary Link</div>
+                    <div class="slds-value">
                       <span class="value-text link" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="ancestry_link">
-                    <div class="label">Ancestry Link</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="ancestry_link">
+                    <div class="slds-label">Ancestry Link</div>
+                    <div class="slds-value">
                       <span class="value-text link" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="zillow_link">
-                    <div class="label">Zillow Link</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="zillow_link">
+                    <div class="slds-label">Zillow Link</div>
+                    <div class="slds-value">
                       <span class="value-text link" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="tax_assessor_link">
-                    <div class="label">Tax Assessor Link</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="tax_assessor_link">
+                    <div class="slds-label">Tax Assessor Link</div>
+                    <div class="slds-value">
                       <span class="value-text link" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="google_maps_link">
-                    <div class="label">Google Maps Link</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="google_maps_link">
+                    <div class="slds-label">Google Maps Link</div>
+                    <div class="slds-value">
                       <span class="value-text link" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
+
                 </div>
 
-                <div>
-                  <div class="field" data-field="birth_date">
-                    <div class="label">Birth Date</div>
-                    <div class="value">
+                <div class="slds-col-right">
+
+                  <div class="slds-field" data-field="birth_date">
+                    <div class="slds-label">Birth Date</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="death_date">
-                    <div class="label">Death Date</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="death_date">
+                    <div class="slds-label">Death Date</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="age">
-                    <div class="label">Age</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="age">
+                    <div class="slds-label">Age</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
 
-                  <div class="field" data-field="creation_log">
-                    <div class="label">Creation Log</div>
-                    <div class="value">
+                  <div class="slds-field" data-field="creation_log">
+                    <div class="slds-label">Creation Log</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -1489,52 +1405,44 @@
               <div class="section-head">
                 <div><h3>Activity</h3></div>
               </div>
-
-              <div class="field-grid">
-                <div>
-                  <div class="field" data-field="last_contacted">
-                    <div class="label">Last Contacted</div>
-                    <div class="value">
+              <div class="slds-grid">
+                <div class="slds-col-left">
+                  <div class="slds-field" data-field="last_contacted">
+                    <div class="slds-label">Last Contacted</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="slds-field" data-field="days_of_inactivity">
+                    <div class="slds-label">Days of Inactivity</div>
+                    <div class="slds-value">
+                      <span class="value-text" data-editable="true">47</span>
+                      <span class="edit" title="Edit">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <div class="field" data-field="activity_notes">
-                    <div class="label">Notes</div>
-                    <div class="value">
+                <div class="slds-col-right">
+                  <div class="slds-field" data-field="activity_notes">
+                    <div class="slds-label">Notes</div>
+                    <div class="slds-value">
                       <span class="value-text" data-editable="true">—</span>
                       <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                          <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
             <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
 
           <!-- MILESTONES -->
-          <div class="tab-pane" id="pane-milestones" role="tabpanel" aria-labelledby="tab-milestones">
-            <div class="section">
-              <div class="section-head">
-                <div><h3>Milestones</h3></div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
@@ -1557,15 +1465,8 @@
           <div class="note-contact-name" id="noteContactName">—</div>
           <div id="noteContactRelation">—</div>
         </div>
-        <textarea 
-          class="note-textarea" 
-          id="noteTextarea" 
-          placeholder="Add your note here..."
-          maxlength="5000"
-        ></textarea>
-        <div class="note-char-count">
-          <span id="noteCharCount">0</span> / 5000 characters
-        </div>
+        <textarea class="note-textarea" id="noteTextarea" placeholder="Add your note here..." maxlength="5000"></textarea>
+        <div class="note-char-count"><span id="noteCharCount">0</span> / 5000 characters</div>
       </div>
       <div class="note-modal-footer">
         <button class="note-btn note-btn-cancel" id="noteBtnCancel">Cancel</button>
@@ -1575,23 +1476,20 @@
   </div>
 
   <script>
-    // Apply data (webhook mapping)
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
 
         for (const [key, value] of Object.entries(payload)) {
-          const node = document.querySelector(`.field[data-field="${cssEscape(key)}"] .value-text`);
+          const node = document.querySelector(`.slds-field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) node.textContent = formatValue(value);
         }
 
-        // Top snapshot mapping (header fields)
         for (const [key, value] of Object.entries(payload)) {
           const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
           if (snap) snap.textContent = formatValue(value);
         }
 
-        // Format currency fields
         const formatCurrency = (val) => {
           if (!val || val === "—") return "—";
           const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
@@ -1599,32 +1497,27 @@
           return "$" + Math.round(num).toLocaleString("en-US");
         };
         ["taxes_owed", "equity", "appraisal"].forEach(field => {
-          const el = document.querySelector(`.field[data-field="${field}"] .value-text`);
+          const el = document.querySelector(`.slds-field[data-field="${field}"] .value-text`);
           if (el && payload[field]) el.textContent = formatCurrency(payload[field]);
         });
-        // Also format snapshot appraisal/taxes if present
         ["taxes_owed", "appraisal"].forEach(field => {
           const snap = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
           if (snap && payload[field]) snap.textContent = formatCurrency(payload[field]);
         });
 
-        // ── Deal Insight metrics computed from confirmed_owners ──────────────
         const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
 
-        // Heirs Identified: owner_status === "Yes"
         const confirmedOwners = owners.filter(o =>
           String(o.owner_status || o.ownerStatus || "").trim().toLowerCase() === "yes"
         );
         const heirsIdentified = confirmedOwners.length;
 
-        // Heirs Contacted: owner_status === "Yes" AND lead_status is Contacted or beyond
         const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
         const heirsContacted = confirmedOwners.filter(o => {
           const s = String(o.lead_status || o.leadStatus || "").trim().toLowerCase();
           return contactedStatuses.some(cs => s.includes(cs));
         }).length;
 
-        // Heirs Offered: owner_status === "Yes" AND offer_made is not empty
         const heirsOffered = confirmedOwners.filter(o => {
           const raw = o.offer_made !== undefined ? o.offer_made : o.offerMade;
           if (typeof raw === "boolean") return raw === true;
@@ -1632,7 +1525,6 @@
           return false;
         }).length;
 
-        // Ownership Secured: owner_status === "Yes" AND lead_status === "Closed" → sum ownership %
         const closedOwners = confirmedOwners.filter(o =>
           String(o.lead_status || o.leadStatus || "").trim().toLowerCase() === "closed"
         );
@@ -1656,7 +1548,6 @@
             : "—"
         );
 
-        // Toggle empty state
         const insightsFields = document.getElementById("dealInsightsFields");
         const insightsEmpty  = document.getElementById("dealInsightsEmpty");
         if (insightsFields && insightsEmpty) {
@@ -1664,7 +1555,6 @@
           insightsEmpty.style.display  = heirsIdentified > 0 ? "none" : "block";
         }
 
-        // Badge: Complete when all confirmed owners have been contacted
         const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
         if (badge) {
          const isComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
@@ -1672,9 +1562,7 @@
          badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
          syncOwnershipTreeButton(isComplete);
         }
-        // ── End Deal Insight metrics ─────────────────────────────────────────
 
-        // ── Last Contact — most recent contacted_date across all subitems ────
         let mostRecentDate = null;
         (owners || []).forEach(o => {
           const raw = o.contacted_date || o.lastContact || "";
@@ -1690,7 +1578,6 @@
           if (dateEl) dateEl.textContent = formatted;
           if (daysEl) daysEl.textContent = daysAgoStr || formatted;
         }
-        // ── End Last Contact ─────────────────────────────────────────────────
 
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
@@ -1703,26 +1590,16 @@
       }
     };
 
-    // ── Ownership Tree Button logic ──────────────────────────────────────────
-
-    /**
-     * Show the button only when the pill is NOT yet complete.
-     * If already complete, hide the button (tree is already mapped out).
-     */
     function syncOwnershipTreeButton(isComplete) {
       const btn = document.getElementById("ownershipTreeBtn");
       if (!btn) return;
       btn.style.display = isComplete ? "none" : "inline-flex";
     }
 
-    /**
-     * Fire the confetti burst originating near the Heirs Identified pill.
-     */
     function fireOwnershipConfetti() {
       const container = document.getElementById("ownershipConfetti");
       if (!container) return;
       container.innerHTML = "";
-
       const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
       let originX = window.innerWidth / 2;
       let originY = 100;
@@ -1731,91 +1608,59 @@
         originX = r.left + r.width / 2;
         originY = r.top + r.height / 2;
       }
-
       const colors = ["#10b981", "#34d399", "#6ee7b7", "#0176d3", "#60a5fa", "#fbbf24", "#a78bfa"];
       const count = 38;
-
       for (let i = 0; i < count; i++) {
         const el = document.createElement("div");
         el.className = "confetti-piece";
-
         const angle = (Math.random() * 360);
         const distance = 60 + Math.random() * 180;
         const rad = (angle * Math.PI) / 180;
         const tx = Math.cos(rad) * distance;
-        const ty = Math.sin(rad) * distance - 60; // bias upward
+        const ty = Math.sin(rad) * distance - 60;
         const duration = 0.55 + Math.random() * 0.55;
         const delay = Math.random() * 0.18;
         const size = 6 + Math.random() * 6;
         const color = colors[Math.floor(Math.random() * colors.length)];
         const shapes = ["2px", "50%", "0px"];
         const borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
-
         Object.assign(el.style, {
-          left: `${originX}px`,
-          top: `${originY}px`,
-          width: `${size}px`,
-          height: `${size}px`,
-          background: color,
-          borderRadius: borderRadius,
-          animationDuration: `${duration}s`,
-          animationDelay: `${delay}s`,
+          left: `${originX}px`, top: `${originY}px`,
+          width: `${size}px`, height: `${size}px`,
+          background: color, borderRadius: borderRadius,
+          animationDuration: `${duration}s`, animationDelay: `${delay}s`,
           transform: `translate(${tx}px, ${ty}px)`,
         });
-
-        // Override the keyframe end position via a custom approach
-        el.style.setProperty("--tx", `${tx}px`);
-        el.style.setProperty("--ty", `${ty}px`);
-
         container.appendChild(el);
       }
-
-      // Clean up after animation
       setTimeout(() => { container.innerHTML = ""; }, 1400);
     }
 
-    /**
-     * Celebrate: animate the pill, fire confetti, update Monday, hide button.
-     */
     async function markOwnershipTreeComplete() {
       const btn = document.getElementById("ownershipTreeBtn");
       const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
-
-      // Optimistically update the pill UI
       if (badge) {
         badge.textContent = "Complete";
         badge.className = "heir-status-badge heir-status-complete";
-        // Trigger celebration animation
         badge.classList.remove("ownership-celebrate");
-        void badge.offsetWidth; // force reflow
+        void badge.offsetWidth;
         badge.classList.add("ownership-celebrate");
         setTimeout(() => badge.classList.remove("ownership-celebrate"), 1000);
       }
-
-      // Confetti burst
       fireOwnershipConfetti();
-
-      // Hide the button immediately
       if (btn) {
         btn.style.transition = "opacity 0.3s ease, transform 0.3s ease";
         btn.style.opacity = "0";
         btn.style.transform = "scale(0.85)";
         setTimeout(() => { btn.style.display = "none"; }, 320);
       }
-
-      // Send to Monday via the same save webhook
       const { boardId, pulseId } = extractIdsFromUrl();
       if (boardId && pulseId) {
         try {
           const res = await fetch(SAVE_WEBHOOK, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              boardId,
-              pulseId,
-              columnId: "dropdown_mm1aybze",
-              value: "Complete"
-            })
+            body: JSON.stringify({ boardId, pulseId, columnId: "dropdown_mm1aybze", value: "Complete" })
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           console.log("✓ Ownership Map marked Complete in Monday");
@@ -1827,9 +1672,6 @@
 
     document.getElementById("ownershipTreeBtn").addEventListener("click", markOwnershipTreeComplete);
 
-    // ── End Ownership Tree Button logic ─────────────────────────────────────
-
-    // Characteristics dropdown
     const characteristics = document.getElementById("characteristicsToggle");
 
     function toneDotClass(tone){
@@ -1845,7 +1687,6 @@
       return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
     }
 
-    // Now setup event listeners
     const toggleCharacteristics = () => {
       const isOpen = characteristics.getAttribute("data-open") === "true";
       characteristics.setAttribute("data-open", String(!isOpen));
@@ -1856,7 +1697,6 @@
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCharacteristics(); }
     });
 
-    // Tabs
     const tabs = Array.from(document.querySelectorAll(".tab"));
     const panes = Array.from(document.querySelectorAll(".tab-pane"));
     tabs.forEach(tab => {
@@ -1895,10 +1735,9 @@
     function formatPhoneDisplay(phone){
       if (!phone || phone === "—") return null;
       const digits = String(phone).replace(/\D/g, '');
-      // Strip leading 1 if 11 digits
       const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
       if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
-      return phone; // return as-is if not a standard number
+      return phone;
     }
 
     function calcDaysAgo(dateStr){
@@ -1913,16 +1752,10 @@
 
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
-      // Only show owner_status === "Yes" in this tab
       const confirmed = (contacts || []).filter(c =>
         String(c.owner_status || "").trim().toLowerCase() === "yes"
       );
-      // Sort by lead status — closest to Closed first
-      const STATUS_ORDER = [
-        "closed", "accepted offer", "negotiations", "review",
-        "interested in selling", "contacted", "attempt 3",
-        "attempt 2", "attempt 1", "re-skiptrace"
-      ];
+      const STATUS_ORDER = ["closed", "accepted offer", "negotiations", "review", "interested in selling", "contacted", "attempt 3", "attempt 2", "attempt 1", "re-skiptrace"];
       const statusRank = (s) => {
         const v = String(s || "").toLowerCase().trim();
         const idx = STATUS_ORDER.findIndex(k => v.includes(k));
@@ -1933,9 +1766,7 @@
       );
       const rows = sorted.map((c, index) => {
         const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
-        const motivation       = c.seller_motivation ?? c.motivation ?? null;
         const lastContact      = c.contacted_date ?? c.lastContact ?? null;
-        const contactOutcome   = c.contact_outcome ?? c.contactOutcome ?? null;
         const leadStatus       = c.lead_status ?? c.leadStatus ?? null;
         const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
         const offerMade        = c.offer_made ?? c.offerMade ?? false;
@@ -1943,7 +1774,6 @@
         const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
         const phone1           = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
 
-        // Calculate days ago from contacted_date
         const daysAgo = calcDaysAgo(lastContact);
         let lastContactColor = '#374151';
         if (daysAgo) {
@@ -1955,7 +1785,6 @@
           }
         }
 
-        // Follow-up overdue / upcoming
         let followupCell = `<span class="td-muted">—</span>`;
         if (followupDate && followupDate !== "—") {
           const fpDate = parseFlexibleDate(followupDate);
@@ -1965,23 +1794,11 @@
             const diffDays = Math.floor((fp - today) / (1000 * 60 * 60 * 24));
             if (diffDays < 0) {
               const overdue = Math.abs(diffDays);
-              followupCell = `
-                <div>
-                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #dc2626; font-weight: 500;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div>
-                </div>`;
+              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #dc2626; font-weight: 500;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div></div>`;
             } else if (diffDays === 0) {
-              followupCell = `
-                <div>
-                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #f59e0b; font-weight: 500;">Due today</div>
-                </div>`;
+              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #f59e0b; font-weight: 500;">Due today</div></div>`;
             } else {
-              followupCell = `
-                <div>
-                  <div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div>
-                  <div style="font-size: 12px; color: #9ca3af;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div>
-                </div>`;
+              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #9ca3af;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div></div>`;
             }
           }
         }
@@ -1993,10 +1810,7 @@
         <tr>
           <td>
             <div style="display:flex;align-items:center;gap:0;">
-              ${mondayUrl
-                ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-                : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
-              }${closedBadge}
+              ${mondayUrl ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>` : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`}${closedBadge}
             </div>
             <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
               ${c.relationship ? `<span style="font-size: 12px; color: #9ca3af;">${escapeHtml(c.relationship)}</span>` : ''}
@@ -2010,7 +1824,6 @@
               ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
               : `<span class="td-muted">Not contacted</span>`}
           </td>
-          <td>${leadStatus && leadStatus !== "—" ? `<div style="font-weight: 500; color: #374151;">${escapeHtml(leadStatus)}</div>` : `<span class="td-muted">—</span>`}</td>
           <td>${followupCell}</td>
           <td>
             ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">${offerAmount && offerAmount !== "—" ? "$" + Math.round(parseFloat(String(offerAmount).replace(/[^0-9.]/g, ""))).toLocaleString("en-US") : "—"}</div>` : `<span class="td-muted">No offer</span>`}
@@ -2021,12 +1834,10 @@
               <button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button>
             </div>
           </td>
-        </tr>
-      `;
+        </tr>`;
       }).join("");
       tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
 
-      // Add event listeners to Add Note buttons
       tbody.querySelectorAll('.add-note-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -2038,52 +1849,166 @@
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
-      // Show subitems where owner_status is NOT "Yes"
       const others = (contacts || []).filter(c =>
         String(c.owner_status || "").trim().toLowerCase() !== "yes"
       );
 
-      const simpleStatusCell = (val) => {
-        if (!val || val === "—") return `<span class="td-muted">—</span>`;
-        if (typeof val === "object") return statusCell(val);
-        const v = val.toLowerCase();
-        let tone = "dot";
-        if (v.includes("correct") || v.includes("good") || v.includes("contacted")) tone = "dot good";
-        else if (v.includes("dial na") || v.includes("wrong") || v.includes("disconnected")) tone = "dot warn";
-        return `<span class="status"><span class="${tone}"></span>${escapeHtml(val)}</span>`;
-      };
+      // Status option definitions
+      const LEAD_STATUS_OPTS = [
+        { value: "Referral",      dot: "green"  },
+        { value: "In Progress",   dot: "blue"   },
+        { value: "Contacted",     dot: "green"  },
+        { value: "Not Reached",   dot: "amber"  },
+        { value: "Wrong Number",  dot: "red"    },
+        { value: "Do Not Call",   dot: "red"    },
+        { value: "Closed",        dot: "purple" },
+      ];
+      const PHONE_STATUS_OPTS = [
+        { value: "Good",          dot: "green"  },
+        { value: "No Answer",     dot: "amber"  },
+        { value: "Wrong Number",  dot: "red"    },
+        { value: "Disconnected",  dot: "red"    },
+        { value: "Left Voicemail",dot: "blue"   },
+        { value: "Do Not Call",   dot: "red"    },
+      ];
 
-      const rows = others.map(c => {
-        const mondayUrl      = c.monday_url ?? c.mondayUrl ?? null;
-        const leadStatus     = c.lead_status ?? c.leadStatus ?? null;
-        const contactOutcome = c.contact_outcome ?? c.contactOutcome ?? "—";
-        const phone1         = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
-        const phone1Status   = c.phone_1_status ?? c.phone1Status ?? null;
-        const phone2         = formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null);
-        const phone2Status   = c.phone_2_status ?? c.phone2Status ?? null;
+      function dotClass(value, opts) {
+        if (!value || value === "—") return "none";
+        const match = opts.find(o => o.value.toLowerCase() === String(value).toLowerCase());
+        return match ? match.dot : "none";
+      }
+
+      function statusDropdown(value, opts, fieldKey, rowIdx) {
+        const current = value || "—";
+        const dot = dotClass(current, opts);
+        const id = `orc-dd-${fieldKey}-${rowIdx}`;
+        return `
+          <div class="orc-status-wrap" id="${id}" data-field="${fieldKey}" data-row="${rowIdx}" data-opts="${fieldKey === 'lead_status' ? 'lead' : 'phone'}">
+            <button class="orc-status-btn" type="button" data-dd="${id}" data-current="${escapeHtml(current)}">
+              <span class="orc-status-dot ${dot}"></span>
+              <span class="orc-status-label">${escapeHtml(current)}</span>
+              <svg class="orc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>`;
+      }
+
+      const rows = others.map((c, i) => {
+        const mondayUrl    = c.monday_url ?? c.mondayUrl ?? null;
+        const leadStatus   = c.lead_status ?? c.leadStatus ?? null;
+        const phone1       = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
+        const phone1Status = c.phone_1_status ?? c.phone1Status ?? null;
+        const phone2       = formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null);
+        const phone2Status = c.phone_2_status ?? c.phone2Status ?? null;
+        const idx = i + 1;
 
         return `
-        <tr>
-          <td>
-            ${mondayUrl
-              ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>`
-              : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`
-            }
+        <tr data-orc-row="${i}">
+          <td class="orc-idx">${idx}</td>
+          <td>${mondayUrl
+            ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="orc-name">${escapeHtml(c.name ?? "—")}</a>`
+            : `<span class="orc-name-plain">${escapeHtml(c.name ?? "—")}</span>`}
           </td>
-          <td class="td-muted">${escapeHtml(c.relationship ?? "—")}</td>
-          <td>${leadStatusDot(leadStatus)}</td>
-          <td>${escapeHtml(contactOutcome)}</td>
-          <td>${phone1 ? `<a href="tel:${formatPhoneForTel(phone1)}" style="font-weight:500; color:#0176d3; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone1)}</a>` : `<span class="td-muted">—</span>`}</td>
-          <td>${simpleStatusCell(phone1Status)}</td>
-          <td>${phone2 ? `<a href="tel:${formatPhoneForTel(phone2)}" style="font-weight:500; color:#0176d3; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone2)}</a>` : `<span class="td-muted">—</span>`}</td>
-          <td>${simpleStatusCell(phone2Status)}</td>
-        </tr>
-      `;
+          <td class="orc-rel">${escapeHtml(c.relationship ?? "—")}</td>
+          <td>${statusDropdown(leadStatus, LEAD_STATUS_OPTS, 'lead_status', i)}</td>
+          <td>${phone1 ? `<a href="tel:${formatPhoneForTel(phone1)}" class="orc-phone">${escapeHtml(phone1)}</a>` : `<span class="orc-empty">—</span>`}</td>
+          <td>${statusDropdown(phone1Status, PHONE_STATUS_OPTS, 'phone_1_status', i)}</td>
+          <td>${phone2 ? `<a href="tel:${formatPhoneForTel(phone2)}" class="orc-phone">${escapeHtml(phone2)}</a>` : `<span class="orc-empty">—</span>`}</td>
+          <td>${statusDropdown(phone2Status, PHONE_STATUS_OPTS, 'phone_2_status', i)}</td>
+        </tr>`;
       }).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No other related contacts.</td></tr>`;
+
+      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="8" style="padding:16px 16px; color:#9ca3af;">No other related contacts.</td></tr>`;
+
+      // Update count
+      const orcCount = document.getElementById("orcCount");
+      if (orcCount) orcCount.textContent = `${others.length} item${others.length !== 1 ? 's' : ''}`;
+
+      // Portal dropdown — single floating menu appended to body
+      let orcPortal = document.getElementById('orcPortal');
+      if (!orcPortal) {
+        orcPortal = document.createElement('div');
+        orcPortal.id = 'orcPortal';
+        orcPortal.className = 'orc-dropdown';
+        orcPortal.style.position = 'fixed';
+        orcPortal.style.zIndex = '9999';
+        document.body.appendChild(orcPortal);
+      }
+
+      let activeWrap = null;
+
+      function closePortal() {
+        orcPortal.style.display = 'none';
+        orcPortal.innerHTML = '';
+        if (activeWrap) {
+          activeWrap.classList.remove('open');
+          activeWrap = null;
+        }
+      }
+
+      tbody.querySelectorAll('.orc-status-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const ddId = btn.getAttribute('data-dd');
+          const wrap = document.getElementById(ddId);
+
+          if (activeWrap === wrap) { closePortal(); return; }
+          closePortal();
+
+          const fieldKey = wrap.getAttribute('data-field');
+          const rowIdx   = parseInt(wrap.getAttribute('data-row'));
+          const optsKey  = wrap.getAttribute('data-opts');
+          const opts     = optsKey === 'lead' ? LEAD_STATUS_OPTS : PHONE_STATUS_OPTS;
+          const current  = btn.getAttribute('data-current');
+
+          // Build items
+          orcPortal.innerHTML = opts.map(o => `
+            <div class="orc-dropdown-item${o.value === current ? ' selected' : ''}"
+                 data-value="${escapeHtml(o.value)}"
+                 data-dot="${o.dot}"
+                 data-ddid="${ddId}">
+              <span class="orc-status-dot ${o.dot}"></span>${escapeHtml(o.value)}
+            </div>`).join('');
+
+          // Position portal
+          const rect = btn.getBoundingClientRect();
+          const portalH = opts.length * 35 + 8;
+          const spaceBelow = window.innerHeight - rect.bottom;
+          orcPortal.style.display = 'block';
+          orcPortal.style.minWidth = Math.max(rect.width, 170) + 'px';
+          if (spaceBelow < portalH + 8 && rect.top > portalH) {
+            orcPortal.style.top  = (rect.top - portalH - 4) + 'px';
+          } else {
+            orcPortal.style.top  = (rect.bottom + 4) + 'px';
+          }
+          orcPortal.style.left = rect.left + 'px';
+
+          wrap.classList.add('open');
+          activeWrap = wrap;
+
+          // Item click
+          orcPortal.querySelectorAll('.orc-dropdown-item').forEach(item => {
+            item.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              const val  = item.getAttribute('data-value');
+              const dot  = item.getAttribute('data-dot');
+              const wId  = item.getAttribute('data-ddid');
+              const w    = document.getElementById(wId);
+              const b    = w.querySelector('.orc-status-btn');
+              b.querySelector('.orc-status-dot').className = `orc-status-dot ${dot}`;
+              b.querySelector('.orc-status-label').textContent = val;
+              b.setAttribute('data-current', val);
+              closePortal();
+            });
+          });
+        });
+      });
+
+      // Close on outside click
+      document.addEventListener('click', closePortal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePortal(); });
+
     }
 
-    // Sub-tabs functionality
     const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
     const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
     subTabs.forEach(subTab => {
@@ -2095,9 +2020,7 @@
       });
     });
 
-    // Column ID map — data-field → Monday.com column ID
     const COLUMN_ID_MAP = {
-      // Property Details
       "lead_type":          "text16__1",
       "tax_status":         "dropdown_1_mkm2rj6r",
       "condition":          "dropdown_mkm2dn8t",
@@ -2106,11 +2029,9 @@
       "deed_status":        "dropdown_mkxn2crm",
       "will_status":        "dropdown_mkxn8zvw",
       "title_issue":        "dropdown_3_mkm2q90p",
-      // Update Activity
       "next_action_step":   "dropdown_mkzkc600",
       "stalled_reason":     "dropdown_mkzkq6pk",
       "follow_up_date":     "date_mkpbazwa",
-      // Research
       "obituary_link":      "link_mkm1203y",
       "ancestry_link":      "link_mkn89tj9",
       "zillow_link":        "link_mkktcawe",
@@ -2119,7 +2040,6 @@
       "birth_date":         "text_mkm2b3zj",
       "death_date":         "text_1_mkm22xph",
       "age":                "text29__1",
-      // Activity
       "last_contacted":     "date_Mjj4pmmI",
       "activity_notes":     "text_activity_notes",
     };
@@ -2128,15 +2048,9 @@
 
     async function saveToMonday(fieldKey, newValue) {
       const columnId = COLUMN_ID_MAP[fieldKey];
-      if (!columnId) {
-        console.warn(`No column ID mapped for field: ${fieldKey}`);
-        return;
-      }
+      if (!columnId) { console.warn(`No column ID mapped for field: ${fieldKey}`); return; }
       const { boardId, pulseId } = extractIdsFromUrl();
-      if (!boardId || !pulseId) {
-        console.error("Cannot save — missing boardId or pulseId in URL");
-        return;
-      }
+      if (!boardId || !pulseId) { console.error("Cannot save — missing boardId or pulseId in URL"); return; }
       try {
         const res = await fetch(SAVE_WEBHOOK, {
           method: "POST",
@@ -2170,11 +2084,11 @@
       setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 400); }, 2500);
     }
 
-    // Inline edit — saves to Monday on commit
-    Array.from(document.querySelectorAll(".field .edit")).forEach(pencil => {
+    // Inline edit — updated selector for slds-field
+    Array.from(document.querySelectorAll(".slds-field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
-        const field = pencil.closest(".field");
+        const field = pencil.closest(".slds-field");
         const fieldKey = field.getAttribute("data-field");
         const valueText = field.querySelector(".value-text");
         const editable = valueText.getAttribute("data-editable") === "true";
@@ -2182,7 +2096,7 @@
         if (field.querySelector(".inline-input")) return;
 
         const oldValue = valueText.textContent.trim() === "—" ? "" : valueText.textContent.trim();
-        const valueWrap = field.querySelector(".value");
+        const valueWrap = field.querySelector(".slds-value");
         valueText.style.display = "none";
         pencil.style.display = "none";
 
@@ -2231,12 +2145,10 @@
       });
     });
 
-    // Click-to-open for Research links
     Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
       node.addEventListener('click', () => {
         const raw = (node.textContent || '').trim();
         if (!raw || raw === '—') return;
-
         let url = raw;
         if (!/^https?:\/\//i.test(url)) {
           if (/\./.test(url) || url.startsWith('www.') || url.includes('/')) {
@@ -2244,58 +2156,36 @@
           }
         }
         if (!/^https?:\/\//i.test(url)) return;
-
         window.open(url, '_blank', 'noopener,noreferrer');
       });
     });
 
-    // Refresh button
-    document.getElementById("btnRefresh").addEventListener("click", () => {
-      fetchDataFromMake();
-    });
+    document.getElementById("btnRefresh").addEventListener("click", () => { fetchDataFromMake(); });
 
-    // Loading overlay helpers
     function showLoading(){
       const overlay = document.getElementById("loadingOverlay");
-      if (overlay) {
-        overlay.setAttribute("aria-hidden", "false");
-        overlay.classList.remove('fade-out');
-      }
+      if (overlay) { overlay.setAttribute("aria-hidden", "false"); overlay.classList.remove('fade-out'); }
     }
-    
     function hideLoading(){
       const overlay = document.getElementById("loadingOverlay");
       if (!overlay) return;
       overlay.classList.add('fade-out');
-      setTimeout(() => {
-        overlay.setAttribute("aria-hidden", "true");
-        overlay.classList.remove('fade-out');
-      }, 300);
+      setTimeout(() => { overlay.setAttribute("aria-hidden", "true"); overlay.classList.remove('fade-out'); }, 300);
     }
 
-
-    // Action Required banner + Related Contacts summary
-    function startOfDay(d){
-      const x = new Date(d);
-      x.setHours(0,0,0,0);
-      return x;
-    }
+    function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
 
     function parseFlexibleDate(input){
       if (!input) return null;
       if (input instanceof Date) return isNaN(input) ? null : input;
-
       const s = String(input).trim();
       if (!s || s === "—") return null;
-
       if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
         const d = new Date(s + "T00:00:00");
         return isNaN(d) ? null : d;
       }
-
       const t = Date.parse(s);
       if (!isNaN(t)) return new Date(t);
-
       return null;
     }
 
@@ -2303,162 +2193,77 @@
       const banner = document.getElementById("actionBanner");
       const textNode = document.getElementById("actionBannerText");
       if (!banner || !textNode) return;
-
       const today = startOfDay(new Date());
-
       let best = null;
       (confirmedOwners || []).forEach(c => {
         const d = parseFlexibleDate(c?.follow_up_date ?? c?.followupDate);
         if (!d) return;
-
         const due = startOfDay(d);
         const diffDays = Math.floor((today - due) / (1000*60*60*24));
-
         if (diffDays > 0) {
-          const candidate = {
-            name: String(c?.name ?? "—").trim() || "—",
-            daysOverdue: diffDays,
-            nextAction: String(c?.next_action ?? c?.nextAction ?? "").trim()
-          };
+          const candidate = { name: String(c?.name ?? "—").trim() || "—", daysOverdue: diffDays, nextAction: String(c?.next_action ?? c?.nextAction ?? "").trim() };
           if (!best || candidate.daysOverdue > best.daysOverdue) best = candidate;
         }
       });
-
-      if (!best) {
-        banner.classList.remove("show");
-        textNode.textContent = "—";
-        return;
-      }
-
+      if (!best) { banner.classList.remove("show"); textNode.textContent = "—"; return; }
       const plural = best.daysOverdue === 1 ? "" : "s";
       const base = `<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
       const full = best.nextAction ? `${base} <strong>Next step:</strong> ${best.nextAction}.` : base;
-
       textNode.innerHTML = full;
       banner.classList.add("show");
-    }
-
-    function normalizeStatusText(s){
-      return String(s ?? "").trim().toLowerCase();
     }
 
     function computeContactsSummary(payload){
       const el = document.getElementById("contactsSummary");
       if (!el) return;
-
       const allSubitems = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
-
-      // Confirmed owners = owner_status "Yes"
-      const confirmedOwners = allSubitems.filter(c =>
-        String(c.owner_status || "").trim().toLowerCase() === "yes"
-      );
-
-      // Contacted = lead_status is Contacted or further along
+      const confirmedOwners = allSubitems.filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
       const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
       const contacted = confirmedOwners.filter(c => {
         const s = String(c.lead_status || "").trim().toLowerCase();
         return contactedStatuses.some(cs => s.includes(cs));
       }).length;
-
-      // Unrelated = owner_status is NOT "Yes"
-      const unrelated = allSubitems.filter(c =>
-        String(c.owner_status || "").trim().toLowerCase() !== "yes"
-      ).length;
-
-      const total = payload?.heirs_total ?? allSubitems.length;
-
-      el.textContent = `${total} Heirs Total · ${contacted} Contacted · ${unrelated} Unrelated Contacts`;
-    }
-    
-    // Extract board ID from current URL for Monday.com links
-    function extractBoardIdFromUrl() {
-      const urlParams = window.location.search;
-      if (!urlParams || urlParams === '?') return '';
-      
-      const cleaned = urlParams.substring(1).trim();
-      
-      // Path format: 18395630812/pulses/11004380444
-      if (cleaned.includes('/pulses/')) {
-        const parts = cleaned.split('/pulses/');
-        return parts[0].trim();
-      }
-      
-      // Query param format
-      const params = new URLSearchParams(cleaned);
-      return params.get('boardId') || params.get('board_id') || '';
+      const owners = confirmedOwners.length;
+      const unrelated = allSubitems.filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes").length;
+      const total = allSubitems.length;
+      el.textContent = `${total} Total Contacts · ${owners} Owners · ${unrelated} Unrelated`;
     }
 
-    // Extract board ID from URL for Monday.com links
     function extractIdsFromUrl() {
       const fullUrl = window.location.href;
-      console.log('Full URL:', fullUrl);
-
       let urlParams = window.location.search;
-      console.log('Query string:', urlParams);
-
-      if (!urlParams || urlParams === '?') {
-        console.error('No query parameters found in URL');
-        return { boardId: null, pulseId: null };
-      }
-
+      if (!urlParams || urlParams === '?') { return { boardId: null, pulseId: null }; }
       urlParams = urlParams.substring(1).trim();
-      console.log('Cleaned params:', urlParams);
-
       if (urlParams.includes('/pulses/')) {
         const parts = urlParams.split('/pulses/');
-        const boardId = parts[0].trim();
-        const pulseId = parts[1] ? parts[1].trim() : null;
-        console.log('Extracted from path format - Board ID:', boardId, 'Pulse ID:', pulseId);
-        return { boardId, pulseId };
+        return { boardId: parts[0].trim(), pulseId: parts[1] ? parts[1].trim() : null };
       }
-
       const params = new URLSearchParams(urlParams);
-      const boardId = params.get('boardId') || params.get('board_id');
-      const pulseId = params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id');
-      console.log('Extracted from query params - Board ID:', boardId, 'Pulse ID:', pulseId);
-      return { boardId, pulseId };
+      return {
+        boardId: params.get('boardId') || params.get('board_id'),
+        pulseId: params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id')
+      };
     }
 
     async function fetchDataFromMake() {
       const webhookURL = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
-
       showLoading();
-
       const { boardId, pulseId } = extractIdsFromUrl();
-
       if (!boardId || !pulseId) {
         console.error('Missing board ID or pulse ID in URL');
         alert(`Error: Missing board ID or pulse ID in URL.\n\nFound:\n- Board ID: ${boardId || 'MISSING'}\n- Pulse ID: ${pulseId || 'MISSING'}`);
         hideLoading();
         return;
       }
-
-      console.log('Board ID:', boardId);
-      console.log('Pulse ID:', pulseId);
-
       try {
-        console.log('Fetching data from Make.com...');
         const response = await fetch(webhookURL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            boardId: boardId,
-            pulseId: pulseId
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ boardId, pulseId })
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        console.log('Received data from Make.com:', data);
-
         window.RecordPage.applyData(data);
-
-        console.log('Data applied successfully!');
       } catch (error) {
         console.error('Error fetching data from Make.com:', error);
         alert('Failed to refresh data. Check console for details.');
@@ -2467,19 +2272,75 @@
       }
     }
 
-    // Fetch data on page load
     window.addEventListener('DOMContentLoaded', () => {
-      fetchDataFromMake();
+      const testData = {
+        confirmed_owners: [
+          {
+            name: "Robert J. Hargrove",
+            owner_status: "yes",
+            relationship: "Son",
+            ownership_percent: "40",
+            lead_status: "Interested in Selling",
+            last_contact: "Mar 6, 2026",
+            follow_up_date: "Mar 18, 2026",
+            offer_made: false,
+            offer_amount: "",
+            phone_1: "8326741092",
+            monday_url: ""
+          },
+          {
+            name: "Patricia A. Hargrove",
+            owner_status: "yes",
+            relationship: "Daughter",
+            ownership_percent: "35",
+            lead_status: "Contacted",
+            last_contact: "Feb 28, 2026",
+            follow_up_date: "Mar 10, 2026",
+            offer_made: false,
+            offer_amount: "",
+            phone_1: "7135559021",
+            monday_url: ""
+          },
+          {
+            name: "Dennis Hargrove",
+            owner_status: "yes",
+            relationship: "Son",
+            ownership_percent: "25",
+            lead_status: "Not Reached",
+            last_contact: "",
+            follow_up_date: "",
+            offer_made: false,
+            offer_amount: "",
+            phone_1: "2815553847",
+            monday_url: ""
+          },
+          {
+            name: "Carol Simmons",
+            owner_status: "no",
+            relationship: "Neighbor",
+            lead_status: "Referral",
+            phone_1: "9365551234",
+            phone_1_status: "Good",
+            phone_2: "",
+            phone_2_status: ""
+          },
+          {
+            name: "James R. Tatum",
+            owner_status: "no",
+            relationship: "Attorney",
+            lead_status: "In Progress",
+            phone_1: "8325557890",
+            phone_1_status: "Good",
+            phone_2: "7135552211",
+            phone_2_status: "No Answer"
+          }
+        ]
+      };
+      window.RecordPage.applyData(testData);
     });
 
-    // Utils
     function escapeHtml(str){
-      return String(str ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      return String(str ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
     function formatValue(v){
       if (v === null || v === undefined || v === "") return "—";
@@ -2487,43 +2348,29 @@
       if (typeof v === "boolean") return v ? "Yes" : "No";
       return String(v);
     }
-    function cssEscape(s){
-      return String(s).replaceAll('"', '\\"');
-    }
+    function cssEscape(s){ return String(s).replaceAll('"', '\\"'); }
 
-
-
-    // Note Modal functionality
     let currentNoteContact = null;
     let currentNoteContactIndex = null;
 
     function openNoteModal(contact, contactIndex, buttonElement) {
       currentNoteContact = contact;
       currentNoteContactIndex = contactIndex;
-      
       document.getElementById('noteContactName').textContent = contact.name || '—';
       const ownerPct = contact.ownership_percent ?? contact.ownershipPercent ?? '—';
       document.getElementById('noteContactRelation').textContent = contact.relationship 
         ? `${contact.relationship} • ${ownerPct}% ownership`
         : `${ownerPct}% ownership`;
-      
       document.getElementById('noteTextarea').value = '';
       document.getElementById('noteCharCount').textContent = '0';
-      
       const overlay = document.getElementById('noteModalOverlay');
       const modal = overlay.querySelector('.note-modal');
-
-      // Center modal in viewport — works reliably inside iframes
       modal.style.position = 'fixed';
       modal.style.top = '50%';
       modal.style.left = '50%';
       modal.style.transform = 'translate(-50%, -50%)';
-      
       overlay.classList.add('active');
-      
-      setTimeout(() => {
-        document.getElementById('noteTextarea').focus();
-      }, 100);
+      setTimeout(() => { document.getElementById('noteTextarea').focus(); }, 100);
     }
 
     function closeNoteModal() {
@@ -2534,52 +2381,24 @@
 
     async function saveNote() {
       const noteText = document.getElementById('noteTextarea').value.trim();
-      
-      if (!noteText) {
-        alert('Please enter a note before saving.');
-        return;
-      }
-      
-      if (!currentNoteContact) {
-        alert('Error: No contact selected.');
-        return;
-      }
-
-      // Disable save button
+      if (!noteText) { alert('Please enter a note before saving.'); return; }
+      if (!currentNoteContact) { alert('Error: No contact selected.'); return; }
       const saveBtn = document.getElementById('noteBtnSave');
       saveBtn.disabled = true;
       saveBtn.textContent = 'Saving...';
-
       try {
-        // TODO: Send to Make.com webhook to update Monday.com subitem
-        const webhookURL = 'YOUR_MAKE_WEBHOOK_URL_FOR_NOTES';
-        
         const payload = {
           contactName: currentNoteContact.name,
           contactIndex: currentNoteContactIndex,
           note: noteText,
           timestamp: new Date().toISOString(),
-          boardId: 'BOARD_ID', // Extract from URL
-          pulseId: 'PULSE_ID'  // Extract from URL
+          boardId: 'BOARD_ID',
+          pulseId: 'PULSE_ID'
         };
-
-        // Uncomment when webhook is ready:
-        // const response = await fetch(webhookURL, {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(payload)
-        // });
-        // 
-        // if (!response.ok) throw new Error('Failed to save note');
-
         console.log('Note to save:', payload);
-        
-        // Simulate success
         await new Promise(resolve => setTimeout(resolve, 500));
-        
         alert(`Note saved for ${currentNoteContact.name}!`);
         closeNoteModal();
-        
       } catch (error) {
         console.error('Error saving note:', error);
         alert('Failed to save note. Please try again.');
@@ -2589,26 +2408,15 @@
       }
     }
 
-    // Modal event listeners
     document.getElementById('noteModalClose').addEventListener('click', closeNoteModal);
     document.getElementById('noteBtnCancel').addEventListener('click', closeNoteModal);
     document.getElementById('noteBtnSave').addEventListener('click', saveNote);
-    
-    // Close on overlay click (outside modal)
     document.getElementById('noteModalOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'noteModalOverlay') {
-        closeNoteModal();
-      }
+      if (e.target.id === 'noteModalOverlay') closeNoteModal();
     });
-    
-    // Close on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.getElementById('noteModalOverlay').classList.contains('active')) {
-        closeNoteModal();
-      }
+      if (e.key === 'Escape' && document.getElementById('noteModalOverlay').classList.contains('active')) closeNoteModal();
     });
-    
-    // Character counter
     document.getElementById('noteTextarea').addEventListener('input', (e) => {
       document.getElementById('noteCharCount').textContent = e.target.value.length;
     });
