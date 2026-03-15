@@ -1196,13 +1196,24 @@
 
     async function saveToMonday(fieldKey, newValue) {
       const columnId = COLUMN_ID_MAP[fieldKey];
-      if (!columnId) { console.warn(`No column ID mapped for field: ${fieldKey}`); return; }
+      if (!columnId) {
+        console.warn(`No column ID for "${fieldKey}" — column_map may not have loaded yet. Check your Make.com webhook response includes a column_map object.`);
+        return;
+      }
       const { boardId, pulseId } = extractIdsFromUrl();
       if (!boardId || !pulseId) { console.error("Cannot save — missing boardId or pulseId in URL"); return; }
       try {
-        const res = await fetch(SAVE_WEBHOOK, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({boardId,pulseId,columnId,value:newValue}) });
+        const res = await fetch(SAVE_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ boardId, pulseId, columnId, value: newValue })
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      } catch (err) { console.error(`Failed to save ${fieldKey}:`, err); showSaveToast("error"); }
+        console.log(`✓ Saved "${fieldKey}" (${columnId}) → "${newValue}"`);
+      } catch (err) {
+        console.error(`✗ Failed to save ${fieldKey}:`, err);
+        showSaveToast("error");
+      }
     }
 
     function showSaveToast(type) {
