@@ -135,7 +135,7 @@
     .tab-pane{ display:none; }
     .tab-pane.active{ display:block; }
 
-    /* ---------- TOP SNAPSHOT (Property Details / Deal Insights) ---------- */
+    /* ---------- TOP SNAPSHOT ---------- */
     .topSnapshot{
       background: var(--bg);
       padding: 18px 18px 22px;
@@ -187,46 +187,6 @@
       gap:6px;
       white-space:nowrap;
     }
-    .slabel .caret{
-      font-size: 11px;
-      color: #a0a7b6;
-      transform: translateY(-1px);
-    }
-
-    .info-badge{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: help;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .info-badge.complete{
-      color: #10b981;
-      filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
-    }
-    .info-badge.complete:hover{
-      transform: scale(1.15);
-      filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
-    }
-
-    .info-badge.in-progress{
-      width: 8px;
-      height: 8px;
-      background: #f59e0b;
-      border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-      animation: pulse-warning 2s ease-in-out infinite;
-    }
-    .info-badge.in-progress:hover{
-      transform: scale(1.2);
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
-    }
-
-    @keyframes pulse-warning {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
-      50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
-    }
 
     .heir-status-badge{
       display: inline-block;
@@ -256,10 +216,8 @@
     .svalue.ok{ color: rgba(46,132,74,.95); font-weight: 650; }
 
     /* =====================================================
-       CRM FIELD LAYOUT — stacked label above value
-       Matches Salesforce record detail style
+       CRM FIELD LAYOUT
        ===================================================== */
-
     .section{
       padding: 0 16px 8px 30px;
     }
@@ -282,7 +240,6 @@
       letter-spacing: .08px;
     }
 
-    /* 2-column grid, each field 50% */
     .slds-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -291,7 +248,6 @@
       .slds-grid { grid-template-columns: 1fr; }
     }
 
-    /* Field: stacked, label on top */
     .slds-field {
       display: flex;
       flex-direction: column;
@@ -299,20 +255,11 @@
       border-bottom: 1px solid #e8e8e8;
       min-width: 0;
     }
-    .slds-col-left {
-      padding-right: 20px;
-    }
-    .slds-col-right {
-      padding-left: 24px;
-    }
-    .slds-col-left .slds-field:last-child {
-      border-bottom: 1px solid #e8e8e8;
-    }
-    .slds-col-right .slds-field:last-child {
-      border-bottom: 1px solid #e8e8e8;
-    }
+    .slds-col-left { padding-right: 20px; }
+    .slds-col-right { padding-left: 24px; }
+    .slds-col-left .slds-field:last-child { border-bottom: 1px solid #e8e8e8; }
+    .slds-col-right .slds-field:last-child { border-bottom: 1px solid #e8e8e8; }
 
-    /* Label: small, light grey, above value */
     .slds-label {
       font-size: 12px;
       font-weight: 400;
@@ -325,7 +272,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Value row: text + pencil */
     .slds-value {
       display: flex;
       align-items: center;
@@ -334,7 +280,6 @@
       min-width: 0;
     }
 
-    /* Value: darker, slightly larger, medium weight */
     .value-text {
       font-size: 15px;
       color: #080707;
@@ -345,13 +290,9 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .value-text.link {
-      color: var(--blue);
-      cursor: pointer;
-    }
+    .value-text.link { color: var(--blue); cursor: pointer; }
     .value-text.link:hover { text-decoration: underline; }
 
-    /* Pencil — appears on row hover */
     .edit{
       opacity: 0;
       transition: opacity .1s ease, color .1s ease;
@@ -381,11 +322,7 @@
       box-shadow: 0 0 0 2px rgba(1,118,211,.12);
     }
 
-    /* Stalled highlight */
-    .slds-field.stalled .value-text{
-      color: var(--stalled-text);
-      font-weight: 600;
-    }
+    .slds-field.stalled .value-text{ color: var(--stalled-text); font-weight: 600; }
     .slds-field.stalled{
       background: var(--stalled-bg);
       border-top: 1px solid var(--stalled-border);
@@ -395,11 +332,9 @@
     }
 
     /* =====================================================
-       OTHER RELATED CONTACTS — Salesforce-style table
+       OTHER RELATED CONTACTS TABLE
        ===================================================== */
-    .orc-wrap {
-      padding: 0 0 14px;
-    }
+    .orc-wrap { padding: 0 0 14px; }
     .orc-table {
       width: 100%;
       border-collapse: collapse;
@@ -433,77 +368,26 @@
     .orc-table tbody tr:last-child td { border-bottom: 0; }
     .orc-table tbody tr { background: white; transition: background 0.12s ease; }
     .orc-table tbody tr:hover { background: #f9fafb; }
-    .orc-table .orc-name {
-      font-weight: 600;
-      color: #0176d3;
-      text-decoration: none;
-      cursor: pointer;
-    }
+    .orc-table .orc-name { font-weight: 600; color: #0176d3; text-decoration: none; cursor: pointer; }
     .orc-table .orc-name:hover { text-decoration: underline; }
-    .orc-table .orc-name-plain {
-      font-weight: 600;
-      color: #111827;
-    }
-    .orc-table .orc-rel {
-      color: #6b7280;
-      font-size: 13.5px;
-    }
-    .orc-table .orc-phone {
-      color: #0176d3;
-      font-weight: 500;
-      text-decoration: none;
-      white-space: nowrap;
-    }
+    .orc-table .orc-name-plain { font-weight: 600; color: #111827; }
+    .orc-table .orc-rel { color: #6b7280; font-size: 13.5px; }
+    .orc-table .orc-phone { color: #0176d3; font-weight: 500; text-decoration: none; white-space: nowrap; }
     .orc-table .orc-phone:hover { text-decoration: underline; }
     .orc-table .orc-empty { color: #9ca3af; }
+    .orc-idx { font-size: 12px; color: #9ca3af; font-weight: 400; text-align: right; min-width: 18px; }
 
-    /* Row index number */
-    .orc-idx {
-      font-size: 12px;
-      color: #9ca3af;
-      font-weight: 400;
-      text-align: right;
-      min-width: 18px;
-    }
-
-    /* Inline status dropdown */
-    .orc-status-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
+    .orc-status-wrap { position: relative; display: inline-flex; align-items: center; }
     .orc-status-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: none;
-      border: none;
-      padding: 3px 2px;
-      font-family: var(--font);
-      font-size: 14.5px;
-      font-weight: 500;
-      color: #374151;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.1s ease;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: none; border: none; padding: 3px 2px;
+      font-family: var(--font); font-size: 14.5px; font-weight: 500; color: #374151;
+      cursor: pointer; border-radius: 4px; transition: background 0.1s ease; white-space: nowrap;
     }
     .orc-status-btn:hover { background: #f3f4f6; }
-    .orc-status-btn .orc-chevron {
-      width: 13px;
-      height: 13px;
-      color: #9ca3af;
-      flex-shrink: 0;
-      transition: transform 0.15s ease;
-    }
+    .orc-status-btn .orc-chevron { width: 13px; height: 13px; color: #9ca3af; flex-shrink: 0; transition: transform 0.15s ease; }
     .orc-status-wrap.open .orc-chevron { transform: rotate(180deg); }
-    .orc-status-btn .orc-status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: #d1d5db;
-    }
+    .orc-status-btn .orc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: #d1d5db; }
     .orc-status-btn .orc-status-dot.green  { background: #10b981; }
     .orc-status-btn .orc-status-dot.amber  { background: #f59e0b; }
     .orc-status-btn .orc-status-dot.red    { background: #ef4444; }
@@ -511,302 +395,89 @@
     .orc-status-btn .orc-status-dot.purple { background: #7c3aed; }
     .orc-status-btn .orc-status-dot.none   { background: #d1d5db; }
 
-    /* Dropdown menu */
     .orc-dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      z-index: 200;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-      min-width: 170px;
-      padding: 4px 0;
-      display: none;
+      position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10); min-width: 170px; padding: 4px 0; display: none;
     }
     .orc-status-wrap.open .orc-dropdown { display: block; }
-    .orc-status-wrap.drop-up .orc-dropdown {
-      top: auto;
-      bottom: calc(100% + 4px);
-    }
+    .orc-status-wrap.drop-up .orc-dropdown { top: auto; bottom: calc(100% + 4px); }
     .orc-dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 7px 14px;
-      font-size: 14.5px;
-      font-weight: 500;
-      color: #111827;
-      cursor: pointer;
-      transition: background 0.1s ease;
-      white-space: nowrap;
+      display: flex; align-items: center; gap: 9px; padding: 7px 14px;
+      font-size: 14.5px; font-weight: 500; color: #111827; cursor: pointer;
+      transition: background 0.1s ease; white-space: nowrap;
     }
     .orc-dropdown-item:hover { background: #f3f4f6; }
     .orc-dropdown-item.selected { color: #0176d3; }
-    .orc-dropdown-item .orc-status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .orc-dropdown-divider {
-      height: 1px;
-      background: #f3f4f6;
-      margin: 4px 0;
-    }
-
-
+    .orc-dropdown-item .orc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .orc-dropdown-divider { height: 1px; background: #f3f4f6; margin: 4px 0; }
 
     /* ---------- CHARACTERISTICS DROPDOWN ---------- */
-    .inline-toggle{
-      padding: 0 16px 7px 30px;
-    }
+    .inline-toggle{ padding: 0 16px 7px 30px; }
     .toggle-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding: 8px 10px;
-      cursor:pointer;
-      user-select:none;
-      background: #f8f9fb;
-      border: 1px solid #eaedf1;
-      border-radius: 5px;
-      margin: 4px 0 8px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 8px 10px; cursor:pointer; user-select:none;
+      background: #f8f9fb; border: 1px solid #eaedf1; border-radius: 5px; margin: 4px 0 8px;
     }
-    .toggle-left{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      min-width:0;
-    }
-
+    .toggle-left{ display:flex; align-items:center; gap:8px; min-width:0; }
     .toggle-btn{
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      border: 1px solid #d8dce4;
-      background: #fff;
-      color: #3e3e3c;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 0;
-      cursor:pointer;
-      transition: background .12s ease, border-color .12s ease, transform .08s ease;
-      flex: 0 0 auto;
+      width: 22px; height: 22px; border-radius: 999px; border: 1px solid #d8dce4; background: #fff;
+      color: #3e3e3c; display:inline-flex; align-items:center; justify-content:center; padding: 0;
+      cursor:pointer; transition: background .12s ease, border-color .12s ease, transform .08s ease; flex: 0 0 auto;
     }
     .toggle-btn:hover{ background:#fafafa; border-color:#bfc8d4; }
     .toggle-btn:active{ transform: translateY(1px); }
     .toggle-btn:focus{ outline:none; }
-    .toggle-btn:focus-visible{
-      outline: 2px solid rgba(1,118,211,.25);
-      outline-offset: 2px;
-    }
-
-    .chev{
-      width: 14px;
-      height: 14px;
-      color: currentColor;
-      transition: transform .14s ease;
-      flex: 0 0 auto;
-    }
+    .chev{ width: 14px; height: 14px; color: currentColor; transition: transform .14s ease; flex: 0 0 auto; }
     .inline-toggle[data-open="true"] .chev{ transform: rotate(90deg); }
-
-    .toggle-title{
-      font-size: 18.5px;
-      font-weight: 600;
-      color:#111827;
-      letter-spacing: .08px;
-      white-space:nowrap;
-    }
-    .toggle-body{
-      display:none;
-      padding: 0 0 2px;
-    }
+    .toggle-title{ font-size: 18.5px; font-weight: 600; color:#111827; letter-spacing: .08px; white-space:nowrap; }
+    .toggle-body{ display:none; padding: 0 0 2px; }
     .inline-toggle[data-open="true"] .toggle-body{ display:block; }
 
-    /* ---------- RELATED CONTACTS TABLE - MODERN STYLING ---------- */
-    .table-wrap{ 
-      padding: 0 0 14px; 
-      overflow-x: auto;
-      overflow-y: visible;
-    }
-    table{
-      width:100%;
-      border-collapse: collapse;
-      font-size: 16.5px;
-      background: #fff;
-      border: none;
-      border-radius: 0;
-      overflow:hidden;
-      min-width: 1100px;
-    }
+    /* ---------- RELATED CONTACTS TABLE ---------- */
+    .table-wrap{ padding: 0 0 14px; overflow-x: auto; overflow-y: visible; }
+    table{ width:100%; border-collapse: collapse; font-size: 16.5px; background: #fff; min-width: 1100px; }
     thead th{
-      text-align:left;
-      font-size: 15.5px;
-      color: #6b7280;
-      font-weight: 600;
-      padding: 12px 16px;
-      background: #fafbfc;
-      border-bottom: 1px solid #e5e7eb;
-      white-space: nowrap;
+      text-align:left; font-size: 15.5px; color: #6b7280; font-weight: 600;
+      padding: 12px 16px; background: #fafbfc; border-bottom: 1px solid #e5e7eb; white-space: nowrap;
     }
-    tbody td{
-      padding: 14px 16px;
-      border-bottom: 1px solid #f3f4f6;
-      vertical-align: middle;
-      font-size: 16.5px;
-      color: #374151;
-    }
+    tbody td{ padding: 14px 16px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; font-size: 16.5px; color: #374151; }
     tbody tr:last-child td{ border-bottom: 0; }
-    tbody tr{
-      background: white;
-      transition: background 0.15s ease;
-    }
+    tbody tr{ background: white; transition: background 0.15s ease; }
     tbody tr:hover{ background: #f9fafb; }
     .td-muted{ color: #9ca3af; font-size: 15.5px; }
-    .td-link{
-      color: var(--blue);
-      cursor:pointer;
-      font-weight: 600;
-      font-size: 16.5px;
-    }
+    .td-link{ color: var(--blue); cursor:pointer; font-weight: 600; font-size: 16.5px; }
     .td-link:hover{ text-decoration: underline; }
     a.td-link{ text-decoration: none; }
     a.td-link:hover{ text-decoration: underline; }
-
-    .status{
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      font-size: 15.5px;
-      font-weight: 500;
-    }
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius: 50%;
-      background: #cbd5e1;
-      flex-shrink: 0;
-    }
+    .status{ display:inline-flex; align-items:center; gap:7px; font-size: 15.5px; font-weight: 500; }
+    .dot{ width:8px; height:8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; }
     .dot.good{ background: #10b981; }
     .dot.warn{ background: #f59e0b; }
-
     .quick-actions{ display: flex; gap: 6px; }
     .quick-actions .btn{ font-size: 14.5px; padding: 6px 10px; border-radius: 6px; }
-
-    .phone-link{
-      color: var(--blue);
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .phone-link:hover{ text-decoration: underline; color: #0176d3; }
+    .phone-link{ color: var(--blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+    .phone-link:hover{ text-decoration: underline; }
 
     /* Add Note Modal */
-    .note-modal-overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.15);
-      display: none;
-      z-index: 10000;
-      pointer-events: none;
-    }
+    .note-modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,0.15); display: none; z-index: 10000; pointer-events: none; }
     .note-modal-overlay.active{ display: block; pointer-events: auto; }
-    
     .note-modal{
-      position: absolute;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
-      width: 400px;
-      max-height: 500px;
-      display: flex;
-      flex-direction: column;
-      z-index: 10001;
+      position: absolute; background: white; border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
+      width: 400px; max-height: 500px; display: flex; flex-direction: column; z-index: 10001;
     }
-    .note-modal::after{
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid white;
-      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
-    }
-    .note-modal-header{
-      padding: 14px 16px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .note-modal-header{ padding: 14px 16px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
     .note-modal-title{ font-size: 16px; font-weight: 600; color: #111827; }
-    .note-modal-close{
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: #6b7280;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-      padding: 0;
-    }
+    .note-modal-close{ width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; padding: 0; }
     .note-modal-close:hover{ background: #f3f4f6; color: #111827; }
     .note-modal-body{ padding: 16px; overflow-y: auto; flex: 1; }
-    .note-contact-info{
-      background: #f9fafb;
-      padding: 10px 12px;
-      border-radius: 6px;
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: #6b7280;
-    }
+    .note-contact-info{ background: #f9fafb; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; color: #6b7280; }
     .note-contact-name{ font-weight: 600; color: #111827; font-size: 14px; }
-    .note-textarea{
-      width: 100%;
-      min-height: 120px;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-family: var(--font);
-      font-size: 14px;
-      resize: vertical;
-      outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .note-textarea:focus{
-      border-color: #0176d3;
-      box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.1);
-    }
-    .note-modal-footer{
-      padding: 12px 16px;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-    .note-btn{
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      border: none;
-    }
+    .note-textarea{ width: 100%; min-height: 120px; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: var(--font); font-size: 14px; resize: vertical; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+    .note-textarea:focus{ border-color: #0176d3; box-shadow: 0 0 0 3px rgba(1,118,211,0.1); }
+    .note-modal-footer{ padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 8px; }
+    .note-btn{ padding: 8px 16px; border-radius: 6px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; border: none; }
     .note-btn-cancel{ background: white; color: #6b7280; border: 1px solid #d1d5db; }
     .note-btn-cancel:hover{ background: #f9fafb; border-color: #9ca3af; }
     .note-btn-save{ background: #0176d3; color: white; }
@@ -814,81 +485,36 @@
     .note-btn-save:disabled{ background: #9ca3af; cursor: not-allowed; }
     .note-char-count{ text-align: right; margin-top: 6px; font-size: 11px; color: #9ca3af; }
 
-    .hint{
-      padding: 10px 16px 14px;
-      color: var(--muted);
-      font-size: 13px;
-      border-top: 1px solid var(--line);
-      background: #fbfcfe;
-    }
+    .hint{ padding: 10px 16px 14px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); background: #fbfcfe; }
 
     /* ---------- SUB-TABS ---------- */
-    .sub-tabs-bar{
-      display: flex;
-      gap: 24px;
-      padding: 0 0 8px 0;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 14px;
-    }
+    .sub-tabs-bar{ display: flex; gap: 24px; padding: 0 0 8px 0; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
     .sub-tab{
-      appearance: none;
-      border: 0;
-      background: transparent;
-      font-family: var(--font);
-      font-size: 14.5px;
-      padding: 8px 0;
-      color: var(--muted);
-      cursor: pointer;
-      position: relative;
-      font-weight: 500;
-      transition: color .12s ease;
+      appearance: none; border: 0; background: transparent; font-family: var(--font);
+      font-size: 14.5px; padding: 8px 0; color: var(--muted); cursor: pointer;
+      position: relative; font-weight: 500; transition: color .12s ease;
     }
     .sub-tab[aria-selected="true"]{ color: var(--text); font-weight: 600; }
-    .sub-tab[aria-selected="true"]::after{
-      content: "";
-      position: absolute;
-      left: 0; right: 0; bottom: -9px;
-      height: 2px;
-      background: var(--blue);
-    }
+    .sub-tab[aria-selected="true"]::after{ content: ""; position: absolute; left: 0; right: 0; bottom: -9px; height: 2px; background: var(--blue); }
     .sub-tab:hover{ color: var(--text); }
     .sub-tab:focus{ outline: none; }
-    .sub-tab:focus-visible{
-      outline: 2px solid rgba(1,118,211,.25);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
     .sub-tab-pane{ display: none; }
     .sub-tab-pane.active{ display: block; }
     #subpane-confirmed table{ min-width: 1100px; }
 
     /* ---------- LOADING OVERLAY ---------- */
     #loadingOverlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(243,244,246,.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      padding: 24px;
-      animation: fadeIn 0.3s ease;
+      position: fixed; inset: 0; background: rgba(243,244,246,.85);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 10000; padding: 24px; animation: fadeIn 0.3s ease;
     }
     #loadingOverlay[aria-hidden="false"]{ display:flex; }
     #loadingOverlay.fade-out{ animation: fadeOut 0.5s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     .loadingCard{ display: flex; flex-direction: column; align-items: center; gap: 20px; }
-    .spinner{
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      border: 5px solid rgba(1,118,211,.15);
-      border-top-color: #0176d3;
-      animation: spin 0.8s linear infinite;
-      flex: 0 0 auto;
-    }
+    .spinner{ width: 56px; height: 56px; border-radius: 50%; border: 5px solid rgba(1,118,211,.15); border-top-color: #0176d3; animation: spin 0.8s linear infinite; flex: 0 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loadingText{ display:flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
     .loadingTitle{ font-size: 18px; font-weight: 650; color: #111827; letter-spacing: -0.01em; }
@@ -896,27 +522,13 @@
 
     /* ---------- ACTION REQUIRED BANNER ---------- */
     #actionBanner{
-      margin: 0 14px;
-      border-radius: 6px;
-      border: 1px solid #fecaca;
-      background: #fef2f2;
-      color: #7f1d1d;
-      padding: 0 16px 0 18px;
-      box-shadow: 0 1px 2px rgba(0,0,0,.04);
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transform: translateY(-6px);
+      margin: 0 14px; border-radius: 6px; border: 1px solid #fecaca; background: #fef2f2; color: #7f1d1d;
+      padding: 0 16px 0 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04); overflow: hidden;
+      max-height: 0; opacity: 0; transform: translateY(-6px);
       transition: max-height .22s ease, opacity .18s ease, transform .18s ease, padding .22s ease, margin-top .22s ease;
       position: relative;
     }
-    #actionBanner::before{
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 4px;
-      background: #dc2626;
-    }
+    #actionBanner::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #dc2626; }
     #actionBanner.show{ max-height: 160px; opacity: 1; transform: translateY(0); margin-top: 10px; padding: 14px 16px 14px 18px; }
     #actionBanner strong{ font-weight: 700; }
     #actionBanner .bannerText{ font-size: 14px; line-height: 1.5; color: #1f2937; letter-spacing: -0.01em; }
@@ -925,25 +537,14 @@
     /* ---------- SECTION META ---------- */
     .section-head .section-meta{ font-size: 14px; color: var(--muted); font-weight: 600; white-space: nowrap; }
 
-    /* ---------- MARK OWNERSHIP TREE COMPLETE BUTTON ---------- */
+    /* ---------- MARK OWNERSHIP TREE COMPLETE ---------- */
     #ownershipTreeBtn{
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 10px;
-      padding: 6px 12px;
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #bfdbfe;
-      border-radius: 6px;
-      font-family: var(--font);
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
-      letter-spacing: 0.01em;
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      padding: 6px 12px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+      border-radius: 6px; font-family: var(--font); font-size: 12.5px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
     }
-    #ownershipTreeBtn:hover{ background: #dbeafe; border-color: #93c5fd; box-shadow: 0 2px 6px rgba(29, 78, 216, 0.12); }
+    #ownershipTreeBtn:hover{ background: #dbeafe; border-color: #93c5fd; box-shadow: 0 2px 6px rgba(29,78,216,0.12); }
     #ownershipTreeBtn:active{ transform: translateY(1px); }
     #ownershipTreeBtn svg{ width: 13px; height: 13px; flex-shrink: 0; }
 
@@ -957,13 +558,7 @@
     .ownership-celebrate{ animation: ownershipCelebrate 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important; }
 
     #ownershipConfetti{ position: fixed; inset: 0; pointer-events: none; z-index: 99999; overflow: hidden; }
-    .confetti-piece{
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 2px;
-      opacity: 0;
-      animation: confettiFall linear forwards;
-    }
+    .confetti-piece{ position: absolute; width: 8px; height: 8px; border-radius: 2px; opacity: 0; animation: confettiFall linear forwards; }
     @keyframes confettiFall {
       0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
       80%  { opacity: 0.8; }
@@ -989,7 +584,6 @@
     <div class="layout">
       <div class="panel">
 
-        <!-- Top snapshot FIRST -->
         <div class="topSnapshot" aria-label="Top Snapshot">
           <div class="topSnapshotGrid">
             <div class="snapshotBlock">
@@ -1052,7 +646,6 @@
           </div>
         </div>
 
-        <!-- Tabs + Refresh -->
         <div class="tabsbar" role="group" aria-label="Tabs and actions">
           <div class="tabs" role="tablist" aria-label="Record Tabs">
             <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
@@ -1067,7 +660,6 @@
           </div>
         </div>
 
-        <!-- Action Required Banner -->
         <div id="actionBanner" aria-live="polite" aria-atomic="true" role="status">
           <div class="bannerText" id="actionBannerText">—</div>
         </div>
@@ -1076,164 +668,79 @@
           <!-- DEAL INFO -->
           <div class="tab-pane active" id="pane-deal" role="tabpanel" aria-labelledby="tab-deal">
 
-            <!-- Property Details Section — SLDS layout -->
             <div class="section">
-              <div class="section-head">
-                <div><h3>Property Details</h3></div>
-              </div>
-
+              <div class="section-head"><div><h3>Property Details</h3></div></div>
               <div class="slds-grid">
-                <!-- Left column -->
                 <div class="slds-col-left">
-
                   <div class="slds-field" data-field="lead_type">
                     <div class="slds-label">Lead Type</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="tax_status">
                     <div class="slds-label">Tax Status</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="condition">
                     <div class="slds-label">Condition</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="occupancy">
                     <div class="slds-label">Occupancy</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                 </div>
-
-                <!-- Right column -->
                 <div class="slds-col-right">
-
                   <div class="slds-field" data-field="equity">
                     <div class="slds-label">Equity</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="deed_status">
                     <div class="slds-label">Deed Status</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true" data-link-field="deed_link">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true" data-link-field="deed_link">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="will_status">
                     <div class="slds-label">Will Status</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true" data-link-field="will_link">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true" data-link-field="will_link">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
                   <div class="slds-field" data-field="title_issue">
                     <div class="slds-label">Title Issue</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
+                    <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                   </div>
-
-
                 </div>
               </div>
             </div>
 
-
-            <!-- Update Activity (collapsible) — SLDS layout -->
             <div class="inline-toggle" id="characteristicsToggle" data-open="false">
               <div class="toggle-head" role="button" tabindex="0" aria-expanded="false" aria-controls="characteristicsBody">
                 <div class="toggle-left">
                   <button class="toggle-btn" type="button" aria-label="Toggle Update Activity">
-                    <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   </button>
                   <div class="toggle-title">Update Activity</div>
                 </div>
               </div>
-
               <div class="toggle-body" id="characteristicsBody">
                 <div class="slds-grid">
                   <div class="slds-col-left">
-
                     <div class="slds-field" data-field="next_action_step">
                       <div class="slds-label">Next Action Step</div>
-                      <div class="slds-value">
-                        <span class="value-text" data-editable="true">—</span>
-                        <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </span>
-                      </div>
+                      <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                     </div>
-
                     <div class="slds-field" data-field="stalled_reason">
                       <div class="slds-label">Stalled Reason</div>
-                      <div class="slds-value">
-                        <span class="value-text" data-editable="true">—</span>
-                        <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </span>
-                      </div>
+                      <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                     </div>
-
                   </div>
-
                   <div class="slds-col-right">
-
                     <div class="slds-field" data-field="follow_up_date">
                       <div class="slds-label">Follow-up Date</div>
-                      <div class="slds-value">
-                        <span class="value-text" data-editable="true">—</span>
-                        <span class="edit" title="Edit">
-                          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </span>
-                      </div>
+                      <div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Related Contacts -->
             <div class="section">
               <div class="section-head">
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -1251,17 +758,7 @@
               <div class="sub-tab-pane active" id="subpane-confirmed" role="tabpanel" aria-labelledby="subtab-confirmed">
                 <div class="table-wrap">
                   <table aria-label="Confirmed Owners Table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>Last Contact</th>
-                        <th>Next Follow-up</th>
-                        <th>Offer Status</th>
-                        <th>Number</th>
-                        <th>Quick Actions</th>
-                      </tr>
-                    </thead>
+                    <thead><tr><th>Name</th><th>Status</th><th>Last Contact</th><th>Next Follow-up</th><th>Offer Status</th><th>Number</th><th>Quick Actions</th></tr></thead>
                     <tbody id="confirmedOwnersTbody"></tbody>
                   </table>
                 </div>
@@ -1270,18 +767,7 @@
               <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
                 <div class="orc-wrap">
                   <table class="orc-table" aria-label="Other Related Contacts Table">
-                    <thead>
-                      <tr>
-                        <th style="width:24px;"></th>
-                        <th>Name</th>
-                        <th>Relationship</th>
-                        <th>Lead Status</th>
-                        <th>Phone 1</th>
-                        <th>Phone 1 Status</th>
-                        <th>Phone 2</th>
-                        <th>Phone 2 Status</th>
-                      </tr>
-                    </thead>
+                    <thead><tr><th style="width:24px;"></th><th>Name</th><th>Relationship</th><th>Lead Status</th><th>Phone 1</th><th>Phone 1 Status</th><th>Phone 2</th><th>Phone 2 Status</th></tr></thead>
                     <tbody id="otherContactsTbody"></tbody>
                   </table>
                 </div>
@@ -1293,107 +779,20 @@
           <!-- RESEARCH -->
           <div class="tab-pane" id="pane-research" role="tabpanel" aria-labelledby="tab-research">
             <div class="section">
-              <div class="section-head">
-                <div><h3>Research</h3></div>
-              </div>
-
+              <div class="section-head"><div><h3>Research</h3></div></div>
               <div class="slds-grid">
                 <div class="slds-col-left">
-
-                  <div class="slds-field" data-field="obituary_link">
-                    <div class="slds-label">Obituary Link</div>
-                    <div class="slds-value">
-                      <span class="value-text link" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="ancestry_link">
-                    <div class="slds-label">Ancestry Link</div>
-                    <div class="slds-value">
-                      <span class="value-text link" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="zillow_link">
-                    <div class="slds-label">Zillow Link</div>
-                    <div class="slds-value">
-                      <span class="value-text link" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="tax_assessor_link">
-                    <div class="slds-label">Tax Assessor Link</div>
-                    <div class="slds-value">
-                      <span class="value-text link" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="google_maps_link">
-                    <div class="slds-label">Google Maps Link</div>
-                    <div class="slds-value">
-                      <span class="value-text link" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
+                  <div class="slds-field" data-field="obituary_link"><div class="slds-label">Obituary Link</div><div class="slds-value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="ancestry_link"><div class="slds-label">Ancestry Link</div><div class="slds-value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="zillow_link"><div class="slds-label">Zillow Link</div><div class="slds-value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="tax_assessor_link"><div class="slds-label">Tax Assessor Link</div><div class="slds-value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="google_maps_link"><div class="slds-label">Google Maps Link</div><div class="slds-value"><span class="value-text link" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                 </div>
-
                 <div class="slds-col-right">
-
-                  <div class="slds-field" data-field="birth_date">
-                    <div class="slds-label">Birth Date</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="death_date">
-                    <div class="slds-label">Death Date</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="age">
-                    <div class="slds-label">Age</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slds-field" data-field="creation_log">
-                    <div class="slds-label">Creation Log</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-
+                  <div class="slds-field" data-field="birth_date"><div class="slds-label">Birth Date</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="death_date"><div class="slds-label">Death Date</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="age"><div class="slds-label">Age</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="creation_log"><div class="slds-label">Creation Log</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                 </div>
               </div>
             </div>
@@ -1402,62 +801,31 @@
           <!-- ACTIVITY -->
           <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
             <div class="section">
-              <div class="section-head">
-                <div><h3>Activity</h3></div>
-              </div>
+              <div class="section-head"><div><h3>Activity</h3></div></div>
               <div class="slds-grid">
                 <div class="slds-col-left">
-                  <div class="slds-field" data-field="last_contacted">
-                    <div class="slds-label">Last Contacted</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slds-field" data-field="days_of_inactivity">
-                    <div class="slds-label">Days of Inactivity</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
+                  <div class="slds-field" data-field="last_contacted"><div class="slds-label">Last Contacted</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+                  <div class="slds-field" data-field="days_of_inactivity"><div class="slds-label">Days of Inactivity</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                 </div>
                 <div class="slds-col-right">
-                  <div class="slds-field" data-field="activity_notes">
-                    <div class="slds-label">Notes</div>
-                    <div class="slds-value">
-                      <span class="value-text" data-editable="true">—</span>
-                      <span class="edit" title="Edit">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                    </div>
-                  </div>
+                  <div class="slds-field" data-field="activity_notes"><div class="slds-label">Notes</div><div class="slds-value"><span class="value-text" data-editable="true">—</span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                 </div>
               </div>
             </div>
             <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
 
-          <!-- MILESTONES -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Add Note Modal -->
   <div class="note-modal-overlay" id="noteModalOverlay">
     <div class="note-modal">
       <div class="note-modal-header">
         <h3 class="note-modal-title">Add Note</h3>
         <button class="note-modal-close" id="noteModalClose" aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
       <div class="note-modal-body">
@@ -1476,572 +844,7 @@
   </div>
 
   <script>
-    window.RecordPage = {
-      applyData(payload){
-        if (!payload || typeof payload !== "object") return;
-
-        for (const [key, value] of Object.entries(payload)) {
-          const node = document.querySelector(`.slds-field[data-field="${cssEscape(key)}"] .value-text`);
-          if (node) node.textContent = formatValue(value);
-        }
-
-        for (const [key, value] of Object.entries(payload)) {
-          const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
-          if (snap) snap.textContent = formatValue(value);
-        }
-
-        const formatCurrency = (val) => {
-          if (!val || val === "—") return "—";
-          const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
-          if (isNaN(num)) return val;
-          return "$" + Math.round(num).toLocaleString("en-US");
-        };
-        ["taxes_owed", "equity", "appraisal"].forEach(field => {
-          const el = document.querySelector(`.slds-field[data-field="${field}"] .value-text`);
-          if (el && payload[field]) el.textContent = formatCurrency(payload[field]);
-        });
-        ["taxes_owed", "appraisal"].forEach(field => {
-          const snap = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
-          if (snap && payload[field]) snap.textContent = formatCurrency(payload[field]);
-        });
-
-        const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
-
-        const confirmedOwners = owners.filter(o =>
-          String(o.owner_status || o.ownerStatus || "").trim().toLowerCase() === "yes"
-        );
-        const heirsIdentified = confirmedOwners.length;
-
-        const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
-        const heirsContacted = confirmedOwners.filter(o => {
-          const s = String(o.lead_status || o.leadStatus || "").trim().toLowerCase();
-          return contactedStatuses.some(cs => s.includes(cs));
-        }).length;
-
-        const heirsOffered = confirmedOwners.filter(o => {
-          const raw = o.offer_made !== undefined ? o.offer_made : o.offerMade;
-          if (typeof raw === "boolean") return raw === true;
-          if (typeof raw === "string") return raw.trim() !== "" && raw.trim() !== "—";
-          return false;
-        }).length;
-
-        const closedOwners = confirmedOwners.filter(o =>
-          String(o.lead_status || o.leadStatus || "").trim().toLowerCase() === "closed"
-        );
-        let ownershipPct = 0;
-        closedOwners.forEach(o => {
-          const num = parseFloat(String(o.ownership_percent || o.ownershipPercent || "0").replace(/[^0-9.]/g, ""));
-          if (!isNaN(num)) ownershipPct += num;
-        });
-
-        const setSnap = (field, val) => {
-          const el = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
-          if (el) el.textContent = val;
-        };
-
-        setSnap("heirs_identified", heirsIdentified > 0 ? String(heirsIdentified) : "—");
-        setSnap("heirs_contacted",  heirsIdentified > 0 ? `${heirsContacted} of ${heirsIdentified}` : "—");
-        setSnap("heirs_offered",    heirsIdentified > 0 ? `${heirsOffered} of ${heirsIdentified}` : "—");
-        setSnap("ownership_secured",
-          heirsIdentified > 0
-            ? `${ownershipPct}% (${closedOwners.length} of ${heirsIdentified})`
-            : "—"
-        );
-
-        const insightsFields = document.getElementById("dealInsightsFields");
-        const insightsEmpty  = document.getElementById("dealInsightsEmpty");
-        if (insightsFields && insightsEmpty) {
-          insightsFields.style.display = heirsIdentified > 0 ? "" : "none";
-          insightsEmpty.style.display  = heirsIdentified > 0 ? "none" : "block";
-        }
-
-        const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
-        if (badge) {
-         const isComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
-         badge.textContent = isComplete ? "Complete" : "In Progress";
-         badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
-         syncOwnershipTreeButton(isComplete);
-        }
-
-        let mostRecentDate = null;
-        (owners || []).forEach(o => {
-          const raw = o.contacted_date || o.lastContact || "";
-          if (!raw || raw === "—") return;
-          const d = parseFlexibleDate(raw);
-          if (d && (!mostRecentDate || d > mostRecentDate)) mostRecentDate = d;
-        });
-        if (mostRecentDate) {
-          const formatted = mostRecentDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-          const daysAgoStr = calcDaysAgo(mostRecentDate);
-          const dateEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_date"]');
-          const daysEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_days_ago"]');
-          if (dateEl) dateEl.textContent = formatted;
-          if (daysEl) daysEl.textContent = daysAgoStr || formatted;
-        }
-
-        if (Array.isArray(payload.confirmed_owners)) {
-          renderConfirmedOwners(payload.confirmed_owners);
-          renderOtherContacts(payload.confirmed_owners);
-          updateActionBannerFromContacts(payload.confirmed_owners);
-        } else {
-          updateActionBannerFromContacts([]);
-        }
-        computeContactsSummary(payload);
-
-        // Wire deed_link and will_link — make status clickable only if link exists
-        [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
-          const el = document.querySelector(`.slds-field[data-field="${statusField}"] .value-text`);
-          const link = payload[linkField];
-          if (!el) return;
-          if (link && String(link).trim() !== '' && String(link).trim() !== '—') {
-            el.style.color = '#0176d3';
-            el.style.cursor = 'pointer';
-            el.style.textDecoration = 'none';
-            el.onclick = () => window.open(link, '_blank', 'noopener,noreferrer');
-            el.onmouseover = () => el.style.textDecoration = 'underline';
-            el.onmouseout  = () => el.style.textDecoration = 'none';
-          } else {
-            el.style.color = '';
-            el.style.cursor = '';
-            el.style.textDecoration = '';
-            el.onclick = null;
-            el.onmouseover = null;
-            el.onmouseout  = null;
-          }
-        });
-      }
-    };
-
-    function syncOwnershipTreeButton(isComplete) {
-      const btn = document.getElementById("ownershipTreeBtn");
-      if (!btn) return;
-      btn.style.display = isComplete ? "none" : "inline-flex";
-    }
-
-    function fireOwnershipConfetti() {
-      const container = document.getElementById("ownershipConfetti");
-      if (!container) return;
-      container.innerHTML = "";
-      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
-      let originX = window.innerWidth / 2;
-      let originY = 100;
-      if (badge) {
-        const r = badge.getBoundingClientRect();
-        originX = r.left + r.width / 2;
-        originY = r.top + r.height / 2;
-      }
-      const colors = ["#10b981", "#34d399", "#6ee7b7", "#0176d3", "#60a5fa", "#fbbf24", "#a78bfa"];
-      const count = 38;
-      for (let i = 0; i < count; i++) {
-        const el = document.createElement("div");
-        el.className = "confetti-piece";
-        const angle = (Math.random() * 360);
-        const distance = 60 + Math.random() * 180;
-        const rad = (angle * Math.PI) / 180;
-        const tx = Math.cos(rad) * distance;
-        const ty = Math.sin(rad) * distance - 60;
-        const duration = 0.55 + Math.random() * 0.55;
-        const delay = Math.random() * 0.18;
-        const size = 6 + Math.random() * 6;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const shapes = ["2px", "50%", "0px"];
-        const borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
-        Object.assign(el.style, {
-          left: `${originX}px`, top: `${originY}px`,
-          width: `${size}px`, height: `${size}px`,
-          background: color, borderRadius: borderRadius,
-          animationDuration: `${duration}s`, animationDelay: `${delay}s`,
-          transform: `translate(${tx}px, ${ty}px)`,
-        });
-        container.appendChild(el);
-      }
-      setTimeout(() => { container.innerHTML = ""; }, 1400);
-    }
-
-    async function markOwnershipTreeComplete() {
-      const btn = document.getElementById("ownershipTreeBtn");
-      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
-      if (badge) {
-        badge.textContent = "Complete";
-        badge.className = "heir-status-badge heir-status-complete";
-        badge.classList.remove("ownership-celebrate");
-        void badge.offsetWidth;
-        badge.classList.add("ownership-celebrate");
-        setTimeout(() => badge.classList.remove("ownership-celebrate"), 1000);
-      }
-      fireOwnershipConfetti();
-      if (btn) {
-        btn.style.transition = "opacity 0.3s ease, transform 0.3s ease";
-        btn.style.opacity = "0";
-        btn.style.transform = "scale(0.85)";
-        setTimeout(() => { btn.style.display = "none"; }, 320);
-      }
-      const { boardId, pulseId } = extractIdsFromUrl();
-      if (boardId && pulseId) {
-        try {
-          const res = await fetch(SAVE_WEBHOOK, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ boardId, pulseId, columnId: "dropdown_mm1aybze", value: "Complete" })
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          console.log("✓ Ownership Map marked Complete in Monday");
-        } catch (err) {
-          console.error("✗ Failed to update Ownership Map:", err);
-        }
-      }
-    }
-
-    document.getElementById("ownershipTreeBtn").addEventListener("click", markOwnershipTreeComplete);
-
-    const characteristics = document.getElementById("characteristicsToggle");
-
-    function toneDotClass(tone){
-      if (tone === "good") return "dot good";
-      if (tone === "warn") return "dot warn";
-      return "dot";
-    }
-    function statusCell(statusObj){
-      if (!statusObj || typeof statusObj !== "object") return `<span class="td-muted">—</span>`;
-      const dot = toneDotClass(statusObj.tone);
-      const text = statusObj.text ?? "—";
-      const mutedClass = (statusObj.tone === "muted") ? "td-muted" : "";
-      return `<span class="status ${mutedClass}"><span class="${dot}"></span>${escapeHtml(text)}</span>`;
-    }
-
-    const toggleCharacteristics = () => {
-      const isOpen = characteristics.getAttribute("data-open") === "true";
-      characteristics.setAttribute("data-open", String(!isOpen));
-      characteristics.querySelector(".toggle-head").setAttribute("aria-expanded", String(!isOpen));
-    };
-    characteristics.querySelector(".toggle-head").addEventListener("click", toggleCharacteristics);
-    characteristics.querySelector(".toggle-head").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCharacteristics(); }
-    });
-
-    const tabs = Array.from(document.querySelectorAll(".tab"));
-    const panes = Array.from(document.querySelectorAll(".tab-pane"));
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.setAttribute("aria-selected", "false"));
-        panes.forEach(p => p.classList.remove("active"));
-        tab.setAttribute("aria-selected", "true");
-        document.getElementById(tab.getAttribute("aria-controls")).classList.add("active");
-      });
-    });
-
-    function leadStatusDot(status){
-      if (!status || status === "—") return `<span class="td-muted">—</span>`;
-      const s = String(status).toLowerCase().trim();
-      let color = '#d1d5db';
-      if (s.includes('re-skiptrace'))            color = '#d1d5db';
-      else if (s.includes('attempt 1'))          color = '#9ca3af';
-      else if (s.includes('attempt 2'))          color = '#6b7280';
-      else if (s.includes('attempt 3'))          color = '#93c5fd';
-      else if (s.includes('contacted'))          color = '#60a5fa';
-      else if (s.includes('interested'))         color = '#3b82f6';
-      else if (s.includes('negotiation') || s.includes('review')) color = '#2563eb';
-      else if (s.includes('accepted'))           color = '#1d4ed8';
-      else if (s.includes('closed'))             color = '#1e3a8a';
-      return `<span style="display:inline-flex; align-items:center; gap:7px; font-size:14.5px; font-weight:500; color:#374151;">
-        <span style="width:9px; height:9px; border-radius:50%; background:${color}; flex-shrink:0; display:inline-block;"></span>
-        ${escapeHtml(status)}
-      </span>`;
-    }
-
-    function formatPhoneForTel(phone){
-      if (!phone) return '';
-      return phone.replace(/\D/g, '');
-    }
-
-    function formatPhoneDisplay(phone){
-      if (!phone || phone === "—") return null;
-      const digits = String(phone).replace(/\D/g, '');
-      const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
-      if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
-      return phone;
-    }
-
-    function calcDaysAgo(dateStr){
-      if (!dateStr || dateStr === "—") return null;
-      const d = parseFlexibleDate(dateStr);
-      if (!d) return null;
-      const days = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-      if (days === 0) return "Today";
-      if (days === 1) return "1 day ago";
-      return `${days} days ago`;
-    }
-
-    function renderConfirmedOwners(contacts){
-      const tbody = document.getElementById("confirmedOwnersTbody");
-      const confirmed = (contacts || []).filter(c =>
-        String(c.owner_status || "").trim().toLowerCase() === "yes"
-      );
-      const STATUS_ORDER = ["closed", "accepted offer", "negotiations", "review", "interested in selling", "contacted", "attempt 3", "attempt 2", "attempt 1", "re-skiptrace"];
-      const statusRank = (s) => {
-        const v = String(s || "").toLowerCase().trim();
-        const idx = STATUS_ORDER.findIndex(k => v.includes(k));
-        return idx === -1 ? STATUS_ORDER.length : idx;
-      };
-      const sorted = [...confirmed].sort((a, b) =>
-        statusRank(a.lead_status || a.leadStatus) - statusRank(b.lead_status || b.leadStatus)
-      );
-      const rows = sorted.map((c, index) => {
-        const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
-        const lastContact      = c.contacted_date ?? c.lastContact ?? null;
-        const leadStatus       = c.lead_status ?? c.leadStatus ?? null;
-        const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
-        const offerMade        = c.offer_made ?? c.offerMade ?? false;
-        const offerAmount      = c.offer_amount ?? c.offerAmount ?? "—";
-        const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
-        const phone1           = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
-
-        const daysAgo = calcDaysAgo(lastContact);
-        let lastContactColor = '#374151';
-        if (daysAgo) {
-          const match = daysAgo.match(/(\d+)/);
-          if (match) {
-            const days = parseInt(match[1]);
-            if (days >= 12) lastContactColor = '#dc2626';
-            else if (days >= 6) lastContactColor = '#f59e0b';
-          }
-        }
-
-        let followupCell = `<span class="td-muted">—</span>`;
-        if (followupDate && followupDate !== "—") {
-          const fpDate = parseFlexibleDate(followupDate);
-          if (fpDate) {
-            const today = startOfDay(new Date());
-            const fp = startOfDay(fpDate);
-            const diffDays = Math.floor((fp - today) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0) {
-              const overdue = Math.abs(diffDays);
-              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #dc2626; font-weight: 500;">Overdue by ${overdue} day${overdue === 1 ? '' : 's'}</div></div>`;
-            } else if (diffDays === 0) {
-              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #f59e0b; font-weight: 500;">Due today</div></div>`;
-            } else {
-              followupCell = `<div><div style="font-weight: 600; color: #111827;">${escapeHtml(followupDate)}</div><div style="font-size: 12px; color: #9ca3af;">Upcoming in ${diffDays} day${diffDays === 1 ? '' : 's'}</div></div>`;
-            }
-          }
-        }
-
-        const isClosed = String(c.lead_status || "").trim().toLowerCase() === "closed";
-        const closedBadge = isClosed ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:6px;vertical-align:middle;"><svg style="width:9px;height:9px;" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></span>` : '';
-
-        return `
-        <tr>
-          <td>
-            <div style="display:flex;align-items:center;gap:0;">
-              ${mondayUrl ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name ?? "—")}</a>` : `<span style="font-weight: 600;">${escapeHtml(c.name ?? "—")}</span>`}${closedBadge}
-            </div>
-            <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
-              ${c.relationship ? `<span style="font-size: 12px; color: #9ca3af;">${escapeHtml(c.relationship)}</span>` : ''}
-              ${c.relationship && ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 11px; color: #cbd5e1;">·</span>` : ''}
-              ${ownershipPercent && ownershipPercent !== "—" && ownershipPercent !== 0 && ownershipPercent !== "0" ? `<span style="font-size: 12px; font-weight: 700; color: #0176d3;">${escapeHtml(String(ownershipPercent))}%</span>` : ''}
-            </div>
-          </td>
-          <td>${leadStatusDot(leadStatus)}</td>
-          <td>
-            ${lastContact && lastContact !== "—"
-              ? `<div style="font-weight: 600;">${escapeHtml(lastContact)}</div><div style="font-size: 12px; color: ${lastContactColor};">${daysAgo || ''}</div>`
-              : `<span class="td-muted">Not contacted</span>`}
-          </td>
-          <td>${followupCell}</td>
-          <td>
-            ${offerMade ? `<div style="font-weight: 600;">Presented</div><div style="font-size: 12px; color: #6b7280;">${offerAmount && offerAmount !== "—" ? "$" + Math.round(parseFloat(String(offerAmount).replace(/[^0-9.]/g, ""))).toLocaleString("en-US") : "—"}</div>` : `<span class="td-muted">No offer</span>`}
-          </td>
-          <td>${phone1 ? `<a href="tel:${formatPhoneForTel(phone1)}" style="font-weight:500; color:#0176d3; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone1)}</a>` : `<span class="td-muted">—</span>`}</td>
-          <td>
-            <div class="quick-actions">
-              <button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button>
-            </div>
-          </td>
-        </tr>`;
-      }).join("");
-      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
-
-      tbody.querySelectorAll('.add-note-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const contactIndex = parseInt(e.target.getAttribute('data-contact-index'));
-          openNoteModal(sorted[contactIndex], contactIndex, e.target);
-        });
-      });
-    }
-
-    function renderOtherContacts(contacts){
-      const tbody = document.getElementById("otherContactsTbody");
-      const others = (contacts || []).filter(c =>
-        String(c.owner_status || "").trim().toLowerCase() !== "yes"
-      );
-
-      // Status option definitions
-      const LEAD_STATUS_OPTS = [
-        { value: "Referral",      dot: "green"  },
-        { value: "In Progress",   dot: "blue"   },
-        { value: "Contacted",     dot: "green"  },
-        { value: "Not Reached",   dot: "amber"  },
-        { value: "Wrong Number",  dot: "red"    },
-        { value: "Do Not Call",   dot: "red"    },
-        { value: "Closed",        dot: "purple" },
-      ];
-      const PHONE_STATUS_OPTS = [
-        { value: "Good",          dot: "green"  },
-        { value: "No Answer",     dot: "amber"  },
-        { value: "Wrong Number",  dot: "red"    },
-        { value: "Disconnected",  dot: "red"    },
-        { value: "Left Voicemail",dot: "blue"   },
-        { value: "Do Not Call",   dot: "red"    },
-      ];
-
-      function dotClass(value, opts) {
-        if (!value || value === "—") return "none";
-        const match = opts.find(o => o.value.toLowerCase() === String(value).toLowerCase());
-        return match ? match.dot : "none";
-      }
-
-      function statusDropdown(value, opts, fieldKey, rowIdx) {
-        const current = value || "—";
-        const dot = dotClass(current, opts);
-        const id = `orc-dd-${fieldKey}-${rowIdx}`;
-        return `
-          <div class="orc-status-wrap" id="${id}" data-field="${fieldKey}" data-row="${rowIdx}" data-opts="${fieldKey === 'lead_status' ? 'lead' : 'phone'}">
-            <button class="orc-status-btn" type="button" data-dd="${id}" data-current="${escapeHtml(current)}">
-              <span class="orc-status-dot ${dot}"></span>
-              <span class="orc-status-label">${escapeHtml(current)}</span>
-              <svg class="orc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>`;
-      }
-
-      const rows = others.map((c, i) => {
-        const mondayUrl    = c.monday_url ?? c.mondayUrl ?? null;
-        const leadStatus   = c.lead_status ?? c.leadStatus ?? null;
-        const phone1       = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
-        const phone1Status = c.phone_1_status ?? c.phone1Status ?? null;
-        const phone2       = formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null);
-        const phone2Status = c.phone_2_status ?? c.phone2Status ?? null;
-        const idx = i + 1;
-
-        return `
-        <tr data-orc-row="${i}">
-          <td class="orc-idx">${idx}</td>
-          <td>${mondayUrl
-            ? `<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="orc-name">${escapeHtml(c.name ?? "—")}</a>`
-            : `<span class="orc-name-plain">${escapeHtml(c.name ?? "—")}</span>`}
-          </td>
-          <td class="orc-rel">${escapeHtml(c.relationship ?? "—")}</td>
-          <td>${statusDropdown(leadStatus, LEAD_STATUS_OPTS, 'lead_status', i)}</td>
-          <td>${phone1 ? `<a href="tel:${formatPhoneForTel(phone1)}" class="orc-phone">${escapeHtml(phone1)}</a>` : `<span class="orc-empty">—</span>`}</td>
-          <td>${statusDropdown(phone1Status, PHONE_STATUS_OPTS, 'phone_1_status', i)}</td>
-          <td>${phone2 ? `<a href="tel:${formatPhoneForTel(phone2)}" class="orc-phone">${escapeHtml(phone2)}</a>` : `<span class="orc-empty">—</span>`}</td>
-          <td>${statusDropdown(phone2Status, PHONE_STATUS_OPTS, 'phone_2_status', i)}</td>
-        </tr>`;
-      }).join("");
-
-      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="8" style="padding:16px 16px; color:#9ca3af;">No other related contacts.</td></tr>`;
-
-      // Update count
-      const orcCount = document.getElementById("orcCount");
-      if (orcCount) orcCount.textContent = `${others.length} item${others.length !== 1 ? 's' : ''}`;
-
-      // Portal dropdown — single floating menu appended to body
-      let orcPortal = document.getElementById('orcPortal');
-      if (!orcPortal) {
-        orcPortal = document.createElement('div');
-        orcPortal.id = 'orcPortal';
-        orcPortal.className = 'orc-dropdown';
-        orcPortal.style.position = 'fixed';
-        orcPortal.style.zIndex = '9999';
-        document.body.appendChild(orcPortal);
-      }
-
-      let activeWrap = null;
-
-      function closePortal() {
-        orcPortal.style.display = 'none';
-        orcPortal.innerHTML = '';
-        if (activeWrap) {
-          activeWrap.classList.remove('open');
-          activeWrap = null;
-        }
-      }
-
-      tbody.querySelectorAll('.orc-status-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const ddId = btn.getAttribute('data-dd');
-          const wrap = document.getElementById(ddId);
-
-          if (activeWrap === wrap) { closePortal(); return; }
-          closePortal();
-
-          const fieldKey = wrap.getAttribute('data-field');
-          const rowIdx   = parseInt(wrap.getAttribute('data-row'));
-          const optsKey  = wrap.getAttribute('data-opts');
-          const opts     = optsKey === 'lead' ? LEAD_STATUS_OPTS : PHONE_STATUS_OPTS;
-          const current  = btn.getAttribute('data-current');
-
-          // Build items
-          orcPortal.innerHTML = opts.map(o => `
-            <div class="orc-dropdown-item${o.value === current ? ' selected' : ''}"
-                 data-value="${escapeHtml(o.value)}"
-                 data-dot="${o.dot}"
-                 data-ddid="${ddId}">
-              <span class="orc-status-dot ${o.dot}"></span>${escapeHtml(o.value)}
-            </div>`).join('');
-
-          // Position portal
-          const rect = btn.getBoundingClientRect();
-          const portalH = opts.length * 35 + 8;
-          const spaceBelow = window.innerHeight - rect.bottom;
-          orcPortal.style.display = 'block';
-          orcPortal.style.minWidth = Math.max(rect.width, 170) + 'px';
-          if (spaceBelow < portalH + 8 && rect.top > portalH) {
-            orcPortal.style.top  = (rect.top - portalH - 4) + 'px';
-          } else {
-            orcPortal.style.top  = (rect.bottom + 4) + 'px';
-          }
-          orcPortal.style.left = rect.left + 'px';
-
-          wrap.classList.add('open');
-          activeWrap = wrap;
-
-          // Item click
-          orcPortal.querySelectorAll('.orc-dropdown-item').forEach(item => {
-            item.addEventListener('click', (ev) => {
-              ev.stopPropagation();
-              const val  = item.getAttribute('data-value');
-              const dot  = item.getAttribute('data-dot');
-              const wId  = item.getAttribute('data-ddid');
-              const w    = document.getElementById(wId);
-              const b    = w.querySelector('.orc-status-btn');
-              b.querySelector('.orc-status-dot').className = `orc-status-dot ${dot}`;
-              b.querySelector('.orc-status-label').textContent = val;
-              b.setAttribute('data-current', val);
-              closePortal();
-            });
-          });
-        });
-      });
-
-      // Close on outside click
-      document.addEventListener('click', closePortal);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePortal(); });
-
-    }
-
-    const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
-    const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
-    subTabs.forEach(subTab => {
-      subTab.addEventListener("click", () => {
-        subTabs.forEach(t => t.setAttribute("aria-selected", "false"));
-        subPanes.forEach(p => p.classList.remove("active"));
-        subTab.setAttribute("aria-selected", "true");
-        document.getElementById(subTab.getAttribute("aria-controls")).classList.add("active");
-      });
-    });
-
+    // ── COLUMN ID MAP — fallback hardcoded values, overwritten on load by column_map ──
     const COLUMN_ID_MAP = {
       "lead_type":          "text16__1",
       "tax_status":         "dropdown_1_mkm2rj6r",
@@ -2070,315 +873,506 @@
 
     const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
+    window.RecordPage = {
+      applyData(payload){
+        if (!payload || typeof payload !== "object") return;
+
+        // ── Merge dynamic column IDs from webhook — makes saves board-agnostic ──
+        if (payload.column_map && typeof payload.column_map === "object") {
+          Object.assign(COLUMN_ID_MAP, payload.column_map);
+        }
+
+        for (const [key, value] of Object.entries(payload)) {
+          const node = document.querySelector(`.slds-field[data-field="${cssEscape(key)}"] .value-text`);
+          if (node) node.textContent = formatValue(value);
+        }
+
+        for (const [key, value] of Object.entries(payload)) {
+          const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
+          if (snap) snap.textContent = formatValue(value);
+        }
+
+        const formatCurrency = (val) => {
+          if (!val || val === "—") return "—";
+          const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
+          if (isNaN(num)) return val;
+          return "$" + Math.round(num).toLocaleString("en-US");
+        };
+        ["taxes_owed", "equity", "appraisal"].forEach(field => {
+          const el = document.querySelector(`.slds-field[data-field="${field}"] .value-text`);
+          if (el && payload[field]) el.textContent = formatCurrency(payload[field]);
+        });
+        ["taxes_owed", "appraisal"].forEach(field => {
+          const snap = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
+          if (snap && payload[field]) snap.textContent = formatCurrency(payload[field]);
+        });
+
+        const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
+        const confirmedOwners = owners.filter(o => String(o.owner_status || o.ownerStatus || "").trim().toLowerCase() === "yes");
+        const heirsIdentified = confirmedOwners.length;
+        const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
+        const heirsContacted = confirmedOwners.filter(o => {
+          const s = String(o.lead_status || o.leadStatus || "").trim().toLowerCase();
+          return contactedStatuses.some(cs => s.includes(cs));
+        }).length;
+        const heirsOffered = confirmedOwners.filter(o => {
+          const raw = o.offer_made !== undefined ? o.offer_made : o.offerMade;
+          if (typeof raw === "boolean") return raw === true;
+          if (typeof raw === "string") return raw.trim() !== "" && raw.trim() !== "—";
+          return false;
+        }).length;
+        const closedOwners = confirmedOwners.filter(o => String(o.lead_status || o.leadStatus || "").trim().toLowerCase() === "closed");
+        let ownershipPct = 0;
+        closedOwners.forEach(o => {
+          const num = parseFloat(String(o.ownership_percent || o.ownershipPercent || "0").replace(/[^0-9.]/g, ""));
+          if (!isNaN(num)) ownershipPct += num;
+        });
+
+        const setSnap = (field, val) => {
+          const el = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
+          if (el) el.textContent = val;
+        };
+        setSnap("heirs_identified", heirsIdentified > 0 ? String(heirsIdentified) : "—");
+        setSnap("heirs_contacted",  heirsIdentified > 0 ? `${heirsContacted} of ${heirsIdentified}` : "—");
+        setSnap("heirs_offered",    heirsIdentified > 0 ? `${heirsOffered} of ${heirsIdentified}` : "—");
+        setSnap("ownership_secured", heirsIdentified > 0 ? `${ownershipPct}% (${closedOwners.length} of ${heirsIdentified})` : "—");
+
+        const insightsFields = document.getElementById("dealInsightsFields");
+        const insightsEmpty  = document.getElementById("dealInsightsEmpty");
+        if (insightsFields && insightsEmpty) {
+          insightsFields.style.display = heirsIdentified > 0 ? "" : "none";
+          insightsEmpty.style.display  = heirsIdentified > 0 ? "none" : "block";
+        }
+
+        const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
+        if (badge) {
+          const isComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
+          badge.textContent = isComplete ? "Complete" : "In Progress";
+          badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
+          syncOwnershipTreeButton(isComplete);
+        }
+
+        let mostRecentDate = null;
+        (owners || []).forEach(o => {
+          const raw = o.contacted_date || o.lastContact || "";
+          if (!raw || raw === "—") return;
+          const d = parseFlexibleDate(raw);
+          if (d && (!mostRecentDate || d > mostRecentDate)) mostRecentDate = d;
+        });
+        if (mostRecentDate) {
+          const formatted = mostRecentDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          const daysAgoStr = calcDaysAgo(mostRecentDate);
+          const dateEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_date"]');
+          const daysEl = document.querySelector('[data-snapshot="true"][data-field="last_contact_days_ago"]');
+          if (dateEl) dateEl.textContent = formatted;
+          if (daysEl) daysEl.textContent = daysAgoStr || formatted;
+        }
+
+        if (Array.isArray(payload.confirmed_owners)) {
+          renderConfirmedOwners(payload.confirmed_owners);
+          renderOtherContacts(payload.confirmed_owners);
+          updateActionBannerFromContacts(payload.confirmed_owners);
+        } else {
+          updateActionBannerFromContacts([]);
+        }
+        computeContactsSummary(payload);
+
+        [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
+          const el = document.querySelector(`.slds-field[data-field="${statusField}"] .value-text`);
+          const link = payload[linkField];
+          if (!el) return;
+          if (link && String(link).trim() !== '' && String(link).trim() !== '—') {
+            el.style.color = '#0176d3'; el.style.cursor = 'pointer'; el.style.textDecoration = 'none';
+            el.onclick = () => window.open(link, '_blank', 'noopener,noreferrer');
+            el.onmouseover = () => el.style.textDecoration = 'underline';
+            el.onmouseout  = () => el.style.textDecoration = 'none';
+          } else {
+            el.style.color = ''; el.style.cursor = ''; el.style.textDecoration = '';
+            el.onclick = null; el.onmouseover = null; el.onmouseout = null;
+          }
+        });
+      }
+    };
+
+    function syncOwnershipTreeButton(isComplete) {
+      const btn = document.getElementById("ownershipTreeBtn");
+      if (!btn) return;
+      btn.style.display = isComplete ? "none" : "inline-flex";
+    }
+
+    function fireOwnershipConfetti() {
+      const container = document.getElementById("ownershipConfetti");
+      if (!container) return;
+      container.innerHTML = "";
+      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
+      let originX = window.innerWidth / 2, originY = 100;
+      if (badge) { const r = badge.getBoundingClientRect(); originX = r.left + r.width / 2; originY = r.top + r.height / 2; }
+      const colors = ["#10b981","#34d399","#6ee7b7","#0176d3","#60a5fa","#fbbf24","#a78bfa"];
+      for (let i = 0; i < 38; i++) {
+        const el = document.createElement("div"); el.className = "confetti-piece";
+        const angle = Math.random() * 360, distance = 60 + Math.random() * 180;
+        const rad = (angle * Math.PI) / 180;
+        const tx = Math.cos(rad) * distance, ty = Math.sin(rad) * distance - 60;
+        const size = 6 + Math.random() * 6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const shapes = ["2px","50%","0px"];
+        Object.assign(el.style, { left:`${originX}px`, top:`${originY}px`, width:`${size}px`, height:`${size}px`, background:color, borderRadius:shapes[Math.floor(Math.random()*shapes.length)], animationDuration:`${0.55+Math.random()*0.55}s`, animationDelay:`${Math.random()*0.18}s`, transform:`translate(${tx}px,${ty}px)` });
+        container.appendChild(el);
+      }
+      setTimeout(() => { container.innerHTML = ""; }, 1400);
+    }
+
+    async function markOwnershipTreeComplete() {
+      const btn = document.getElementById("ownershipTreeBtn");
+      const badge = document.querySelector('[data-snapshot="true"][data-field="heirs_identified_status"]');
+      if (badge) {
+        badge.textContent = "Complete"; badge.className = "heir-status-badge heir-status-complete";
+        badge.classList.remove("ownership-celebrate"); void badge.offsetWidth; badge.classList.add("ownership-celebrate");
+        setTimeout(() => badge.classList.remove("ownership-celebrate"), 1000);
+      }
+      fireOwnershipConfetti();
+      if (btn) { btn.style.transition = "opacity 0.3s ease, transform 0.3s ease"; btn.style.opacity = "0"; btn.style.transform = "scale(0.85)"; setTimeout(() => { btn.style.display = "none"; }, 320); }
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if (boardId && pulseId) {
+        try {
+          const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: "dropdown_mm1aybze", value: "Complete" }) });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } catch (err) { console.error("Failed to update Ownership Map:", err); }
+      }
+    }
+
+    document.getElementById("ownershipTreeBtn").addEventListener("click", markOwnershipTreeComplete);
+
+    const characteristics = document.getElementById("characteristicsToggle");
+    const toggleCharacteristics = () => {
+      const isOpen = characteristics.getAttribute("data-open") === "true";
+      characteristics.setAttribute("data-open", String(!isOpen));
+      characteristics.querySelector(".toggle-head").setAttribute("aria-expanded", String(!isOpen));
+    };
+    characteristics.querySelector(".toggle-head").addEventListener("click", toggleCharacteristics);
+    characteristics.querySelector(".toggle-head").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCharacteristics(); } });
+
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const panes = Array.from(document.querySelectorAll(".tab-pane"));
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.setAttribute("aria-selected", "false"));
+        panes.forEach(p => p.classList.remove("active"));
+        tab.setAttribute("aria-selected", "true");
+        document.getElementById(tab.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
+
+    function leadStatusDot(status){
+      if (!status || status === "—") return `<span class="td-muted">—</span>`;
+      const s = String(status).toLowerCase().trim();
+      let color = '#d1d5db';
+      if (s.includes('re-skiptrace'))            color = '#d1d5db';
+      else if (s.includes('attempt 1'))          color = '#9ca3af';
+      else if (s.includes('attempt 2'))          color = '#6b7280';
+      else if (s.includes('attempt 3'))          color = '#93c5fd';
+      else if (s.includes('contacted'))          color = '#60a5fa';
+      else if (s.includes('interested'))         color = '#3b82f6';
+      else if (s.includes('negotiation') || s.includes('review')) color = '#2563eb';
+      else if (s.includes('accepted'))           color = '#1d4ed8';
+      else if (s.includes('closed'))             color = '#1e3a8a';
+      return `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:500;color:#374151;"><span style="width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>${escapeHtml(status)}</span>`;
+    }
+
+    function formatPhoneForTel(phone){ if (!phone) return ''; return phone.replace(/\D/g, ''); }
+    function formatPhoneDisplay(phone){
+      if (!phone || phone === "—") return null;
+      const digits = String(phone).replace(/\D/g, '');
+      const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
+      if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+      return phone;
+    }
+
+    function calcDaysAgo(dateStr){
+      if (!dateStr || dateStr === "—") return null;
+      const d = parseFlexibleDate(dateStr);
+      if (!d) return null;
+      const days = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+      if (days === 0) return "Today"; if (days === 1) return "1 day ago"; return `${days} days ago`;
+    }
+
+    function renderConfirmedOwners(contacts){
+      const tbody = document.getElementById("confirmedOwnersTbody");
+      const confirmed = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
+      const STATUS_ORDER = ["closed","accepted offer","negotiations","review","interested in selling","contacted","attempt 3","attempt 2","attempt 1","re-skiptrace"];
+      const statusRank = (s) => { const v = String(s || "").toLowerCase().trim(); const idx = STATUS_ORDER.findIndex(k => v.includes(k)); return idx === -1 ? STATUS_ORDER.length : idx; };
+      const sorted = [...confirmed].sort((a, b) => statusRank(a.lead_status || a.leadStatus) - statusRank(b.lead_status || b.leadStatus));
+      const rows = sorted.map((c, index) => {
+        const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
+        const lastContact      = c.contacted_date ?? c.lastContact ?? null;
+        const leadStatus       = c.lead_status ?? c.leadStatus ?? null;
+        const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
+        const offerMade        = c.offer_made ?? c.offerMade ?? false;
+        const offerAmount      = c.offer_amount ?? c.offerAmount ?? "—";
+        const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
+        const phone1           = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
+        const daysAgo = calcDaysAgo(lastContact);
+        let lastContactColor = '#374151';
+        if (daysAgo) { const match = daysAgo.match(/(\d+)/); if (match) { const days = parseInt(match[1]); if (days >= 12) lastContactColor = '#dc2626'; else if (days >= 6) lastContactColor = '#f59e0b'; } }
+        let followupCell = `<span class="td-muted">—</span>`;
+        if (followupDate && followupDate !== "—") {
+          const fpDate = parseFlexibleDate(followupDate);
+          if (fpDate) {
+            const today = startOfDay(new Date()); const fp = startOfDay(fpDate);
+            const diffDays = Math.floor((fp - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) { const overdue = Math.abs(diffDays); followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#dc2626;font-weight:500;">Overdue by ${overdue} day${overdue===1?'':'s'}</div></div>`; }
+            else if (diffDays === 0) { followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#f59e0b;font-weight:500;">Due today</div></div>`; }
+            else { followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#9ca3af;">Upcoming in ${diffDays} day${diffDays===1?'':'s'}</div></div>`; }
+          }
+        }
+        const isClosed = String(c.lead_status || "").trim().toLowerCase() === "closed";
+        const closedBadge = isClosed ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:6px;vertical-align:middle;"><svg style="width:9px;height:9px;" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></span>` : '';
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0;">${mondayUrl?`<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name??"—")}</a>`:`<span style="font-weight:600;">${escapeHtml(c.name??"—")}</span>`}${closedBadge}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+              ${c.relationship?`<span style="font-size:12px;color:#9ca3af;">${escapeHtml(c.relationship)}</span>`:''}
+              ${c.relationship&&ownershipPercent&&ownershipPercent!=="—"&&ownershipPercent!==0&&ownershipPercent!=="0"?`<span style="font-size:11px;color:#cbd5e1;">·</span>`:''}
+              ${ownershipPercent&&ownershipPercent!=="—"&&ownershipPercent!==0&&ownershipPercent!=="0"?`<span style="font-size:12px;font-weight:700;color:#0176d3;">${escapeHtml(String(ownershipPercent))}%</span>`:''}
+            </div>
+          </td>
+          <td>${leadStatusDot(leadStatus)}</td>
+          <td>${lastContact&&lastContact!=="—"?`<div style="font-weight:600;">${escapeHtml(lastContact)}</div><div style="font-size:12px;color:${lastContactColor};">${daysAgo||''}</div>`:`<span class="td-muted">Not contacted</span>`}</td>
+          <td>${followupCell}</td>
+          <td>${offerMade?`<div style="font-weight:600;">Presented</div><div style="font-size:12px;color:#6b7280;">${offerAmount&&offerAmount!=="—"?"$"+Math.round(parseFloat(String(offerAmount).replace(/[^0-9.]/g,""))).toLocaleString("en-US"):"—"}</div>`:`<span class="td-muted">No offer</span>`}</td>
+          <td>${phone1?`<a href="tel:${formatPhoneForTel(phone1)}" style="font-weight:500;color:#0176d3;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone1)}</a>`:`<span class="td-muted">—</span>`}</td>
+          <td><div class="quick-actions"><button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button></div></td>
+        </tr>`;
+      }).join("");
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
+      tbody.querySelectorAll('.add-note-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); const idx = parseInt(e.target.getAttribute('data-contact-index')); openNoteModal(sorted[idx], idx, e.target); });
+      });
+    }
+
+    function renderOtherContacts(contacts){
+      const tbody = document.getElementById("otherContactsTbody");
+      const others = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes");
+      const LEAD_STATUS_OPTS = [{ value:"Referral",dot:"green"},{ value:"In Progress",dot:"blue"},{ value:"Contacted",dot:"green"},{ value:"Not Reached",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Do Not Call",dot:"red"},{ value:"Closed",dot:"purple"}];
+      const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
+      function dotClass(value, opts) { if (!value||value==="—") return "none"; const match = opts.find(o => o.value.toLowerCase()===String(value).toLowerCase()); return match?match.dot:"none"; }
+      function statusDropdown(value, opts, fieldKey, rowIdx) {
+        const current = value||"—"; const dot = dotClass(current,opts); const id=`orc-dd-${fieldKey}-${rowIdx}`;
+        return `<div class="orc-status-wrap" id="${id}" data-field="${fieldKey}" data-row="${rowIdx}" data-opts="${fieldKey==='lead_status'?'lead':'phone'}"><button class="orc-status-btn" type="button" data-dd="${id}" data-current="${escapeHtml(current)}"><span class="orc-status-dot ${dot}"></span><span class="orc-status-label">${escapeHtml(current)}</span><svg class="orc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button></div>`;
+      }
+      const rows = others.map((c,i) => {
+        const mondayUrl = c.monday_url??c.mondayUrl??null;
+        const leadStatus = c.lead_status??c.leadStatus??null;
+        const phone1 = formatPhoneDisplay(c.phone_1??c.phone1??null);
+        const phone1Status = c.phone_1_status??c.phone1Status??null;
+        const phone2 = formatPhoneDisplay(c.phone_2??c.phone2??null);
+        const phone2Status = c.phone_2_status??c.phone2Status??null;
+        return `<tr data-orc-row="${i}">
+          <td class="orc-idx">${i+1}</td>
+          <td>${mondayUrl?`<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="orc-name">${escapeHtml(c.name??"—")}</a>`:`<span class="orc-name-plain">${escapeHtml(c.name??"—")}</span>`}</td>
+          <td class="orc-rel">${escapeHtml(c.relationship??"—")}</td>
+          <td>${statusDropdown(leadStatus,LEAD_STATUS_OPTS,'lead_status',i)}</td>
+          <td>${phone1?`<a href="tel:${formatPhoneForTel(phone1)}" class="orc-phone">${escapeHtml(phone1)}</a>`:`<span class="orc-empty">—</span>`}</td>
+          <td>${statusDropdown(phone1Status,PHONE_STATUS_OPTS,'phone_1_status',i)}</td>
+          <td>${phone2?`<a href="tel:${formatPhoneForTel(phone2)}" class="orc-phone">${escapeHtml(phone2)}</a>`:`<span class="orc-empty">—</span>`}</td>
+          <td>${statusDropdown(phone2Status,PHONE_STATUS_OPTS,'phone_2_status',i)}</td>
+        </tr>`;
+      }).join("");
+      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="8" style="padding:16px;color:#9ca3af;">No other related contacts.</td></tr>`;
+
+      let orcPortal = document.getElementById('orcPortal');
+      if (!orcPortal) { orcPortal = document.createElement('div'); orcPortal.id='orcPortal'; orcPortal.className='orc-dropdown'; orcPortal.style.position='fixed'; orcPortal.style.zIndex='9999'; document.body.appendChild(orcPortal); }
+      let activeWrap = null;
+      function closePortal() { orcPortal.style.display='none'; orcPortal.innerHTML=''; if(activeWrap){activeWrap.classList.remove('open');activeWrap=null;} }
+      tbody.querySelectorAll('.orc-status-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); const ddId=btn.getAttribute('data-dd'); const wrap=document.getElementById(ddId);
+          if(activeWrap===wrap){closePortal();return;} closePortal();
+          const fieldKey=wrap.getAttribute('data-field'); const rowIdx=parseInt(wrap.getAttribute('data-row'));
+          const optsKey=wrap.getAttribute('data-opts'); const opts=optsKey==='lead'?LEAD_STATUS_OPTS:PHONE_STATUS_OPTS;
+          const current=btn.getAttribute('data-current');
+          orcPortal.innerHTML = opts.map(o=>`<div class="orc-dropdown-item${o.value===current?' selected':''}" data-value="${escapeHtml(o.value)}" data-dot="${o.dot}" data-ddid="${ddId}"><span class="orc-status-dot ${o.dot}"></span>${escapeHtml(o.value)}</div>`).join('');
+          const rect=btn.getBoundingClientRect(); const portalH=opts.length*35+8;
+          orcPortal.style.display='block'; orcPortal.style.minWidth=Math.max(rect.width,170)+'px';
+          orcPortal.style.top = (window.innerHeight-rect.bottom<portalH+8&&rect.top>portalH) ? (rect.top-portalH-4)+'px' : (rect.bottom+4)+'px';
+          orcPortal.style.left=rect.left+'px'; wrap.classList.add('open'); activeWrap=wrap;
+          orcPortal.querySelectorAll('.orc-dropdown-item').forEach(item=>{
+            item.addEventListener('click',(ev)=>{ ev.stopPropagation(); const val=item.getAttribute('data-value'); const dot=item.getAttribute('data-dot'); const wId=item.getAttribute('data-ddid'); const w=document.getElementById(wId); const b=w.querySelector('.orc-status-btn'); b.querySelector('.orc-status-dot').className=`orc-status-dot ${dot}`; b.querySelector('.orc-status-label').textContent=val; b.setAttribute('data-current',val); closePortal(); });
+          });
+        });
+      });
+      document.addEventListener('click', closePortal);
+      document.addEventListener('keydown', (e)=>{if(e.key==='Escape')closePortal();});
+    }
+
+    const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
+    const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
+    subTabs.forEach(subTab => {
+      subTab.addEventListener("click", () => {
+        subTabs.forEach(t => t.setAttribute("aria-selected","false"));
+        subPanes.forEach(p => p.classList.remove("active"));
+        subTab.setAttribute("aria-selected","true");
+        document.getElementById(subTab.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
+
     async function saveToMonday(fieldKey, newValue) {
       const columnId = COLUMN_ID_MAP[fieldKey];
       if (!columnId) { console.warn(`No column ID mapped for field: ${fieldKey}`); return; }
       const { boardId, pulseId } = extractIdsFromUrl();
       if (!boardId || !pulseId) { console.error("Cannot save — missing boardId or pulseId in URL"); return; }
       try {
-        const res = await fetch(SAVE_WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ boardId, pulseId, columnId, value: newValue })
-        });
+        const res = await fetch(SAVE_WEBHOOK, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({boardId,pulseId,columnId,value:newValue}) });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        console.log(`✓ Saved ${fieldKey} → ${newValue}`);
-      } catch (err) {
-        console.error(`✗ Failed to save ${fieldKey}:`, err);
-        showSaveToast("error");
-      }
+      } catch (err) { console.error(`Failed to save ${fieldKey}:`, err); showSaveToast("error"); }
     }
 
     function showSaveToast(type) {
-      const existing = document.getElementById("saveToast");
-      if (existing) existing.remove();
-      const toast = document.createElement("div");
-      toast.id = "saveToast";
-      toast.textContent = type === "error" ? "⚠ Save failed — check console" : "✓ Saved";
-      Object.assign(toast.style, {
-        position: "fixed", bottom: "20px", right: "20px",
-        padding: "10px 16px", borderRadius: "8px", fontSize: "14px",
-        fontWeight: "600", zIndex: "99999", transition: "opacity 0.4s ease",
-        background: type === "error" ? "#fef2f2" : "#d1fae5",
-        color: type === "error" ? "#dc2626" : "#065f46",
-        border: `1px solid ${type === "error" ? "#fecaca" : "#6ee7b7"}`,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-      });
+      const existing = document.getElementById("saveToast"); if(existing) existing.remove();
+      const toast = document.createElement("div"); toast.id="saveToast"; toast.textContent=type==="error"?"⚠ Save failed":"✓ Saved";
+      Object.assign(toast.style,{position:"fixed",bottom:"20px",right:"20px",padding:"10px 16px",borderRadius:"8px",fontSize:"14px",fontWeight:"600",zIndex:"99999",transition:"opacity 0.4s ease",background:type==="error"?"#fef2f2":"#d1fae5",color:type==="error"?"#dc2626":"#065f46",border:`1px solid ${type==="error"?"#fecaca":"#6ee7b7"}`,boxShadow:"0 4px 12px rgba(0,0,0,0.1)"});
       document.body.appendChild(toast);
-      setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 400); }, 2500);
+      setTimeout(()=>{toast.style.opacity="0";setTimeout(()=>toast.remove(),400);},2500);
     }
 
-    // Inline edit — updated selector for slds-field
     Array.from(document.querySelectorAll(".slds-field .edit")).forEach(pencil => {
       pencil.addEventListener("click", (e) => {
         e.stopPropagation();
-        const field = pencil.closest(".slds-field");
-        const fieldKey = field.getAttribute("data-field");
+        const field = pencil.closest(".slds-field"); const fieldKey = field.getAttribute("data-field");
         const valueText = field.querySelector(".value-text");
-        const editable = valueText.getAttribute("data-editable") === "true";
-        if (!editable) return;
+        if (valueText.getAttribute("data-editable") !== "true") return;
         if (field.querySelector(".inline-input")) return;
-
         const oldValue = valueText.textContent.trim() === "—" ? "" : valueText.textContent.trim();
         const valueWrap = field.querySelector(".slds-value");
-        valueText.style.display = "none";
-        pencil.style.display = "none";
-
-        const input = document.createElement("input");
-        input.className = "inline-input";
-        input.value = oldValue;
-
-        const left = document.createElement("div");
-        left.style.flex = "1";
-        left.style.minWidth = "0";
-        left.appendChild(input);
+        valueText.style.display="none"; pencil.style.display="none";
+        const input = document.createElement("input"); input.className="inline-input"; input.value=oldValue;
+        const left = document.createElement("div"); left.style.flex="1"; left.style.minWidth="0"; left.appendChild(input);
         valueWrap.insertBefore(left, valueWrap.firstChild);
-
         let committed = false;
-
         const commit = async () => {
-          if (committed) return;
-          committed = true;
-          const newValue = input.value.trim() || "—";
-          valueText.textContent = newValue;
-          left.remove();
-          valueText.style.display = "";
-          pencil.style.display = "";
-          if (newValue !== (oldValue || "—")) {
-            await saveToMonday(fieldKey, newValue === "—" ? "" : newValue);
-            showSaveToast("success");
-          }
+          if(committed) return; committed=true;
+          const newValue = input.value.trim()||"—";
+          valueText.textContent=newValue; left.remove(); valueText.style.display=""; pencil.style.display="";
+          if(newValue!==(oldValue||"—")){ await saveToMonday(fieldKey, newValue==="—"?"":newValue); showSaveToast("success"); }
         };
-
-        const cancel = () => {
-          if (committed) return;
-          committed = true;
-          left.remove();
-          valueText.style.display = "";
-          pencil.style.display = "";
-        };
-
-        input.addEventListener("blur", commit);
-        input.addEventListener("keydown", (ke) => {
-          if (ke.key === "Enter") { ke.preventDefault(); commit(); }
-          if (ke.key === "Escape") cancel();
-        });
-
-        input.focus();
-        input.select();
+        const cancel = () => { if(committed) return; committed=true; left.remove(); valueText.style.display=""; pencil.style.display=""; };
+        input.addEventListener("blur",commit);
+        input.addEventListener("keydown",(ke)=>{ if(ke.key==="Enter"){ke.preventDefault();commit();} if(ke.key==="Escape")cancel(); });
+        input.focus(); input.select();
       });
     });
 
     Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
       node.addEventListener('click', () => {
-        const raw = (node.textContent || '').trim();
-        if (!raw || raw === '—') return;
-        let url = raw;
-        if (!/^https?:\/\//i.test(url)) {
-          if (/\./.test(url) || url.startsWith('www.') || url.includes('/')) {
-            url = 'https://' + url.replace(/^www\./i, 'www.');
-          }
-        }
-        if (!/^https?:\/\//i.test(url)) return;
-        window.open(url, '_blank', 'noopener,noreferrer');
+        const raw = (node.textContent||'').trim(); if(!raw||raw==='—') return;
+        let url=raw; if(!/^https?:\/\//i.test(url)){ if(/\./.test(url)||url.startsWith('www.')||url.includes('/')) url='https://'+url.replace(/^www\./i,'www.'); }
+        if(!/^https?:\/\//i.test(url)) return;
+        window.open(url,'_blank','noopener,noreferrer');
       });
     });
 
-    document.getElementById("btnRefresh").addEventListener("click", () => { fetchDataFromMake(); });
+    document.getElementById("btnRefresh").addEventListener("click", ()=>{ fetchDataFromMake(); });
 
-    function showLoading(){
-      const overlay = document.getElementById("loadingOverlay");
-      if (overlay) { overlay.setAttribute("aria-hidden", "false"); overlay.classList.remove('fade-out'); }
-    }
-    function hideLoading(){
-      const overlay = document.getElementById("loadingOverlay");
-      if (!overlay) return;
-      overlay.classList.add('fade-out');
-      setTimeout(() => { overlay.setAttribute("aria-hidden", "true"); overlay.classList.remove('fade-out'); }, 300);
-    }
-
-    function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+    function showLoading(){ const o=document.getElementById("loadingOverlay"); if(o){o.setAttribute("aria-hidden","false");o.classList.remove('fade-out');} }
+    function hideLoading(){ const o=document.getElementById("loadingOverlay"); if(!o) return; o.classList.add('fade-out'); setTimeout(()=>{o.setAttribute("aria-hidden","true");o.classList.remove('fade-out');},300); }
+    function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
 
     function parseFlexibleDate(input){
-      if (!input) return null;
-      if (input instanceof Date) return isNaN(input) ? null : input;
-      const s = String(input).trim();
-      if (!s || s === "—") return null;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-        const d = new Date(s + "T00:00:00");
-        return isNaN(d) ? null : d;
-      }
-      const t = Date.parse(s);
-      if (!isNaN(t)) return new Date(t);
-      return null;
+      if(!input) return null; if(input instanceof Date) return isNaN(input)?null:input;
+      const s=String(input).trim(); if(!s||s==="—") return null;
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ const d=new Date(s+"T00:00:00"); return isNaN(d)?null:d; }
+      const t=Date.parse(s); if(!isNaN(t)) return new Date(t); return null;
     }
 
     function updateActionBannerFromContacts(confirmedOwners){
-      const banner = document.getElementById("actionBanner");
-      const textNode = document.getElementById("actionBannerText");
-      if (!banner || !textNode) return;
-      const today = startOfDay(new Date());
-      let best = null;
-      (confirmedOwners || []).forEach(c => {
-        const d = parseFlexibleDate(c?.follow_up_date ?? c?.followupDate);
-        if (!d) return;
-        const due = startOfDay(d);
-        const diffDays = Math.floor((today - due) / (1000*60*60*24));
-        if (diffDays > 0) {
-          const candidate = { name: String(c?.name ?? "—").trim() || "—", daysOverdue: diffDays, nextAction: String(c?.next_action ?? c?.nextAction ?? "").trim() };
-          if (!best || candidate.daysOverdue > best.daysOverdue) best = candidate;
+      const banner=document.getElementById("actionBanner"); const textNode=document.getElementById("actionBannerText");
+      if(!banner||!textNode) return;
+      const today=startOfDay(new Date()); let best=null;
+      (confirmedOwners||[]).forEach(c=>{
+        const d=parseFlexibleDate(c?.follow_up_date??c?.followupDate); if(!d) return;
+        const due=startOfDay(d); const diffDays=Math.floor((today-due)/(1000*60*60*24));
+        if(diffDays>0){
+          const candidate={name:String(c?.name??"—").trim()||"—",daysOverdue:diffDays,nextAction:String(c?.next_action??c?.nextAction??"").trim()};
+          if(!best||candidate.daysOverdue>best.daysOverdue) best=candidate;
         }
       });
-      if (!best) { banner.classList.remove("show"); textNode.textContent = "—"; return; }
-      const plural = best.daysOverdue === 1 ? "" : "s";
-      const base = `<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
-      const full = best.nextAction ? `${base} <strong>Next step:</strong> ${best.nextAction}.` : base;
-      textNode.innerHTML = full;
+      if(!best){banner.classList.remove("show");textNode.textContent="—";return;}
+      const plural=best.daysOverdue===1?"":"s";
+      const base=`<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
+      // ── Show "No next steps." when nextAction is empty ──
+      const full=best.nextAction
+        ? `${base} <strong>Next step:</strong> ${best.nextAction}.`
+        : `${base} <strong>Next step:</strong> No next steps.`;
+      textNode.innerHTML=full;
       banner.classList.add("show");
     }
 
     function computeContactsSummary(payload){
-      const el = document.getElementById("contactsSummary");
-      if (!el) return;
-      const allSubitems = Array.isArray(payload?.confirmed_owners) ? payload.confirmed_owners : [];
-      const confirmedOwners = allSubitems.filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
-      const contactedStatuses = ["contacted", "interested in selling", "negotiations", "review", "accepted offer", "closed"];
-      const contacted = confirmedOwners.filter(c => {
-        const s = String(c.lead_status || "").trim().toLowerCase();
-        return contactedStatuses.some(cs => s.includes(cs));
-      }).length;
-      const owners = confirmedOwners.length;
-      const unrelated = allSubitems.filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes").length;
-      const total = allSubitems.length;
-      el.textContent = `${total} Total Contacts · ${owners} Owners · ${unrelated} Unrelated`;
+      const el=document.getElementById("contactsSummary"); if(!el) return;
+      const allSubitems=Array.isArray(payload?.confirmed_owners)?payload.confirmed_owners:[];
+      const confirmedOwners=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()==="yes");
+      const contactedStatuses=["contacted","interested in selling","negotiations","review","accepted offer","closed"];
+      const contacted=confirmedOwners.filter(c=>{const s=String(c.lead_status||"").trim().toLowerCase();return contactedStatuses.some(cs=>s.includes(cs));}).length;
+      const owners=confirmedOwners.length;
+      const unrelated=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()!=="yes").length;
+      el.textContent=`${allSubitems.length} Total Contacts · ${owners} Owners · ${unrelated} Unrelated`;
     }
 
-    function extractIdsFromUrl() {
-      const fullUrl = window.location.href;
-      let urlParams = window.location.search;
-      if (!urlParams || urlParams === '?') { return { boardId: null, pulseId: null }; }
-      urlParams = urlParams.substring(1).trim();
-      if (urlParams.includes('/pulses/')) {
-        const parts = urlParams.split('/pulses/');
-        return { boardId: parts[0].trim(), pulseId: parts[1] ? parts[1].trim() : null };
-      }
-      const params = new URLSearchParams(urlParams);
-      return {
-        boardId: params.get('boardId') || params.get('board_id'),
-        pulseId: params.get('pulseId') || params.get('pulse_id') || params.get('itemId') || params.get('item_id')
-      };
+    function extractIdsFromUrl(){
+      let urlParams=window.location.search;
+      if(!urlParams||urlParams==='?') return{boardId:null,pulseId:null};
+      urlParams=urlParams.substring(1).trim();
+      if(urlParams.includes('/pulses/')){ const parts=urlParams.split('/pulses/'); return{boardId:parts[0].trim(),pulseId:parts[1]?parts[1].trim():null}; }
+      const params=new URLSearchParams(urlParams);
+      return{ boardId:params.get('boardId')||params.get('board_id'), pulseId:params.get('pulseId')||params.get('pulse_id')||params.get('itemId')||params.get('item_id') };
     }
 
-    async function fetchDataFromMake() {
-      const webhookURL = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
+    async function fetchDataFromMake(){
+      const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
       showLoading();
-      const { boardId, pulseId } = extractIdsFromUrl();
-      if (!boardId || !pulseId) {
-        console.error('Missing board ID or pulse ID in URL');
-        alert(`Error: Missing board ID or pulse ID in URL.\n\nFound:\n- Board ID: ${boardId || 'MISSING'}\n- Pulse ID: ${pulseId || 'MISSING'}`);
-        hideLoading();
-        return;
-      }
-      try {
-        const response = await fetch(webhookURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ boardId, pulseId })
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+      const{boardId,pulseId}=extractIdsFromUrl();
+      if(!boardId||!pulseId){ console.error('Missing board ID or pulse ID'); hideLoading(); return; }
+      try{
+        const response=await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
+        if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data=await response.json();
         window.RecordPage.applyData(data);
-      } catch (error) {
-        console.error('Error fetching data from Make.com:', error);
-        alert('Failed to refresh data. Check console for details.');
-      } finally {
-        hideLoading();
-      }
+      }catch(error){ console.error('Error fetching data from Make.com:',error); }
+      finally{ hideLoading(); }
     }
 
-    window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
+    window.addEventListener('DOMContentLoaded',()=>{ fetchDataFromMake(); });
 
-    function escapeHtml(str){
-      return String(str ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    function escapeHtml(str){ return String(str??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+    function formatValue(v){ if(v===null||v===undefined||v==="") return "—"; if(typeof v==="number") return String(v); if(typeof v==="boolean") return v?"Yes":"No"; return String(v); }
+    function cssEscape(s){ return String(s).replaceAll('"','\\"'); }
+
+    let currentNoteContact=null, currentNoteContactIndex=null;
+    function openNoteModal(contact,contactIndex,buttonElement){
+      currentNoteContact=contact; currentNoteContactIndex=contactIndex;
+      document.getElementById('noteContactName').textContent=contact.name||'—';
+      const ownerPct=contact.ownership_percent??contact.ownershipPercent??'—';
+      document.getElementById('noteContactRelation').textContent=contact.relationship?`${contact.relationship} • ${ownerPct}% ownership`:`${ownerPct}% ownership`;
+      document.getElementById('noteTextarea').value=''; document.getElementById('noteCharCount').textContent='0';
+      const overlay=document.getElementById('noteModalOverlay'); const modal=overlay.querySelector('.note-modal');
+      modal.style.position='fixed'; modal.style.top='50%'; modal.style.left='50%'; modal.style.transform='translate(-50%,-50%)';
+      overlay.classList.add('active'); setTimeout(()=>{document.getElementById('noteTextarea').focus();},100);
     }
-    function formatValue(v){
-      if (v === null || v === undefined || v === "") return "—";
-      if (typeof v === "number") return String(v);
-      if (typeof v === "boolean") return v ? "Yes" : "No";
-      return String(v);
+    function closeNoteModal(){ document.getElementById('noteModalOverlay').classList.remove('active'); currentNoteContact=null; currentNoteContactIndex=null; }
+    async function saveNote(){
+      const noteText=document.getElementById('noteTextarea').value.trim();
+      if(!noteText){alert('Please enter a note before saving.');return;}
+      const saveBtn=document.getElementById('noteBtnSave'); saveBtn.disabled=true; saveBtn.textContent='Saving...';
+      try{ console.log('Note:',{contactName:currentNoteContact?.name,note:noteText,timestamp:new Date().toISOString(),...extractIdsFromUrl()}); await new Promise(r=>setTimeout(r,500)); closeNoteModal(); showSaveToast("success"); }
+      catch(error){ console.error('Error saving note:',error); alert('Failed to save note.'); }
+      finally{ saveBtn.disabled=false; saveBtn.textContent='Save Note'; }
     }
-    function cssEscape(s){ return String(s).replaceAll('"', '\\"'); }
-
-    let currentNoteContact = null;
-    let currentNoteContactIndex = null;
-
-    function openNoteModal(contact, contactIndex, buttonElement) {
-      currentNoteContact = contact;
-      currentNoteContactIndex = contactIndex;
-      document.getElementById('noteContactName').textContent = contact.name || '—';
-      const ownerPct = contact.ownership_percent ?? contact.ownershipPercent ?? '—';
-      document.getElementById('noteContactRelation').textContent = contact.relationship 
-        ? `${contact.relationship} • ${ownerPct}% ownership`
-        : `${ownerPct}% ownership`;
-      document.getElementById('noteTextarea').value = '';
-      document.getElementById('noteCharCount').textContent = '0';
-      const overlay = document.getElementById('noteModalOverlay');
-      const modal = overlay.querySelector('.note-modal');
-      modal.style.position = 'fixed';
-      modal.style.top = '50%';
-      modal.style.left = '50%';
-      modal.style.transform = 'translate(-50%, -50%)';
-      overlay.classList.add('active');
-      setTimeout(() => { document.getElementById('noteTextarea').focus(); }, 100);
-    }
-
-    function closeNoteModal() {
-      document.getElementById('noteModalOverlay').classList.remove('active');
-      currentNoteContact = null;
-      currentNoteContactIndex = null;
-    }
-
-    async function saveNote() {
-      const noteText = document.getElementById('noteTextarea').value.trim();
-      if (!noteText) { alert('Please enter a note before saving.'); return; }
-      if (!currentNoteContact) { alert('Error: No contact selected.'); return; }
-      const saveBtn = document.getElementById('noteBtnSave');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
-      try {
-        const payload = {
-          contactName: currentNoteContact.name,
-          contactIndex: currentNoteContactIndex,
-          note: noteText,
-          timestamp: new Date().toISOString(),
-          boardId: 'BOARD_ID',
-          pulseId: 'PULSE_ID'
-        };
-        console.log('Note to save:', payload);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        alert(`Note saved for ${currentNoteContact.name}!`);
-        closeNoteModal();
-      } catch (error) {
-        console.error('Error saving note:', error);
-        alert('Failed to save note. Please try again.');
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Note';
-      }
-    }
-
-    document.getElementById('noteModalClose').addEventListener('click', closeNoteModal);
-    document.getElementById('noteBtnCancel').addEventListener('click', closeNoteModal);
-    document.getElementById('noteBtnSave').addEventListener('click', saveNote);
-    document.getElementById('noteModalOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'noteModalOverlay') closeNoteModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.getElementById('noteModalOverlay').classList.contains('active')) closeNoteModal();
-    });
-    document.getElementById('noteTextarea').addEventListener('input', (e) => {
-      document.getElementById('noteCharCount').textContent = e.target.value.length;
-    });
+    document.getElementById('noteModalClose').addEventListener('click',closeNoteModal);
+    document.getElementById('noteBtnCancel').addEventListener('click',closeNoteModal);
+    document.getElementById('noteBtnSave').addEventListener('click',saveNote);
+    document.getElementById('noteModalOverlay').addEventListener('click',(e)=>{if(e.target.id==='noteModalOverlay')closeNoteModal();});
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&document.getElementById('noteModalOverlay').classList.contains('active'))closeNoteModal();});
+    document.getElementById('noteTextarea').addEventListener('input',(e)=>{document.getElementById('noteCharCount').textContent=e.target.value.length;});
   </script>
 </body>
 </html>
