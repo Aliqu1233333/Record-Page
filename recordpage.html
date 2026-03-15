@@ -845,31 +845,9 @@
 
   <script>
     // ── COLUMN ID MAP — fallback hardcoded values, overwritten on load by column_map ──
-    const COLUMN_ID_MAP = {
-      "lead_type":          "text16__1",
-      "tax_status":         "dropdown_1_mkm2rj6r",
-      "condition":          "dropdown_mkm2dn8t",
-      "occupancy":          "dropdown_2_mkm2g8p5",
-      "equity":             "text_mkr4rctb",
-      "deed_status":        "dropdown_mkxn2crm",
-      "will_status":        "dropdown_mkxn8zvw",
-      "deed_link":          "text_deed_link",
-      "will_link":          "text_will_link",
-      "title_issue":        "dropdown_3_mkm2q90p",
-      "next_action_step":   "dropdown_mkzkc600",
-      "stalled_reason":     "dropdown_mkzkq6pk",
-      "follow_up_date":     "date_mkpbazwa",
-      "obituary_link":      "link_mkm1203y",
-      "ancestry_link":      "link_mkn89tj9",
-      "zillow_link":        "link_mkktcawe",
-      "tax_assessor_link":  "dup__of_obituary_mkm13z9",
-      "google_maps_link":   "link_mkxf5hmb",
-      "birth_date":         "text_mkm2b3zj",
-      "death_date":         "text_1_mkm22xph",
-      "age":                "text29__1",
-      "last_contacted":     "date_Mjj4pmmI",
-      "activity_notes":     "text_activity_notes",
-    };
+    // Column IDs are populated dynamically from the column_map in the webhook response.
+    // No hardcoded IDs — works for any board automatically.
+    const COLUMN_ID_MAP = {};
 
     const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
@@ -1292,7 +1270,7 @@
         const d=parseFlexibleDate(c?.follow_up_date??c?.followupDate); if(!d) return;
         const due=startOfDay(d); const diffDays=Math.floor((today-due)/(1000*60*60*24));
         if(diffDays>0){
-          const candidate={name:String(c?.name??"—").trim()||"—",daysOverdue:diffDays,nextAction:String(c?.next_action??c?.nextAction??"").trim()};
+          const rawNext=String(c?.next_action??c?.nextAction??"").trim(); const candidate={name:String(c?.name??"—").trim()||"—",daysOverdue:diffDays,nextAction:(rawNext&&rawNext!=="—")?rawNext:""};
           if(!best||candidate.daysOverdue>best.daysOverdue) best=candidate;
         }
       });
