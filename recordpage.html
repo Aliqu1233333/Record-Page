@@ -1935,7 +1935,16 @@
     let rcOthers = [];
 
     // Fire webhook when a field changes in the Related Contacts section
+    // Debounce guard prevents double-fires on the same pulse+field within 1500ms
+    const _rcWebhookLastFired = {};
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
+      const key = `${pulseId}::${columnId}`;
+      const now = Date.now();
+      if(_rcWebhookLastFired[key] && now - _rcWebhookLastFired[key] < 1500) {
+        console.log(`RC webhook debounced: ${key}`);
+        return;
+      }
+      _rcWebhookLastFired[key] = now;
       try {
         await fetch(RC_CHANGE_WEBHOOK, {
           method: "POST",
