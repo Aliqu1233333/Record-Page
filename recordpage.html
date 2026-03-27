@@ -771,7 +771,7 @@
 
     /* Left list */
     .rc-list {
-      width:240px; flex-shrink:0; background:#fff;
+      width:300px; flex-shrink:0; background:#fff;
       border-right:1px solid #f3f3f3; overflow-y:auto; max-height:520px;
     }
     .rc-list-item {
@@ -2206,6 +2206,23 @@
       if(cntOther) cntOther.textContent = `(${rcOthers.length})`;
     }
 
+    // ── Name & phone formatters ──────────────────────────────────────────
+    function toProperName(raw){
+      if(!raw || raw === "—") return raw;
+      const parts = String(raw).trim().split(/\s+/);
+      // Drop middle name/initial — keep first and last only
+      const keep = parts.length >= 3 ? [parts[0], parts[parts.length - 1]] : parts;
+      return keep.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    function formatPhone(raw){
+      if(!raw || raw === "—") return raw;
+      const digits = String(raw).replace(/\D/g,'');
+      const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
+      if(d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+      return raw;
+    }
+
     // ── Map payload subitems → rc format ────────────────────────────────
     function rcMapContact(c){
       // Support both snake_case (API) and camelCase (old) field names
@@ -2223,28 +2240,27 @@
       const ownerStatusNorm = String(rawOwnerStatus).trim().toLowerCase();
       const ownerStatusDisplay = rawOwnerStatus ? String(rawOwnerStatus) : "—";
       return {
-        name:             c.name ?? "—",
+        name:             toProperName(c.name ?? "—"),
         relation:         c.relationship ?? c.relation ?? "—",
         ownership:        c.ownership_percent != null ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%') : (c.ownership ?? "—"),
         status,
         statusOn,
         ownerStatus:      ownerStatusDisplay,
-        ownerStatusNorm,  // used internally by filter
+        ownerStatusNorm,
         followUp,
         overdue,
         sellerMotivation: c.seller_motivation ?? c.sellerMotivation ?? "—",
         offer:            c.offer_amount ?? c.offerAmount ?? (c.offer_made ? "Presented" : "—"),
-        phone:            c.phone_1 ?? c.phone1 ?? c.phone ?? "—",
+        phone:            formatPhone(c.phone_1 ?? c.phone1 ?? c.phone ?? "—"),
         phoneStatus:      c.phone_1_status ?? c.phone1Status ?? c.phoneStatus ?? "—",
-        phone2:           c.phone_2 ?? c.phone2 ?? "—",
+        phone2:           formatPhone(c.phone_2 ?? c.phone2 ?? "—"),
         phone2Status:     c.phone_2_status ?? c.phone2Status ?? "—",
-        phone3:           c.phone_3 ?? c.phone3 ?? "—",
+        phone3:           formatPhone(c.phone_3 ?? c.phone3 ?? "—"),
         phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
         contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
         address:          c.address ?? "—",
         keyContact:       !!(c.key_contact ?? c.keyContact ?? false),
         notes:            c.notes ?? "",
-        // Keep original for webhook pulse_id
         pulseId:          c.pulse_id ?? c.pulseId ?? c.id ?? null,
         boardId:          c.board_id ?? c.boardId ?? null,
       };
@@ -2304,11 +2320,14 @@
     });
 
     // ── Event delegation per pane ────────────────────────────────────────
-    function rcAttachPaneEvents(paneId, dataArr, innerId, detailId, renderFn, isOwner){
+    function rcAttachPaneEvents(paneId, _dataArr, innerId, detailId, renderFn, isOwner){
       const pane = document.getElementById(paneId);
       if(!pane) return;
+      // Always read the live array so edits after applyData() populates data work correctly
+      const getLiveData = () => paneId === 'pane-owners' ? rcOwners : rcOthers;
       pane.addEventListener("click", async e => {
         const el = e.target;
+        const dataArr = getLiveData();
         const { boardId, pulseId: globalPulseId } = getRcIds();
 
         // Status dropdown open/close
@@ -2478,6 +2497,8 @@
     }
 
     // Attach pane event listeners
+    // NOTE: dataArr param is intentionally NOT used for lookups inside the handler —
+    // we always read rcOwners/rcOthers live to avoid stale-closure bugs after applyData populates them.
     rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
     rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
 
