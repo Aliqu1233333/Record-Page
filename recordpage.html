@@ -1478,6 +1478,7 @@
 
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
+      if (!tbody) return; // table removed in RC revamp — new component handles rendering
       const confirmed = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
       const STATUS_ORDER = ["closed","accepted offer","negotiations","review","interested in selling","contacted","attempt 3","attempt 2","attempt 1","re-skiptrace"];
       const statusRank = (s) => { const v = String(s || "").toLowerCase().trim(); const idx = STATUS_ORDER.findIndex(k => v.includes(k)); return idx === -1 ? STATUS_ORDER.length : idx; };
@@ -1532,6 +1533,7 @@
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
+      if (!tbody) return; // table removed in RC revamp — new component handles rendering
       const others = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes");
       const LEAD_STATUS_OPTS = [{ value:"Referral",dot:"green"},{ value:"In Progress",dot:"blue"},{ value:"Contacted",dot:"green"},{ value:"Not Reached",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Do Not Call",dot:"red"},{ value:"Closed",dot:"purple"}];
       const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
