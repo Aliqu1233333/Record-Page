@@ -776,7 +776,7 @@
     }
     .rc-list-item {
       display:flex; align-items:flex-start;
-      padding:11px 14px 11px 11px; cursor:pointer;
+      padding:13px 16px 13px 12px; cursor:pointer;
       border-left:3px solid transparent; transition:border-color .12s;
     }
     .rc-list-item:hover { background:#fafbfc; }
@@ -2008,7 +2008,12 @@
 
     function rcRecordFlagHtml(c, isOwner){
       if(!isOwner || !rcOwnerIsQualifying(c)) return '';
-      const missing = RC_READINESS_OWNER.filter(f => !rcHasVal(c[f.field]));
+      const isAccepted = c.status === 'Accepted Offer';
+      const fields = RC_READINESS_OWNER.filter(f => {
+        if(isAccepted && (f.field === 'followUp' || f.field === 'sellerMotivation')) return false;
+        return true;
+      });
+      const missing = fields.filter(f => !rcHasVal(c[f.field]));
       if(!missing.length) return '';
       const tiles = missing.slice(0,4).map(f => `
         <div class="rc-readiness-tile">
@@ -2177,9 +2182,8 @@
         div.innerHTML = `
           <div class="rc-item-body">
             <div class="rc-item-name-row">
-              ${isClosed ? RC_CLOSED_CHECK : ''}
               <span class="rc-item-name">${escapeHtml(c.name)}</span>
-              ${rcStatusTextHtml(c, isOwner)}
+              ${isClosed ? RC_CLOSED_CHECK : ''}
             </div>
             <div class="rc-item-sub">${escapeHtml(c.relation)}${c.ownership && c.ownership !== "—" ? " · " + escapeHtml(c.ownership) : ""}</div>
             <div class="rc-item-status">
@@ -2235,14 +2239,18 @@
         const d = parseFlexibleDate(followUp);
         if(d){ const ds = new Date(d); ds.setHours(0,0,0,0); overdue = ds < today; }
       }
-      // Normalize owner_status — handles "Yes", "yes", true, or missing
+      // Treat 0 ownership as empty — not a real value
+      const rawOwnership = c.ownership_percent != null
+        ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%')
+        : (c.ownership ?? "—");
+      const ownershipDisplay = (parseFloat(String(rawOwnership).replace(/[^0-9.]/g,'')) === 0) ? "—" : rawOwnership;
       const rawOwnerStatus = c.owner_status ?? c.ownerStatus ?? "";
       const ownerStatusNorm = String(rawOwnerStatus).trim().toLowerCase();
       const ownerStatusDisplay = rawOwnerStatus ? String(rawOwnerStatus) : "—";
       return {
         name:             toProperName(c.name ?? "—"),
         relation:         c.relationship ?? c.relation ?? "—",
-        ownership:        c.ownership_percent != null ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%') : (c.ownership ?? "—"),
+        ownership:        ownershipDisplay,
         status,
         statusOn,
         ownerStatus:      ownerStatusDisplay,
