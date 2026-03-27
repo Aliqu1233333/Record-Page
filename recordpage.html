@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lightning-Style Record Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -22,7 +25,7 @@
 
       --radius: 10px;
       --shadow: 0 1px 0 rgba(0,0,0,.03);
-      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --font: "Inter", "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     }
 
     *{ box-sizing: border-box; }
@@ -282,6 +285,7 @@
 
     .value-text {
       font-size: 15px;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
       color: #080707;
       font-weight: 400;
       line-height: 1.4;
@@ -332,56 +336,101 @@
     }
 
     /* =====================================================
-       OTHER RELATED CONTACTS TABLE
+       OTHER RELATED CONTACTS TABLE — UPGRADED
        ===================================================== */
     .orc-wrap { padding: 0 0 14px; }
     .orc-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
+      font-size: 14px;
       background: #fff;
       min-width: 820px;
     }
+
+    /* CHANGE 4: Sortable-looking column headers */
     .orc-table thead th {
       text-align: left;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: #6b7280;
-      padding: 9px 14px;
+      padding: 8px 12px;
       background: #fafbfc;
       border-bottom: 1px solid #e5e7eb;
       border-right: 1px solid #e5e7eb;
       white-space: nowrap;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease, color 0.1s ease;
+      position: relative;
     }
-    .orc-table thead th:last-child { border-right: none; }
-    .orc-table thead th:first-child { padding: 9px 6px 9px 16px; }
+    .orc-table thead th:last-child { border-right: none; cursor: default; }
+    .orc-table thead th:first-child { padding: 8px 6px 8px 14px; cursor: default; }
+    .orc-table thead th:not(:first-child):not(:last-child):hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    .orc-table thead th .sort-icon {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-left: 4px;
+      vertical-align: middle;
+      opacity: 0.35;
+      transition: opacity 0.1s ease;
+    }
+    .orc-table thead th:hover .sort-icon { opacity: 0.7; }
+    .orc-table thead th.sort-asc .sort-icon,
+    .orc-table thead th.sort-desc .sort-icon { opacity: 1; color: #0176d3; }
+    .orc-table thead th.sort-asc .sort-icon svg:first-child { opacity: 1; }
+    .orc-table thead th.sort-asc .sort-icon svg:last-child { opacity: 0.25; }
+    .orc-table thead th.sort-desc .sort-icon svg:first-child { opacity: 0.25; }
+    .orc-table thead th.sort-desc .sort-icon svg:last-child { opacity: 1; }
+
+    /* CHANGE 3: Tighter row height — 8px 12px padding */
     .orc-table tbody td {
-      padding: 11px 14px;
+      padding: 8px 12px;
       border-bottom: 1px solid #f3f4f6;
       vertical-align: middle;
       color: #111827;
-      font-size: 15px;
+      font-size: 14px;
     }
-    .orc-table tbody td:first-child { padding: 11px 6px 11px 16px; }
+    .orc-table tbody td:first-child { padding: 8px 6px 8px 14px; }
     .orc-table tbody tr:last-child td { border-bottom: 0; }
-    .orc-table tbody tr { background: white; transition: background 0.12s ease; }
-    .orc-table tbody tr:hover { background: #f9fafb; }
-    .orc-table .orc-name { font-weight: 600; color: #0176d3; text-decoration: none; cursor: pointer; }
+
+    /* CHANGE 5: Zebra striping */
+    .orc-table tbody tr { background: white; transition: background 0.1s ease; }
+    .orc-table tbody tr:nth-child(even) { background: #fafbfc; }
+    .orc-table tbody tr:hover { background: #eef4fb !important; }
+
+    /* Row counter */
+    .orc-idx {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #0176d3;
+      text-align: right;
+      min-width: 22px;
+      padding-right: 4px;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+
+    .orc-table .orc-name { font-weight: 600; color: #0176d3; text-decoration: none; cursor: pointer; font-size: 14px; }
     .orc-table .orc-name:hover { text-decoration: underline; }
-    .orc-table .orc-name-plain { font-weight: 600; color: #111827; }
-    .orc-table .orc-rel { color: #6b7280; font-size: 13.5px; }
-    .orc-table .orc-phone { color: #0176d3; font-weight: 500; text-decoration: none; white-space: nowrap; }
+    .orc-table .orc-name-plain { font-weight: 600; color: #111827; font-size: 14px; }
+    .orc-table .orc-rel { color: #6b7280; font-size: 13px; }
+    .orc-table .orc-phone { color: #0176d3; font-weight: 500; text-decoration: none; white-space: nowrap; font-size: 13.5px; }
     .orc-table .orc-phone:hover { text-decoration: underline; }
     .orc-table .orc-empty { color: #9ca3af; }
-    .orc-idx { font-size: 12px; color: #9ca3af; font-weight: 400; text-align: right; min-width: 18px; }
+
+
 
     .orc-status-wrap { position: relative; display: inline-flex; align-items: center; }
     .orc-status-btn {
       display: inline-flex; align-items: center; gap: 5px;
       background: none; border: none; padding: 3px 2px;
-      font-family: var(--font); font-size: 14.5px; font-weight: 500; color: #374151;
+      font-family: var(--font); font-size: 13.5px; font-weight: 500; color: #374151;
       cursor: pointer; border-radius: 4px; transition: background 0.1s ease; white-space: nowrap;
     }
     .orc-status-btn:hover { background: #f3f4f6; }
@@ -404,13 +453,108 @@
     .orc-status-wrap.drop-up .orc-dropdown { top: auto; bottom: calc(100% + 4px); }
     .orc-dropdown-item {
       display: flex; align-items: center; gap: 9px; padding: 7px 14px;
-      font-size: 14.5px; font-weight: 500; color: #111827; cursor: pointer;
+      font-size: 13.5px; font-weight: 500; color: #111827; cursor: pointer;
       transition: background 0.1s ease; white-space: nowrap;
     }
     .orc-dropdown-item:hover { background: #f3f4f6; }
     .orc-dropdown-item.selected { color: #0176d3; }
     .orc-dropdown-item .orc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .orc-dropdown-divider { height: 1px; background: #f3f4f6; margin: 4px 0; }
+
+    /* ---------- ORC TOOLBAR ---------- */
+    .orc-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .orc-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      color: #374151;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s ease, border-color 0.1s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+    .orc-tool-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+    .orc-tool-btn.active { background: #f3f4f6; border-color: #d1d5db; }
+    .orc-filter-badge {
+      background: #6b7280;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 1px 5px;
+      line-height: 1.4;
+      margin-left: 1px;
+    }
+
+    /* ---------- ORC PANELS (sort / filter) ---------- */
+    .orc-panel {
+      display: none;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin: 0 0 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+      animation: panelIn 0.12s ease;
+    }
+    .orc-panel.open { display: block; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .orc-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .orc-panel-title { font-size: 11.5px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+    .orc-panel-clear { background: none; border: none; font-family: var(--font); font-size: 12px; color: #9ca3af; cursor: pointer; padding: 0; transition: color 0.1s ease; }
+    .orc-panel-clear:hover { color: #374151; }
+    .orc-panel-body { padding: 10px 14px 12px; }
+    .orc-sort-row { display: flex; align-items: center; gap: 8px; }
+    .orc-panel-select {
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: #374151;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      flex: 1;
+      transition: border-color 0.1s ease;
+    }
+    .orc-panel-select:focus { border-color: #0176d3; box-shadow: 0 0 0 2px rgba(1,118,211,0.1); }
+    .orc-panel-label { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+    .orc-panel-apply {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #374151;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s ease, border-color 0.1s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .orc-panel-apply:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+    /* ---------- PHONE CELL status btn tweak (smaller for stacked layout) ---------- */
+    .orc-phone-status-wrap .orc-status-btn { font-size: 12px; padding: 1px 2px; }
 
     /* ---------- CHARACTERISTICS DROPDOWN ---------- */
     .inline-toggle{ padding: 0 16px 7px 30px; }
@@ -531,7 +675,7 @@
     #actionBanner::before{ content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #dc2626; }
     #actionBanner.show{ max-height: 160px; opacity: 1; transform: translateY(0); margin-top: 10px; padding: 14px 16px 14px 18px; }
     #actionBanner strong{ font-weight: 700; }
-    #actionBanner .bannerText{ font-size: 14px; line-height: 1.5; color: #1f2937; letter-spacing: -0.01em; }
+    #actionBanner .bannerText{ font-size: 14px; font-family: "Inter", system-ui, sans-serif; line-height: 1.5; color: #1f2937; letter-spacing: -0.01em; }
     #actionBanner .bannerText strong:first-child{ color: #dc2626; }
 
     /* ---------- SECTION META ---------- */
@@ -563,6 +707,216 @@
       0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
       80%  { opacity: 0.8; }
       100% { opacity: 0; transform: translateY(260px) rotate(540deg) scale(0.5); }
+    }
+
+    /* =====================================================
+       NEW RELATED CONTACTS COMPONENT STYLES
+       ===================================================== */
+    /* Panel shell */
+    #rcPanel { background: var(--surface); }
+
+    /* Collapse toggle header */
+    .rc-toggle {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:17px 24px; cursor:pointer; user-select:none;
+      border-bottom:1px solid transparent; transition:border-color .15s;
+    }
+    .rc-toggle:hover { background:#fafbfc; }
+    #rcPanel[data-open="true"] .rc-toggle { border-bottom-color:transparent; }
+    .rc-toggle-left { display:flex; align-items:center; gap:12px; }
+
+    .rc-obj-icon {
+      width:36px; height:36px; border-radius:6px; flex-shrink:0;
+      background:#3a86ff;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .rc-obj-icon svg { width:20px; height:20px; color:#fff; display:block; }
+
+    .rc-toggle-stack { display:flex; align-items:center; }
+    .rc-toggle-title {
+      display:flex; align-items:center; gap:6px;
+      font-size:20px; font-weight:700; color:var(--navy); line-height:1;
+      font-family:var(--font);
+    }
+    .rc-toggle-meta { font-size:14px; color:var(--muted); font-family:var(--font); }
+    .rc-chev { width:16px; height:16px; color:var(--muted); transition:transform .18s ease; flex-shrink:0; }
+    #rcPanel[data-open="true"] .rc-chev { transform:rotate(180deg); }
+
+    .rc-body { display:none; }
+    #rcPanel[data-open="true"] .rc-body { display:block; }
+
+    /* Tabs */
+    .rc-tabs {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 24px 0; border-bottom:1px solid #f0f0f0; background:#fff;
+    }
+    .rc-tabs-left { display:flex; gap:28px; }
+    .rc-tab {
+      appearance:none; border:0; background:transparent;
+      font-family:var(--font); font-size:14.5px; font-weight:500;
+      padding:0 0 16px; color:#8c8c8c; cursor:pointer;
+      position:relative; transition:color .12s; white-space:nowrap;
+    }
+    .rc-tab[aria-selected="true"] { color:#1f1f1f; font-weight:600; }
+    .rc-tab[aria-selected="true"]::after {
+      content:""; position:absolute; left:0; right:0; bottom:-1px;
+      height:2px; background:var(--blue); border-radius:1px;
+    }
+    .rc-tab-count { font-size:14.5px; font-weight:500; color:#8c8c8c; }
+    .rc-tab[aria-selected="true"] .rc-tab-count { color:#1f1f1f; }
+
+    /* Tab panes */
+    .rc-pane { display:none; }
+    .rc-pane.active { display:flex; align-items:flex-start; min-height:260px; padding-top:4px; }
+
+    /* Left list */
+    .rc-list {
+      width:240px; flex-shrink:0; background:#fff;
+      border-right:1px solid #f3f3f3; overflow-y:auto; max-height:520px;
+    }
+    .rc-list-item {
+      display:flex; align-items:flex-start;
+      padding:11px 14px 11px 11px; cursor:pointer;
+      border-left:3px solid transparent; transition:border-color .12s;
+    }
+    .rc-list-item:hover { background:#fafbfc; }
+    .rc-list-item.active { background:transparent; border-left-color:var(--blue); }
+    .rc-item-body { flex:1; min-width:0; }
+    .rc-item-name { font-size:13.5px; font-weight:600; color:#1f1f1f; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .rc-item-sub { font-size:12px; color:#5f6b7a; margin-top:3px; line-height:1.3; }
+    .rc-item-status { display:flex; align-items:center; gap:6px; margin-top:5px; }
+    .rc-dot { width:5px; height:5px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
+    .rc-dot.active { background:var(--blue); }
+    .rc-item-status-text { font-size:11.5px; color:#8c8c8c; line-height:1; }
+
+    /* Right detail */
+    .rc-detail { flex:1; min-width:0; background:#fff; }
+    .rc-detail-empty {
+      display:flex; align-items:flex-start; justify-content:center;
+      min-height:300px; padding:24px 28px;
+      padding-top:calc(300px * 0.18);
+    }
+    .rc-empty-block { display:flex; flex-direction:column; align-items:center; gap:9px; max-width:240px; text-align:center; }
+    .rc-empty-icon { width:34px; height:34px; color:#d1d5db; margin-bottom:2px; }
+    .rc-empty-title { font-size:14px; font-weight:600; color:#8c8c8c; line-height:1.3; }
+    .rc-empty-sub { font-size:12.5px; font-weight:400; color:#b0b8c4; line-height:1.5; }
+
+    /* Detail inner */
+    .rc-detail-inner { padding:18px 20px 24px; display:none; }
+    .rc-det-name { font-size:20px; font-weight:700; color:#1f1f1f; margin-bottom:3px; line-height:1.2; }
+    .rc-det-sub { font-size:12.5px; color:#5f6b7a; font-weight:400; line-height:1.5; margin-bottom:0; }
+    .rc-det-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:0; }
+    .rc-det-icon { width:35px; height:35px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+    .rc-det-icon.owner { background:#F4A623; }
+    .rc-det-icon.other { background:#06a59a; }
+    .rc-det-icon svg { display:block; }
+    .rc-det-header-text { flex:1; min-width:0; }
+
+    /* Record Readiness */
+    .rc-readiness { margin:10px 0 12px; border:1px solid #f0f0f0; border-radius:6px; background:#fffef7; padding:9px 12px; }
+    .rc-readiness-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
+    .rc-readiness-top-left { flex:1; min-width:0; }
+    .rc-readiness-label { font-size:10.5px; font-weight:600; color:#a0a0a0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; display:block; }
+    .rc-readiness-title { font-size:13px; font-weight:600; color:#2a2a2a; line-height:1.3; }
+    .rc-readiness-pill { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; padding:3px 8px; background:#f4f4f4; border-radius:999px; font-size:11px; color:#8c97a0; white-space:nowrap; }
+    .rc-readiness-pill-dot { width:6px; height:6px; border-radius:50%; background:#d4a017; flex-shrink:0; }
+    .rc-readiness-tiles { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .rc-readiness-tile { display:flex; align-items:center; padding:8px 10px 8px 11px; border:1px solid #f0f0f0; border-radius:5px; background:#fff; gap:8px; }
+    .rc-tile-left { flex:1; min-width:0; }
+    .rc-tile-title { font-size:13px; font-weight:600; color:#1f1f1f; line-height:1.2; margin-bottom:1px; }
+    .rc-tile-sub { font-size:11.5px; color:#8c8c8c; line-height:1.2; }
+    .rc-tile-action { font-size:12.5px; color:var(--blue); font-weight:500; background:none; border:0; padding:0; margin-left:4px; margin-right:2px; cursor:pointer; font-family:var(--font); flex-shrink:0; white-space:nowrap; align-self:flex-start; margin-top:1px; }
+    .rc-tile-action:hover { text-decoration:underline; }
+
+    /* Field grid */
+    .rc-fields { display:grid; grid-template-columns:1fr 1fr; column-gap:20px; row-gap:16px; margin-top:18px; }
+    .rc-label { font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#8c8c8c; margin-bottom:5px; line-height:1; }
+    .rc-value { font-size:14.5px; font-weight:500; color:#1f1f1f; line-height:1.35; }
+    .rc-value.offer { font-weight:600; color:#1f1f1f; }
+    .rc-value.link { color:var(--blue); cursor:pointer; font-weight:500; }
+    .rc-value.link:hover { text-decoration:underline; }
+    .rc-value.muted { color:#c4cad6; font-weight:400; font-size:14px; }
+    .rc-value.overdue { color:#1f1f1f; font-weight:700; }
+    .rc-status-row { display:flex; align-items:center; gap:6px; line-height:1.35; }
+    .rc-sdot { width:7px; height:7px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
+    .rc-sdot.on { background:var(--blue); }
+    .rc-star { color:#5f6b7a; margin-right:3px; }
+    .rc-value.multiline { white-space:normal; line-height:1.5; font-size:13.5px; }
+    .rc-crown { display:inline-flex; align-items:center; gap:5px; color:#1f1f1f; font-size:14.5px; font-weight:500; }
+    .rc-crown svg { width:15px; height:15px; color:#d4a017; flex-shrink:0; }
+    .rc-phone-row { display:flex; align-items:center; gap:0; font-size:14.5px; font-weight:500; color:#1f1f1f; }
+    .rc-phone-row .rc-ph-num { color:var(--blue); cursor:pointer; }
+    .rc-phone-row .rc-ph-num:hover { text-decoration:underline; }
+    .rc-phone-row .rc-ph-dot { margin:0 6px; color:#d1d5db; }
+    .rc-phone-row .rc-ph-status { color:#5f6b7a; font-weight:400; font-size:13.5px; }
+    .rc-ph-disp-wrapper { display:inline-block; position:relative; }
+    .rc-ph-disp-btn { display:inline-flex; align-items:center; gap:4px; background:none; border:0; padding:0; cursor:pointer; font-family:var(--font); font-size:13px; font-weight:400; color:#5f6b7a; }
+    .rc-ph-disp-btn svg { width:10px; height:10px; color:#9ca3af; }
+    .rc-ph-disp-btn:hover { text-decoration:underline; }
+    .rc-ph-disp-empty { color:#b0b8c4; }
+    .rc-ph-disp-wrapper .rc-status-dropdown { min-width:180px; }
+    .rc-status-btn--nodot { padding-left:2px; }
+
+    /* Inline status */
+    .rc-item-name-row { display:flex; align-items:baseline; gap:9px; }
+    .rc-item-inline-status { font-size:12px; font-weight:400; color:#5f6b7a; white-space:nowrap; flex-shrink:0; }
+    .rc-det-signals { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:500; color:#0e7a5a; background:#f0faf5; border:1px solid #c6ead9; border-radius:4px; padding:1px 7px 1px 5px; margin-left:6px; vertical-align:middle; position:relative; top:-1px; }
+    .rc-signals-check { width:11px; height:11px; flex-shrink:0; }
+    .rc-det-signals .rc-signals-check { width:12px; height:12px; }
+    .rc-list-item-right { display:none; }
+
+    /* Interactive status dropdown */
+    .rc-status-wrapper { position:relative; display:inline-block; }
+    .rc-status-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      background:none; border:1px solid transparent; border-radius:4px;
+      padding:2px 6px 2px 2px; cursor:pointer;
+      font-family:var(--font); font-size:14.5px; font-weight:500; color:#1f1f1f;
+      transition:border-color .12s;
+    }
+    .rc-status-btn:hover { border-color:#dbe0e6; background:#f9fafb; }
+    .rc-status-btn svg { width:12px; height:12px; color:#9ca3af; }
+    .rc-status-dropdown {
+      position:absolute; top:calc(100% + 4px); left:0; z-index:50;
+      background:#fff; border:1px solid #e5e7eb; border-radius:6px;
+      box-shadow:0 4px 14px rgba(0,0,0,.10);
+      min-width:200px; padding:4px 0; display:none;
+      max-height:160px; overflow-y:auto; scroll-behavior:smooth;
+    }
+    .rc-status-dropdown.drop-up { top:auto; bottom:calc(100% + 4px); }
+    .rc-status-dropdown.always-up { top:auto; bottom:calc(100% + 4px); }
+    .rc-status-dropdown.open { display:block; }
+    .rc-status-opt {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 14px; font-size:13.5px; font-family:var(--font); color:#374151; cursor:pointer;
+      border:0; background:transparent; width:100%; text-align:left;
+    }
+    .rc-status-opt:hover { background:#f5f7f9; }
+    .rc-status-opt.current { color:var(--blue); font-weight:600; }
+    .rc-status-opt .opt-dot { width:6px; height:6px; border-radius:50%; background:#d1d5db; flex-shrink:0; }
+    .rc-status-opt.on .opt-dot { background:var(--blue); }
+
+    /* Missing / inline-edit */
+    .rc-editable { display:inline-flex; align-items:center; gap:5px; cursor:pointer; }
+    .rc-missing-text { font-size:14px; font-weight:400; color:#c4cad6; }
+    .rc-pencil-icon { width:11px; height:11px; color:#6b7280; opacity:0; flex-shrink:0; transition:opacity .12s; }
+    .rc-editable:hover .rc-pencil-icon { opacity:.7; }
+    .rc-value.unknown-rel { color:#bf8b8b; font-weight:400; }
+    .rc-value.rc-missing-flag { color:#bf8b8b; font-weight:400; }
+    .rc-inline-edit { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .rc-inline-select,
+    .rc-inline-input { padding:5px 8px; border:1px solid var(--blue); border-radius:4px; font-family:var(--font); font-size:13px; color:#1f1f1f; background:#fff; outline:none; }
+    .rc-inline-save { font-size:12px; font-weight:600; color:var(--blue); background:none; border:0; cursor:pointer; font-family:var(--font); padding:0; }
+    .rc-inline-save:hover { text-decoration:underline; }
+    .rc-inline-cancel { font-size:12px; color:#9ca3af; background:none; border:0; cursor:pointer; font-family:var(--font); padding:0; }
+    .rc-inline-cancel:hover { color:#374151; }
+    .rc-inline-clear { font-size:12px; color:#e57373; background:none; border:0; cursor:pointer; font-family:var(--font); padding:0; }
+    .rc-inline-clear:hover { color:#c62828; text-decoration:underline; }
+    .rc-det-sub .rc-owner-badge {
+      display:inline-block; font-size:10.5px; font-weight:600;
+      color:#5f6b7a; background:#f3f4f6; border:1px solid #e2e5ea;
+      border-radius:3px; padding:1px 5px; margin-left:4px;
+      vertical-align:middle; position:relative; top:-1px;
     }
   </style>
 </head>
@@ -612,9 +966,9 @@
               </div>
             </div>
             <div class="snapshotBlock">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin: 0 0 10px 0;">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; margin: 0 0 10px 0; min-height: 0;">
                 <div class="snapshotTitle" style="margin:0;">DEAL INSIGHTS</div>
-                <button id="ownershipTreeBtn" type="button" style="display:none; font-size:11px; padding: 3px 8px; gap: 4px;" aria-label="Mark Ownership Complete">
+                <button id="ownershipTreeBtn" type="button" style="display:none; font-size:11px; padding: 3px 8px; gap: 4px; margin-top: -2px;" aria-label="Mark Ownership Complete">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M5.636 5.636l2.122 2.122M3 12h3m-.364 6.364 2.122-2.122M12 21v-3m6.364.364-2.122-2.122M21 12h-3m.364-6.364-2.122 2.122" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
                   Mark Ownership Complete
                 </button>
@@ -741,37 +1095,93 @@
               </div>
             </div>
 
-            <div class="section">
-              <div class="section-head">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAB4AHgDASIAAhEBAxEB/8QAGwABAQADAQEBAAAAAAAAAAAAAAEGBwgFAgP/xAA/EAABAgUCAwQGBggHAAAAAAABABECAwQhMQVBBlFhBxJxgRdTk6HS4hMUZpGk4SIyNkJSVdHwRnODhJSx8f/EABsBAQEAAgMBAAAAAAAAAAAAAAABAwQFBgcC/8QAMBEAAQMCAggFAwUAAAAAAAAAAAECAwQRBSEGEhMVMUFRU0NhkaHRI4LBMnGBseH/2gAMAwEAAhEDEQA/AMnwMhGvsNlRjZR8OwXrRyY5Ws6C1s7pe6oNuipSYJtum2MI+/XKDBs+6EL0ayBx05o3K6mA5DeKgLm5CMyF91OrN0VAL4/squLdFDYnCoQoZ7nluocb+CpI2LlQEM4UIAAd/ciDa7eaKlLsyjNZrbOhfl9yWsCHKEBcZsnR98BXZH/SQEcXdOjo56JublAWzhTa1kbkPFBlwL7IUbBywVYhlLgFsILjLMhCg5JZzhRiDyZU2Yc0cCF7FQDAy5ULAPb7kuyPzDKgpPUFFDbzRLANtsha25RwT1VA5AFCkPM2WzuEOzGRWabKrtbqaiCKdCI4JEkiEwwnHeJBuRtstYjO66kAAAADAYC67pBXTUrGNiW2tfP9rfJrzvVqJYwb0W8Nes1A/wCtD8Kei3hr1uoe2h+FZytWcd9otdS6tO03Q/opcNPGZcyfFD3oooxkAGwANt3XA0U+JVj9SKRfXIwsdI9bIp7Xou4b9bqHtofhQdl3DXrdQ9rD8K8ngDtErK7VZGl62JUf1g9yTPgh7p75wIgLXxbdbPSsqMRo5NSWRfUOdIxbKpgx7LeG/W6h7aH4U9FvDfrdQ9tD8KzlFqb1rO4p8bV/Uwb0W8N+t1D20Pwrw+LuzKRSaZNrdEqaiZFJhMccicQTEBnukAX6braqEAhiHBWSLGayN6O11XyUqSuReJy2/wD6UhwhIToHZejm+CCieNkS9ilfIu6jW5JbBt5IXQiFBNjZdRrlshhZ3K6kXUdKfC+78GrU8gubOJqSfQcRV1JUgibBPjuR+sCXEXmGPmuk1qHtqr9Fq6ukgopsqdXShFDPjl3Ahs0JIsS722utTRudzKhWI26OT0sfNOq61jD+DqSfWcVabT08MUUf1mCIkD9WGEgmLyAJXRNX9IKWcZT/AEnci7rZdrLVPYrqOiUUdZKrJ0qn1CdGBLjmkARQfwg8323tllttTSKdz6lGq2yN4eYnddxy/OimzJscU6OOKYYiYjGSSTu6/Mm3lsumK+DTqann1tXJkQy5UEUybMilgsAHJwsLPaHwc5H1CoP+1gv71y1Pjss6fSgVbdF/wytmVeDTA+y6Oph4304SIowIoovpBC94O6Xfot+LEeG+NeGtU1WXQUMmbT1E0EQGORDCImDs4J5e5ZcuAxqoknnR0keotuf8mCZyquaWOXMhifeoGy2E8M9VcG42XoRvkuA4F0QYcmyIpC2fLeCDrnIQ8h/2hds28EBGvdiupFy41vzXUMuOGZLhmQRCKCIAwkYIK6npT4X3fg1qnkag7W+KdQm6zP0GlmRyKSQBDNEJYzoiAbn+EPj8lr1hybkt68X8B6bxDX/X4qidSVJhEMyKAAiNgwJB3a3kvE9EtD/OKn2Q/qs+H4vQU9O1n6VtnkvHmpWSsa1ENSDLthbH7IOJ68atJ4fqpkVRTToYvoe8XMowwmKx/hIBt4dV6h7JaH+cVPsof6r2+EOA9N4e1A6hBUTqqoEJhlmMACB8kAbtZTEcXoKincy91tlkvHkHysc2xkOv0Ueo6HXUEuOGCOop45UMUWATCQCei00ezXipyBT0rf54ut5Iuu0OKT0TVbHay9TAyRzMkNUcD8A67pvE1HqFcKeVIp4jHF3ZneJ/RIAAHUhbXRfMyOGXLimRxCGCEGKInYBYa2ulrZEfJx4ZEe9XrdTl3xDq9GuVMnCC9r/cvTzkRfOEVs99kUCC7NupbO7Jjn1Qc2VIUYLGyzfhTtG1HRaCDT6qll18iUO7KeZ3I4RtC7FwPBYQoXix5rXqaWKpbqStuhHNR2Sm0h2uk/4eH/N+RPS7f9nvxvyLVxfoeToL/mtDcVB2/dfkx7FnQ2iO137PfjPkQdrt/wBnvxvyLVoF3QM/5JuKg7fuvyNizobSPa79n/xvyJ6Xfs9+M+Rau2uQobnCbioO37r8jYs6G0vS99nvxvyLxOLO0bUta0+OgpqWDT6ebCYZvdmGOOMbjvMGHOzrCBkOA2EHg59yyR4NRRPR7WZp5qv9qVImIt7BvEIfBXyKg6LkzIAb3sEV/eGf6IotgBexCju5uhv5JbwCArMeuylsEOg8FWugGS1gowu2/RB5IH8kKOd0BvjdCDy96O2AUIOb/eEf3q8u86hwxAVBc7qW7zOzJsqz8kBB4qjJD2x4IRlgeqhL7KAPYjyRCf7CKhA1ndQgjrdEQpfMXTYOboigG290uWfleyIqLFzjKHLF0RTmQmcXQ5NkRUvMbozZ80RQFJDN7lOVgDhEVINwwRESwsf/2Q==" alt="Contacts" aria-hidden="true" style="width:32px; height:32px; object-fit:contain; flex-shrink:0; border-radius:5px;">
-                  <h3 style="margin:0;">Related Contacts</h3>
-                </div>
-                <div class="section-meta" id="contactsSummary">—</div>
-              </div>
+            <!-- NEW RELATED CONTACTS COMPONENT -->
+            <div style="padding: 0 16px 12px 30px;" id="rcSectionWrapper">
 
-              <div class="sub-tabs-bar" role="tablist" aria-label="Contact Tabs">
-                <button class="sub-tab" role="tab" id="subtab-confirmed" aria-selected="true" aria-controls="subpane-confirmed" type="button">Confirmed Owners</button>
-                <button class="sub-tab" role="tab" id="subtab-other" aria-selected="false" aria-controls="subpane-other" type="button">Other Related Contacts</button>
-              </div>
+              <!-- Panel shell -->
+              <div class="panel" data-open="false" id="rcPanel" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;width:100%;">
 
-              <div class="sub-tab-pane active" id="subpane-confirmed" role="tabpanel" aria-labelledby="subtab-confirmed">
-                <div class="table-wrap">
-                  <table aria-label="Confirmed Owners Table">
-                    <thead><tr><th>Name</th><th>Status</th><th>Last Contact</th><th>Next Follow-up</th><th>Offer Status</th><th>Number</th><th>Quick Actions</th></tr></thead>
-                    <tbody id="confirmedOwnersTbody"></tbody>
-                  </table>
+                <!-- Collapse toggle header -->
+                <div class="rc-toggle" id="rcToggle">
+                  <div class="rc-toggle-left">
+                    <div class="rc-obj-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="9" cy="7" r="3.5" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 21v-1.5A3.5 3.5 0 0 1 6.5 16h5A3.5 3.5 0 0 1 15 19.5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M21 21v-1.5a3.5 3.5 0 0 0-2.5-3.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div class="rc-toggle-stack">
+                      <span class="rc-toggle-title">
+                        Related Contacts
+                        <svg class="rc-chev" viewBox="0 0 24 24" fill="none">
+                          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                  <span class="rc-toggle-meta" id="rcMeta">—</span>
                 </div>
-              </div>
 
-              <div class="sub-tab-pane" id="subpane-other" role="tabpanel" aria-labelledby="subtab-other">
-                <div class="orc-wrap">
-                  <table class="orc-table" aria-label="Other Related Contacts Table">
-                    <thead><tr><th style="width:24px;"></th><th>Name</th><th>Relationship</th><th>Lead Status</th><th>Phone 1</th><th>Phone 1 Status</th><th>Phone 2</th><th>Phone 2 Status</th></tr></thead>
-                    <tbody id="otherContactsTbody"></tbody>
-                  </table>
-                </div>
-              </div>
+                <!-- Body (hidden when collapsed) -->
+                <div class="rc-body">
+                  <!-- Tabs -->
+                  <div class="rc-tabs" role="tablist">
+                    <div class="rc-tabs-left">
+                      <button class="rc-tab" role="tab" aria-selected="true" aria-controls="pane-owners" id="tab-owners" type="button">
+                        Confirmed Owners <span class="rc-tab-count" id="cnt-owners"></span>
+                      </button>
+                      <button class="rc-tab" role="tab" aria-selected="false" aria-controls="pane-other" id="tab-other" type="button">
+                        Other Contacts <span class="rc-tab-count" id="cnt-other"></span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Pane: Confirmed Owners -->
+                  <div class="rc-pane active" id="pane-owners">
+                    <div class="rc-list" id="list-owners"></div>
+                    <div class="rc-detail" id="detail-owners">
+                      <div class="rc-detail-empty">
+                        <div class="rc-empty-block">
+                          <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          <div class="rc-empty-title">Select a contact</div>
+                          <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                        </div>
+                      </div>
+                      <div class="rc-detail-inner" id="inner-owners"></div>
+                    </div>
+                  </div>
+
+                  <!-- Pane: Other Contacts -->
+                  <div class="rc-pane" id="pane-other">
+                    <div class="rc-list" id="list-other"></div>
+                    <div class="rc-detail" id="detail-other">
+                      <div class="rc-detail-empty">
+                        <div class="rc-empty-block">
+                          <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          <div class="rc-empty-title">Select a contact</div>
+                          <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                        </div>
+                      </div>
+                      <div class="rc-detail-inner" id="inner-other"></div>
+                    </div>
+                  </div>
+
+                </div><!-- /.rc-body -->
+              </div><!-- /#rcPanel -->
+            </div><!-- /#rcSectionWrapper -->
+
             </div>
 
           </div>
@@ -812,7 +1222,6 @@
                 </div>
               </div>
             </div>
-            <div class="hint">Wire this pane to monday updates + files if you want a true activity feed.</div>
           </div>
 
         </div>
@@ -844,32 +1253,31 @@
   </div>
 
   <script>
-    // ── COLUMN ID MAP — fallback hardcoded values, overwritten on load by column_map ──
-    // Column IDs are populated dynamically from the column_map in the webhook response.
-    // No hardcoded IDs — works for any board automatically.
     const COLUMN_ID_MAP = {};
-
     const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
-
-        // ── Merge dynamic column IDs from webhook — makes saves board-agnostic ──
         if (payload.column_map && typeof payload.column_map === "object") {
           Object.assign(COLUMN_ID_MAP, payload.column_map);
         }
-
         for (const [key, value] of Object.entries(payload)) {
           const node = document.querySelector(`.slds-field[data-field="${cssEscape(key)}"] .value-text`);
-          if (node) node.textContent = formatValue(value);
+          if (node) {
+            const formatted = formatValue(value);
+            if (node.classList.contains('link') && formatted !== '—') {
+              node.textContent = 'Open ↗';
+              node.setAttribute('data-href', formatted);
+            } else {
+              node.textContent = formatted;
+            }
+          }
         }
-
         for (const [key, value] of Object.entries(payload)) {
           const snap = document.querySelector(`[data-snapshot="true"][data-field="${cssEscape(key)}"]`);
           if (snap) snap.textContent = formatValue(value);
         }
-
         const formatCurrency = (val) => {
           if (!val || val === "—") return "—";
           const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
@@ -884,7 +1292,6 @@
           const snap = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
           if (snap && payload[field]) snap.textContent = formatCurrency(payload[field]);
         });
-
         const owners = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
         const confirmedOwners = owners.filter(o => String(o.owner_status || o.ownerStatus || "").trim().toLowerCase() === "yes");
         const heirsIdentified = confirmedOwners.length;
@@ -905,7 +1312,6 @@
           const num = parseFloat(String(o.ownership_percent || o.ownershipPercent || "0").replace(/[^0-9.]/g, ""));
           if (!isNaN(num)) ownershipPct += num;
         });
-
         const setSnap = (field, val) => {
           const el = document.querySelector(`[data-snapshot="true"][data-field="${field}"]`);
           if (el) el.textContent = val;
@@ -914,14 +1320,12 @@
         setSnap("heirs_contacted",  heirsIdentified > 0 ? `${heirsContacted} of ${heirsIdentified}` : "—");
         setSnap("heirs_offered",    heirsIdentified > 0 ? `${heirsOffered} of ${heirsIdentified}` : "—");
         setSnap("ownership_secured", heirsIdentified > 0 ? `${ownershipPct}% (${closedOwners.length} of ${heirsIdentified})` : "—");
-
         const insightsFields = document.getElementById("dealInsightsFields");
         const insightsEmpty  = document.getElementById("dealInsightsEmpty");
         if (insightsFields && insightsEmpty) {
           insightsFields.style.display = heirsIdentified > 0 ? "" : "none";
           insightsEmpty.style.display  = heirsIdentified > 0 ? "none" : "block";
         }
-
         const badge = document.querySelector(`[data-snapshot="true"][data-field="heirs_identified_status"]`);
         if (badge) {
           const isComplete = String(payload.ownership_map || "").trim().toLowerCase() === "complete";
@@ -929,7 +1333,6 @@
           badge.className   = "heir-status-badge " + (isComplete ? "heir-status-complete" : "heir-status-in-progress");
           syncOwnershipTreeButton(isComplete);
         }
-
         let mostRecentDate = null;
         (owners || []).forEach(o => {
           const raw = o.contacted_date || o.lastContact || "";
@@ -945,16 +1348,15 @@
           if (dateEl) dateEl.textContent = formatted;
           if (daysEl) daysEl.textContent = daysAgoStr || formatted;
         }
-
         if (Array.isArray(payload.confirmed_owners)) {
           renderConfirmedOwners(payload.confirmed_owners);
           renderOtherContacts(payload.confirmed_owners);
           updateActionBannerFromContacts(payload.confirmed_owners);
+          rcPopulateFromPayload(payload);
         } else {
           updateActionBannerFromContacts([]);
         }
         computeContactsSummary(payload);
-
         [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
           const el = document.querySelector(`.slds-field[data-field="${statusField}"] .value-text`);
           const link = payload[linkField];
@@ -1138,6 +1540,7 @@
         const current = value||"—"; const dot = dotClass(current,opts); const id=`orc-dd-${fieldKey}-${rowIdx}`;
         return `<div class="orc-status-wrap" id="${id}" data-field="${fieldKey}" data-row="${rowIdx}" data-opts="${fieldKey==='lead_status'?'lead':'phone'}"><button class="orc-status-btn" type="button" data-dd="${id}" data-current="${escapeHtml(current)}"><span class="orc-status-dot ${dot}"></span><span class="orc-status-label">${escapeHtml(current)}</span><svg class="orc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button></div>`;
       }
+
       const rows = others.map((c,i) => {
         const mondayUrl = c.monday_url??c.mondayUrl??null;
         const leadStatus = c.lead_status??c.leadStatus??null;
@@ -1145,19 +1548,55 @@
         const phone1Status = c.phone_1_status??c.phone1Status??null;
         const phone2 = formatPhoneDisplay(c.phone_2??c.phone2??null);
         const phone2Status = c.phone_2_status??c.phone2Status??null;
+
+        function phoneStatusTag(status) {
+          if (!status || status === '—') return '';
+          const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
+          const colors = { green:'#10b981', amber:'#f59e0b', red:'#ef4444', blue:'#0176d3', none:'#d1d5db' };
+          const match = PHONE_STATUS_OPTS.find(o => o.value.toLowerCase() === String(status).toLowerCase());
+          const dotColor = match ? colors[match.dot] : colors.none;
+          return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:#9ca3af;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;display:inline-block;"></span>${escapeHtml(status)}</span>`;
+        }
+
+        function phoneCell(phone, status, fieldKey, rowIdx) {
+          if (!phone) return `<span class="orc-empty">—</span>`;
+          const telLink = `<a href="tel:${formatPhoneForTel(phone)}" class="orc-phone">${escapeHtml(phone)}</a>`;
+          const tag = phoneStatusTag(status);
+          return `<div style="display:flex;flex-direction:column;gap:2px;">${telLink}${tag}</div>`;
+        }
+
         return `<tr data-orc-row="${i}">
-          <td class="orc-idx">${i+1}</td>
+          <td class="orc-idx">${i + 1}</td>
           <td>${mondayUrl?`<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="orc-name">${escapeHtml(c.name??"—")}</a>`:`<span class="orc-name-plain">${escapeHtml(c.name??"—")}</span>`}</td>
           <td class="orc-rel">${escapeHtml(c.relationship??"—")}</td>
           <td>${statusDropdown(leadStatus,LEAD_STATUS_OPTS,'lead_status',i)}</td>
-          <td>${phone1?`<a href="tel:${formatPhoneForTel(phone1)}" class="orc-phone">${escapeHtml(phone1)}</a>`:`<span class="orc-empty">—</span>`}</td>
-          <td>${statusDropdown(phone1Status,PHONE_STATUS_OPTS,'phone_1_status',i)}</td>
-          <td>${phone2?`<a href="tel:${formatPhoneForTel(phone2)}" class="orc-phone">${escapeHtml(phone2)}</a>`:`<span class="orc-empty">—</span>`}</td>
-          <td>${statusDropdown(phone2Status,PHONE_STATUS_OPTS,'phone_2_status',i)}</td>
+          <td>${phoneCell(phone1, phone1Status, 'phone_1_status', i)}</td>
+          <td>${phoneCell(phone2, phone2Status, 'phone_2_status', i)}</td>
         </tr>`;
       }).join("");
-      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="8" style="padding:16px;color:#9ca3af;">No other related contacts.</td></tr>`;
+      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="6" style="padding:16px;color:#9ca3af;">No other related contacts.</td></tr>`;
 
+      // Column sort
+      document.querySelectorAll('.orc-table thead th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const field = th.getAttribute('data-sort');
+          const isAsc = th.classList.contains('sort-asc');
+          document.querySelectorAll('.orc-table thead th').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+          th.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+          const dir = isAsc ? -1 : 1;
+          const rowEls = Array.from(tbody.querySelectorAll('tr'));
+          rowEls.sort((a, b) => {
+            const aIdx = parseInt(a.getAttribute('data-orc-row'));
+            const bIdx = parseInt(b.getAttribute('data-orc-row'));
+            const aVal = String(others[aIdx]?.[field] ?? others[aIdx]?.[(field.replace(/_([a-z])/g, (_,c)=>c.toUpperCase()))] ?? '').toLowerCase();
+            const bVal = String(others[bIdx]?.[field] ?? others[bIdx]?.[(field.replace(/_([a-z])/g, (_,c)=>c.toUpperCase()))] ?? '').toLowerCase();
+            return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+          });
+          rowEls.forEach(r => tbody.appendChild(r));
+        });
+      });
+
+      // Existing dropdown portal logic
       let orcPortal = document.getElementById('orcPortal');
       if (!orcPortal) { orcPortal = document.createElement('div'); orcPortal.id='orcPortal'; orcPortal.className='orc-dropdown'; orcPortal.style.position='fixed'; orcPortal.style.zIndex='9999'; document.body.appendChild(orcPortal); }
       let activeWrap = null;
@@ -1181,6 +1620,139 @@
       });
       document.addEventListener('click', closePortal);
       document.addEventListener('keydown', (e)=>{if(e.key==='Escape')closePortal();});
+
+      // Wire toolbar
+      initOrcToolbar(others);
+    }
+
+    // ── ORC TOOLBAR: Sort, Filter, Export ──
+    let _orcData = [];  // reference to current other contacts for export/filter
+
+    function initOrcToolbar(others) {
+      _orcData = others;
+      const toolbar = document.getElementById('orcToolbar');
+      if (toolbar) toolbar.style.display = 'flex';
+
+      // ── Panel toggles ──
+      function closeAllPanels() {
+        document.getElementById('orcSortPanel')?.classList.remove('open');
+        document.getElementById('orcFilterPanel')?.classList.remove('open');
+        document.getElementById('orcSortBtn')?.classList.remove('active');
+        document.getElementById('orcFilterBtn')?.classList.remove('active');
+      }
+
+      document.getElementById('orcSortBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const panel = document.getElementById('orcSortPanel');
+        const isOpen = panel.classList.contains('open');
+        closeAllPanels();
+        if (!isOpen) { panel.classList.add('open'); document.getElementById('orcSortBtn').classList.add('active'); }
+      });
+
+      document.getElementById('orcFilterBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const panel = document.getElementById('orcFilterPanel');
+        const isOpen = panel.classList.contains('open');
+        closeAllPanels();
+        if (!isOpen) { panel.classList.add('open'); document.getElementById('orcFilterBtn').classList.add('active'); }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#orcSortPanel') && !e.target.closest('#orcSortBtn') &&
+            !e.target.closest('#orcFilterPanel') && !e.target.closest('#orcFilterBtn')) {
+          closeAllPanels();
+        }
+      });
+
+      // ── Sort apply ──
+      document.getElementById('orcSortApply')?.addEventListener('click', () => {
+        const field = document.getElementById('orcSortField').value;
+        const dir = document.getElementById('orcSortDir').value === 'asc' ? 1 : -1;
+        if (!field) return;
+        const tbody = document.getElementById('otherContactsTbody');
+        const rowEls = Array.from(tbody.querySelectorAll('tr'));
+        rowEls.sort((a, b) => {
+          const ai = parseInt(a.getAttribute('data-orc-row'));
+          const bi = parseInt(b.getAttribute('data-orc-row'));
+          const aVal = String(others[ai]?.[field] ?? '').toLowerCase();
+          const bVal = String(others[bi]?.[field] ?? '').toLowerCase();
+          return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+        });
+        rowEls.forEach(r => tbody.appendChild(r));
+        closeAllPanels();
+      });
+
+      document.getElementById('orcSortClear')?.addEventListener('click', () => {
+        document.getElementById('orcSortField').value = '';
+        document.getElementById('orcSortDir').value = 'asc';
+        const tbody = document.getElementById('otherContactsTbody');
+        const rowEls = Array.from(tbody.querySelectorAll('tr'));
+        rowEls.sort((a,b) => parseInt(a.getAttribute('data-orc-row')) - parseInt(b.getAttribute('data-orc-row')));
+        rowEls.forEach(r => tbody.appendChild(r));
+        closeAllPanels();
+      });
+
+      // ── Filter apply ──
+      function applyFilters() {
+        const leadFilter = document.getElementById('orcFilterLeadStatus').value.toLowerCase();
+        const phone1Filter = document.getElementById('orcFilterPhone1').value.toLowerCase();
+        const hasPhone2Filter = document.getElementById('orcFilterHasPhone2').value;
+        const tbody = document.getElementById('otherContactsTbody');
+        let activeFilters = 0;
+        if (leadFilter) activeFilters++;
+        if (phone1Filter) activeFilters++;
+        if (hasPhone2Filter) activeFilters++;
+        const badge = document.getElementById('orcFilterBadge');
+        if (badge) { badge.style.display = activeFilters > 0 ? 'inline' : 'none'; badge.textContent = activeFilters; }
+        document.getElementById('orcFilterBtn')?.classList.toggle('active', activeFilters > 0);
+        tbody.querySelectorAll('tr').forEach(row => {
+          const idx = parseInt(row.getAttribute('data-orc-row'));
+          const c = others[idx];
+          if (!c) return;
+          let show = true;
+          if (leadFilter) { const ls = String(c.lead_status ?? c.leadStatus ?? '').toLowerCase(); if (!ls.includes(leadFilter)) show = false; }
+          if (phone1Filter) { const ps = String(c.phone_1_status ?? c.phone1Status ?? '').toLowerCase(); if (!ps.includes(phone1Filter)) show = false; }
+          if (hasPhone2Filter === 'yes') { const p2 = c.phone_2 ?? c.phone2 ?? null; if (!p2) show = false; }
+          if (hasPhone2Filter === 'no') { const p2 = c.phone_2 ?? c.phone2 ?? null; if (p2) show = false; }
+          row.style.display = show ? '' : 'none';
+        });
+        closeAllPanels();
+      }
+
+      document.getElementById('orcFilterApply')?.addEventListener('click', applyFilters);
+
+      document.getElementById('orcFilterClear')?.addEventListener('click', () => {
+        document.getElementById('orcFilterLeadStatus').value = '';
+        document.getElementById('orcFilterPhone1').value = '';
+        document.getElementById('orcFilterHasPhone2').value = '';
+        const badge = document.getElementById('orcFilterBadge');
+        if (badge) badge.style.display = 'none';
+        document.getElementById('orcFilterBtn')?.classList.remove('active');
+        const tbody = document.getElementById('otherContactsTbody');
+        tbody.querySelectorAll('tr').forEach(row => { row.style.display = ''; });
+        closeAllPanels();
+      });
+
+      // ── Export CSV ──
+      document.getElementById('orcExportBtn')?.addEventListener('click', () => {
+        const headers = ['#','Name','Relationship','Lead Status','Phone 1','Phone 1 Status','Phone 2','Phone 2 Status'];
+        const rows = others.map((c, i) => [
+          i + 1,
+          c.name ?? '',
+          c.relationship ?? '',
+          c.lead_status ?? c.leadStatus ?? '',
+          formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null) ?? '',
+          c.phone_1_status ?? c.phone1Status ?? '',
+          formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null) ?? '',
+          c.phone_2_status ?? c.phone2Status ?? ''
+        ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'related_contacts.csv'; a.click();
+        URL.revokeObjectURL(url);
+      });
     }
 
     const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
@@ -1196,24 +1768,14 @@
 
     async function saveToMonday(fieldKey, newValue) {
       const columnId = COLUMN_ID_MAP[fieldKey];
-      if (!columnId) {
-        console.warn(`No column ID for "${fieldKey}" — column_map may not have loaded yet. Check your Make.com webhook response includes a column_map object.`);
-        return;
-      }
+      if (!columnId) { console.warn(`No column ID for "${fieldKey}"`); return; }
       const { boardId, pulseId } = extractIdsFromUrl();
       if (!boardId || !pulseId) { console.error("Cannot save — missing boardId or pulseId in URL"); return; }
       try {
-        const res = await fetch(SAVE_WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ boardId, pulseId, columnId, value: newValue })
-        });
+        const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId, value: newValue }) });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         console.log(`✓ Saved "${fieldKey}" (${columnId}) → "${newValue}"`);
-      } catch (err) {
-        console.error(`✗ Failed to save ${fieldKey}:`, err);
-        showSaveToast("error");
-      }
+      } catch (err) { console.error(`✗ Failed to save ${fieldKey}:`, err); showSaveToast("error"); }
     }
 
     function showSaveToast(type) {
@@ -1253,10 +1815,12 @@
 
     Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
       node.addEventListener('click', () => {
-        const raw = (node.textContent||'').trim(); if(!raw||raw==='—') return;
-        let url=raw; if(!/^https?:\/\//i.test(url)){ if(/\./.test(url)||url.startsWith('www.')||url.includes('/')) url='https://'+url.replace(/^www\./i,'www.'); }
-        if(!/^https?:\/\//i.test(url)) return;
-        window.open(url,'_blank','noopener,noreferrer');
+        const raw = (node.getAttribute('data-href') || '').trim();
+        if (!raw || raw === '—') return;
+        let url = raw;
+        if (!/^https?:\/\//i.test(url)) { if (/\./.test(url) || url.startsWith('www.') || url.includes('/')) url = 'https://' + url.replace(/^www\./i, 'www.'); }
+        if (!/^https?:\/\//i.test(url)) return;
+        window.open(url, '_blank', 'noopener,noreferrer');
       });
     });
 
@@ -1288,10 +1852,7 @@
       if(!best){banner.classList.remove("show");textNode.textContent="—";return;}
       const plural=best.daysOverdue===1?"":"s";
       const base=`<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
-      // ── Show "No next steps." when nextAction is empty ──
-      const full=best.nextAction
-        ? `${base} <strong>Next step:</strong> ${best.nextAction}.`
-        : `${base} <strong>Next step:</strong> No next steps.`;
+      const full=base;
       textNode.innerHTML=full;
       banner.classList.add("show");
     }
@@ -1300,8 +1861,6 @@
       const el=document.getElementById("contactsSummary"); if(!el) return;
       const allSubitems=Array.isArray(payload?.confirmed_owners)?payload.confirmed_owners:[];
       const confirmedOwners=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()==="yes");
-      const contactedStatuses=["contacted","interested in selling","negotiations","review","accepted offer","closed"];
-      const contacted=confirmedOwners.filter(c=>{const s=String(c.lead_status||"").trim().toLowerCase();return contactedStatuses.some(cs=>s.includes(cs));}).length;
       const owners=confirmedOwners.length;
       const unrelated=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()!=="yes").length;
       el.textContent=`${allSubitems.length} Total Contacts · ${owners} Owners · ${unrelated} Unrelated`;
@@ -1362,6 +1921,562 @@
     document.getElementById('noteModalOverlay').addEventListener('click',(e)=>{if(e.target.id==='noteModalOverlay')closeNoteModal();});
     document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&document.getElementById('noteModalOverlay').classList.contains('active'))closeNoteModal();});
     document.getElementById('noteTextarea').addEventListener('input',(e)=>{document.getElementById('noteCharCount').textContent=e.target.value.length;});
+
+    // =====================================================================
+    // NEW RELATED CONTACTS COMPONENT — Data, Rendering, Webhook
+    // =====================================================================
+
+    const RC_CHANGE_WEBHOOK = "https://hook.us1.make.com/l6va4f33thefrag75ohlmscqwbrpee5v";
+
+    // Live contact data arrays (populated by applyData on initial load)
+    let rcOwners = [];
+    let rcOthers = [];
+
+    // Fire webhook when a field changes in the Related Contacts section
+    async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
+      try {
+        await fetch(RC_CHANGE_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue })
+        });
+      } catch(err) { console.warn("RC webhook error:", err); }
+    }
+
+    // Helper: get pulse+board ids
+    function getRcIds() { return extractIdsFromUrl(); }
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+    function rcVal(v, cls){ return (v && v !== "—") ? `<div class="rc-value ${cls||''}">${escapeHtml(v)}</div>` : `<div class="rc-value muted">—</div>`; }
+    function rcHasVal(v){ return v && v !== "—"; }
+
+    const RC_PENCIL_SVG = `<svg class="rc-pencil-icon" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const RC_CHEV_SVG   = `<svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const RC_CROWN_SVG  = `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 15h16l2-10-5.5 4L10 2 5.5 9 0 5l2 10zm0 2h16v2H2v-2z"/></svg>`;
+    const RC_CLOSED_CHECK = `<svg style="width:13px;height:13px;flex-shrink:0;margin-top:1px" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    const RC_FIELD_EDIT_CFG = {
+      sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'seller_motivation' },
+      ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'owner_status' },
+      contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'], columnId:'contact_outcome' },
+      phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_1_status' },
+      phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_2_status' },
+      phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_3_status' },
+      followUp:         { type:'date',   columnId:'follow_up_date' },
+      phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_1' },
+      phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_2' },
+      phone3:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3' },
+      ownership:        { type:'text',   placeholder:'e.g. 25%', columnId:'ownership_percent' },
+      relation:         { type:'text',   placeholder:'e.g. Spouse, Son...', columnId:'relationship' },
+      address:          { type:'text',   placeholder:'Enter address', columnId:'address' },
+      offer:            { type:'text',   placeholder:'e.g. $185,000 presented', columnId:'offer_amount' },
+      status:           { type:'select', columnId:'lead_status' },
+    };
+
+    function rcEditableEl(field, displayVal, extraClass, flagged){
+      const cfg = RC_FIELD_EDIT_CFG[field] || {type:'text'};
+      const optsAttr = cfg.opts ? `data-opts="${cfg.opts.join('|')}"` : '';
+      const isEmpty = !displayVal || displayVal === '—';
+      const cls = (flagged && isEmpty) ? 'rc-missing-flag' : (extraClass || '');
+      const label = isEmpty ? '—' : displayVal;
+      return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
+        <span class="rc-value ${cls}">${escapeHtml(label)}</span>${RC_PENCIL_SVG}
+      </div>`;
+    }
+
+    function rcMissingEl(field){
+      const cfg = RC_FIELD_EDIT_CFG[field] || {type:'text'};
+      const optsAttr = cfg.opts ? `data-opts="${cfg.opts.join('|')}"` : '';
+      return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
+        <span class="rc-missing-text">—</span>${RC_PENCIL_SVG}
+      </div>`;
+    }
+
+    // ── Record Readiness ────────────────────────────────────────────────
+    const RC_QUALIFYING_STATUSES = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer'];
+    const RC_READINESS_OWNER = [
+      { field:'sellerMotivation', label:'Seller motivation', sub:'Identify what the Seller Motivation is', actionLabel:'Add' },
+      { field:'ownerStatus',      label:'Owner status',      sub:"Identify the Lead's Ownership Status",  actionLabel:'Set' },
+      { field:'followUp',         label:'Follow-up date',    sub:'Set up the next Follow-Up Date',         actionLabel:'Set' },
+      { field:'ownership',        label:'Ownership %',       sub:"Identify Lead's Ownership Percentage",   actionLabel:'Add' },
+    ];
+
+    function rcOwnerIsQualifying(c){ return RC_QUALIFYING_STATUSES.includes(c.status); }
+    function rcOwnerFields(c){ return [c.ownerStatus, c.sellerMotivation, c.followUp, c.ownership]; }
+
+    function rcRecordFlagHtml(c, isOwner){
+      if(!isOwner || !rcOwnerIsQualifying(c)) return '';
+      const missing = RC_READINESS_OWNER.filter(f => !rcHasVal(c[f.field]));
+      if(!missing.length) return '';
+      const tiles = missing.slice(0,4).map(f => `
+        <div class="rc-readiness-tile">
+          <div class="rc-tile-left">
+            <div class="rc-tile-title">${f.label}</div>
+            <div class="rc-tile-sub">${f.sub}</div>
+          </div>
+          <button class="rc-tile-action" data-dg-field="${f.field}">${f.actionLabel}</button>
+        </div>`).join('');
+      return `<div class="rc-readiness">
+        <div class="rc-readiness-top">
+          <div class="rc-readiness-top-left">
+            <span class="rc-readiness-label">RECORD READINESS</span>
+            <div class="rc-readiness-title">${missing.length} field${missing.length !== 1 ? 's' : ''} should be completed before the next conversation.</div>
+          </div>
+          <span class="rc-readiness-pill"><span class="rc-readiness-pill-dot"></span>Needs attention</span>
+        </div>
+        <div class="rc-readiness-tiles">${tiles}</div>
+      </div>`;
+    }
+
+    // ── Generic styled dropdown ─────────────────────────────────────────
+    function rcStyledDropdown(value, opts, field, placeholder, alwaysUp, flagged){
+      const current = rcHasVal(value) ? value : null;
+      const optHtml = opts.map(o =>
+        `<button class="rc-status-opt${o===current?' current':''}" data-action="setfield" data-field="${field}" data-val="${escapeHtml(o)}">${escapeHtml(o)}</button>`
+      ).join('');
+      const emptyLabel = (flagged && !current)
+        ? `<span style="color:#bf8b8b;font-weight:400">${placeholder}</span>`
+        : `<span style="color:#b0b8c4;font-weight:400">${placeholder}</span>`;
+      return `<div class="rc-status-wrapper">
+        <button class="rc-status-btn rc-status-btn--nodot" data-action="openstatus">
+          <span class="rc-status-row">${current ? escapeHtml(current) : emptyLabel}</span>${RC_CHEV_SVG}
+        </button>
+        <div class="rc-status-dropdown${alwaysUp?' always-up':''}">
+          ${optHtml}
+          ${current ? `<button class="rc-status-opt rc-status-opt-clear" data-action="setfield" data-field="${field}" data-val="—" style="color:#e57373;border-top:1px solid #f3f4f6;margin-top:2px;">Clear</button>` : ''}
+        </div>
+      </div>`;
+    }
+
+    // ── Status options ──────────────────────────────────────────────────
+    const RC_STATUS_OPTS = ['Re-Skiptrace','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed','Not Interested'];
+
+    function rcStatusFieldHtml(c){
+      const dotCls = c.statusOn ? 'on' : '';
+      const optHtml = RC_STATUS_OPTS.map(o =>
+        `<button class="rc-status-opt${o===c.status?' current':''}" data-action="setstatus" data-val="${escapeHtml(o)}">
+          <span class="opt-dot"></span>${escapeHtml(o)}
+        </button>`
+      ).join('');
+      return `<div class="rc-status-wrapper">
+        <button class="rc-status-btn" data-action="openstatus">
+          <span class="rc-status-row"><span class="rc-sdot ${dotCls}"></span>${escapeHtml(c.status||'New')}</span>${RC_CHEV_SVG}
+        </button>
+        <div class="rc-status-dropdown">${optHtml}</div>
+      </div>`;
+    }
+
+    // ── Sorting ─────────────────────────────────────────────────────────
+    const RC_STATUS_PRIORITY = {'Closed':10,'Accepted Offer':9,'Negotiations/Review':8,'Interested In Selling':7,'Contacted':6,'Attempt 3 - No Answer':5,'Attempt 2 - No Answer':4,'Attempt 1 - No Answer':3,'Re-Skiptrace':2,'New':1,'Not Interested':0};
+    function rcSortByStatus(data){ return [...data].sort((a,b) => (RC_STATUS_PRIORITY[b.status]??1) - (RC_STATUS_PRIORITY[a.status]??1)); }
+
+    // ── Inline status ────────────────────────────────────────────────────
+    function rcStatusTextHtml(c, isOwner){
+      const fields = isOwner ? rcOwnerFields(c) : [];
+      const missing = fields.filter(v => !rcHasVal(v)).length;
+      if(missing >= 2) return `<span class="rc-item-inline-status">Missing info</span>`;
+      if(missing === 1) return `<span class="rc-item-inline-status">Partial</span>`;
+      return '';
+    }
+
+    // ── Phone row ────────────────────────────────────────────────────────
+    function rcPhoneRowHtml(phone, status, statusField){
+      const phoneField = statusField === 'phoneStatus' ? 'phone' : statusField === 'phone2Status' ? 'phone2' : 'phone3';
+      if(!phone || phone === "—") return rcMissingEl(phoneField);
+      const opts = ['Correct Number','Dial NA','Wrong Number','Disconnected'];
+      const optHtml = opts.map(o =>
+        `<button class="rc-status-opt${o===status?' current':''}" data-action="setfield" data-field="${statusField}" data-val="${o}">${o}</button>`
+      ).join('');
+      const dispLabel = (status && status !== "—") ? status : '<span class="rc-ph-disp-empty">Set disposition</span>';
+      return `<div class="rc-phone-row">
+        <span class="rc-ph-num">${escapeHtml(phone)}</span>
+        <span class="rc-ph-dot">·</span>
+        <div class="rc-status-wrapper rc-ph-disp-wrapper">
+          <button class="rc-ph-disp-btn" data-action="openstatus">${dispLabel}${RC_CHEV_SVG}</button>
+          <div class="rc-status-dropdown">${optHtml}</div>
+        </div>
+      </div>`;
+    }
+
+    // ── Render detail: Owner ─────────────────────────────────────────────
+    function rcRenderDetailOwner(c, innerId, detailId){
+      const det = document.getElementById(detailId);
+      det.querySelector(".rc-detail-empty").style.display = "none";
+      const inner = document.getElementById(innerId);
+      inner.style.display = "block";
+      const allFilled = rcOwnerIsQualifying(c) && rcOwnerFields(c).filter(v=>!rcHasVal(v)).length === 0;
+      const bannerActive = rcOwnerIsQualifying(c);
+      const signalsBadge = allFilled ? ` <span class="rc-det-signals"><svg class="rc-signals-check" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Signals Identified</span>` : "";
+      const subtitle = rcHasVal(c.ownership) ? `${escapeHtml(c.relation)} · ${escapeHtml(c.ownership)} ownership${signalsBadge}` : `${escapeHtml(c.relation)}${signalsBadge}`;
+      inner.innerHTML = `
+        <div class="rc-det-header">
+          <div class="rc-det-icon owner">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff" style="width:24px;height:24px;display:block;"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>
+          </div>
+          <div class="rc-det-header-text">
+            <div class="rc-det-name">${escapeHtml(c.name)}</div>
+            <div class="rc-det-sub" style="margin-bottom:0">${subtitle}</div>
+          </div>
+        </div>
+        ${rcRecordFlagHtml(c, true)}
+        <div class="rc-fields">
+          <div class="rc-field"><div class="rc-label">Lead Status</div>${rcStatusFieldHtml(c)}</div>
+          <div class="rc-field"><div class="rc-label">Ownership %</div>${rcEditableEl('ownership', rcHasVal(c.ownership)?c.ownership:'—','',bannerActive&&!rcHasVal(c.ownership))}</div>
+          <div class="rc-field"><div class="rc-label">Relationship</div>${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+          <div class="rc-field"><div class="rc-label">Owner Status</div>${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—',false,bannerActive&&!rcHasVal(c.ownerStatus))}</div>
+          <div class="rc-field"><div class="rc-label">Follow-Up Date</div>${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'', bannerActive&&!rcHasVal(c.followUp))}</div>
+          <div class="rc-field"><div class="rc-label">Seller Motivation</div>${rcStyledDropdown(c.sellerMotivation,["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'],'sellerMotivation','—',true,bannerActive&&!rcHasVal(c.sellerMotivation))}</div>
+          <div class="rc-field"><div class="rc-label">Offer Amount</div>${rcEditableEl('offer', rcHasVal(c.offer)?c.offer:'—','offer')}</div>
+          <div class="rc-field"><div class="rc-label">Phone</div>${rcEditableEl('phone', rcHasVal(c.phone)?c.phone:'—', rcHasVal(c.phone)?'link':'')}</div>
+        </div>`;
+    }
+
+    // ── Render detail: Other ─────────────────────────────────────────────
+    function rcRenderDetailOther(c, innerId, detailId){
+      const det = document.getElementById(detailId);
+      det.querySelector(".rc-detail-empty").style.display = "none";
+      const inner = document.getElementById(innerId);
+      inner.style.display = "block";
+      inner.innerHTML = `
+        <div class="rc-det-header">
+          <div class="rc-det-icon other">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff" style="width:24px;height:24px;display:block;"><path d="M460 90H60c-27 0-50 22-50 50v240c0 27 23 50 50 50h400c28 0 50-22 50-50V140c0-28-22-50-50-50zM248 372H104c-16 0-28-17-28-34 1-25 27-40 54-52 19-8 22-16 22-24s-5-16-12-22a55 55 0 0 1-17-41c0-32 19-58 52-58s52 27 52 58c0 17-6 32-17 41-7 6-12 13-12 22 0 8 2 16 22 23 27 12 53 28 54 53 3 17-10 34-26 34zm195-58c0 9-8 17-17 17h-75c-9 0-17-7-17-17v-25c0-9 8-17 17-17h75c9 0 17 7 17 17zm0-91c0 9-8 17-17 17H302c-9 0-17-7-17-17v-25c0-9 8-17 17-17h125c9 0 17 7 17 17v25z"/></svg>
+          </div>
+          <div class="rc-det-header-text">
+            <div class="rc-det-name">${escapeHtml(c.name)}</div>
+            <div class="rc-det-sub" style="margin-bottom:0">${escapeHtml(c.relation)}</div>
+          </div>
+        </div>
+        ${rcRecordFlagHtml(c, false)}
+        <div class="rc-fields">
+          <div class="rc-field"><div class="rc-label">Lead Status</div>${rcStatusFieldHtml(c)}</div>
+          <div class="rc-field"><div class="rc-label">Relationship</div>${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+          <div class="rc-field"><div class="rc-label">Owner Status</div>${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—')}</div>
+          <div class="rc-field"><div class="rc-label">Contact Outcome</div>${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
+          <div class="rc-field"><div class="rc-label">Follow-Up Date</div>${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'')}</div>
+          <div class="rc-field"><div class="rc-label">Address</div>${rcEditableEl('address', (c.address&&c.address!=='Unknown'&&c.address!=='—')?c.address:'—','multiline')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 1</div>${rcPhoneRowHtml(c.phone,c.phoneStatus,'phoneStatus')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 2</div>${rcPhoneRowHtml(c.phone2,c.phone2Status,'phone2Status')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 3</div>${rcPhoneRowHtml(c.phone3,c.phone3Status,'phone3Status')}</div>
+        </div>`;
+    }
+
+    // ── Build list ───────────────────────────────────────────────────────
+    function rcBuildList(data, listId, innerId, detailId, renderFn, isOwner){
+      const list = document.getElementById(listId);
+      if(!list) return;
+      list.innerHTML = "";
+      const sorted = rcSortByStatus(data);
+      sorted.forEach((c)=>{
+        const isClosed = c.status === 'Closed';
+        const div = document.createElement("div");
+        div.className = "rc-list-item";
+        div.dataset.i = data.indexOf(c);
+        div.innerHTML = `
+          <div class="rc-item-body">
+            <div class="rc-item-name-row">
+              ${isClosed ? RC_CLOSED_CHECK : ''}
+              <span class="rc-item-name">${escapeHtml(c.name)}</span>
+              ${rcStatusTextHtml(c, isOwner)}
+            </div>
+            <div class="rc-item-sub">${escapeHtml(c.relation)}${c.ownership && c.ownership !== "—" ? " · " + escapeHtml(c.ownership) : ""}</div>
+            <div class="rc-item-status">
+              <span class="rc-dot ${c.statusOn?'active':''}"></span>
+              <span class="rc-item-status-text">${escapeHtml(c.status||'New')}</span>
+            </div>
+          </div>`;
+        div.addEventListener("click",()=>{
+          list.querySelectorAll(".rc-list-item").forEach(el=>el.classList.remove("active"));
+          div.classList.add("active");
+          renderFn(c, innerId, detailId);
+        });
+        list.appendChild(div);
+      });
+    }
+
+    // ── Update meta count bar ────────────────────────────────────────────
+    function rcUpdateMeta(){
+      const meta = document.getElementById("rcMeta");
+      const cntO = document.getElementById("cnt-owners");
+      const cntOther = document.getElementById("cnt-other");
+      if(meta) meta.textContent = `${rcOwners.length + rcOthers.length} contacts · ${rcOwners.length} owners`;
+      if(cntO) cntO.textContent = `(${rcOwners.length})`;
+      if(cntOther) cntOther.textContent = `(${rcOthers.length})`;
+    }
+
+    // ── Map payload subitems → rc format ────────────────────────────────
+    function rcMapContact(c){
+      // Support both snake_case (API) and camelCase (old) field names
+      const status    = c.lead_status ?? c.leadStatus ?? c.status ?? "New";
+      const statusOn  = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(status);
+      const followUp  = c.follow_up_date ?? c.followupDate ?? c.followUp ?? "—";
+      const today     = new Date(); today.setHours(0,0,0,0);
+      let overdue = false;
+      if(followUp && followUp !== "—"){
+        const d = parseFlexibleDate(followUp);
+        if(d){ const ds = new Date(d); ds.setHours(0,0,0,0); overdue = ds < today; }
+      }
+      return {
+        name:             c.name ?? "—",
+        relation:         c.relationship ?? c.relation ?? "—",
+        ownership:        c.ownership_percent != null ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%') : (c.ownership ?? "—"),
+        status,
+        statusOn,
+        ownerStatus:      c.owner_status ?? c.ownerStatus ?? "—",
+        followUp,
+        overdue,
+        sellerMotivation: c.seller_motivation ?? c.sellerMotivation ?? "—",
+        offer:            c.offer_amount ?? c.offerAmount ?? (c.offer_made ? "Presented" : "—"),
+        phone:            c.phone_1 ?? c.phone1 ?? c.phone ?? "—",
+        phoneStatus:      c.phone_1_status ?? c.phone1Status ?? c.phoneStatus ?? "—",
+        phone2:           c.phone_2 ?? c.phone2 ?? "—",
+        phone2Status:     c.phone_2_status ?? c.phone2Status ?? "—",
+        phone3:           c.phone_3 ?? c.phone3 ?? "—",
+        phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
+        contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
+        address:          c.address ?? "—",
+        keyContact:       !!c.key_contact ?? !!c.keyContact ?? false,
+        notes:            c.notes ?? "",
+        // Keep original for webhook pulse_id
+        pulseId:          c.pulse_id ?? c.pulseId ?? c.id ?? null,
+        boardId:          c.board_id ?? c.boardId ?? null,
+      };
+    }
+
+    // ── Populate RC component from applyData payload ─────────────────────
+    function rcPopulateFromPayload(payload){
+      const allContacts = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
+      rcOwners = allContacts
+        .filter(c => String(c.owner_status ?? c.ownerStatus ?? "").trim().toLowerCase() === "yes")
+        .map(rcMapContact);
+      rcOthers = allContacts
+        .filter(c => String(c.owner_status ?? c.ownerStatus ?? "").trim().toLowerCase() !== "yes")
+        .map(rcMapContact);
+
+      rcUpdateMeta();
+      rcBuildList(rcOwners, "list-owners", "inner-owners", "detail-owners", rcRenderDetailOwner, true);
+      rcBuildList(rcOthers, "list-other",  "inner-other",  "detail-other",  rcRenderDetailOther, false);
+    }
+
+    // ── Tab switching ────────────────────────────────────────────────────
+    document.querySelectorAll(".rc-tab").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        document.querySelectorAll(".rc-tab").forEach(b=>b.setAttribute("aria-selected","false"));
+        document.querySelectorAll(".rc-pane").forEach(p=>p.classList.remove("active"));
+        btn.setAttribute("aria-selected","true");
+        document.getElementById(btn.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
+
+    // ── Collapse toggle (starts CLOSED per requirements) ─────────────────
+    document.getElementById("rcToggle").addEventListener("click",()=>{
+      const p = document.getElementById("rcPanel");
+      p.dataset.open = p.dataset.open === "true" ? "false" : "true";
+    });
+
+    // ── Close status dropdowns on outside click ───────────────────────────
+    document.addEventListener("click", e => {
+      if(!e.target.closest(".rc-status-wrapper") && !e.target.closest(".rc-ph-disp-wrapper")){
+        document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+      }
+      if(!e.target.closest(".rc-editable") && !e.target.closest(".rc-inline-edit")){
+        document.querySelectorAll(".rc-inline-edit").forEach(editEl => {
+          const wrap = editEl.closest(".rc-editable");
+          if(!wrap) return;
+          const field = wrap.dataset.editField;
+          const pane = wrap.closest(".rc-pane");
+          if(!pane) return;
+          const dataArr = pane.id === 'pane-owners' ? rcOwners : rcOthers;
+          const activeItem = document.getElementById(pane.id.replace('pane-','list-')).querySelector('.rc-list-item.active');
+          const c = activeItem ? dataArr[+activeItem.dataset.i] : null;
+          if(!c) return;
+          const rawVal = c[field];
+          const displayVal = (rawVal && rawVal !== '—') ? rawVal : '—';
+          const extraCls = field==='offer'?'offer':field==='phone'?'link':'';
+          wrap.innerHTML = `<span class="rc-value ${extraCls}">${escapeHtml(displayVal)}</span>${RC_PENCIL_SVG}`;
+        });
+      }
+    });
+
+    // ── Event delegation per pane ────────────────────────────────────────
+    function rcAttachPaneEvents(paneId, dataArr, innerId, detailId, renderFn, isOwner){
+      const pane = document.getElementById(paneId);
+      if(!pane) return;
+      pane.addEventListener("click", async e => {
+        const el = e.target;
+        const { boardId, pulseId: globalPulseId } = getRcIds();
+
+        // Status dropdown open/close
+        if(el.closest("[data-action='openstatus']")){
+          e.stopPropagation();
+          const wrapper = el.closest(".rc-status-wrapper") || el.closest(".rc-ph-disp-wrapper");
+          const drop = wrapper.querySelector(".rc-status-dropdown");
+          const isOpen = drop.classList.contains("open");
+          document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+          if(!isOpen){
+            const btnRect = (el.closest(".rc-status-btn") || el.closest(".rc-ph-disp-btn") || el).getBoundingClientRect();
+            drop.classList.remove("drop-up");
+            if(window.innerHeight - btnRect.bottom < 172) drop.classList.add("drop-up");
+            drop.classList.add("open");
+            const current = drop.querySelector(".rc-status-opt.current");
+            if(current){ const itemH = current.offsetHeight||37; drop.scrollTop = current.offsetTop - itemH*2; }
+          }
+          return;
+        }
+
+        // Deal Guidance prompt → scroll to editable field
+        if(el.closest("[data-dg-field]") && !el.closest(".rc-editable")){
+          const field = el.closest("[data-dg-field]").dataset.dgField;
+          const target = document.getElementById(innerId).querySelector(`.rc-editable[data-edit-field="${field}"]`);
+          if(target){ target.scrollIntoView({behavior:'smooth',block:'nearest'}); target.click(); }
+          return;
+        }
+
+        // Inline edit — open
+        const editTarget = el.closest(".rc-editable");
+        if(editTarget && !editTarget.querySelector(".rc-inline-edit")){
+          e.stopPropagation();
+          const field = editTarget.dataset.editField;
+          const type  = editTarget.dataset.editType;
+          const opts  = editTarget.dataset.opts ? editTarget.dataset.opts.split('|') : [];
+          const currentSpan = editTarget.querySelector('.rc-value,.rc-missing-text');
+          const currentVal = currentSpan ? currentSpan.textContent.trim() : '';
+          const isDash = currentVal === '—' || currentVal === '';
+          let inputHtml = '';
+          if(type === 'select'){
+            inputHtml = `<select class="rc-inline-select" data-field="${field}"><option value="">Select…</option>${opts.map(o=>`<option>${escapeHtml(o)}</option>`).join('')}</select>`;
+          } else if(type === 'date'){
+            inputHtml = `<input class="rc-inline-input" type="date" data-field="${field}"/>`;
+          } else {
+            const cfg = RC_FIELD_EDIT_CFG[field]||{};
+            const ph = isDash ? (cfg.placeholder||'') : currentVal;
+            inputHtml = `<input class="rc-inline-input" type="text" data-field="${field}" placeholder="${escapeHtml(ph)}"/>`;
+          }
+          editTarget.innerHTML = `<div class="rc-inline-edit">
+            ${inputHtml}
+            <button class="rc-inline-save" data-action="inline-save" data-field="${field}">Save</button>
+            <button class="rc-inline-clear" data-action="inline-clear" data-field="${field}">Clear</button>
+            <button class="rc-inline-cancel" data-action="inline-cancel" data-field="${field}">Cancel</button>
+          </div>`;
+          const inp = editTarget.querySelector('select,input');
+          if(inp) inp.focus();
+          return;
+        }
+
+        // Inline edit — save
+        if(el.closest("[data-action='inline-save']")){
+          e.stopPropagation();
+          const field = el.closest("[data-action='inline-save']").dataset.field;
+          const wrap  = el.closest(".rc-editable");
+          const input = wrap.querySelector(`[data-field="${field}"]`);
+          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          if(!activeItem || !input) return;
+          const c = dataArr[+activeItem.dataset.i];
+          if(input.value && input.value !== "Select…"){
+            let newVal = input.value;
+            if(input.type === 'date'){
+              const d = new Date(newVal + 'T12:00:00');
+              newVal = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+            } else if(field === 'offer'){
+              const num = parseFloat(newVal.replace(/[^0-9.]/g,''));
+              if(!isNaN(num)) newVal = '$' + num.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+            } else if(field === 'ownership'){
+              const num = parseFloat(newVal.replace(/[^0-9.]/g,''));
+              if(!isNaN(num)) newVal = num + '%';
+            }
+            c[field] = newVal;
+            // Fire webhook
+            const cfg = RC_FIELD_EDIT_CFG[field]||{};
+            const colId = cfg.columnId || field;
+            const cPulseId = c.pulseId || globalPulseId;
+            const cBoardId = c.boardId || boardId;
+            if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, newVal);
+          }
+          rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
+          document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
+            .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
+          renderFn(c, innerId, detailId);
+          return;
+        }
+
+        // Inline edit — clear
+        if(el.closest("[data-action='inline-clear']")){
+          e.stopPropagation();
+          const field = el.closest("[data-action='inline-clear']").dataset.field;
+          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          if(!activeItem) return;
+          const c = dataArr[+activeItem.dataset.i];
+          c[field] = "—";
+          const cfg = RC_FIELD_EDIT_CFG[field]||{};
+          const colId = cfg.columnId || field;
+          const cPulseId = c.pulseId || globalPulseId;
+          const cBoardId = c.boardId || boardId;
+          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, "");
+          rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
+          document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
+            .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
+          renderFn(c, innerId, detailId);
+          return;
+        }
+
+        // Inline edit — cancel
+        if(el.closest("[data-action='inline-cancel']")){
+          e.stopPropagation();
+          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          if(activeItem) renderFn(dataArr[+activeItem.dataset.i], innerId, detailId);
+          return;
+        }
+
+        // Lead status selected
+        if(el.closest("[data-action='setstatus']")){
+          e.stopPropagation();
+          const btn = el.closest("[data-action='setstatus']");
+          const newStatus = btn.dataset.val;
+          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          if(!activeItem) return;
+          const c = dataArr[+activeItem.dataset.i];
+          c.status = newStatus;
+          c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(newStatus);
+          document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+          // Fire webhook
+          const cPulseId = c.pulseId || globalPulseId;
+          const cBoardId = c.boardId || boardId;
+          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, 'lead_status', newStatus);
+          rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
+          document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
+            .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
+          renderFn(c, innerId, detailId);
+          return;
+        }
+
+        // Generic field dropdown selected
+        if(el.closest("[data-action='setfield']")){
+          e.stopPropagation();
+          const btn = el.closest("[data-action='setfield']");
+          const field = btn.dataset.field;
+          const val = btn.dataset.val;
+          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          if(!activeItem) return;
+          const c = dataArr[+activeItem.dataset.i];
+          c[field] = val;
+          document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+          // Fire webhook
+          const cfg = RC_FIELD_EDIT_CFG[field]||{};
+          const colId = cfg.columnId || field;
+          const cPulseId = c.pulseId || globalPulseId;
+          const cBoardId = c.boardId || boardId;
+          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, val === '—' ? '' : val);
+          renderFn(c, innerId, detailId);
+          return;
+        }
+      });
+    }
+
+    // Attach pane event listeners
+    rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
+    rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
+
+
   </script>
 </body>
 </html>
