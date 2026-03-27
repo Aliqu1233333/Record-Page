@@ -2216,13 +2216,18 @@
         const d = parseFlexibleDate(followUp);
         if(d){ const ds = new Date(d); ds.setHours(0,0,0,0); overdue = ds < today; }
       }
+      // Normalize owner_status — handles "Yes", "yes", true, or missing
+      const rawOwnerStatus = c.owner_status ?? c.ownerStatus ?? "";
+      const ownerStatusNorm = String(rawOwnerStatus).trim().toLowerCase();
+      const ownerStatusDisplay = rawOwnerStatus ? String(rawOwnerStatus) : "—";
       return {
         name:             c.name ?? "—",
         relation:         c.relationship ?? c.relation ?? "—",
         ownership:        c.ownership_percent != null ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%') : (c.ownership ?? "—"),
         status,
         statusOn,
-        ownerStatus:      c.owner_status ?? c.ownerStatus ?? "—",
+        ownerStatus:      ownerStatusDisplay,
+        ownerStatusNorm,  // used internally by filter
         followUp,
         overdue,
         sellerMotivation: c.seller_motivation ?? c.sellerMotivation ?? "—",
@@ -2235,7 +2240,7 @@
         phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
         contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
         address:          c.address ?? "—",
-        keyContact:       !!c.key_contact ?? !!c.keyContact ?? false,
+        keyContact:       !!(c.key_contact ?? c.keyContact ?? false),
         notes:            c.notes ?? "",
         // Keep original for webhook pulse_id
         pulseId:          c.pulse_id ?? c.pulseId ?? c.id ?? null,
@@ -2246,12 +2251,10 @@
     // ── Populate RC component from applyData payload ─────────────────────
     function rcPopulateFromPayload(payload){
       const allContacts = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
-      rcOwners = allContacts
-        .filter(c => String(c.owner_status ?? c.ownerStatus ?? "").trim().toLowerCase() === "yes")
-        .map(rcMapContact);
-      rcOthers = allContacts
-        .filter(c => String(c.owner_status ?? c.ownerStatus ?? "").trim().toLowerCase() !== "yes")
-        .map(rcMapContact);
+      // Map first so ownerStatusNorm is available for the split
+      const allMapped = allContacts.map(rcMapContact);
+      rcOwners = allMapped.filter(c => c.ownerStatusNorm === "yes");
+      rcOthers = allMapped.filter(c => c.ownerStatusNorm !== "yes");
 
       rcUpdateMeta();
       rcBuildList(rcOwners, "list-owners", "inner-owners", "detail-owners", rcRenderDetailOwner, true);
