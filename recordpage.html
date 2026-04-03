@@ -10,7 +10,7 @@
 
   <style>
     :root{
-      --bg: #f4f6f9;
+      --bg: #f3f4f6;
       --surface: #ffffff;
       --line: #e5e7eb;
       --line-2: #dbe0e6;
@@ -29,10 +29,9 @@
     }
 
     *{ box-sizing: border-box; }
-    html{ min-height: 100%; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      min-height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: var(--font);
@@ -45,7 +44,6 @@
       max-width: none;
       margin: 0;
       padding: 14px 14px 18px 32px;
-      min-height: 144vh;
     }
 
     .layout{
@@ -224,7 +222,7 @@
        CRM FIELD LAYOUT
        ===================================================== */
     .section{
-      padding: 0 16px 8px 30px;
+      padding: 0 16px 10px 30px;
     }
     .section + .section{
       border-top: 1px solid var(--line);
@@ -235,11 +233,11 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 4px 0 8px;
+      padding: 8px 0 10px;
     }
     .section-head h3{
       margin:0;
-      font-size: 18.5px;
+      font-size: 20.5px;
       font-weight: 600;
       color:#122349;
       letter-spacing: .08px;
@@ -256,7 +254,7 @@
     .slds-field {
       display: flex;
       flex-direction: column;
-      padding: 10px 0 4px 0;
+      padding: 11px 0 6px 0;
       border-bottom: 1px solid #e8e8e8;
       min-width: 0;
     }
@@ -271,7 +269,7 @@
       color: #5e6470;
       line-height: 1.3;
       margin-top: 0;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -349,6 +347,7 @@
       min-width: 820px;
     }
 
+    /* CHANGE 4: Sortable-looking column headers */
     .orc-table thead th {
       text-align: left;
       font-size: 11.5px;
@@ -389,6 +388,7 @@
     .orc-table thead th.sort-desc .sort-icon svg:first-child { opacity: 0.25; }
     .orc-table thead th.sort-desc .sort-icon svg:last-child { opacity: 1; }
 
+    /* CHANGE 3: Tighter row height — 8px 12px padding */
     .orc-table tbody td {
       padding: 8px 12px;
       border-bottom: 1px solid #f3f4f6;
@@ -399,10 +399,12 @@
     .orc-table tbody td:first-child { padding: 8px 6px 8px 14px; }
     .orc-table tbody tr:last-child td { border-bottom: 0; }
 
+    /* CHANGE 5: Zebra striping */
     .orc-table tbody tr { background: white; transition: background 0.1s ease; }
     .orc-table tbody tr:nth-child(even) { background: #fafbfc; }
     .orc-table tbody tr:hover { background: #eef4fb !important; }
 
+    /* Row counter */
     .orc-idx {
       font-size: 11.5px;
       font-weight: 600;
@@ -421,6 +423,8 @@
     .orc-table .orc-phone { color: #0176d3; font-weight: 500; text-decoration: none; white-space: nowrap; font-size: 13.5px; }
     .orc-table .orc-phone:hover { text-decoration: underline; }
     .orc-table .orc-empty { color: #9ca3af; }
+
+
 
     .orc-status-wrap { position: relative; display: inline-flex; align-items: center; }
     .orc-status-btn {
@@ -706,9 +710,8 @@
     }
 
     /* =====================================================
-       REFINED RELATED CONTACTS COMPONENT STYLES
+       NEW RELATED CONTACTS COMPONENT STYLES
        ===================================================== */
-
     /* Panel shell */
     #rcPanel { background: var(--surface); }
 
@@ -742,44 +745,16 @@
     .rc-body { display:none; }
     #rcPanel[data-open="true"] .rc-body { display:block; }
 
-    /* ── REFINEMENT 1: Tabs constrained to left panel width ── */
+    /* Tabs */
     .rc-tabs {
-      display:flex;
-      align-items:stretch;
-      /* Remove justify-content:space-between — tabs now left-aligned only */
-      border-bottom: none;
-      background: #fff;
-      /* No full-width border — handled per-section below */
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 24px 0; border-bottom:1px solid #f0f0f0; background:#fff;
     }
-
-    /* Left tab strip — constrained to list width */
-    .rc-tabs-left-col {
-      width: 300px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: flex-end;
-      gap: 0;
-      padding: 14px 0 0 16px;
-      border-bottom: 1px solid #eaeaea;
-      background: #fff;
-    }
-
-    /* Spacer that fills right of tabs — white to match tab row */
-    .rc-tabs-right-spacer {
-      flex: 1;
-      border-bottom: 1px solid #eaeaea;
-      background: #ffffff;
-    }
-
+    .rc-tabs-left { display:flex; gap:28px; }
     .rc-tab {
       appearance:none; border:0; background:transparent;
-      font-family:var(--font);
-      /* REFINEMENT 1: ~1px smaller, more compact */
-      font-size: 13px;
-      font-weight: 500;
-      /* Reduced horizontal padding for compactness */
-      padding: 0 10px 12px;
-      color:#8c8c8c; cursor:pointer;
+      font-family:var(--font); font-size:14.5px; font-weight:500;
+      padding:0 0 16px; color:#8c8c8c; cursor:pointer;
       position:relative; transition:color .12s; white-space:nowrap;
     }
     .rc-tab[aria-selected="true"] { color:#1f1f1f; font-weight:600; }
@@ -787,46 +762,25 @@
       content:""; position:absolute; left:0; right:0; bottom:-1px;
       height:2px; background:var(--blue); border-radius:1px;
     }
-    .rc-tab-count { font-size:12px; font-weight:500; color:#8c8c8c; }
+    .rc-tab-count { font-size:14.5px; font-weight:500; color:#8c8c8c; }
     .rc-tab[aria-selected="true"] .rc-tab-count { color:#1f1f1f; }
 
     /* Tab panes */
     .rc-pane { display:none; }
-    .rc-pane.active {
-      display:flex;
-      align-items:stretch;
-      min-height: 344px;
-    }
+    .rc-pane.active { display:flex; align-items:flex-start; min-height:260px; padding-top:4px; }
 
-    /* ── Left list — layer: white ── */
+    /* Left list */
     .rc-list {
-      width: 300px;
-      flex-shrink: 0;
-      background: #ffffff;
-      border-right: 1px solid #d8dde6;
-      overflow-y: auto;
-      max-height: 688px;
+      width:300px; flex-shrink:0; background:#fff;
+      border-right:1px solid #f3f3f3; overflow-y:auto; max-height:520px;
     }
-
-    /* Row base */
     .rc-list-item {
       display:flex; align-items:flex-start;
-      padding: 12px 16px 12px 12px;
-      cursor:pointer;
-      border-left: 3px solid transparent;
-      border-bottom: 1px solid #eef1f6;
-      transition: border-color .12s, background .1s;
-      background: #ffffff;
+      padding:13px 16px 13px 12px; cursor:pointer;
+      border-left:3px solid transparent; transition:border-color .12s;
     }
-    .rc-list-item:last-child { border-bottom: none; }
-    .rc-list-item:hover { background: #f4f8ff; }
-    /* Selected row — Salesforce blue */
-    .rc-list-item.active {
-      background: #e5f0ff;
-      border-left-color: #1b96ff;
-    }
-    .rc-list-item.active:hover { background: #e5f0ff; }
-
+    .rc-list-item:hover { background:#fafbfc; }
+    .rc-list-item.active { background:transparent; border-left-color:var(--blue); }
     .rc-item-body { flex:1; min-width:0; }
     .rc-item-name { font-size:13.5px; font-weight:600; color:#1f1f1f; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .rc-item-sub { font-size:12px; color:#5f6b7a; margin-top:3px; line-height:1.3; }
@@ -835,155 +789,31 @@
     .rc-dot.active { background:var(--blue); }
     .rc-item-status-text { font-size:11.5px; color:#8c8c8c; line-height:1; }
 
-    /* ── Detail panel — layer: pure white ── */
-    .rc-detail {
-      flex: 1;
-      min-width: 0;
-      background: #ffffff;
-      align-self: stretch;
-    }
-
+    /* Right detail */
+    .rc-detail { flex:1; min-width:0; background:#fff; }
     .rc-detail-empty {
       display:flex; align-items:flex-start; justify-content:center;
-      min-height:397px; padding:24px 28px;
+      min-height:300px; padding:24px 28px;
       padding-top:calc(300px * 0.18);
-      background: #ffffff;
     }
     .rc-empty-block { display:flex; flex-direction:column; align-items:center; gap:9px; max-width:240px; text-align:center; }
     .rc-empty-icon { width:34px; height:34px; color:#d1d5db; margin-bottom:2px; }
     .rc-empty-title { font-size:14px; font-weight:600; color:#8c8c8c; line-height:1.3; }
     .rc-empty-sub { font-size:12.5px; font-weight:400; color:#b0b8c4; line-height:1.5; }
 
-    /* ── Detail inner ── */
-    .rc-detail-inner {
-      padding: 0;
-      display: none;
-      background: #ffffff;
-    }
+    /* Detail inner */
+    .rc-detail-inner { padding:18px 20px 24px; display:none; }
+    .rc-det-name { font-size:20px; font-weight:700; color:#1f1f1f; margin-bottom:3px; line-height:1.2; }
+    .rc-det-sub { font-size:12.5px; color:#5f6b7a; font-weight:400; line-height:1.5; margin-bottom:0; }
+    .rc-det-header { display:flex; align-items:flex-start; gap:12px; margin-bottom:0; }
+    .rc-det-icon { width:35px; height:35px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+    .rc-det-icon.owner { background:#F4A623; }
+    .rc-det-icon.other { background:#06a59a; }
+    .rc-det-icon svg { display:block; }
+    .rc-det-header-text { flex:1; min-width:0; }
 
-    /* ── Header — layer: distinct mid-gray, darker than page ── */
-    .rc-det-header {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      background: #eef1f6;
-      border: none;
-      border-bottom: 1px solid #d8dde6;
-      border-radius: 0;
-      padding: 14px 18px;
-      margin: 0;
-    }
-
-    /* Icon: -12% from 50px → 44px */
-    .rc-det-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .rc-det-icon.owner { background: #F4A623; }
-    .rc-det-icon.other { background: #06a59a; }
-    .rc-det-icon svg { display: block; }
-    .rc-det-icon.owner svg,
-    .rc-det-icon.other svg { width: 27px; height: 27px; }
-
-    .rc-det-header-text { flex: 1; min-width: 0; }
-
-    /* Name: -5% from 21.5px → 20.4px */
-    .rc-det-name {
-      font-size: 20.4px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 3px;
-      line-height: 1.15;
-    }
-
-    /* Subtitle: -10% from 12px → 10.8px */
-    .rc-det-sub {
-      font-size: 10.8px;
-      color: #5f6b7a;
-      font-weight: 400;
-      line-height: 1.4;
-      margin-bottom: 0;
-    }
-
-    /* ── View Full Record button ── */
-    .rc-det-action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #0176d3;
-      color: #ffffff;
-      font-family: var(--font);
-      font-size: 12.5px;
-      font-weight: 500;
-      padding: 7px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      text-decoration: none;
-      transition: background .12s ease;
-    }
-    .rc-det-action-btn:hover { background: #0161b3; }
-    .rc-det-action-btn:active { background: #0153a0; transform: translateY(1px); }
-    .rc-section-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #f5f6f8;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin: 0 0 12px 0;
-      cursor: pointer;
-      user-select: none;
-      transition: background .1s;
-    }
-    .rc-section-header:hover { background: #eceef2; }
-
-    /* Chevron */
-    .rc-section-chevron {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: #5f6b7a;
-      transition: transform .18s ease;
-    }
-    .rc-section-block.collapsed .rc-section-chevron {
-      transform: rotate(-90deg);
-    }
-
-    /* Section title text */
-    .rc-section-header-title {
-      font-size: 13.5px;
-      font-weight: 500;
-      font-family: "Inter", var(--font);
-      color: #122349;
-      line-height: 1.2;
-      flex: 1;
-    }
-
-    /* Collapsible body */
-    .rc-section-body {
-      padding-top: 10px;
-    }
-    .rc-section-block.collapsed .rc-section-body {
-      display: none;
-    }
-
-    /* ── Record Readiness ── */
-    .rc-readiness {
-      margin: 16px 20px 0;
-      border: 1px solid #eeeeee;
-      border-radius: 6px;
-      background: #fffef7;
-      padding: 9px 12px;
-    }
+    /* Record Readiness */
+    .rc-readiness { margin:10px 0 12px; border:1px solid #f0f0f0; border-radius:6px; background:#fffef7; padding:9px 12px; }
     .rc-readiness-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
     .rc-readiness-top-left { flex:1; min-width:0; }
     .rc-readiness-label { font-size:10.5px; font-weight:600; color:#a0a0a0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; display:block; }
@@ -998,74 +828,15 @@
     .rc-tile-action { font-size:12.5px; color:var(--blue); font-weight:500; background:none; border:0; padding:0; margin-left:4px; margin-right:2px; cursor:pointer; font-family:var(--font); flex-shrink:0; white-space:nowrap; align-self:flex-start; margin-top:1px; }
     .rc-tile-action:hover { text-decoration:underline; }
 
-    /* ── Record body ── */
-    .rc-record-body {
-      padding: 16px 20px 24px;
-      overflow: hidden;
-    }
-
-    /* ── Section block ── */
-    .rc-section-block {
-      margin-bottom: 18px;
-    }
-    .rc-section-block:last-child { margin-bottom: 0; }
-
-    /* ── Strict 2-column grid ── */
-    .rc-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 28px;
-      margin-bottom: 16px;
-      align-items: start;
-    }
-    .rc-row:last-child { margin-bottom: 0; }
-
-    .rc-field { min-width: 0; }
-
-    /* Field label */
-    .rc-label {
-      font-size: 12px;
-      font-weight: 400;
-      font-family: var(--font);
-      letter-spacing: 0;
-      text-transform: none;
-      color: #555b66;
-      margin-bottom: 3px;
-      line-height: 1.3;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Base value */
-    .rc-value {
-      font-size: 13.5px;
-      font-weight: 400;
-      color: #4b5563;
-      line-height: 1.4;
-      display: block;
-      min-height: 20px;
-    }
-
-    /* Key fields: Lead Status, Seller Motivation */
-    .rc-field--key .rc-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #111827;
-    }
-
-    /* Offer Amount — formatted, not bold */
-    .rc-value.offer {
-      font-size: 15px;
-      font-weight: 400;
-      color: #111827;
-    }
-
-    .rc-value.link { color: var(--blue); cursor: pointer; font-weight: 500; }
-    .rc-value.link:hover { text-decoration: underline; }
-    .rc-value.muted { color: #c2c8d0 !important; font-weight: 400 !important; font-size: 13px; }
-    .rc-value.overdue { color: #111827 !important; font-weight: 700 !important; }
+    /* Field grid */
+    .rc-fields { display:grid; grid-template-columns:1fr 1fr; column-gap:20px; row-gap:16px; margin-top:18px; }
+    .rc-label { font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#8c8c8c; margin-bottom:5px; line-height:1; }
+    .rc-value { font-size:14.5px; font-weight:500; color:#1f1f1f; line-height:1.35; }
+    .rc-value.offer { font-weight:600; color:#1f1f1f; }
+    .rc-value.link { color:var(--blue); cursor:pointer; font-weight:500; }
+    .rc-value.link:hover { text-decoration:underline; }
+    .rc-value.muted { color:#c4cad6; font-weight:400; font-size:14px; }
+    .rc-value.overdue { color:#1f1f1f; font-weight:700; }
     .rc-status-row { display:flex; align-items:center; gap:6px; line-height:1.35; }
     .rc-sdot { width:7px; height:7px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
     .rc-sdot.on { background:var(--blue); }
@@ -1100,10 +871,10 @@
       display:inline-flex; align-items:center; gap:5px;
       background:none; border:1px solid transparent; border-radius:4px;
       padding:2px 6px 2px 2px; cursor:pointer;
-      font-family:var(--font); font-size:14px; font-weight:400; color:#1f1f1f;
+      font-family:var(--font); font-size:14.5px; font-weight:500; color:#1f1f1f;
       transition:border-color .12s;
     }
-    .rc-status-btn:hover { border-color:#dbe0e6; background:rgba(0,0,0,.02); }
+    .rc-status-btn:hover { border-color:#dbe0e6; background:#f9fafb; }
     .rc-status-btn svg { width:12px; height:12px; color:#9ca3af; }
     .rc-status-dropdown {
       position:absolute; top:calc(100% + 4px); left:0; z-index:50;
@@ -1203,7 +974,7 @@
                 </button>
               </div>
               <div class="snapshotDivider"></div>
-              <div class="snapshotFields" id="dealInsightsFields">
+              <div class="snapshotFields" id="dealInsightsFields" style="display:none;">
                 <div class="sfield">
                   <div class="slabel">
                     Heirs Identified
@@ -1224,7 +995,7 @@
                   <div class="svalue ok" style="font-size: 16.5px;" data-snapshot="true" data-field="ownership_secured">—</div>
                 </div>
               </div>
-              <div id="dealInsightsEmpty" style="display:none; padding: 10px 0 4px; font-size: 13.5px; color: #9ca3af; font-style: italic;">No Heirs Identified Yet</div>
+              <div id="dealInsightsEmpty" style="display:block; padding: 10px 0 4px; font-size: 13.5px; color: #9ca3af; font-style: italic;">No Heirs Identified Yet</div>
             </div>
           </div>
         </div>
@@ -1355,10 +1126,9 @@
 
                 <!-- Body (hidden when collapsed) -->
                 <div class="rc-body">
-
-                  <!-- REFINEMENT 1: Tabs constrained to left panel width with right spacer -->
+                  <!-- Tabs -->
                   <div class="rc-tabs" role="tablist">
-                    <div class="rc-tabs-left-col">
+                    <div class="rc-tabs-left">
                       <button class="rc-tab" role="tab" aria-selected="true" aria-controls="pane-owners" id="tab-owners" type="button">
                         Confirmed Owners <span class="rc-tab-count" id="cnt-owners"></span>
                       </button>
@@ -1366,8 +1136,6 @@
                         Other Contacts <span class="rc-tab-count" id="cnt-other"></span>
                       </button>
                     </div>
-                    <!-- Spacer with matching bottom border fills right side -->
-                    <div class="rc-tabs-right-spacer"></div>
                   </div>
 
                   <!-- Pane: Confirmed Owners -->
@@ -1710,7 +1478,7 @@
 
     function renderConfirmedOwners(contacts){
       const tbody = document.getElementById("confirmedOwnersTbody");
-      if (!tbody) return;
+      if (!tbody) return; // table removed in RC revamp — new component handles rendering
       const confirmed = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
       const STATUS_ORDER = ["closed","accepted offer","negotiations","review","interested in selling","contacted","attempt 3","attempt 2","attempt 1","re-skiptrace"];
       const statusRank = (s) => { const v = String(s || "").toLowerCase().trim(); const idx = STATUS_ORDER.findIndex(k => v.includes(k)); return idx === -1 ? STATUS_ORDER.length : idx; };
@@ -1765,7 +1533,7 @@
 
     function renderOtherContacts(contacts){
       const tbody = document.getElementById("otherContactsTbody");
-      if (!tbody) return;
+      if (!tbody) return; // table removed in RC revamp — new component handles rendering
       const others = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes");
       const LEAD_STATUS_OPTS = [{ value:"Referral",dot:"green"},{ value:"In Progress",dot:"blue"},{ value:"Contacted",dot:"green"},{ value:"Not Reached",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Do Not Call",dot:"red"},{ value:"Closed",dot:"purple"}];
       const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
@@ -1810,6 +1578,7 @@
       }).join("");
       tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="6" style="padding:16px;color:#9ca3af;">No other related contacts.</td></tr>`;
 
+      // Column sort
       document.querySelectorAll('.orc-table thead th[data-sort]').forEach(th => {
         th.addEventListener('click', () => {
           const field = th.getAttribute('data-sort');
@@ -1829,6 +1598,7 @@
         });
       });
 
+      // Existing dropdown portal logic
       let orcPortal = document.getElementById('orcPortal');
       if (!orcPortal) { orcPortal = document.createElement('div'); orcPortal.id='orcPortal'; orcPortal.className='orc-dropdown'; orcPortal.style.position='fixed'; orcPortal.style.zIndex='9999'; document.body.appendChild(orcPortal); }
       let activeWrap = null;
@@ -1853,16 +1623,19 @@
       document.addEventListener('click', closePortal);
       document.addEventListener('keydown', (e)=>{if(e.key==='Escape')closePortal();});
 
+      // Wire toolbar
       initOrcToolbar(others);
     }
 
-    let _orcData = [];
+    // ── ORC TOOLBAR: Sort, Filter, Export ──
+    let _orcData = [];  // reference to current other contacts for export/filter
 
     function initOrcToolbar(others) {
       _orcData = others;
       const toolbar = document.getElementById('orcToolbar');
       if (toolbar) toolbar.style.display = 'flex';
 
+      // ── Panel toggles ──
       function closeAllPanels() {
         document.getElementById('orcSortPanel')?.classList.remove('open');
         document.getElementById('orcFilterPanel')?.classList.remove('open');
@@ -1893,6 +1666,7 @@
         }
       });
 
+      // ── Sort apply ──
       document.getElementById('orcSortApply')?.addEventListener('click', () => {
         const field = document.getElementById('orcSortField').value;
         const dir = document.getElementById('orcSortDir').value === 'asc' ? 1 : -1;
@@ -1920,6 +1694,7 @@
         closeAllPanels();
       });
 
+      // ── Filter apply ──
       function applyFilters() {
         const leadFilter = document.getElementById('orcFilterLeadStatus').value.toLowerCase();
         const phone1Filter = document.getElementById('orcFilterPhone1').value.toLowerCase();
@@ -1960,6 +1735,7 @@
         closeAllPanels();
       });
 
+      // ── Export CSV ──
       document.getElementById('orcExportBtn')?.addEventListener('click', () => {
         const headers = ['#','Name','Relationship','Lead Status','Phone 1','Phone 1 Status','Phone 2','Phone 2 Status'];
         const rows = others.map((c, i) => [
@@ -2078,7 +1854,8 @@
       if(!best){banner.classList.remove("show");textNode.textContent="—";return;}
       const plural=best.daysOverdue===1?"":"s";
       const base=`<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
-      textNode.innerHTML=base;
+      const full=base;
+      textNode.innerHTML=full;
       banner.classList.add("show");
     }
 
@@ -2114,7 +1891,7 @@
       finally{ hideLoading(); }
     }
 
-    window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
+    window.addEventListener('DOMContentLoaded',()=>{ fetchDataFromMake(); });
 
     function escapeHtml(str){ return String(str??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
     function formatValue(v){ if(v===null||v===undefined||v==="") return "—"; if(typeof v==="number") return String(v); if(typeof v==="boolean") return v?"Yes":"No"; return String(v); }
@@ -2148,19 +1925,25 @@
     document.getElementById('noteTextarea').addEventListener('input',(e)=>{document.getElementById('noteCharCount').textContent=e.target.value.length;});
 
     // =====================================================================
-    // RELATED CONTACTS COMPONENT — Data, Rendering, Webhook
+    // NEW RELATED CONTACTS COMPONENT — Data, Rendering, Webhook
     // =====================================================================
 
     const RC_CHANGE_WEBHOOK = "https://hook.us1.make.com/l6va4f33thefrag75ohlmscqwbrpee5v";
 
+    // Live contact data arrays (populated by applyData on initial load)
     let rcOwners = [];
     let rcOthers = [];
 
+    // Fire webhook when a field changes in the Related Contacts section
+    // Debounce guard prevents double-fires on the same pulse+field within 1500ms
     const _rcWebhookLastFired = {};
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
       const key = `${pulseId}::${columnId}`;
       const now = Date.now();
-      if(_rcWebhookLastFired[key] && now - _rcWebhookLastFired[key] < 1500) { return; }
+      if(_rcWebhookLastFired[key] && now - _rcWebhookLastFired[key] < 1500) {
+        console.log(`RC webhook debounced: ${key}`);
+        return;
+      }
       _rcWebhookLastFired[key] = now;
       try {
         await fetch(RC_CHANGE_WEBHOOK, {
@@ -2171,8 +1954,10 @@
       } catch(err) { console.warn("RC webhook error:", err); }
     }
 
+    // Helper: get pulse+board ids
     function getRcIds() { return extractIdsFromUrl(); }
 
+    // ── Helpers ─────────────────────────────────────────────────────────
     function rcVal(v, cls){ return (v && v !== "—") ? `<div class="rc-value ${cls||''}">${escapeHtml(v)}</div>` : `<div class="rc-value muted">—</div>`; }
     function rcHasVal(v){ return v && v !== "—"; }
 
@@ -2218,6 +2003,7 @@
       </div>`;
     }
 
+    // ── Record Readiness ────────────────────────────────────────────────
     const RC_QUALIFYING_STATUSES = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer'];
     const RC_READINESS_OWNER = [
       { field:'sellerMotivation', label:'Seller motivation', sub:'Identify what the Seller Motivation is', actionLabel:'Add' },
@@ -2258,6 +2044,7 @@
       </div>`;
     }
 
+    // ── Generic styled dropdown ─────────────────────────────────────────
     function rcStyledDropdown(value, opts, field, placeholder, alwaysUp, flagged){
       const current = rcHasVal(value) ? value : null;
       const optHtml = opts.map(o =>
@@ -2277,6 +2064,7 @@
       </div>`;
     }
 
+    // ── Status options ──────────────────────────────────────────────────
     const RC_STATUS_OPTS = ['Re-Skiptrace','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed','Not Interested'];
 
     function rcStatusFieldHtml(c){
@@ -2294,9 +2082,11 @@
       </div>`;
     }
 
+    // ── Sorting ─────────────────────────────────────────────────────────
     const RC_STATUS_PRIORITY = {'Closed':10,'Accepted Offer':9,'Negotiations/Review':8,'Interested In Selling':7,'Contacted':6,'Attempt 3 - No Answer':5,'Attempt 2 - No Answer':4,'Attempt 1 - No Answer':3,'Re-Skiptrace':2,'New':1,'Not Interested':0};
     function rcSortByStatus(data){ return [...data].sort((a,b) => (RC_STATUS_PRIORITY[b.status]??1) - (RC_STATUS_PRIORITY[a.status]??1)); }
 
+    // ── Inline status ────────────────────────────────────────────────────
     function rcStatusTextHtml(c, isOwner){
       const fields = isOwner ? rcOwnerFields(c) : [];
       const missing = fields.filter(v => !rcHasVal(v)).length;
@@ -2305,6 +2095,7 @@
       return '';
     }
 
+    // ── Phone row ────────────────────────────────────────────────────────
     function rcPhoneRowHtml(phone, status, statusField){
       const phoneField = statusField === 'phoneStatus' ? 'phone' : statusField === 'phone2Status' ? 'phone2' : 'phone3';
       if(!phone || phone === "—") return rcMissingEl(phoneField);
@@ -2318,12 +2109,12 @@
         <span class="rc-ph-dot">·</span>
         <div class="rc-status-wrapper rc-ph-disp-wrapper">
           <button class="rc-ph-disp-btn" data-action="openstatus">${dispLabel}${RC_CHEV_SVG}</button>
-          <div class="rc-status-dropdown">${optHtml}</div>
+          <div class="rc-status-dropdown always-up">${optHtml}</div>
         </div>
       </div>`;
     }
 
-    // ── Render detail: unified record card with internal sections ──────────
+    // ── Render detail: Owner ─────────────────────────────────────────────
     function rcRenderDetailOwner(c, innerId, detailId){
       const det = document.getElementById(detailId);
       det.querySelector(".rc-detail-empty").style.display = "none";
@@ -2333,183 +2124,60 @@
       const bannerActive = rcOwnerIsQualifying(c);
       const signalsBadge = allFilled ? ` <span class="rc-det-signals"><svg class="rc-signals-check" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Signals Identified</span>` : "";
       const subtitle = rcHasVal(c.ownership) ? `${escapeHtml(c.relation)} · ${escapeHtml(c.ownership)} ownership${signalsBadge}` : `${escapeHtml(c.relation)}${signalsBadge}`;
-
       inner.innerHTML = `
         <div class="rc-det-header">
           <div class="rc-det-icon owner">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff" style="width:24px;height:24px;display:block;"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>
           </div>
           <div class="rc-det-header-text">
             <div class="rc-det-name">${escapeHtml(c.name)}</div>
-            <div class="rc-det-sub">${subtitle}</div>
+            <div class="rc-det-sub" style="margin-bottom:0">${subtitle}</div>
           </div>
-          ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-btn">View Full Record</a>` : ''}
         </div>
-
         ${rcRecordFlagHtml(c, true)}
-
-        <div class="rc-record-body">
-
-          <div class="rc-section-block" id="sec-owner-lead-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="rc-section-header-title">Lead Details</span>
-            </div>
-            <div class="rc-section-body">
-              <!-- Row 1: Lead Status | Offer Amount -->
-              <div class="rc-row">
-                <div class="rc-field rc-field--key">
-                  <span class="rc-label">Lead Status</span>
-                  <div class="rc-value">${rcStatusFieldHtml(c)}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Offer Amount</span>
-                  <div class="rc-value offer">${rcHasVal(c.offer) ? (()=>{ const n=parseFloat(String(c.offer).replace(/[^0-9.]/g,'')); return isNaN(n)?escapeHtml(c.offer):'$'+Math.round(n).toLocaleString('en-US'); })() : '<span style="color:#b8bfca;font-weight:400">—</span>'}</div>
-                </div>
-              </div>
-              <!-- Row 2: Seller Motivation | Owner Status -->
-              <div class="rc-row">
-                <div class="rc-field rc-field--key">
-                  <span class="rc-label">Seller Motivation</span>
-                  <div class="rc-value">${rcStyledDropdown(c.sellerMotivation,["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'],'sellerMotivation','—',true,bannerActive&&!rcHasVal(c.sellerMotivation))}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Owner Status</span>
-                  <div class="rc-value">${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—',false,bannerActive&&!rcHasVal(c.ownerStatus))}</div>
-                </div>
-              </div>
-              <!-- Row 3: Follow-Up Date | Ownership % -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Follow-Up Date</span>
-                  <div class="rc-value">${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'', bannerActive&&!rcHasVal(c.followUp))}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Ownership %</span>
-                  <div class="rc-value">${rcEditableEl('ownership', rcHasVal(c.ownership)?c.ownership:'—','',bannerActive&&!rcHasVal(c.ownership))}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="rc-section-block" id="sec-owner-contact-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="rc-section-header-title">Contact Info</span>
-            </div>
-            <div class="rc-section-body">
-              <!-- Row 1: Relationship | Phone -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Relationship</span>
-                  <div class="rc-value">${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Phone</span>
-                  <div class="rc-value">${rcEditableEl('phone', rcHasVal(c.phone)?c.phone:'—', rcHasVal(c.phone)?'link':'')}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div class="rc-fields">
+          <div class="rc-field"><div class="rc-label">Lead Status</div>${rcStatusFieldHtml(c)}</div>
+          <div class="rc-field"><div class="rc-label">Ownership %</div>${rcEditableEl('ownership', rcHasVal(c.ownership)?c.ownership:'—','',bannerActive&&!rcHasVal(c.ownership))}</div>
+          <div class="rc-field"><div class="rc-label">Relationship</div>${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+          <div class="rc-field"><div class="rc-label">Owner Status</div>${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—',false,bannerActive&&!rcHasVal(c.ownerStatus))}</div>
+          <div class="rc-field"><div class="rc-label">Follow-Up Date</div>${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'', bannerActive&&!rcHasVal(c.followUp))}</div>
+          <div class="rc-field"><div class="rc-label">Seller Motivation</div>${rcStyledDropdown(c.sellerMotivation,["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'],'sellerMotivation','—',true,bannerActive&&!rcHasVal(c.sellerMotivation))}</div>
+          <div class="rc-field"><div class="rc-label">Offer Amount</div>${rcEditableEl('offer', rcHasVal(c.offer)?c.offer:'—','offer')}</div>
+          <div class="rc-field"><div class="rc-label">Phone</div>${rcEditableEl('phone', rcHasVal(c.phone)?c.phone:'—', rcHasVal(c.phone)?'link':'')}</div>
         </div>`;
     }
 
+    // ── Render detail: Other ─────────────────────────────────────────────
     function rcRenderDetailOther(c, innerId, detailId){
       const det = document.getElementById(detailId);
       det.querySelector(".rc-detail-empty").style.display = "none";
       const inner = document.getElementById(innerId);
       inner.style.display = "block";
-
       inner.innerHTML = `
         <div class="rc-det-header">
           <div class="rc-det-icon other">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M460 90H60c-27 0-50 22-50 50v240c0 27 23 50 50 50h400c28 0 50-22 50-50V140c0-28-22-50-50-50zM248 372H104c-16 0-28-17-28-34 1-25 27-40 54-52 19-8 22-16 22-24s-5-16-12-22a55 55 0 0 1-17-41c0-32 19-58 52-58s52 27 52 58c0 17-6 32-17 41-7 6-12 13-12 22 0 8 2 16 22 23 27 12 53 28 54 53 3 17-10 34-26 34zm195-58c0 9-8 17-17 17h-75c-9 0-17-7-17-17v-25c0-9 8-17 17-17h75c9 0 17 7 17 17zm0-91c0 9-8 17-17 17H302c-9 0-17-7-17-17v-25c0-9 8-17 17-17h125c9 0 17 7 17 17v25z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff" style="width:24px;height:24px;display:block;"><path d="M460 90H60c-27 0-50 22-50 50v240c0 27 23 50 50 50h400c28 0 50-22 50-50V140c0-28-22-50-50-50zM248 372H104c-16 0-28-17-28-34 1-25 27-40 54-52 19-8 22-16 22-24s-5-16-12-22a55 55 0 0 1-17-41c0-32 19-58 52-58s52 27 52 58c0 17-6 32-17 41-7 6-12 13-12 22 0 8 2 16 22 23 27 12 53 28 54 53 3 17-10 34-26 34zm195-58c0 9-8 17-17 17h-75c-9 0-17-7-17-17v-25c0-9 8-17 17-17h75c9 0 17 7 17 17zm0-91c0 9-8 17-17 17H302c-9 0-17-7-17-17v-25c0-9 8-17 17-17h125c9 0 17 7 17 17v25z"/></svg>
           </div>
           <div class="rc-det-header-text">
             <div class="rc-det-name">${escapeHtml(c.name)}</div>
-            <div class="rc-det-sub">${escapeHtml(c.relation)}</div>
+            <div class="rc-det-sub" style="margin-bottom:0">${escapeHtml(c.relation)}</div>
           </div>
-          ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-btn">View Full Record</a>` : ''}
         </div>
-
         ${rcRecordFlagHtml(c, false)}
-
-        <div class="rc-record-body">
-
-          <div class="rc-section-block" id="sec-other-lead-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="rc-section-header-title">Lead Details</span>
-            </div>
-            <div class="rc-section-body">
-              <!-- Row 1: Lead Status | Contact Outcome -->
-              <div class="rc-row">
-                <div class="rc-field rc-field--key">
-                  <span class="rc-label">Lead Status</span>
-                  <div class="rc-value">${rcStatusFieldHtml(c)}</div>
-                </div>
-                <div class="rc-field rc-field--key">
-                  <span class="rc-label">Contact Outcome</span>
-                  <div class="rc-value">${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
-                </div>
-              </div>
-              <!-- Row 2: Owner Status | Follow-Up Date -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Owner Status</span>
-                  <div class="rc-value">${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—')}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Follow-Up Date</span>
-                  <div class="rc-value">${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'')}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="rc-section-block" id="sec-other-contact-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="rc-section-header-title">Contact Info</span>
-            </div>
-            <div class="rc-section-body">
-              <!-- Row 1: Relationship | Address -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Relationship</span>
-                  <div class="rc-value">${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Address</span>
-                  <div class="rc-value">${rcEditableEl('address', (c.address&&c.address!=='Unknown'&&c.address!=='—')?c.address:'—','multiline')}</div>
-                </div>
-              </div>
-              <!-- Row 2: Phone 1 | Phone 2 -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Phone 1</span>
-                  <div class="rc-value">${rcPhoneRowHtml(c.phone,c.phoneStatus,'phoneStatus')}</div>
-                </div>
-                <div class="rc-field">
-                  <span class="rc-label">Phone 2</span>
-                  <div class="rc-value">${rcPhoneRowHtml(c.phone2,c.phone2Status,'phone2Status')}</div>
-                </div>
-              </div>
-              <!-- Row 3: Phone 3 | empty -->
-              <div class="rc-row">
-                <div class="rc-field">
-                  <span class="rc-label">Phone 3</span>
-                  <div class="rc-value">${rcPhoneRowHtml(c.phone3,c.phone3Status,'phone3Status')}</div>
-                </div>
-                <div class="rc-field"></div>
-              </div>
-            </div>
-          </div>
-
+        <div class="rc-fields">
+          <div class="rc-field"><div class="rc-label">Lead Status</div>${rcStatusFieldHtml(c)}</div>
+          <div class="rc-field"><div class="rc-label">Relationship</div>${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+          <div class="rc-field"><div class="rc-label">Owner Status</div>${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—')}</div>
+          <div class="rc-field"><div class="rc-label">Contact Outcome</div>${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
+          <div class="rc-field"><div class="rc-label">Follow-Up Date</div>${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'')}</div>
+          <div class="rc-field"><div class="rc-label">Address</div>${rcEditableEl('address', (c.address&&c.address!=='Unknown'&&c.address!=='—')?c.address:'—','multiline')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 1</div>${rcPhoneRowHtml(c.phone,c.phoneStatus,'phoneStatus')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 2</div>${rcPhoneRowHtml(c.phone2,c.phone2Status,'phone2Status')}</div>
+          <div class="rc-field"><div class="rc-label">Phone 3</div>${rcPhoneRowHtml(c.phone3,c.phone3Status,'phone3Status')}</div>
         </div>`;
     }
 
+    // ── Build list ───────────────────────────────────────────────────────
     function rcBuildList(data, listId, innerId, detailId, renderFn, isOwner){
       const list = document.getElementById(listId);
       if(!list) return;
@@ -2541,6 +2209,7 @@
       });
     }
 
+    // ── Update meta count bar ────────────────────────────────────────────
     function rcUpdateMeta(){
       const meta = document.getElementById("rcMeta");
       const cntO = document.getElementById("cnt-owners");
@@ -2550,9 +2219,11 @@
       if(cntOther) cntOther.textContent = `(${rcOthers.length})`;
     }
 
+    // ── Name & phone formatters ──────────────────────────────────────────
     function toProperName(raw){
       if(!raw || raw === "—") return raw;
       const parts = String(raw).trim().split(/\s+/);
+      // Drop middle name/initial — keep first and last only
       const keep = parts.length >= 3 ? [parts[0], parts[parts.length - 1]] : parts;
       return keep.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
     }
@@ -2565,7 +2236,9 @@
       return raw;
     }
 
+    // ── Map payload subitems → rc format ────────────────────────────────
     function rcMapContact(c){
+      // Support both snake_case (API) and camelCase (old) field names
       const status    = c.lead_status ?? c.leadStatus ?? c.status ?? "New";
       const statusOn  = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(status);
       const followUp  = c.follow_up_date ?? c.followupDate ?? c.followUp ?? "—";
@@ -2575,6 +2248,7 @@
         const d = parseFlexibleDate(followUp);
         if(d){ const ds = new Date(d); ds.setHours(0,0,0,0); overdue = ds < today; }
       }
+      // Treat 0 ownership as empty — not a real value
       const rawOwnership = c.ownership_percent != null
         ? String(c.ownership_percent) + (String(c.ownership_percent).includes('%') ? '' : '%')
         : (c.ownership ?? "—");
@@ -2606,12 +2280,13 @@
         notes:            c.notes ?? "",
         pulseId:          c.pulse_id ?? c.pulseId ?? c.id ?? null,
         boardId:          c.board_id ?? c.boardId ?? null,
-        mondayUrl:        c.monday_url ?? c.mondayUrl ?? null,
       };
     }
 
+    // ── Populate RC component from applyData payload ─────────────────────
     function rcPopulateFromPayload(payload){
       const allContacts = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
+      // Map first so ownerStatusNorm is available for the split
       const allMapped = allContacts.map(rcMapContact);
       rcOwners = allMapped.filter(c => c.ownerStatusNorm === "yes");
       rcOthers = allMapped.filter(c => c.ownerStatusNorm !== "yes");
@@ -2621,6 +2296,7 @@
       rcBuildList(rcOthers, "list-other",  "inner-other",  "detail-other",  rcRenderDetailOther, false);
     }
 
+    // ── Tab switching ────────────────────────────────────────────────────
     document.querySelectorAll(".rc-tab").forEach(btn=>{
       btn.addEventListener("click",()=>{
         document.querySelectorAll(".rc-tab").forEach(b=>b.setAttribute("aria-selected","false"));
@@ -2630,11 +2306,13 @@
       });
     });
 
+    // ── Collapse toggle (starts CLOSED per requirements) ─────────────────
     document.getElementById("rcToggle").addEventListener("click",()=>{
       const p = document.getElementById("rcPanel");
       p.dataset.open = p.dataset.open === "true" ? "false" : "true";
     });
 
+    // ── Close status dropdowns on outside click ───────────────────────────
     document.addEventListener("click", e => {
       if(!e.target.closest(".rc-status-wrapper") && !e.target.closest(".rc-ph-disp-wrapper")){
         document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
@@ -2658,15 +2336,18 @@
       }
     });
 
+    // ── Event delegation per pane ────────────────────────────────────────
     function rcAttachPaneEvents(paneId, _dataArr, innerId, detailId, renderFn, isOwner){
       const pane = document.getElementById(paneId);
       if(!pane) return;
+      // Always read the live array so edits after applyData() populates data work correctly
       const getLiveData = () => paneId === 'pane-owners' ? rcOwners : rcOthers;
       pane.addEventListener("click", async e => {
         const el = e.target;
         const dataArr = getLiveData();
         const { boardId, pulseId: globalPulseId } = getRcIds();
 
+        // Status dropdown open/close
         if(el.closest("[data-action='openstatus']")){
           e.stopPropagation();
           const wrapper = el.closest(".rc-status-wrapper") || el.closest(".rc-ph-disp-wrapper");
@@ -2684,6 +2365,7 @@
           return;
         }
 
+        // Deal Guidance prompt → scroll to editable field
         if(el.closest("[data-dg-field]") && !el.closest(".rc-editable")){
           const field = el.closest("[data-dg-field]").dataset.dgField;
           const target = document.getElementById(innerId).querySelector(`.rc-editable[data-edit-field="${field}"]`);
@@ -2691,6 +2373,7 @@
           return;
         }
 
+        // Inline edit — open
         const editTarget = el.closest(".rc-editable");
         if(editTarget && !editTarget.querySelector(".rc-inline-edit")){
           e.stopPropagation();
@@ -2721,6 +2404,7 @@
           return;
         }
 
+        // Inline edit — save
         if(el.closest("[data-action='inline-save']")){
           e.stopPropagation();
           const field = el.closest("[data-action='inline-save']").dataset.field;
@@ -2742,6 +2426,7 @@
               if(!isNaN(num)) newVal = num + '%';
             }
             c[field] = newVal;
+            // Fire webhook
             const cfg = RC_FIELD_EDIT_CFG[field]||{};
             const colId = cfg.columnId || field;
             const cPulseId = c.pulseId || globalPulseId;
@@ -2755,6 +2440,7 @@
           return;
         }
 
+        // Inline edit — clear
         if(el.closest("[data-action='inline-clear']")){
           e.stopPropagation();
           const field = el.closest("[data-action='inline-clear']").dataset.field;
@@ -2774,6 +2460,7 @@
           return;
         }
 
+        // Inline edit — cancel
         if(el.closest("[data-action='inline-cancel']")){
           e.stopPropagation();
           const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
@@ -2781,6 +2468,7 @@
           return;
         }
 
+        // Lead status selected
         if(el.closest("[data-action='setstatus']")){
           e.stopPropagation();
           const btn = el.closest("[data-action='setstatus']");
@@ -2791,6 +2479,7 @@
           c.status = newStatus;
           c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(newStatus);
           document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+          // Fire webhook
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
           if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, 'lead_status', newStatus);
@@ -2801,6 +2490,7 @@
           return;
         }
 
+        // Generic field dropdown selected
         if(el.closest("[data-action='setfield']")){
           e.stopPropagation();
           const btn = el.closest("[data-action='setfield']");
@@ -2811,6 +2501,7 @@
           const c = dataArr[+activeItem.dataset.i];
           c[field] = val;
           document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
+          // Fire webhook
           const cfg = RC_FIELD_EDIT_CFG[field]||{};
           const colId = cfg.columnId || field;
           const cPulseId = c.pulseId || globalPulseId;
@@ -2822,8 +2513,12 @@
       });
     }
 
+    // Attach pane event listeners
+    // NOTE: dataArr param is intentionally NOT used for lookups inside the handler —
+    // we always read rcOwners/rcOthers live to avoid stale-closure bugs after applyData populates them.
     rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
     rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
+
 
   </script>
 </body>
