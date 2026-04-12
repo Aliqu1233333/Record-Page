@@ -2978,7 +2978,7 @@
 
     .tray-task-body { flex:1; min-width:0; }
     /* Line 1 — task title, blue link */
-    .tray-task-title-link { font-size:13px; font-weight:600; color:#0250d9; line-height:1.4; cursor:pointer; display:inline; margin-bottom:5px; }
+    .tray-task-title-link { font-size:13px; font-weight:600; color:#0250d9; line-height:1.4; cursor:pointer; display:inline; margin-bottom:7px; display:block; }
     .tray-task-title-link:hover { text-decoration:underline; color:#0250d9; }
     .tray-task-title-link.done { color:#aeaeac; text-decoration:line-through; cursor:default; font-weight:400; }
     /* Line 2 — type/contact desc */
@@ -2990,6 +2990,8 @@
     .tray-task-date-line { font-size:12px; color:#706e6b; line-height:1.35; display:flex; align-items:center; gap:3px; margin-top:2px; }
     .tray-task-date-line.overdue { color:#c23934; font-weight:600; }
     .tray-task-date-line.today   { color:#b57800; font-weight:600; }
+    /* Edit button */
+    .tray-act-edit { width:26px; height:26px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; padding:0; flex-shrink:0; }
 
     .tray-task-actions { display:flex; align-items:center; gap:3px; flex-shrink:0; margin-left:8px; padding-top:2px; }
     .tray-act-btn { width:26px; height:26px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; padding:0; flex-shrink:0; transition:background .08s; }
@@ -3482,6 +3484,10 @@
           +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
           +'</button>';
 
+        var editBtn = '<button class="tray-act-edit" onclick="event.stopPropagation();editTrayTask('+i+')" title="Edit">'
+          +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+          +'</button>';
+
         return '<div class="'+rowCls+'">'
           +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask('+i+')" title="Star">'
           +'<svg width="13" height="13" viewBox="0 0 24 24" fill="'+starFill+'" stroke="'+starStroke+'" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
@@ -3491,7 +3497,7 @@
           +descLine
           +dateLine
           +'</div>'
-          +'<div class="tray-task-actions">'+checkBtn+flagBtn+delBtn+'</div>'
+          +'<div class="tray-task-actions">'+editBtn+checkBtn+flagBtn+delBtn+'</div>'
           +'</div>';
       }).join('');
     }
@@ -3545,12 +3551,44 @@
       } catch(err) { console.warn('Task save error:', err); }
     }
 
+    function editTrayTask(i){
+      var t = trayTasks[i];
+      // Populate form fields with existing task data
+      document.getElementById('trayTaskInput').value    = t.title || '';
+      document.getElementById('trayDueInput').value     = t.due   || '';
+      document.getElementById('trayPriorityInput').value = t.priority || 'normal';
+      document.getElementById('trayNotesInput').value   = t.notes || '';
+      traySelectedContacts = Array.isArray(t.contact) ? t.contact.slice() : (t.contact ? [t.contact] : []);
+      renderContactTags();
+      // Show form
+      document.getElementById('trayAddRow').style.display  = 'none';
+      document.getElementById('trayNewForm').style.display = 'block';
+      document.getElementById('trayTaskInput').focus();
+      // Override save button to update instead of create
+      var saveBtn = document.querySelector('#trayNewForm .tray-form-save');
+      saveBtn.onclick = function(){
+        if(!document.getElementById('trayTaskInput').value.trim()) return;
+        trayTasks[i].title    = document.getElementById('trayTaskInput').value.trim();
+        trayTasks[i].due      = document.getElementById('trayDueInput').value || null;
+        trayTasks[i].priority = document.getElementById('trayPriorityInput').value;
+        trayTasks[i].contact  = traySelectedContacts.length ? traySelectedContacts.slice() : null;
+        trayTasks[i].notes    = document.getElementById('trayNotesInput').value.trim() || null;
+        renderTrayTasks();
+        hideTrayForm();
+        saveTasksToMonday();
+        // Restore save button to original create behavior
+        saveBtn.onclick = saveTrayTask;
+      };
+    }
+
     function updateTrayBadge(){
-      var open  = trayTasks.filter(function(t){ return !t.done; }).length;
-      var badge = document.getElementById('utilityTasksBadge');
-      var count = document.getElementById('trayOpenCount');
+      var open    = trayTasks.filter(function(t){ return !t.done; }).length;
+      var hasOverdue = trayTasks.some(function(t){ return !t.done && isOverdue(t); });
+      var badge   = document.getElementById('utilityTasksBadge');
+      var count   = document.getElementById('trayOpenCount');
       badge.textContent = open;
       badge.style.display = open>0 ? 'inline-flex' : 'none';
+      badge.style.background = hasOverdue ? '#dc2626' : '#0176d3';
       if(count) count.textContent = open>0 ? open+' open' : '';
     }
 
