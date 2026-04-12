@@ -45,7 +45,7 @@
       max-width: none;
       margin: 0;
       padding: 14px 14px 18px 32px;
-      min-height: 144vh;
+      min-height: 107vh;
     }
 
     .layout{
@@ -1591,9 +1591,18 @@
           updateActionBannerFromContacts([]);
         }
         computeContactsSummary(payload);
-        // ── Load tasks from payload ──────────────────────────────────────
-        if (Array.isArray(payload.tasks)) {
-          loadTasksFromPayload(payload.tasks);
+        // ── Load tasks from task_data column ─────────────────────────────
+        if (payload.task_data) {
+          try {
+            const parsed = typeof payload.task_data === 'string'
+              ? JSON.parse(payload.task_data)
+              : payload.task_data;
+            // Support both a single task object and an array of tasks
+            const tasksArr = Array.isArray(parsed)
+              ? parsed
+              : (parsed.tasks ? parsed.tasks : [parsed]);
+            loadTasksFromPayload(tasksArr);
+          } catch(e) { console.warn('Failed to parse task_data:', e); }
         }
         [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
           const el = document.querySelector(`.slds-field[data-field="${statusField}"] .value-text`);
@@ -2122,20 +2131,6 @@
         window.RecordPage.applyData(data);
       }catch(error){ console.error('Error fetching data from Make.com:',error); }
       finally{ hideLoading(); }
-      // Fire tasks fetch separately — doesn't block or delay main load
-      fetchTasksFromMake(boardId, pulseId);
-    }
-
-    async function fetchTasksFromMake(boardId, pulseId){
-      const TASKS_LOAD_WEBHOOK = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
-      if(!boardId||!pulseId) return;
-      try{
-        const response=await fetch(TASKS_LOAD_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
-        if(!response.ok) return;
-        const data=await response.json();
-        // Make returns { tasks: [...] }
-        if(Array.isArray(data.tasks)) window.RecordPage.applyTasks(data.tasks);
-      }catch(error){ console.warn('Tasks fetch error:',error); }
     }
 
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
@@ -3495,18 +3490,36 @@
     function toggleTrayTask(i){
       trayTasks[i].done = !trayTasks[i].done;
       renderTrayTasks();
-      fireTaskWebhook('update', trayTasks[i]);
+      saveTasksToMonday();
     }
     function starTrayTask(i){
       trayTasks[i].starred = !trayTasks[i].starred;
       renderTrayTasks();
-      fireTaskWebhook('update', trayTasks[i]);
+      saveTasksToMonday();
     }
     function deleteTrayTask(i){
-      var task = trayTasks[i];
       trayTasks.splice(i, 1);
       renderTrayTasks();
-      fireTaskWebhook('delete', task);
+      saveTasksToMonday();
+    }
+
+    // Writes the full trayTasks array to the Monday long text column
+    async function saveTasksToMonday(){
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if(!boardId || !pulseId) return;
+      const value = JSON.stringify(trayTasks);
+      try {
+        await fetch(TASK_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            boardId,
+            pulseId,
+            columnId: 'long_text_mm2bk7p6',
+            value
+          })
+        });
+      } catch(err) { console.warn('Task save error:', err); }
     }
 
     function updateTrayBadge(){
@@ -3538,7 +3551,7 @@
       var val = document.getElementById('trayTaskInput').value.trim();
       if(!val) return;
       var task = {
-        id:       null,  // Make will return the Monday update ID — we don't have it yet
+        id:       Date.now().toString(), // local unique id
         title:    val,
         due:      document.getElementById('trayDueInput').value||null,
         priority: document.getElementById('trayPriorityInput').value,
@@ -3552,12 +3565,7 @@
       trayTasks.unshift(task);
       renderTrayTasks();
       hideTrayForm();
-      // Fire async — UI doesn't wait, Make creates the Monday update in the background
-      const result = await fireTaskWebhook('create', task);
-      // If Make returns an update_id, store it so future edits can target the right update
-      if(result && result.update_id) {
-        task.id = result.update_id;
-      }
+      saveTasksToMonday();
     }
 
     /* ── CONTACT MULTI-SELECT ── */
