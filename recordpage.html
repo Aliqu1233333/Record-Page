@@ -1483,6 +1483,7 @@
   <script>
     const COLUMN_ID_MAP = {};
     const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
+    const TASK_WEBHOOK = "https://hook.us1.make.com/YOUR_TASK_WEBHOOK_HERE"; // ← replace with your Make task webhook URL
 
     window.RecordPage = {
       applyData(payload){
@@ -1585,6 +1586,10 @@
           updateActionBannerFromContacts([]);
         }
         computeContactsSummary(payload);
+        // ── Load tasks from payload ──────────────────────────────────────
+        if (Array.isArray(payload.tasks)) {
+          loadTasksFromPayload(payload.tasks);
+        }
         [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
           const el = document.querySelector(`.slds-field[data-field="${statusField}"] .value-text`);
           const link = payload[linkField];
@@ -2822,6 +2827,835 @@
     rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
     rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
 
+  </script>
+
+  <!-- ── BOTTOM UTILITY BAR ── -->
+  <div id="utilityBar" style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -4px 14px rgba(0,0,0,.11);
+    display: flex;
+    align-items: stretch;
+    z-index: 9000;
+    font-family: var(--font);
+  ">
+    <button id="utilityTasksBtn" type="button" onclick="toggleTasksTray()" style="
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 18px;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 500;
+      color: #0250d9;
+      cursor: pointer;
+      height: 100%;
+      white-space: nowrap;
+      transition: background .12s ease;
+    "
+    onmouseover="this.style.background='#f3f4f6'"
+    onmouseout="this.style.background=utilityTasksOpen?'#eff6ff':'transparent'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      To Do List
+      <span id="utilityTasksBadge" style="
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        background: #0176d3;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1;
+      ">0</span>
+    </button>
+  </div>
+
+
+  <style>
+    @keyframes trayBounceUp {
+      0%   { opacity:0; transform:translateY(50px) scale(0.96); }
+      55%  { opacity:1; transform:translateY(-12px) scale(1.01); }
+      75%  { transform:translateY(5px) scale(0.998); }
+      90%  { transform:translateY(-3px) scale(1.001); }
+      100% { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .tray-bounce { animation: trayBounceUp 0.44s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    #tasksTray { font-family:"Salesforce Sans","Inter",system-ui,sans-serif; color:#3e3e3c; }
+
+    /* ── TOP HEADER ── */
+    .tray-top-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fff; border-bottom:3px solid #0250d9; flex-shrink:0; }
+    .tray-top-header-left { display:flex; align-items:center; gap:8px; }
+    .tray-top-title { font-size:14px; font-weight:700; color:#0250d9; letter-spacing:0; }
+    .tray-top-icon { color:#0250d9; display:flex; align-items:center; }
+    .tray-top-minimize { background:none; border:none; cursor:pointer; padding:3px 5px; color:#0250d9; font-size:14px; line-height:1; border-radius:3px; display:flex; align-items:center; }
+    .tray-top-minimize:hover { background:#e8f0fe; }
+
+    /* ── LEFT NAV ── */
+    .tray-left-nav { width:220px; flex-shrink:0; border-right:1px solid #dddbda; background:#fff; display:flex; flex-direction:column; overflow:hidden; }
+    .tray-left-nav-header { display:flex; align-items:center; justify-content:space-between; padding:6px 8px 6px 10px; border-bottom:1px solid #dddbda; flex-shrink:0; background:#fff; }
+    .tray-nav-close { background:none; border:none; cursor:pointer; padding:4px 5px; color:#706e6b; display:flex; align-items:center; border-radius:3px; font-size:16px; line-height:1; }
+    .tray-nav-close:hover { background:#f3f3f3; color:#3e3e3c; }
+    .tray-nav-gear { display:flex; align-items:center; }
+    .tray-nav-gear-btn { background:#fff; border:1px solid #dddbda; cursor:pointer; padding:4px 8px 4px 7px; color:#3e3e3c; display:flex; align-items:center; gap:5px; border-radius:4px 0 0 4px; font-family:inherit; font-size:12px; font-weight:400; line-height:1; }
+    .tray-nav-gear-btn:hover { background:#f3f3f3; }
+    .tray-nav-gear-drop { background:#fff; border:1px solid #dddbda; border-left:none; cursor:pointer; padding:4px 5px; color:#3e3e3c; display:flex; align-items:center; border-radius:0 4px 4px 0; }
+    .tray-nav-gear-drop:hover { background:#f3f3f3; }
+
+    .tray-nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px 9px 13px; font-size:13px; font-weight:400; color:#3e3e3c; cursor:pointer; border-left:3px solid transparent; transition:background .08s; user-select:none; white-space:nowrap; line-height:1.3; }
+    .tray-nav-item:hover { background:#f3f3f3; }
+    .tray-nav-item.active { color:#0250d9; background:#eaf0fe; border-left-color:#0250d9; font-weight:400; }
+    .tray-nav-item svg { flex-shrink:0; opacity:.85; }
+    .tray-nav-item.active svg { opacity:1; color:#0250d9; }
+
+    .tray-nav-divider { height:1px; background:#dddbda; margin:3px 0; }
+    /* No "Labels" section header — divider only */
+
+    .tray-nav-label-item { display:flex; align-items:center; gap:9px; padding:8px 12px 8px 16px; font-size:13px; font-weight:400; color:#3e3e3c; cursor:pointer; border-left:3px solid transparent; transition:background .08s; user-select:none; white-space:nowrap; }
+    .tray-nav-label-item:hover { background:#f3f3f3; }
+    .tray-nav-label-item.active { color:#0250d9; background:#eaf0fe; border-left-color:#0250d9; }
+
+    .tray-nav-new-label { display:flex; align-items:center; gap:8px; padding:9px 13px; font-size:13px; font-weight:400; color:#0250d9; cursor:pointer; margin-top:auto; border-top:1px solid #dddbda; }
+    .tray-nav-new-label:hover { background:#f3f3f3; }
+
+    /* ── RIGHT PANEL ── */
+    .tray-right { flex:1; display:flex; flex-direction:column; min-width:0; background:#fff; }
+    .tray-right-header { display:flex; align-items:center; justify-content:space-between; padding:7px 10px 7px 12px; border-bottom:1px solid #dddbda; flex-shrink:0; }
+    .tray-right-title { font-size:13px; font-weight:400; color:#3e3e3c; display:flex; align-items:center; gap:7px; }
+    .tray-right-title svg { color:#706e6b; flex-shrink:0; }
+    .tray-right-tools { display:flex; align-items:center; gap:5px; }
+    .tray-tool-btn { width:28px; height:28px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; transition:background .08s, border-color .08s; padding:0; flex-shrink:0; }
+    .tray-tool-btn:hover { background:#f3f3f3; border-color:#b0b0ae; }
+    .tray-sort-info { font-size:12px; color:#706e6b; padding:5px 12px 4px; border-bottom:1px solid #f3f3f3; flex-shrink:0; }
+
+    /* ── TASK ROWS — more padding, 3 lines ── */
+    .tray-task-row { display:flex; align-items:flex-start; padding:12px 10px 12px 14px; border-bottom:none; transition:background .08s; }
+    .tray-task-row:hover { background:#f3f3f3; }
+    .tray-task-row.overdue-row { border-left:3px solid #c23934; padding-left:11px; }
+    .tray-task-row.today-row   { border-left:3px solid #ffb75d; padding-left:11px; }
+    .tray-task-row.done-row    { background:#fafafa; }
+
+    .tray-star-btn { background:none; border:none; cursor:pointer; padding:0 7px 0 0; flex-shrink:0; display:flex; align-items:flex-start; padding-top:2px; }
+
+    .tray-task-body { flex:1; min-width:0; }
+    /* Line 1 — task title, blue link */
+    .tray-task-title-link { font-size:13px; font-weight:600; color:#0250d9; line-height:1.4; cursor:pointer; display:inline; margin-bottom:2px; }
+    .tray-task-title-link:hover { text-decoration:underline; color:#0250d9; }
+    .tray-task-title-link.done { color:#aeaeac; text-decoration:line-through; cursor:default; font-weight:400; }
+    /* Line 2 — type/contact desc */
+    .tray-task-expand { display:flex; align-items:baseline; gap:3px; margin-bottom:2px; }
+    .tray-task-expand-chevron { color:#706e6b; font-size:11px; flex-shrink:0; line-height:1; }
+    .tray-task-desc-line { font-size:12px; color:#706e6b; line-height:1.35; }
+    .tray-task-desc-line strong { font-weight:700; color:#3e3e3c; }
+    /* Line 3 — date, standalone */
+    .tray-task-date-line { font-size:12px; color:#706e6b; line-height:1.35; display:flex; align-items:center; gap:3px; }
+    .tray-task-date-line.overdue { color:#c23934; font-weight:600; }
+    .tray-task-date-line.today   { color:#b57800; font-weight:600; }
+
+    .tray-task-actions { display:flex; align-items:center; gap:3px; flex-shrink:0; margin-left:8px; padding-top:2px; }
+    .tray-act-btn { width:26px; height:26px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; padding:0; flex-shrink:0; transition:background .08s; }
+    .tray-act-btn:hover { background:#f3f3f3; border-color:#b0b0ae; }
+    .tray-act-btn.done-btn { background:#0250d9; border-color:#0250d9; color:#fff; }
+    .tray-act-flag { width:26px; height:26px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; padding:0; flex-shrink:0; transition:background .08s; }
+    .tray-act-flag:hover { background:#f3f3f3; border-color:#b0b0ae; }
+    .tray-act-flag.flagged { background:#0250d9; border-color:#0250d9; color:#fff; }
+    .tray-act-chevron { width:26px; height:26px; border-radius:50%; border:1px solid #dddbda; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#706e6b; padding:0; flex-shrink:0; }
+    .tray-act-chevron:hover { background:#f3f3f3; border-color:#b0b0ae; }
+
+    /* ── TASK HOVER TOOLTIP ── */
+    .tray-task-tooltip { position:fixed; z-index:99999; background:#fff; border:1px solid #dddbda; border-radius:8px; box-shadow:0 4px 18px rgba(0,0,0,.18); min-width:200px; padding:0; pointer-events:none; overflow:visible; }
+    .tray-task-tooltip::before { content:''; position:absolute; left:-8px; top:16px; width:0; height:0; border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:8px solid #dddbda; }
+    .tray-task-tooltip::after  { content:''; position:absolute; left:-6px; top:17px; width:0; height:0; border-top:7px solid transparent; border-bottom:7px solid transparent; border-right:7px solid #fff; }
+    .tray-tooltip-inner { border-radius:8px; overflow:hidden; }
+    .tray-tooltip-header { display:flex; align-items:center; gap:9px; padding:10px 12px 8px; border-bottom:1px solid #f0f0f0; }
+    .tray-tooltip-icon { width:28px; height:28px; border-radius:50%; background:#16a34a; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .tray-tooltip-title { font-size:13px; font-weight:600; color:#0250d9; line-height:1.3; flex:1; min-width:0; white-space:normal; word-break:break-word; }
+    .tray-tooltip-close-icon { width:16px; height:16px; color:#9ca3af; flex-shrink:0; }
+    .tray-tooltip-body { padding:9px 12px 11px; }
+    .tray-tooltip-row { display:flex; gap:16px; margin-bottom:7px; }
+    .tray-tooltip-field { flex:1; min-width:0; }
+    .tray-tooltip-label { font-size:11px; font-weight:400; color:#706e6b; margin-bottom:2px; display:block; }
+    .tray-tooltip-value { font-size:12.5px; color:#0250d9; font-weight:400; }
+    .tray-tooltip-notes { font-size:12px; color:#3e3e3c; line-height:1.45; margin-top:4px; }
+
+    /* ── CONTACT FIELD ── */
+    .tray-contact-field { border:1px solid #dddbda; border-radius:4px; background:#fff; padding:4px 8px; cursor:text; min-height:34px; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+    .tray-contact-field:focus-within { border-color:#0250d9; box-shadow:0 0 0 1px #0250d9; }
+    .tray-contact-field input { border:none; outline:none; font-family:inherit; font-size:12.5px; color:#1f2937; flex:1; min-width:80px; background:transparent; padding:2px 0; }
+    .tray-contact-tag { display:inline-flex; align-items:center; gap:4px; background:#eff4ff; border:1px solid #c7d7f5; border-radius:4px; padding:2px 6px; font-size:12px; font-weight:600; color:#0250d9; white-space:nowrap; }
+    .tray-contact-tag-remove { background:none; border:none; cursor:pointer; padding:0; color:#6b7280; font-size:13px; line-height:1; display:flex; align-items:center; }
+    .tray-contact-tag-remove:hover { color:#dc2626; }
+    .tray-contact-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #dddbda; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.1); z-index:9999; max-height:126px; overflow-y:auto; margin-top:2px; display:none; }
+    .tray-contact-dropdown-item { padding:7px 10px; font-size:13px; color:#3e3e3c; cursor:pointer; border-bottom:1px solid #f3f3f3; display:flex; align-items:center; gap:8px; }
+    .tray-contact-dropdown-item:last-child { border-bottom:none; }
+    .tray-contact-dropdown-item:hover { background:#f3f3f3; }
+    .tray-contact-dropdown-item.selected { color:#9ca3af; cursor:default; background:#fff; }
+    .tray-contact-avatar { width:22px; height:22px; border-radius:50%; background:#0250d9; color:#fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; flex-shrink:0; }
+    .tray-new-task-row { display:flex; align-items:center; gap:7px; padding:10px 12px; cursor:pointer; border-top:1px solid #e8e8e8; }
+    .tray-new-task-row:hover { background:#f3f3f3; }
+    .tray-new-task-label { font-size:13px; font-weight:400; color:#0250d9; }
+
+    /* ── FORM ── */
+    .tray-form-wrap { margin:0 10px 10px; background:#f9fafb; border:1px solid #dddbda; border-radius:4px; padding:12px; }
+    .tray-form-label { font-size:11px; font-weight:600; color:#5e6470; margin-bottom:3px; display:block; }
+    .tray-form-input { width:100%; border:1px solid #dddbda; border-radius:4px; padding:6px 9px; font-family:inherit; font-size:13px; color:#1f2937; outline:none; background:#fff; box-sizing:border-box; }
+    .tray-form-input:focus { border-color:#0250d9; box-shadow:0 0 0 1px #0250d9; }
+    .tray-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0; }
+    .tray-form-select { width:100%; border:1px solid #dddbda; border-radius:4px; padding:6px 8px; font-family:inherit; font-size:12.5px; color:#1f2937; outline:none; background:#fff; }
+    .tray-form-select:focus { border-color:#0250d9; }
+    .tray-form-textarea { width:100%; border:1px solid #dddbda; border-radius:4px; padding:6px 9px; font-family:inherit; font-size:12.5px; color:#1f2937; outline:none; background:#fff; resize:vertical; min-height:54px; box-sizing:border-box; }
+    .tray-form-textarea:focus { border-color:#0250d9; box-shadow:0 0 0 1px #0250d9; }
+    .tray-form-save   { padding:6px 16px; border-radius:4px; border:none; background:#0250d9; color:#fff; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+    .tray-form-save:hover { background:#0140b8; }
+    .tray-form-cancel { padding:6px 10px; border-radius:4px; border:1px solid #dddbda; background:#fff; color:#3e3e3c; font-family:inherit; font-size:13px; cursor:pointer; }
+  </style>
+
+  <!-- ── TASKS TRAY ── -->
+  <div id="tasksTray" style="
+    position:fixed; bottom:40px; left:24px;
+    width:697px; height:667px;
+    background:#fff; border:1px solid #dddbda; border-bottom:none;
+    border-radius:11px 11px 0 0;
+    box-shadow:0 -6px 28px rgba(0,0,0,.16);
+    display:none; flex-direction:column; z-index:8999; overflow:hidden;
+  ">
+    <!-- Header — blue icon + title + 3px blue bottom border -->
+    <div class="tray-top-header">
+      <div class="tray-top-header-left">
+        <span class="tray-top-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0250d9" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </span>
+        <span class="tray-top-title">To Do List</span>
+        <span id="trayOpenCount" style="font-size:11px;font-weight:400;color:#706e6b;margin-left:2px;"></span>
+      </div>
+      <button class="tray-top-minimize" onclick="toggleTasksTray()" title="Minimize">—</button>
+    </div>
+
+    <!-- Two-panel body -->
+    <div style="display:flex;flex:1;overflow:hidden;">
+
+      <!-- LEFT NAV -->
+      <div class="tray-left-nav">
+        <!-- Nav header: X close only -->
+        <div class="tray-left-nav-header">
+          <button class="tray-nav-close" onclick="toggleTasksTray()" title="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Nav items -->
+        <div class="tray-nav-item active" onclick="setTrayNav('all',this)" id="nav-all">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          All
+        </div>
+        <div class="tray-nav-item" onclick="setTrayNav('upcoming',this)" id="nav-upcoming">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Upcoming
+        </div>
+        <div class="tray-nav-item" onclick="setTrayNav('starred',this)" id="nav-starred">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Starred
+        </div>
+        <div class="tray-nav-item" onclick="setTrayNav('overdue',this)" id="nav-overdue">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Overdue
+        </div>
+
+        <div class="tray-nav-divider"></div>
+
+        <div class="tray-nav-label-item" onclick="setTrayNav('high',this)" id="nav-high">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#dc2626" stroke="#dc2626" stroke-width="0"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>
+          High
+        </div>
+        <div class="tray-nav-label-item" onclick="setTrayNav('normal',this)" id="nav-normal">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#16a34a" stroke="#16a34a" stroke-width="0"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg>
+          Normal
+        </div>
+        <div class="tray-nav-label-item" onclick="setTrayNav('low',this)" id="nav-low">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#9ca3af" stroke="#9ca3af" stroke-width="0"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/></svg>
+          Low
+        </div>
+
+        <!-- + New Label at bottom -->
+        <div class="tray-nav-new-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0176d3" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span style="font-size:13px;color:#0176d3;">New Label</span>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="tray-right">
+        <div class="tray-right-header">
+          <span class="tray-right-title" id="trayRightTitle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+            All
+          </span>
+          <div class="tray-right-tools">
+            <button class="tray-tool-btn" id="traySearchBtn" title="Search" onclick="toggleTraySearch()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="tray-tool-btn" id="traySortBtn" title="Sort" onclick="toggleTraySort()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
+            </button>
+            <button class="tray-tool-btn" id="trayFilterBtn" title="Filter" onclick="toggleTrayFilter()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="tray-sort-info" id="traySortInfo">0 items · Sort by: Created Date</div>
+
+        <div style="overflow-y:auto;flex:1;">
+          <div id="tasksTrayList"></div>
+
+          <div id="trayAddRow" class="tray-new-task-row" onclick="showTrayForm()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0176d3" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span class="tray-new-task-label">New Task</span>
+          </div>
+
+          <div id="trayNewForm" style="display:none;">
+            <div class="tray-form-wrap">
+              <div style="margin-bottom:8px;">
+                <label class="tray-form-label">Subject *</label>
+                <input id="trayTaskInput" type="text" class="tray-form-input" placeholder="e.g. Call to follow up on offer…"/>
+              </div>
+              <div class="tray-form-grid">
+                <div>
+                  <label class="tray-form-label">Due Date</label>
+                  <input id="trayDueInput" type="date" class="tray-form-input" style="font-size:12px;padding:5px 8px;"/>
+                </div>
+                <div>
+                  <label class="tray-form-label">Priority</label>
+                  <select id="trayPriorityInput" class="tray-form-select">
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-bottom:8px;">
+                <label class="tray-form-label">Related Contact</label>
+                <div style="position:relative;">
+                  <div class="tray-contact-field" id="trayContactField" onclick="document.getElementById('trayContactSearch').focus()">
+                    <div id="trayContactTags" style="display:contents;"></div>
+                    <input id="trayContactSearch" type="text" placeholder="Search contacts…" autocomplete="off" oninput="filterTrayContacts(this.value)" onfocus="showTrayContactDropdown()" />
+                  </div>
+                  <div id="trayContactDropdown" class="tray-contact-dropdown"></div>
+                </div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <label class="tray-form-label">Notes / Comments</label>
+                <textarea id="trayNotesInput" class="tray-form-textarea" placeholder="Add any additional context…"></textarea>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button onclick="saveTrayTask()" class="tray-form-save">Save</button>
+                <button onclick="hideTrayForm()" class="tray-form-cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================================
+    // TASK WEBHOOK — fire on every task mutation
+    // =====================================================================
+    const _taskWebhookLastFired = {};
+    async function fireTaskWebhook(action, task) {
+      const key = `${action}::${task.id || task.title}`;
+      const now = Date.now();
+      if (_taskWebhookLastFired[key] && now - _taskWebhookLastFired[key] < 1500) return null;
+      _taskWebhookLastFired[key] = now;
+      const { boardId, pulseId } = extractIdsFromUrl();
+      try {
+        const res = await fetch(TASK_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, boardId, pulseId, task })
+        });
+        if(res.ok) return await res.json().catch(() => null);
+      } catch(err) { console.warn('Task webhook error:', err); }
+      return null;
+    }
+
+    // Load tasks sent back from Make in the payload
+    // Each task must have at minimum: id, title
+    // Optional: due, priority, contact, notes, done, starred, created
+    function loadTasksFromPayload(tasks) {
+      trayTasks = tasks.map(function(t) {
+        return {
+          id:       t.id       || null,          // Monday update ID — used to target updates
+          title:    t.title    || '—',
+          due:      t.due      || null,
+          priority: t.priority || 'normal',
+          contact:  t.contact  || null,
+          notes:    t.notes    || null,
+          done:     !!t.done,
+          starred:  !!t.starred,
+          label:    t.label    || null,
+          created:  t.created  || null,
+        };
+      });
+      renderTrayTasks();
+    }
+
+    var utilityTasksOpen = false;
+    var trayNav = 'all';
+    var trayTasks = [];
+
+    function toggleTasksTray(){
+      utilityTasksOpen = !utilityTasksOpen;
+      var tray = document.getElementById('tasksTray');
+      var btn  = document.getElementById('utilityTasksBtn');
+      if(utilityTasksOpen){
+        tray.style.display = 'flex';
+        tray.classList.remove('tray-bounce');
+        void tray.offsetWidth;
+        tray.classList.add('tray-bounce');
+      } else {
+        tray.style.display = 'none';
+        tray.classList.remove('tray-bounce');
+      }
+      btn.style.background  = utilityTasksOpen ? '#eff6ff' : 'transparent';
+      btn.style.borderTop   = utilityTasksOpen ? '2px solid #0176d3' : 'none';
+      btn.style.color       = '#0250d9';
+    }
+
+    /* ── TOOLBAR STATE ── */
+    var traySearchQuery = '';
+    var traySortField   = 'created'; /* created | due | priority | title */
+    var traySortAsc     = true;
+    var trayFilterActive = null; /* null | 'overdue' | 'starred' | 'done' */
+
+    function toggleTraySearch(){
+      var bar = document.getElementById('traySearchBar');
+      if(!bar){
+        bar = document.createElement('div');
+        bar.id = 'traySearchBar';
+        bar.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid #e8e8e8;flex-shrink:0;';
+        bar.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#706e6b" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+          +'<input id="traySearchInput" type="text" placeholder="Search tasks…" style="flex:1;border:none;outline:none;font-family:inherit;font-size:12.5px;color:#1f2937;" oninput="traySearchQuery=this.value;renderTrayTasks()"/>'
+          +'<button onclick="closeTraySearch()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:15px;padding:0;line-height:1;">×</button>';
+        var sortInfo = document.getElementById('traySortInfo');
+        sortInfo.parentNode.insertBefore(bar, sortInfo);
+      } else {
+        bar.style.display = bar.style.display==='none' ? 'flex' : 'none';
+      }
+      if(bar.style.display!=='none') setTimeout(function(){ document.getElementById('traySearchInput').focus(); },50);
+      document.getElementById('traySearchBtn').style.background = bar.style.display!=='none' ? '#eaf0fe' : '';
+    }
+
+    function closeTraySearch(){
+      var bar = document.getElementById('traySearchBar');
+      if(bar) bar.style.display='none';
+      traySearchQuery='';
+      renderTrayTasks();
+      document.getElementById('traySearchBtn').style.background='';
+    }
+
+    function toggleTraySort(){
+      var panel = document.getElementById('traySortPanel');
+      if(!panel){
+        panel = document.createElement('div');
+        panel.id='traySortPanel';
+        panel.style.cssText='padding:10px 12px;border-bottom:1px solid #e8e8e8;flex-shrink:0;background:#fafafa;';
+        panel.innerHTML='<div style="font-size:11px;font-weight:600;color:#706e6b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Sort by</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+          +['created','due','priority','title'].map(function(f){
+            var labels={created:'Date Created',due:'Due Date',priority:'Priority',title:'Name'};
+            return '<button onclick="setTraySort(\''+f+'\')" data-sort="'+f+'" style="padding:4px 10px;border-radius:4px;border:1px solid #dddbda;background:#fff;font-family:inherit;font-size:12px;cursor:pointer;color:#3e3e3c;">'+labels[f]+'</button>';
+          }).join('')
+          +'</div>';
+        var sortInfo=document.getElementById('traySortInfo');
+        sortInfo.parentNode.insertBefore(panel,sortInfo);
+      } else {
+        panel.style.display=panel.style.display==='none'?'block':'none';
+      }
+      document.getElementById('traySortBtn').style.background=panel.style.display!=='none'?'#eaf0fe':'';
+      updateSortBtnHighlights();
+    }
+
+    function setTraySort(field){
+      if(traySortField===field) traySortAsc=!traySortAsc;
+      else { traySortField=field; traySortAsc=true; }
+      renderTrayTasks();
+      updateSortBtnHighlights();
+    }
+
+    function updateSortBtnHighlights(){
+      var panel=document.getElementById('traySortPanel');
+      if(!panel) return;
+      panel.querySelectorAll('[data-sort]').forEach(function(btn){
+        btn.style.background = btn.getAttribute('data-sort')===traySortField ? '#eaf0fe' : '#fff';
+        btn.style.borderColor = btn.getAttribute('data-sort')===traySortField ? '#0250d9' : '#dddbda';
+        btn.style.color = btn.getAttribute('data-sort')===traySortField ? '#0250d9' : '#3e3e3c';
+      });
+    }
+
+    function toggleTrayFilter(){
+      var panel=document.getElementById('trayFilterPanel');
+      if(!panel){
+        panel=document.createElement('div');
+        panel.id='trayFilterPanel';
+        panel.style.cssText='padding:10px 12px;border-bottom:1px solid #e8e8e8;flex-shrink:0;background:#fafafa;';
+        panel.innerHTML='<div style="font-size:11px;font-weight:600;color:#706e6b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Filter by</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+          +[['overdue','Overdue'],['starred','Starred'],['done','Done'],['open','Open']].map(function(f){
+            return '<button onclick="setTrayFilter(\''+f[0]+'\')" data-filter="'+f[0]+'" style="padding:4px 10px;border-radius:4px;border:1px solid #dddbda;background:#fff;font-family:inherit;font-size:12px;cursor:pointer;color:#3e3e3c;">'+f[1]+'</button>';
+          }).join('')
+          +'<button onclick="setTrayFilter(null)" style="padding:4px 10px;border-radius:4px;border:1px solid #dddbda;background:#fff;font-family:inherit;font-size:12px;cursor:pointer;color:#9ca3af;">Clear</button>'
+          +'</div>';
+        var sortInfo=document.getElementById('traySortInfo');
+        sortInfo.parentNode.insertBefore(panel,sortInfo);
+      } else {
+        panel.style.display=panel.style.display==='none'?'block':'none';
+      }
+      document.getElementById('trayFilterBtn').style.background=panel.style.display!=='none'?'#eaf0fe':'';
+    }
+
+    function setTrayFilter(val){
+      trayFilterActive=val;
+      renderTrayTasks();
+      var panel=document.getElementById('trayFilterPanel');
+      if(panel) panel.querySelectorAll('[data-filter]').forEach(function(btn){
+        btn.style.background=btn.getAttribute('data-filter')===val?'#eaf0fe':'#fff';
+        btn.style.borderColor=btn.getAttribute('data-filter')===val?'#0250d9':'#dddbda';
+        btn.style.color=btn.getAttribute('data-filter')===val?'#0250d9':'#3e3e3c';
+      });
+      document.getElementById('trayFilterBtn').style.background=val?'#eaf0fe':'';
+    }
+
+    function setTrayNav(nav, el){
+      trayNav = nav;
+      document.querySelectorAll('.tray-nav-item,.tray-nav-label-item').forEach(function(n){ n.classList.remove('active'); });
+      el.classList.add('active');
+      var labels = { all:'All', upcoming:'Upcoming', starred:'Starred', overdue:'Overdue', high:'High Priority', normal:'Normal Priority', low:'Low Priority' };
+      var icons  = {
+        all:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/>',
+        starred:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+        today:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        overdue:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+        urgent:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+        followup:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+        legal:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+      };
+      document.getElementById('trayRightTitle').innerHTML =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+(icons[nav]||icons.all)+'</svg> '+labels[nav];
+      renderTrayTasks();
+    }
+
+    function isOverdue(t){ if(!t.due||t.done) return false; var d=new Date(); d.setHours(0,0,0,0); return new Date(t.due+'T00:00:00')<d; }
+    function isDueToday(t){ if(!t.due||t.done) return false; var d=new Date(); d.setHours(0,0,0,0); return new Date(t.due+'T00:00:00').getTime()===d.getTime(); }
+
+    function formatDueLine(t){
+      if(!t.due) return '';
+      var label = new Date(t.due+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      if(isOverdue(t))  return '<div class="tray-task-date-line overdue">Overdue · '+label+'</div>';
+      if(isDueToday(t)) return '<div class="tray-task-date-line today">by Today</div>';
+      return '<div class="tray-task-date-line">by '+label+'</div>';
+    }
+
+    function getFiltered(){
+      var tasks = trayTasks.filter(function(t){
+        if(trayNav==='upcoming') { if(t.done) return false; var d=new Date(); d.setHours(0,0,0,0); if(!t.due) return false; var due=new Date(t.due+'T00:00:00'); return due>=d; }
+        if(trayNav==='starred')  return t.starred;
+        if(trayNav==='overdue')  return !t.done && isOverdue(t);
+        if(trayNav==='high')     return t.priority==='high';
+        if(trayNav==='normal')   return t.priority==='normal';
+        if(trayNav==='low')      return t.priority==='low';
+        return true;
+      });
+      /* Apply toolbar filter */
+      if(trayFilterActive==='overdue') tasks=tasks.filter(function(t){ return !t.done&&isOverdue(t); });
+      else if(trayFilterActive==='starred') tasks=tasks.filter(function(t){ return t.starred; });
+      else if(trayFilterActive==='done')    tasks=tasks.filter(function(t){ return t.done; });
+      else if(trayFilterActive==='open')    tasks=tasks.filter(function(t){ return !t.done; });
+      /* Apply search */
+      if(traySearchQuery.trim()){
+        var q=traySearchQuery.toLowerCase();
+        tasks=tasks.filter(function(t){
+          return t.title.toLowerCase().includes(q)
+            ||(t.notes&&t.notes.toLowerCase().includes(q))
+            ||(t.contact&&(Array.isArray(t.contact)?t.contact.join(' '):t.contact).toLowerCase().includes(q));
+        });
+      }
+      /* Apply sort */
+      var priorityRank={high:0,normal:1,low:2};
+      tasks=tasks.slice().sort(function(a,b){
+        var av,bv;
+        if(traySortField==='due'){ av=a.due||'9999'; bv=b.due||'9999'; }
+        else if(traySortField==='priority'){ av=priorityRank[a.priority||'normal']; bv=priorityRank[b.priority||'normal']; }
+        else if(traySortField==='title'){ av=a.title.toLowerCase(); bv=b.title.toLowerCase(); }
+        else { return 0; } /* created = insertion order */
+        return traySortAsc ? (av<bv?-1:av>bv?1:0) : (av>bv?-1:av<bv?1:0);
+      });
+      return tasks;
+    }
+
+    function renderTrayTasks(){
+      var list     = document.getElementById('tasksTrayList');
+      var filtered = getFiltered();
+      var info     = document.getElementById('traySortInfo');
+      if(info) info.textContent = filtered.length+' item'+(filtered.length!==1?'s':'')+' · Sort by: Created Date';
+      updateTrayBadge();
+
+      if(!filtered.length){
+        document.getElementById('trayAddRow').style.display='none';
+        list.innerHTML = '<div style="padding:32px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="showTrayForm()">'
+          +'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0250d9" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+          +'<span style="font-size:13px;color:#0250d9;font-weight:400;">New Task</span>'
+          +'</div>';
+        return;
+      }
+      document.getElementById('trayAddRow').style.display='flex';
+
+      list.innerHTML = filtered.map(function(t){
+        var i      = trayTasks.indexOf(t);
+        var rowCls = 'tray-task-row'+(t.done?' done-row':'')+(isOverdue(t)?' overdue-row':'')+(isDueToday(t)?' today-row':'');
+        var starFill  = t.starred ? '#f59e0b' : 'none';
+        var starStroke = t.starred ? '#f59e0b' : '#c8d0db';
+        var isDone = t.done;
+
+        /* Line 2 — contact desc with dark blue names */
+        var contactDisplay = '';
+        if(t.contact){
+          var contacts = Array.isArray(t.contact) ? t.contact : [t.contact];
+          contactDisplay = contacts.map(function(n){ return '<strong style="color:#3e3e3c;font-weight:600;">'+escHtml(n)+'</strong>'; }).join(', ');
+        }
+        var descLine = contactDisplay
+          ? '<div class="tray-task-expand"><span class="tray-task-expand-chevron">›</span><span class="tray-task-desc-line">Complete task for '+contactDisplay+'</span></div>'
+          : '';
+
+        /* Line 3 — date, standalone */
+        var dateLine = formatDueLine(t);
+
+        /* Right action buttons: check ✓ | flag | × delete */
+        var checkBtn = '<button class="tray-act-btn'+(isDone?' done-btn':'')+'" onclick="event.stopPropagation();toggleTrayTask('+i+')" title="Complete">'
+          +(isDone
+            ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>')
+          +'</button>';
+        var flagBtn = '<button class="tray-act-flag'+(t.starred?' flagged':'')+'" onclick="event.stopPropagation();starTrayTask('+i+')" title="Flag">'
+          +'<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(t.starred?'#fff':'none')+'" stroke="'+(t.starred?'#fff':'currentColor')+'" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'
+          +'</button>';
+        var delBtn = '<button class="tray-act-chevron" onclick="event.stopPropagation();deleteTrayTask('+i+')" title="Delete">'
+          +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+          +'</button>';
+
+        return '<div class="'+rowCls+'">'
+          +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask('+i+')" title="Star">'
+          +'<svg width="13" height="13" viewBox="0 0 24 24" fill="'+starFill+'" stroke="'+starStroke+'" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+          +'</button>'
+          +'<div class="tray-task-body">'
+          +'<div><span class="tray-task-title-link'+(isDone?' done':'')+'" onmouseenter="trayTooltipTimer=setTimeout(function(){showTrayTooltipForRow(this,'+i+')}.bind(this),350)" onmouseleave="hideTrayTooltip()">'+escHtml(t.title)+'</span></div>'
+          +descLine
+          +dateLine
+          +'</div>'
+          +'<div class="tray-task-actions">'+checkBtn+flagBtn+delBtn+'</div>'
+          +'</div>';
+      }).join('');
+    }
+
+    function toggleTrayTask(i){
+      trayTasks[i].done = !trayTasks[i].done;
+      renderTrayTasks();
+      fireTaskWebhook('update', trayTasks[i]);
+    }
+    function starTrayTask(i){
+      trayTasks[i].starred = !trayTasks[i].starred;
+      renderTrayTasks();
+      fireTaskWebhook('update', trayTasks[i]);
+    }
+    function deleteTrayTask(i){
+      var task = trayTasks[i];
+      trayTasks.splice(i, 1);
+      renderTrayTasks();
+      fireTaskWebhook('delete', task);
+    }
+
+    function updateTrayBadge(){
+      var open  = trayTasks.filter(function(t){ return !t.done; }).length;
+      var badge = document.getElementById('utilityTasksBadge');
+      var count = document.getElementById('trayOpenCount');
+      badge.textContent = open;
+      badge.style.display = open>0 ? 'inline-flex' : 'none';
+      if(count) count.textContent = open>0 ? open+' open' : '';
+    }
+
+    function showTrayForm(){
+      document.getElementById('trayAddRow').style.display  = 'none';
+      document.getElementById('trayNewForm').style.display = 'block';
+      document.getElementById('trayTaskInput').focus();
+    }
+
+    function hideTrayForm(){
+      document.getElementById('trayAddRow').style.display  = 'flex';
+      document.getElementById('trayNewForm').style.display = 'none';
+      ['trayTaskInput','trayDueInput','trayContactSearch','trayNotesInput'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('trayPriorityInput').value = 'normal';
+      traySelectedContacts = [];
+      renderContactTags();
+      var dd = document.getElementById('trayContactDropdown'); if(dd) dd.style.display='none';
+    }
+
+    async function saveTrayTask(){
+      var val = document.getElementById('trayTaskInput').value.trim();
+      if(!val) return;
+      var task = {
+        id:       null,  // Make will return the Monday update ID — we don't have it yet
+        title:    val,
+        due:      document.getElementById('trayDueInput').value||null,
+        priority: document.getElementById('trayPriorityInput').value,
+        contact:  traySelectedContacts.length ? traySelectedContacts.slice() : null,
+        notes:    document.getElementById('trayNotesInput').value.trim()||null,
+        done:     false,
+        starred:  false,
+        label:    null,
+        created:  new Date().toISOString()
+      };
+      trayTasks.unshift(task);
+      renderTrayTasks();
+      hideTrayForm();
+      // Fire async — UI doesn't wait, Make creates the Monday update in the background
+      const result = await fireTaskWebhook('create', task);
+      // If Make returns an update_id, store it so future edits can target the right update
+      if(result && result.update_id) {
+        task.id = result.update_id;
+      }
+    }
+
+    /* ── CONTACT MULTI-SELECT ── */
+    var traySelectedContacts = [];
+
+    function getTrayContactOptions(){
+      return (rcOwners||[]).concat(rcOthers||[]).map(function(c){ return c.name; }).filter(function(n){ return n&&n!=='—'; });
+    }
+
+    function renderContactTags(){
+      var wrap = document.getElementById('trayContactTags');
+      if(!wrap) return;
+      wrap.innerHTML = traySelectedContacts.map(function(name,i){
+        return '<span class="tray-contact-tag">'+escHtml(name)
+          +'<button class="tray-contact-tag-remove" onclick="event.stopPropagation();removeTrayContact('+i+')" type="button">×</button>'
+          +'</span>';
+      }).join('');
+      var inp = document.getElementById('trayContactSearch');
+      if(inp) inp.placeholder = traySelectedContacts.length ? '' : 'Search contacts…';
+    }
+
+    function removeTrayContact(i){
+      traySelectedContacts.splice(i,1);
+      renderContactTags();
+      filterTrayContacts(document.getElementById('trayContactSearch').value||'');
+    }
+
+    function showTrayContactDropdown(){
+      filterTrayContacts(document.getElementById('trayContactSearch').value||'');
+    }
+
+    function filterTrayContacts(q){
+      var dd = document.getElementById('trayContactDropdown');
+      if(!dd) return;
+      var opts = getTrayContactOptions();
+      var filtered = opts.filter(function(n){ return n.toLowerCase().includes((q||'').toLowerCase()); });
+      if(!filtered.length){ dd.style.display='none'; return; }
+      dd.style.display='block';
+      dd.innerHTML = filtered.map(function(name){
+        var isSelected = traySelectedContacts.indexOf(name)>-1;
+        var initials = name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+        var safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        return '<div class="tray-contact-dropdown-item'+(isSelected?' selected':'')+'"'
+          +(isSelected?'':' onclick="selectTrayContact(\''+safe+'\')"')+'>'
+          +'<div class="tray-contact-avatar">'+initials+'</div>'
+          +'<span style="flex:1;min-width:0;">'+escHtml(name)+'</span>'
+          +(isSelected?'<span style="font-size:11px;color:#9ca3af;flex-shrink:0;">Added</span>':'')
+          +'</div>';
+      }).join('');
+    }
+
+    function selectTrayContact(name){
+      if(traySelectedContacts.indexOf(name)===-1) traySelectedContacts.push(name);
+      renderContactTags();
+      var inp=document.getElementById('trayContactSearch'); if(inp){inp.value='';inp.focus();}
+      filterTrayContacts('');
+    }
+
+    document.addEventListener('click',function(e){
+      var dd=document.getElementById('trayContactDropdown');
+      if(dd&&!e.target.closest('#trayContactField')&&!e.target.closest('#trayContactDropdown')) dd.style.display='none';
+    });
+
+    /* ── TOOLTIP — position:fixed so it escapes overflow:hidden on tray ── */
+    var trayTooltipEl=null;
+    var trayTooltipTimer=null;
+
+    function showTrayTooltipForRow(titleEl, taskIdx){
+      hideTrayTooltip();
+      var t = trayTasks[taskIdx];
+      if(!t) return;
+      var priorityColors={high:'#dc2626',normal:'#16a34a',low:'#9ca3af'};
+      var priorityLabels={high:'High',normal:'Normal',low:'Low'};
+      var pColor=priorityColors[t.priority||'normal']||'#16a34a';
+      var pLabel=priorityLabels[t.priority||'normal']||'Normal';
+      var contactStr=t.contact?(Array.isArray(t.contact)?t.contact.join(', '):t.contact):'';
+      var div=document.createElement('div');
+      div.className='tray-task-tooltip';
+      div.innerHTML='<div class="tray-tooltip-inner">'
+        +'<div class="tray-tooltip-header">'
+          +'<div class="tray-tooltip-icon"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 520 520" fill="#fff"><path d="m240 70-17-17c-5-5-12-5-17 0L100 158l-43-42c-5-5-12-5-17 0l-17 17c-5 5-5 12 0 17l59 59c5 5 11 7 17 7s12-2 17-7L240 87c4-4 4-12 0-17zm244 114H275c-9 0-16-7-16-16v-32c0-9 7-16 16-16h209c9 0 16 7 16 16v32c0 9-7 16-16 16zm0 143H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16zm-354 0H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm0 143H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm354 0H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16z"/></svg></div>'
+          +'<span class="tray-tooltip-title">'+escHtml(t.title)+'</span>'
+          +'<svg class="tray-tooltip-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+        +'</div>'
+        +'<div class="tray-tooltip-body">'
+          +'<div class="tray-tooltip-row">'
+            +'<div class="tray-tooltip-field"><span class="tray-tooltip-label">Priority</span><span class="tray-tooltip-value" style="color:'+pColor+';">'+pLabel+'</span></div>'
+            +(contactStr?'<div class="tray-tooltip-field"><span class="tray-tooltip-label">Contact</span><span class="tray-tooltip-value" style="font-size:11.5px;color:#0250d9;">'+escHtml(contactStr)+'</span></div>':'')
+          +'</div>'
+          +(t.notes?'<div class="tray-tooltip-notes">'+escHtml(t.notes)+'</div>':'<div class="tray-tooltip-notes" style="color:#9ca3af;font-style:italic;">No notes added.</div>')
+        +'</div>'
+        +'</div>';
+      document.body.appendChild(div);
+      trayTooltipEl=div;
+
+      /* Measure actual text width then add header chrome: icon(28) + gap(9) + padding(24) + close(16) + gap(9) + border(2) */
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      ctx.font = '600 13px "Salesforce Sans","Inter",system-ui,sans-serif';
+      var textWidth = ctx.measureText(t.title).width;
+      var ttWidth = Math.max(Math.ceil(textWidth) + 28 + 9 + 24 + 16 + 9 + 2, 200);
+
+      div.style.width = ttWidth+'px';
+      var rect = titleEl.getBoundingClientRect();
+      var left = rect.right + 10;
+      var top  = rect.top - 10;
+      if(top + 160 > window.innerHeight - 8) top = window.innerHeight - 170;
+      if(top < 8) top = 8;
+      div.style.top  = top+'px';
+      div.style.left = left+'px';
+    }
+
+    function hideTrayTooltip(){
+      clearTimeout(trayTooltipTimer);
+      if(trayTooltipEl){trayTooltipEl.remove();trayTooltipEl=null;}
+    }
+
+    function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    renderTrayTasks();
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
   </script>
 </body>
 </html>
