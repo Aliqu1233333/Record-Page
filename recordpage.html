@@ -1593,14 +1593,24 @@
         // ── Load tasks from task_data column ─────────────────────────────
         if (payload.task_data) {
           try {
-            const parsed = typeof payload.task_data === 'string'
-              ? JSON.parse(payload.task_data)
-              : payload.task_data;
-            // Support both a single task object and an array of tasks
-            const tasksArr = Array.isArray(parsed)
-              ? parsed
-              : (parsed.tasks ? parsed.tasks : [parsed]);
-            loadTasksFromPayload(tasksArr);
+            const raw = String(payload.task_data).trim();
+            if (!raw) return;
+            const tasks = raw.split('\n').filter(function(l){ return l.trim(); }).map(function(line){
+              const p = line.split('|');
+              return {
+                id:       p[0] || null,
+                title:    (p[1] || '').replace(/__PIPE__/g,'|'),
+                due:      p[2] || null,
+                priority: p[3] || 'normal',
+                contact:  p[4] ? p[4].replace(/__PIPE__/g,'|').split(',').filter(Boolean) : null,
+                notes:    p[5] ? p[5].replace(/__PIPE__/g,'|') : null,
+                done:     p[6] === '1',
+                starred:  p[7] === '1',
+                label:    null,
+                created:  null
+              };
+            });
+            loadTasksFromPayload(tasks);
           } catch(e) { console.warn('Failed to parse task_data:', e); }
         }
         [['deed_status', 'deed_link'], ['will_status', 'will_link']].forEach(([statusField, linkField]) => {
@@ -3506,7 +3516,21 @@
     async function saveTasksToMonday(){
       const { boardId, pulseId } = extractIdsFromUrl();
       if(!boardId || !pulseId) return;
-      const value = JSON.stringify(trayTasks);
+      // Plain pipe-delimited text — no JSON, no quotes, Make cannot mangle this
+      // Format per line: id|title|due|priority|contact|notes|done|starred
+      const lines = trayTasks.map(function(t){
+        return [
+          t.id       || '',
+          (t.title   || '').replace(/\|/g,'__PIPE__').replace(/\n/g,' '),
+          t.due      || '',
+          t.priority || 'normal',
+          (Array.isArray(t.contact) ? t.contact.join(',') : (t.contact||'')).replace(/\|/g,'__PIPE__'),
+          (t.notes   || '').replace(/\|/g,'__PIPE__').replace(/\n/g,' '),
+          t.done    ? '1' : '0',
+          t.starred ? '1' : '0'
+        ].join('|');
+      });
+      const value = lines.join('\n');
       try {
         await fetch(TASK_WEBHOOK, {
           method: 'POST',
