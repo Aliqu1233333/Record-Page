@@ -1483,11 +1483,16 @@
   <script>
     const COLUMN_ID_MAP = {};
     const SAVE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
-    const TASK_WEBHOOK = "https://hook.us1.make.com/YOUR_TASK_WEBHOOK_HERE"; // ← replace with your Make task webhook URL
+    const TASK_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
+        // ── If this is a tasks-only push from Make, route it directly ──
+        if (payload.tasks && !payload.confirmed_owners && !payload.deceased_owner) {
+          this.applyTasks(payload.tasks);
+          return;
+        }
         if (payload.column_map && typeof payload.column_map === "object") {
           Object.assign(COLUMN_ID_MAP, payload.column_map);
         }
@@ -1604,6 +1609,10 @@
             el.onclick = null; el.onmouseover = null; el.onmouseout = null;
           }
         });
+      },
+      applyTasks(tasks) {
+        if (!Array.isArray(tasks)) return;
+        loadTasksFromPayload(tasks);
       }
     };
 
@@ -2113,6 +2122,20 @@
         window.RecordPage.applyData(data);
       }catch(error){ console.error('Error fetching data from Make.com:',error); }
       finally{ hideLoading(); }
+      // Fire tasks fetch separately — doesn't block or delay main load
+      fetchTasksFromMake(boardId, pulseId);
+    }
+
+    async function fetchTasksFromMake(boardId, pulseId){
+      const TASKS_LOAD_WEBHOOK = 'https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
+      if(!boardId||!pulseId) return;
+      try{
+        const response=await fetch(TASKS_LOAD_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
+        if(!response.ok) return;
+        const data=await response.json();
+        // Make returns { tasks: [...] }
+        if(Array.isArray(data.tasks)) window.RecordPage.applyTasks(data.tasks);
+      }catch(error){ console.warn('Tasks fetch error:',error); }
     }
 
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
