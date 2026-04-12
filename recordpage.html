@@ -1595,7 +1595,7 @@
           try {
             const raw = String(payload.task_data).trim();
             if (!raw) return;
-            const tasks = raw.split('\n').filter(function(l){ return l.trim(); }).map(function(line){
+            const tasks = raw.split('~~').filter(function(l){ return l.trim(); }).map(function(line){
               const p = line.split('|');
               return {
                 id:       p[0] || null,
@@ -3530,7 +3530,7 @@
           t.starred ? '1' : '0'
         ].join('|');
       });
-      const value = lines.join('\n');
+      const value = lines.join('~~');
       try {
         await fetch(TASK_WEBHOOK, {
           method: 'POST',
