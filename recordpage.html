@@ -3741,67 +3741,6 @@
 
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
-    const DUMMY_RECORD_DATA = {
-      name: "BERRY BENNIE FERRELL ESTATE OF",
-      taxes_owed: "$4,500",
-      equity: "$120,000",
-      appraisal: "$250,000",
-      heirs_identified: 4,
-      heirs_contacted: 4,
-      heirs_offered: 2,
-      ownership_secured: "100%",
-      heirs_identified_status: "Complete",
-      last_contact_date: "Oct 15, 2023",
-      last_contact_days_ago: "15 days ago",
-      obituary_link: "https://example.com/obituary",
-      ancestry_link: "https://example.com/ancestry",
-      zillow_link: "https://zillow.com",
-      tax_assessor_link: "https://example.com/tax",
-      google_maps_link: "https://maps.google.com",
-      birth_date: "Jan 14, 1945",
-      death_date: "Oct 02, 2021",
-      age: "76",
-      creation_log: "Created on Sep 12, 2023",
-      last_contacted: "Oct 15, 2023",
-      days_of_inactivity: "15",
-      activity_notes: "Left voicemail regarding the property.",
-      confirmed_owners: [
-        {
-          name: "James Gordon",
-          relationship: "Son",
-          owner_status: "Yes",
-          ownership_percent: "50%",
-          lead_status: "Interested In Selling",
-          follow_up_date: "May 10, 2026",
-          offer_made: true,
-          offer_amount: "$185,000",
-          phone_1: "713-555-0192",
-          phone_1_status: "Good",
-          seller_motivation: "Financial Hardship"
-        },
-        {
-          name: "Barbara Gordon",
-          relationship: "Daughter",
-          owner_status: "Yes",
-          ownership_percent: "50%",
-          lead_status: "Contacted",
-          follow_up_date: "May 12, 2026",
-          offer_made: false,
-          phone_1: "713-555-0193",
-          phone_1_status: "Good",
-          seller_motivation: "Doesn't want involvement"
-        },
-        {
-          name: "Harvey Dent",
-          relationship: "Attorney",
-          owner_status: "No",
-          lead_status: "In Progress",
-          phone_1: "713-555-0999",
-          phone_1_status: "Good",
-          contact_outcome: "Spoke To - Has No Info"
-        }
-      ]
-    };
     if (!extractIdsFromUrl().boardId) {
       setTimeout(() => window.RecordPage.applyData(DUMMY_RECORD_DATA), 200);
     }
