@@ -3437,11 +3437,12 @@
       document.getElementById('trayAddRow').style.display='flex';
 
       list.innerHTML = filtered.map(function(t){
-        var i      = trayTasks.indexOf(t);
+        var tid    = t.id;
         var rowCls = 'tray-task-row'+(t.done?' done-row':'')+(isOverdue(t)?' overdue-row':'')+(isDueToday(t)?' today-row':'');
         var starFill  = t.starred ? '#f59e0b' : 'none';
         var starStroke = t.starred ? '#f59e0b' : '#c8d0db';
         var isDone = t.done;
+        var safeTid = String(tid).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
         /* Line 2 — contact desc with dark blue names */
         var contactDisplay = '';
@@ -3457,28 +3458,28 @@
         var dateLine = formatDueLine(t);
 
         /* Right action buttons: check ✓ | flag | × delete */
-        var checkBtn = '<button class="tray-act-btn'+(isDone?' done-btn':'')+'" onclick="event.stopPropagation();toggleTrayTask('+i+')" title="Complete">'
+        var checkBtn = '<button class="tray-act-btn'+(isDone?' done-btn':'')+'" onclick="event.stopPropagation();toggleTrayTask(\''+safeTid+'\')" title="Complete">'
           +(isDone
             ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>')
           +'</button>';
-        var flagBtn = '<button class="tray-act-flag'+(t.starred?' flagged':'')+'" onclick="event.stopPropagation();starTrayTask('+i+')" title="Flag">'
+        var flagBtn = '<button class="tray-act-flag'+(t.starred?' flagged':'')+'" onclick="event.stopPropagation();starTrayTask(\''+safeTid+'\')" title="Flag">'
           +'<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(t.starred?'#fff':'none')+'" stroke="'+(t.starred?'#fff':'currentColor')+'" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'
           +'</button>';
-        var delBtn = '<button class="tray-act-chevron" onclick="event.stopPropagation();deleteTrayTask('+i+')" title="Delete">'
+        var delBtn = '<button class="tray-act-chevron" onclick="event.stopPropagation();deleteTrayTask(\''+safeTid+'\')" title="Delete">'
           +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
           +'</button>';
 
-        var editBtn = '<button class="tray-act-edit" onclick="event.stopPropagation();editTrayTask('+i+')" title="Edit">'
+        var editBtn = '<button class="tray-act-edit" onclick="event.stopPropagation();editTrayTask(\''+safeTid+'\')" title="Edit">'
           +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
           +'</button>';
 
         return '<div class="'+rowCls+'">'
-          +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask('+i+')" title="Star">'
+          +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask(\''+safeTid+'\')" title="Star">'
           +'<svg width="13" height="13" viewBox="0 0 24 24" fill="'+starFill+'" stroke="'+starStroke+'" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
           +'</button>'
           +'<div class="tray-task-body">'
-          +'<div><span class="tray-task-title-link'+(isDone?' done':'')+'" onmouseenter="trayTooltipTimer=setTimeout(function(){showTrayTooltipForRow(this,'+i+')}.bind(this),350)" onmouseleave="hideTrayTooltip()">'+escHtml(t.title)+'</span></div>'
+          +'<div><span class="tray-task-title-link'+(isDone?' done':'')+'" onmouseenter="trayTooltipTimer=setTimeout(function(){showTrayTooltipForRow(this,\''+safeTid+'\')}.bind(this),350)" onmouseleave="hideTrayTooltip()">'+escHtml(t.title)+'</span></div>'
           +descLine
           +dateLine
           +'</div>'
@@ -3487,18 +3488,24 @@
       }).join('');
     }
 
-    function toggleTrayTask(i){
-      trayTasks[i].done = !trayTasks[i].done;
+    function toggleTrayTask(tid){
+      var t = trayTasks.find(function(x){ return x.id == tid; });
+      if(!t) return;
+      t.done = !t.done;
       renderTrayTasks();
       saveTasksToMonday();
     }
-    function starTrayTask(i){
-      trayTasks[i].starred = !trayTasks[i].starred;
+    function starTrayTask(tid){
+      var t = trayTasks.find(function(x){ return x.id == tid; });
+      if(!t) return;
+      t.starred = !t.starred;
       renderTrayTasks();
       saveTasksToMonday();
     }
-    function deleteTrayTask(i){
-      trayTasks.splice(i, 1);
+    function deleteTrayTask(tid){
+      var idx = trayTasks.findIndex(function(x){ return x.id == tid; });
+      if(idx === -1) return;
+      trayTasks.splice(idx, 1);
       renderTrayTasks();
       saveTasksToMonday();
     }
@@ -3536,8 +3543,9 @@
       } catch(err) { console.warn('Task save error:', err); }
     }
 
-    function editTrayTask(i){
-      var t = trayTasks[i];
+    function editTrayTask(tid){
+      var t = trayTasks.find(function(x){ return x.id == tid; });
+      if(!t) return;
       // Populate form fields with existing task data
       document.getElementById('trayTaskInput').value    = t.title || '';
       document.getElementById('trayDueInput').value     = t.due   || '';
@@ -3553,11 +3561,11 @@
       var saveBtn = document.querySelector('#trayNewForm .tray-form-save');
       saveBtn.onclick = function(){
         if(!document.getElementById('trayTaskInput').value.trim()) return;
-        trayTasks[i].title    = document.getElementById('trayTaskInput').value.trim();
-        trayTasks[i].due      = document.getElementById('trayDueInput').value || null;
-        trayTasks[i].priority = document.getElementById('trayPriorityInput').value;
-        trayTasks[i].contact  = traySelectedContacts.length ? traySelectedContacts.slice() : null;
-        trayTasks[i].notes    = document.getElementById('trayNotesInput').value.trim() || null;
+        t.title    = document.getElementById('trayTaskInput').value.trim();
+        t.due      = document.getElementById('trayDueInput').value || null;
+        t.priority = document.getElementById('trayPriorityInput').value;
+        t.contact  = traySelectedContacts.length ? traySelectedContacts.slice() : null;
+        t.notes    = document.getElementById('trayNotesInput').value.trim() || null;
         renderTrayTasks();
         hideTrayForm();
         saveTasksToMonday();
@@ -3679,9 +3687,9 @@
     var trayTooltipEl=null;
     var trayTooltipTimer=null;
 
-    function showTrayTooltipForRow(titleEl, taskIdx){
+    function showTrayTooltipForRow(titleEl, taskId){
       hideTrayTooltip();
-      var t = trayTasks[taskIdx];
+      var t = trayTasks.find(function(x){ return x.id == taskId; });
       if(!t) return;
       var priorityColors={high:'#dc2626',normal:'#16a34a',low:'#9ca3af'};
       var priorityLabels={high:'High',normal:'Normal',low:'Low'};
