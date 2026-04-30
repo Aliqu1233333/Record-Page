@@ -56,9 +56,9 @@
 
     .panel{
       background: var(--surface);
-      border: 1px solid var(--line);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
       overflow:hidden;
     }
 
@@ -141,9 +141,9 @@
 
     /* ---------- TOP SNAPSHOT ---------- */
     .topSnapshot{
-      background: var(--bg);
-      padding: 18px 18px 22px;
-      border-bottom: 1px solid var(--line);
+      background: #032d60;
+      padding: 20px 24px 24px;
+      border-bottom: 1px solid var(--border-color);
     }
     .topSnapshotGrid{
       display:grid;
@@ -157,16 +157,16 @@
     .snapshotBlock{ min-width: 0; }
 
     .snapshotTitle{
-      font-size: 14.5px;
-      letter-spacing: .14em;
+      font-size: 13.5px;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
+      color: #ffffff;
+      font-weight: 700;
       margin: 0 0 10px 0;
     }
     .snapshotDivider{
       height:1px;
-      background: var(--line);
+      background: rgba(255,255,255,0.15);
       margin: 0 0 12px 0;
     }
 
@@ -180,12 +180,12 @@
     .sfield{ min-width:2px; }
 
     .slabel{
-      font-size: 12px;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: #a0a7b6;
-      font-weight: 600;
-      margin-bottom: 6px;
+      font-size: 12.5px;
+      letter-spacing: .02em;
+      text-transform: none;
+      color: #e2e8f0;
+      font-weight: 500;
+      margin-bottom: 4px;
       display:flex;
       align-items:center;
       gap:6px;
@@ -202,12 +202,12 @@
       text-transform: uppercase;
       margin-left: 6px;
     }
-    .heir-status-complete{ background: #d1fae5; color: #065f46; }
-    .heir-status-in-progress{ background: #fef3c7; color: #92400e; }
+    .heir-status-complete{ background: rgba(209,250,229,0.15); color: #6ee7b7; border: 1px solid rgba(110,231,183,0.3); }
+    .heir-status-in-progress{ background: rgba(254,243,199,0.15); color: #fcd34d; border: 1px solid rgba(252,211,77,0.3); }
 
     .svalue{
       font-size: 16px;
-      color: #122349;
+      color: #ffffff;
       font-weight: 600;
       line-height: 1.25;
       min-width:0;
@@ -215,9 +215,9 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    .svalue.link{ color: var(--blue); cursor: pointer; }
+    .svalue.link{ color: #60a5fa; cursor: pointer; }
     .svalue.link:hover{ text-decoration: underline; }
-    .svalue.ok{ color: rgba(46,132,74,.95); font-weight: 650; }
+    .svalue.ok{ color: #4ade80; font-weight: 600; }
 
     /* =====================================================
        CRM FIELD LAYOUT
@@ -831,10 +831,11 @@
     .rc-item-status-text { font-size:11.5px; color:#8c8c8c; line-height:1; }
 
     /* ── Detail panel — layer: pure white ── */
+    /* ── Detail panel — layer: pure white ── */
     .rc-detail {
       flex: 1;
       min-width: 0;
-      background: #ffffff;
+      background: #eef1f6; /* Darker Gray Canvas */
       align-self: stretch;
     }
 
@@ -842,7 +843,7 @@
       display:flex; align-items:flex-start; justify-content:center;
       min-height:397px; padding:24px 28px;
       padding-top:calc(300px * 0.18);
-      background: #ffffff;
+      background: #eef1f6;
     }
     .rc-empty-block { display:flex; flex-direction:column; align-items:center; gap:9px; max-width:240px; text-align:center; }
     .rc-empty-icon { width:34px; height:34px; color:#d1d5db; margin-bottom:2px; }
@@ -851,29 +852,28 @@
 
     /* ── Detail inner ── */
     .rc-detail-inner {
-      padding: 0;
+      padding: 24px;
       display: none;
-      background: #ffffff;
+      background: #eef1f6;
     }
 
-    /* ── Header — layer: distinct mid-gray, darker than page ── */
+    /* ── Header — Salesforce Highlights Panel ── */
     .rc-det-header {
       display: flex;
       align-items: center;
-      gap: 13px;
-      background: #eef1f6;
-      border: none;
-      border-bottom: 1px solid #d8dde6;
-      border-radius: 0;
-      padding: 14px 18px;
-      margin: 0;
+      gap: 16px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin: 0 0 24px 0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
     }
 
-    /* Icon: -12% from 50px → 44px */
     .rc-det-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -881,26 +881,22 @@
     }
     .rc-det-icon.owner { background: #F4A623; }
     .rc-det-icon.other { background: #06a59a; }
-    .rc-det-icon svg { display: block; }
-    .rc-det-icon.owner svg,
-    .rc-det-icon.other svg { width: 27px; height: 27px; }
+    .rc-det-icon svg { display: block; width: 24px; height: 24px; }
 
     .rc-det-header-text { flex: 1; min-width: 0; }
 
-    /* Name: -5% from 21.5px → 20.4px */
     .rc-det-name {
-      font-size: 20.4px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 3px;
-      line-height: 1.15;
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 2px;
+      line-height: 1.2;
     }
 
-    /* Subtitle: -10% from 12px → 10.8px */
     .rc-det-sub {
-      font-size: 10.8px;
-      color: #5f6b7a;
-      font-weight: 400;
+      font-size: 14px;
+      color: #475569;
+      font-weight: 500;
       line-height: 1.4;
       margin-bottom: 0;
     }
@@ -910,13 +906,13 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #0176d3;
-      color: #ffffff;
+      background: #ffffff;
+      color: #0176d3;
+      border: 1px solid #dddbda;
       font-family: var(--font);
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 500;
-      padding: 7px 14px;
-      border: none;
+      padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
       white-space: nowrap;
@@ -924,123 +920,122 @@
       text-decoration: none;
       transition: background .12s ease;
     }
-    .rc-det-action-btn:hover { background: #0161b3; }
-    .rc-det-action-btn:active { background: #0153a0; transform: translateY(1px); }
+    .rc-det-action-btn:hover { background: #f3f3f3; }
+    .rc-det-action-btn:active { background: #e5e5e5; }
+    
     .rc-section-header {
+      background: #f8f9fb;
+      padding: 12px 16px;
+      margin: 0;
+      border-bottom: 1px solid #eef1f6;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: default;
+      border-radius: 8px 8px 0 0;
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: #f5f6f8;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin: 0 0 12px 0;
-      cursor: pointer;
-      user-select: none;
-      transition: background .1s;
-    }
-    .rc-section-header:hover { background: #eceef2; }
-
-    /* Chevron */
-    .rc-section-chevron {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: #5f6b7a;
-      transition: transform .18s ease;
-    }
-    .rc-section-block.collapsed .rc-section-chevron {
-      transform: rotate(-90deg);
     }
 
-    /* Section title text */
     .rc-section-header-title {
-      font-size: 13.5px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 700;
       font-family: "Inter", var(--font);
-      color: #122349;
+      color: #1e293b;
       line-height: 1.2;
       flex: 1;
     }
 
-    /* Collapsible body */
     .rc-section-body {
-      padding-top: 10px;
-    }
-    .rc-section-block.collapsed .rc-section-body {
-      display: none;
+      padding: 16px 20px;
     }
 
     /* ── Record Readiness ── */
     .rc-readiness {
-      margin: 16px 20px 0;
-      border: 1px solid #eeeeee;
-      border-radius: 6px;
+      margin: 0 0 16px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
       background: #fffef7;
-      padding: 9px 12px;
+      padding: 12px 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
     }
-    .rc-readiness-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
+    .rc-readiness-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
     .rc-readiness-top-left { flex:1; min-width:0; }
     .rc-readiness-label { font-size:10.5px; font-weight:600; color:#a0a0a0; text-transform:uppercase; letter-spacing:.08em; margin-bottom:2px; display:block; }
     .rc-readiness-title { font-size:13px; font-weight:600; color:#2a2a2a; line-height:1.3; }
     .rc-readiness-pill { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; padding:3px 8px; background:#f4f4f4; border-radius:999px; font-size:11px; color:#8c97a0; white-space:nowrap; }
     .rc-readiness-pill-dot { width:6px; height:6px; border-radius:50%; background:#d4a017; flex-shrink:0; }
-    .rc-readiness-tiles { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
-    .rc-readiness-tile { display:flex; align-items:center; padding:8px 10px 8px 11px; border:1px solid #f0f0f0; border-radius:5px; background:#fff; gap:8px; }
+    .rc-readiness-tiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .rc-readiness-tile { display:flex; align-items:center; padding:10px 12px; border:1px solid #f0f0f0; border-radius:6px; background:#fff; gap:10px; }
     .rc-tile-left { flex:1; min-width:0; }
-    .rc-tile-title { font-size:13px; font-weight:600; color:#1f1f1f; line-height:1.2; margin-bottom:1px; }
-    .rc-tile-sub { font-size:11.5px; color:#8c8c8c; line-height:1.2; }
+    .rc-tile-title { font-size:13px; font-weight:600; color:#1f1f1f; line-height:1.2; margin-bottom:2px; }
+    .rc-tile-sub { font-size:12px; color:#6b7280; line-height:1.3; }
     .rc-tile-action { font-size:12.5px; color:var(--blue); font-weight:500; background:none; border:0; padding:0; margin-left:4px; margin-right:2px; cursor:pointer; font-family:var(--font); flex-shrink:0; white-space:nowrap; align-self:flex-start; margin-top:1px; }
     .rc-tile-action:hover { text-decoration:underline; }
 
     /* ── Record body ── */
     .rc-record-body {
-      padding: 16px 20px 24px;
+      padding: 0;
       overflow: hidden;
+      background: transparent;
     }
 
     /* ── Section block ── */
     .rc-section-block {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+      overflow: hidden;
     }
-    .rc-section-block:last-child { margin-bottom: 0; }
 
     /* ── Strict 2-column grid ── */
     .rc-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      column-gap: 28px;
-      margin-bottom: 16px;
+      column-gap: 32px;
+      row-gap: 8px;
+      margin-bottom: 0;
       align-items: start;
     }
-    .rc-row:last-child { margin-bottom: 0; }
 
-    .rc-field { min-width: 0; }
+    .rc-field { 
+      min-width: 0; 
+      padding: 6px 0 6px 0;
+      border-bottom: 1px solid #eef1f6;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 12px;
+    }
 
     /* Field label */
     .rc-label {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 400;
       font-family: var(--font);
-      letter-spacing: 0;
-      text-transform: none;
-      color: #555b66;
-      margin-bottom: 3px;
-      line-height: 1.3;
+      color: #64748b;
+      margin-bottom: 0;
+      line-height: 1.4;
       display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      flex: 0 0 140px;
+      flex-shrink: 0;
+      padding-top: 1px;
     }
 
     /* Base value */
     .rc-value {
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 400;
-      color: #4b5563;
+      color: #0f172a;
       line-height: 1.4;
       display: block;
       min-height: 20px;
+      flex: 1;
+      text-align: left;
     }
 
     /* Key fields: Lead Status, Seller Motivation */
@@ -2379,13 +2374,11 @@
 
         <div class="rc-record-body">
 
-          <div class="rc-section-block" id="sec-owner-lead-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="rc-section-block">
+            <div class="rc-section-header">
               <span class="rc-section-header-title">Lead Details</span>
             </div>
             <div class="rc-section-body">
-              <!-- Row 1: Lead Status | Offer Amount -->
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
                   <span class="rc-label">Lead Status</span>
@@ -2396,7 +2389,6 @@
                   <div class="rc-value offer">${rcHasVal(c.offer) ? (()=>{ const n=parseFloat(String(c.offer).replace(/[^0-9.]/g,'')); return isNaN(n)?escapeHtml(c.offer):'$'+Math.round(n).toLocaleString('en-US'); })() : '<span style="color:#b8bfca;font-weight:400">—</span>'}</div>
                 </div>
               </div>
-              <!-- Row 2: Seller Motivation | Owner Status -->
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
                   <span class="rc-label">Seller Motivation</span>
@@ -2407,7 +2399,6 @@
                   <div class="rc-value">${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—',false,bannerActive&&!rcHasVal(c.ownerStatus))}</div>
                 </div>
               </div>
-              <!-- Row 3: Follow-Up Date | Ownership % -->
               <div class="rc-row">
                 <div class="rc-field">
                   <span class="rc-label">Follow-Up Date</span>
@@ -2421,13 +2412,11 @@
             </div>
           </div>
 
-          <div class="rc-section-block" id="sec-owner-contact-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="rc-section-block">
+            <div class="rc-section-header">
               <span class="rc-section-header-title">Contact Info</span>
             </div>
             <div class="rc-section-body">
-              <!-- Row 1: Relationship | Phone -->
               <div class="rc-row">
                 <div class="rc-field">
                   <span class="rc-label">Relationship</span>
@@ -2466,13 +2455,11 @@
 
         <div class="rc-record-body">
 
-          <div class="rc-section-block" id="sec-other-lead-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="rc-section-block">
+            <div class="rc-section-header">
               <span class="rc-section-header-title">Lead Details</span>
             </div>
             <div class="rc-section-body">
-              <!-- Row 1: Lead Status | Contact Outcome -->
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
                   <span class="rc-label">Lead Status</span>
@@ -2483,7 +2470,6 @@
                   <div class="rc-value">${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
                 </div>
               </div>
-              <!-- Row 2: Owner Status | Follow-Up Date -->
               <div class="rc-row">
                 <div class="rc-field">
                   <span class="rc-label">Owner Status</span>
@@ -2498,8 +2484,7 @@
           </div>
 
           <div class="rc-section-block" id="sec-other-contact-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
-              <svg class="rc-section-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="rc-section-header">
               <span class="rc-section-header-title">Contact Info</span>
             </div>
             <div class="rc-section-body">
@@ -3748,6 +3733,70 @@
 
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
+    const DUMMY_RECORD_DATA = {
+      name: "BERRY BENNIE FERRELL ESTATE OF",
+      taxes_owed: "$4,500",
+      equity: "$120,000",
+      appraisal: "$250,000",
+      heirs_identified: 4,
+      heirs_contacted: 4,
+      heirs_offered: 2,
+      ownership_secured: "100%",
+      heirs_identified_status: "Complete",
+      last_contact_date: "Oct 15, 2023",
+      last_contact_days_ago: "15 days ago",
+      obituary_link: "https://example.com/obituary",
+      ancestry_link: "https://example.com/ancestry",
+      zillow_link: "https://zillow.com",
+      tax_assessor_link: "https://example.com/tax",
+      google_maps_link: "https://maps.google.com",
+      birth_date: "Jan 14, 1945",
+      death_date: "Oct 02, 2021",
+      age: "76",
+      creation_log: "Created on Sep 12, 2023",
+      last_contacted: "Oct 15, 2023",
+      days_of_inactivity: "15",
+      activity_notes: "Left voicemail regarding the property.",
+      confirmed_owners: [
+        {
+          name: "James Gordon",
+          relationship: "Son",
+          owner_status: "Yes",
+          ownership_percent: "50%",
+          lead_status: "Interested In Selling",
+          follow_up_date: "May 10, 2026",
+          offer_made: true,
+          offer_amount: "$185,000",
+          phone_1: "713-555-0192",
+          phone_1_status: "Good",
+          seller_motivation: "Financial Hardship"
+        },
+        {
+          name: "Barbara Gordon",
+          relationship: "Daughter",
+          owner_status: "Yes",
+          ownership_percent: "50%",
+          lead_status: "Contacted",
+          follow_up_date: "May 12, 2026",
+          offer_made: false,
+          phone_1: "713-555-0193",
+          phone_1_status: "Good",
+          seller_motivation: "Doesn't want involvement"
+        },
+        {
+          name: "Harvey Dent",
+          relationship: "Attorney",
+          owner_status: "No",
+          lead_status: "In Progress",
+          phone_1: "713-555-0999",
+          phone_1_status: "Good",
+          contact_outcome: "Spoke To - Has No Info"
+        }
+      ]
+    };
+    if (!extractIdsFromUrl().boardId) {
+      setTimeout(() => window.RecordPage.applyData(DUMMY_RECORD_DATA), 200);
+    }
   </script>
 </body>
 </html>
