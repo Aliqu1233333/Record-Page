@@ -709,141 +709,142 @@
        ===================================================== */
 
     /* Panel shell */
-    #rcPanel { background: var(--surface); }
+    #rcPanel { 
+      background: #ffffff; 
+      font-family: "Salesforce Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      border-top: 3px solid #0176d3;
+      border-radius: 4px; /* Soft rounding for the panel */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
 
     /* Collapse toggle header */
     .rc-toggle {
       display:flex; align-items:center; justify-content:space-between;
-      padding:17px 24px; cursor:pointer; user-select:none;
-      border-bottom:1px solid transparent; transition:border-color .15s;
+      padding:16px; cursor:pointer; user-select:none;
+      border-bottom:1px solid #dddbda; transition:background .15s;
     }
-    .rc-toggle:hover { background:#fafbfc; }
-    #rcPanel[data-open="true"] .rc-toggle { border-bottom-color:transparent; }
-    .rc-toggle-left { display:flex; align-items:center; gap:12px; }
+    .rc-toggle:hover { background:#f9f9f9; }
+    .rc-toggle-left { display:flex; align-items:center; gap:8px; }
 
     .rc-obj-icon {
-      width:36px; height:36px; border-radius:6px; flex-shrink:0;
-      background:#3a86ff;
+      width:32px; height:32px; border-radius:4px; flex-shrink:0;
+      background:#9050e9; /* SLDS Purple */
       display:flex; align-items:center; justify-content:center;
     }
-    .rc-obj-icon svg { width:20px; height:20px; color:#fff; display:block; }
+    .rc-obj-icon svg { width:18px; height:18px; color:#fff; display:block; }
 
     .rc-toggle-stack { display:flex; align-items:center; }
     .rc-toggle-title {
       display:flex; align-items:center; gap:6px;
-      font-size:20px; font-weight:700; color:var(--navy); line-height:1;
+      font-size:16px; font-weight:700; color:#181818; line-height:1;
       font-family:var(--font);
     }
-    .rc-toggle-meta { font-size:14px; color:var(--muted); font-family:var(--font); }
-    .rc-chev { width:16px; height:16px; color:var(--muted); transition:transform .18s ease; flex-shrink:0; }
+    .rc-toggle-meta { font-size:14px; color:#444444; font-family:var(--font); }
+    .rc-chev { width:16px; height:16px; color:#444444; transition:transform .18s ease; flex-shrink:0; }
     #rcPanel[data-open="true"] .rc-chev { transform:rotate(180deg); }
 
     .rc-body { display:none; }
     #rcPanel[data-open="true"] .rc-body { display:block; }
 
-    /* ── REFINEMENT 1: Tabs constrained to left panel width ── */
+    /* ── SLDS Full-Width Tabs ── */
     .rc-tabs {
-      display:flex;
-      align-items:stretch;
-      border-bottom: none;
-      background: #fff;
-    }
-
-    /* Left tab strip — constrained to list width */
-    .rc-tabs-left-col {
-      width: 300px;
-      flex-shrink: 0;
       display: flex;
       align-items: flex-end;
-      gap: 0;
-      padding: 14px 0 0 16px;
-      border-bottom: 1px solid #eaeaea;
-      background: #fff;
-    }
-
-    /* Spacer that fills right of tabs — white to match tab row */
-    .rc-tabs-right-spacer {
-      flex: 1;
-      border-bottom: 1px solid #eaeaea;
+      border-bottom: 1px solid #dddbda;
       background: #ffffff;
+      padding: 0 16px;
+      gap: 24px;
     }
+    .rc-tabs-left-col { display: contents; }
+    .rc-tabs-right-spacer { display: none; }
 
     .rc-tab {
       appearance:none; border:0; background:transparent;
       font-family:var(--font);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 0 10px 12px;
-      color:#8c8c8c; cursor:pointer;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 10px 0;
+      color: #444444; cursor:pointer;
       position:relative; transition:color .12s; white-space:nowrap;
     }
-    .rc-tab[aria-selected="true"] { color:#1f1f1f; font-weight:600; }
+    .rc-tab[aria-selected="true"] { color: #0176d3; font-weight: 700; }
     .rc-tab[aria-selected="true"]::after {
       content:""; position:absolute; left:0; right:0; bottom:-1px;
-      height:2px; background:var(--blue); border-radius:1px;
+      height:3px; background: #0176d3; border-radius: 2px 2px 0 0;
     }
-    .rc-tab-count { font-size:12px; font-weight:500; color:#8c8c8c; }
-    .rc-tab[aria-selected="true"] .rc-tab-count { color:#1f1f1f; }
+    .rc-tab-count { font-size:12px; font-weight:400; color:#706e6b; margin-left:4px; }
+    .rc-tab[aria-selected="true"] .rc-tab-count { color: #0176d3; font-weight: 700; }
 
     /* Tab panes */
     .rc-pane { display:none; }
     .rc-pane.active {
       display:flex;
       align-items:stretch;
-      min-height: 344px;
+      min-height: 400px;
+      background: #ffffff;
     }
 
-    /* ── Left list — layer: white ── */
+    /* ── Left list — SLDS Split View ── */
     .rc-list {
-      width: 300px;
+      width: 320px;
       flex-shrink: 0;
       background: #ffffff;
-      border-right: 1px solid #d8dde6;
+      border-right: 1px solid #dddbda;
       overflow-y: auto;
-      max-height: 688px;
+      max-height: 600px;
     }
 
     /* Row base */
     .rc-list-item {
-      display:flex; align-items:flex-start;
-      padding: 12px 16px 12px 12px;
+      display:flex; align-items:flex-start; gap: 12px;
+      padding: 12px;
       cursor:pointer;
       border-left: 3px solid transparent;
-      border-bottom: 1px solid #eef1f6;
-      transition: border-color .12s, background .1s;
+      border-bottom: 1px solid #dddbda;
+      transition: background .1s;
       background: #ffffff;
     }
     .rc-list-item:last-child { border-bottom: none; }
-    .rc-list-item:hover { background: #f4f8ff; }
-    /* Selected row — Salesforce blue */
+    .rc-list-item:hover { background: #f3f3f3; }
+    /* Selected row */
     .rc-list-item.active {
-      background: #e5f0ff;
-      border-left-color: #1b96ff;
+      background: #f3f3f3;
+      border-left-color: #0176d3;
     }
-    .rc-list-item.active:hover { background: #e5f0ff; }
+    .rc-list-item.active:hover { background: #f3f3f3; }
+
+    .rc-item-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e8e8e8 !important;
+      background-image: none !important;
+      color: #3e3e3c;
+      font-size: 11px; font-weight: 600; font-family: var(--font);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      flex-shrink: 0;
+    }
 
     .rc-item-body { flex:1; min-width:0; }
-    .rc-item-name { font-size:13.5px; font-weight:600; color:#1f1f1f; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .rc-item-name { font-size:13.5px; font-weight:700; color:#0176d3; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .rc-item-sub { font-size:12px; color:#5f6b7a; margin-top:3px; line-height:1.3; }
     .rc-item-status { display:flex; align-items:center; gap:6px; margin-top:5px; }
     .rc-dot { width:5px; height:5px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
     .rc-dot.active { background:var(--blue); }
     .rc-item-status-text { font-size:11.5px; color:#8c8c8c; line-height:1; }
 
-    /* ── Detail panel — layer: pure white ── */
-    /* ── Detail panel — layer: pure white ── */
+    /* ── Detail panel — SLDS Record Layout ── */
     .rc-detail {
       flex: 1;
       min-width: 0;
-      background: #eef1f6; /* Darker Gray Canvas */
+      background: #f9f9f9; /* Cosmos canvas */
       align-self: stretch;
+      display: flex;
+      flex-direction: column;
     }
 
     .rc-detail-empty {
-      display:flex; align-items:flex-start; justify-content:center;
-      min-height:397px; padding:24px 28px;
-      padding-top:calc(300px * 0.18);
-      background: #eef1f6;
+      display:flex; align-items:center; justify-content:center;
+      flex: 1;
+      background: #f9f9f9;
     }
     .rc-empty-block { display:flex; flex-direction:column; align-items:center; gap:9px; max-width:240px; text-align:center; }
     .rc-empty-icon { width:34px; height:34px; color:#d1d5db; margin-bottom:2px; }
@@ -852,57 +853,107 @@
 
     /* ── Detail inner ── */
     .rc-detail-inner {
-      padding: 24px;
+      padding: 0;
       display: none;
-      background: #eef1f6;
+      background: #f9f9f9;
     }
 
-    /* ── Header — Salesforce Highlights Panel ── */
+    /* ── Header — SLDS 2 Record Header ── */
     .rc-det-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 16px 24px;
-      margin: 0 0 24px 0;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      gap: 14px;
+      background: transparent;
+      border: none;
+      border-bottom: none;
+      padding: 16px 16px 10px 16px;
+      margin: 0;
+      box-shadow: none;
     }
 
     .rc-det-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
     .rc-det-icon.owner { background: #F4A623; }
-    .rc-det-icon.other { background: #06a59a; }
-    .rc-det-icon svg { display: block; width: 24px; height: 24px; }
+    .rc-det-icon.other { background: #0176d3; }
+    .rc-det-icon svg { width: 20px; height: 20px; color: #fff; display:block; }
 
     .rc-det-header-text { flex: 1; min-width: 0; }
 
     .rc-det-name {
-      font-size: 22px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 2px;
-      line-height: 1.2;
+      font-size: 22.5px;
+      font-weight: 600;
+      color: #181818;
+      margin-bottom: 4px;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
     }
 
-    .rc-det-sub {
+    .rc-det-subtitle {
+      display: none;
+    }
+
+    /* ── Header Badges ── */
+    .rc-det-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .rc-det-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f3f3f3;
+      color: #5f5f5f;
+      font-size: 12.5px;
+      font-weight: 400;
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: none;
+      font-family: var(--font);
+    }
+    .rc-det-badge.success {
+      background: #eaf5ea;
+      color: #0e7a0e;
+    }
+    .rc-det-badge-dot { display: none; }
+    .rc-det-badge-dot.success { background: #0176d3; }
+
+    /* ── Header Actions ── */
+    .rc-det-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rc-det-action-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0176d3;
+      color: #ffffff;
+      border: 1px solid #0176d3;
+      font-family: var(--font);
       font-size: 14px;
-      color: #475569;
-      font-weight: 500;
-      line-height: 1.4;
-      margin-bottom: 0;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 100px !important;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .12s ease;
     }
-
-    /* ── View Full Record button ── */
-    .rc-det-action-btn {
+    .rc-det-action-primary:hover { background: #015ba7; border-color: #015ba7; }
+    .rc-det-action-primary svg { color: #fff; width: 14px; height: 14px; }
+    
+    .rc-det-action-ghost {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -910,46 +961,131 @@
       color: #0176d3;
       border: 1px solid #dddbda;
       font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 100px !important;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .12s ease;
+    }
+    .rc-det-action-ghost:hover { background: #f3f3f3; }
+
+    /* ── Write Update Popover ── */
+    .rc-update-wrap { position: relative; }
+    
+    .rc-update-module {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 380px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      z-index: 100;
+    }
+    .rc-update-module.active {
+      display: block;
+      animation: rcPopoverFadeIn .2s ease-out forwards;
+    }
+    @keyframes rcPopoverFadeIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .rc-update-input {
+      width: 100%;
+      min-height: 90px;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      font-family: var(--font);
+      font-size: 13px;
+      color: #0f172a;
+      resize: vertical;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .rc-update-input:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: #0176d3;
+      box-shadow: 0 0 0 2px rgba(1, 118, 211, 0.2);
+    }
+    .rc-update-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .rc-update-commit {
+      background: #0176d3;
+      color: #ffffff;
+      border: none;
+      font-family: var(--font);
       font-size: 13px;
       font-weight: 500;
       padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      text-decoration: none;
-      transition: background .12s ease;
     }
-    .rc-det-action-btn:hover { background: #f3f3f3; }
-    .rc-det-action-btn:active { background: #e5e5e5; }
-    
-    .rc-section-header {
-      background: #f8f9fb;
-      padding: 12px 16px;
-      margin: 0;
-      border-bottom: 1px solid #eef1f6;
+    .rc-update-commit:hover { background: #015ba7; }
+    .rc-update-cancel {
+      background: transparent;
+      color: #475569;
+      border: none;
+      font-family: var(--font);
       font-size: 13px;
-      font-weight: 700;
-      color: #1e293b;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      cursor: default;
-      border-radius: 8px 8px 0 0;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .rc-update-cancel:hover { background: #e2e8f0; }
+    .rc-section-header {
+      background: #f3f3f3;
+      padding: 8px 14px;
+      margin: 0 0 8px 0;
+      border: none;
+      border-bottom: none;
+      border-radius: 6px;
       display: flex;
       align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
     }
+    .rc-chevron-icon {
+      width: 14px;
+      height: 14px;
+      color: #706e6b;
+      transition: transform 0.18s ease;
+      flex-shrink: 0;
+    }
+    .rc-section-header::before { display: none; }
 
     .rc-section-header-title {
-      font-size: 13px;
-      font-weight: 700;
-      font-family: "Inter", var(--font);
-      color: #1e293b;
+      font-size: 14.6px;
+      font-weight: 500;
+      font-family: var(--font);
+      color: #032D60;
       line-height: 1.2;
       flex: 1;
     }
 
+    .rc-section-block.collapsed .rc-section-body {
+      display: none;
+    }
+    .rc-section-block.collapsed .rc-chevron-icon {
+      transform: rotate(-90deg);
+    }
+
     .rc-section-body {
-      padding: 16px 20px;
+      padding: 4px 16px 4px 16px;
+      background: transparent;
     }
 
     /* ── Record Readiness ── */
@@ -977,65 +1113,224 @@
 
     /* ── Record body ── */
     .rc-record-body {
-      padding: 0;
+      padding: 8px 16px 16px 16px;
+      overflow: visible;
+      background: #f9f9f9;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) {
+      .rc-record-body { flex-direction: column; }
+    }
+    .rc-record-left-panel {
+      flex: 1.65;
+      min-width: 0;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      padding: 16px 16px 6px 16px;
+    }
+    .rc-record-right-panel {
+      flex: 1;
+      min-width: 280px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e5e5e5;
+      padding: 16px 20px 24px 20px;
+    }
+
+    /* ── Activity Widget ── */
+    .rc-aw-pill-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .rc-aw-pill {
+      display: flex;
+      height: 30px;
+      border: 1px solid #747474;
+      border-radius: 15px;
       overflow: hidden;
-      background: transparent;
+      background: #ffffff;
+    }
+    .rc-aw-pill-left {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      border-right: 1px solid #747474;
+      cursor: pointer;
+    }
+    .rc-aw-pill-left:hover { background: #f3f3f3; }
+    
+    .rc-aw-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .rc-aw-circle.email { background: #9faab5; }
+    .rc-aw-circle.event { background: #d37cf2; }
+    .rc-aw-circle.call { background: #00b0ab; }
+    .rc-aw-circle.task { background: #4bca81; }
+    .rc-aw-circle svg { width: 11px; height: 11px; fill: currentColor; }
+    
+    .rc-aw-pill-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      cursor: pointer;
+      color: #0176d3;
+    }
+    .rc-aw-pill-right:hover { background: #f3f3f3; }
+    .rc-aw-pill-right svg { width: 12px; height: 12px; fill: currentColor; }
+    .rc-aw-pill-right.disabled {
+      background: #ecebea;
+      color: #747474;
+      cursor: default;
+    }
+    
+    .rc-aw-filters-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .rc-aw-filters-text {
+      color: #706e6b;
+      font-size: 13px;
+    }
+    .rc-aw-gear-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid #747474;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0176d3;
+      cursor: pointer;
+    }
+    .rc-aw-gear-btn:hover { background: #f3f3f3; }
+    .rc-aw-gear-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    
+    .rc-aw-actions-row {
+      text-align: right;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0176d3;
+      margin-bottom: 24px;
+    }
+    .rc-aw-actions-row span { cursor: pointer; }
+    .rc-aw-actions-row span:hover { text-decoration: underline; }
+    .rc-aw-dot { margin: 0 4px; color: #706e6b; font-weight: 400; display: inline-block; pointer-events: none; }
+    
+    .rc-aw-accordion-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f3f3;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 400;
+      color: #032D60;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    .rc-aw-accordion-header svg {
+      width: 14px;
+      height: 14px;
+      color: #032D60;
+    }
+    
+    .rc-aw-empty {
+      text-align: center;
+      font-size: 13px;
+      color: #706e6b;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      padding: 0 10px;
+    }
+    
+    .rc-aw-divider {
+      height: 1px;
+      background: #dddbda;
+      margin-bottom: 16px;
+    }
+    .rc-aw-past {
+      text-align: center;
+      font-size: 13px;
+      color: #032D60;
+      line-height: 1.5;
     }
 
     /* ── Section block ── */
     .rc-section-block {
-      margin-bottom: 16px;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-      overflow: hidden;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
+      margin-bottom: 10px;
     }
 
-    /* ── Strict 2-column grid ── */
+    /* ── SLDS 2 view-mode 2-col grid ── */
+    /* Two independent columns — NO connecting lines of any kind */
     .rc-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 32px;
-      row-gap: 8px;
-      margin-bottom: 0;
-      align-items: start;
+      display: flex;
+      margin: 0;
+      align-items: flex-start;
+      border-bottom: none;
     }
 
     .rc-field { 
       min-width: 0; 
-      padding: 6px 0 6px 0;
-      border-bottom: 1px solid #eef1f6;
+      flex: 1;
+      padding: 6px 16px 10px 16px;
+      border: none;
       display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 12px;
+      flex-direction: column;
+      position: relative;
+      transition: background .12s ease;
     }
+    .rc-field-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e5e5e5;
+      flex: 1;
+    }
+    .rc-field:hover { background: #fafafa; }
+    .rc-field:hover .rc-edit-icon { opacity: 1; }
 
-    /* Field label */
+    /* Field label — SLDS 2 bold label style (per native screenshots) */
     .rc-label {
       font-size: 12.5px;
-      font-weight: 400;
+      font-weight: 700;
       font-family: var(--font);
-      color: #64748b;
-      margin-bottom: 0;
-      line-height: 1.4;
+      color: #3e3e3c;
+      line-height: 1.3;
       display: block;
-      flex: 0 0 140px;
-      flex-shrink: 0;
-      padding-top: 1px;
+      margin-bottom: 1px;
     }
 
-    /* Base value */
+    /* Base value — SLDS 2 slds-form-element__static */
     .rc-value {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 400;
-      color: #0f172a;
+      color: #181818;
       line-height: 1.4;
       display: block;
-      min-height: 20px;
-      flex: 1;
-      text-align: left;
+      min-height: 18px;
     }
 
     /* Key fields: Lead Status, Seller Motivation */
@@ -1044,30 +1339,46 @@
       font-weight: 600;
       color: #111827;
     }
-
-    /* Offer Amount — formatted, not bold */
-    .rc-value.offer {
-      font-size: 15px;
-      font-weight: 400;
-      color: #111827;
+    
+    /* ── Inline Edit ── */
+    .rc-editable-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 8px;
     }
+    .rc-edit-icon {
+      opacity: 0;
+      color: #9ca3af;
+      width: 11px;
+      height: 11px;
+      cursor: pointer;
+      transition: opacity .12s ease, color .12s ease;
+      flex-shrink: 0;
+      position: absolute;
+      right: 12px;
+      top: 14px;
+    }
+    .rc-field:hover .rc-edit-icon { opacity: 1; }
+    .rc-edit-icon:hover { color: #0176d3; }
 
     .rc-value.link { color: var(--blue); cursor: pointer; font-weight: 500; }
     .rc-value.link:hover { text-decoration: underline; }
     .rc-value.muted { color: #c2c8d0 !important; font-weight: 400 !important; font-size: 13px; }
     .rc-value.overdue { color: #111827 !important; font-weight: 700 !important; }
     .rc-status-row { display:flex; align-items:center; gap:6px; line-height:1.35; }
-    .rc-sdot { width:7px; height:7px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
-    .rc-sdot.on { background:var(--blue); }
+    .rc-sdot { width:8px; height:8px; border-radius:50%; background:#c8d0da; flex-shrink:0; }
+    .rc-sdot.on { background:#0176d3; }
     .rc-star { color:#5f6b7a; margin-right:3px; }
     .rc-value.multiline { white-space:normal; line-height:1.5; font-size:13.5px; }
     .rc-crown { display:inline-flex; align-items:center; gap:5px; color:#1f1f1f; font-size:14.5px; font-weight:500; }
     .rc-crown svg { width:15px; height:15px; color:#d4a017; flex-shrink:0; }
-    .rc-phone-row { display:flex; align-items:center; gap:0; font-size:14.5px; font-weight:500; color:#1f1f1f; }
+    .rc-phone-row { display:flex; align-items:center; gap:0; font-size:13px; font-weight:400; color:#181818; }
     .rc-phone-row .rc-ph-num { color:var(--blue); cursor:pointer; }
     .rc-phone-row .rc-ph-num:hover { text-decoration:underline; }
     .rc-phone-row .rc-ph-dot { margin:0 6px; color:#d1d5db; }
-    .rc-phone-row .rc-ph-status { color:#5f6b7a; font-weight:400; font-size:13.5px; }
+    .rc-phone-row .rc-ph-status { color:#706e6b; font-weight:400; font-size:12px; }
     .rc-ph-disp-wrapper { display:inline-block; position:relative; }
     .rc-ph-disp-btn { display:inline-flex; align-items:center; gap:4px; background:none; border:0; padding:0; cursor:pointer; font-family:var(--font); font-size:13px; font-weight:400; color:#5f6b7a; }
     .rc-ph-disp-btn svg { width:10px; height:10px; color:#9ca3af; }
@@ -1084,17 +1395,17 @@
     .rc-det-signals .rc-signals-check { width:12px; height:12px; }
     .rc-list-item-right { display:none; }
 
-    /* Interactive status dropdown */
+    /* Interactive status dropdown — Cosmos: borderless trigger */
     .rc-status-wrapper { position:relative; display:inline-block; }
     .rc-status-btn {
       display:inline-flex; align-items:center; gap:5px;
-      background:none; border:1px solid transparent; border-radius:4px;
-      padding:2px 6px 2px 2px; cursor:pointer;
-      font-family:var(--font); font-size:14px; font-weight:400; color:#1f1f1f;
-      transition:border-color .12s;
+      background:transparent; border:none; border-radius:0;
+      padding:0; cursor:pointer;
+      font-family:var(--font); font-size:13px; font-weight:400; color:#181818;
+      transition:color .12s;
     }
-    .rc-status-btn:hover { border-color:#dbe0e6; background:rgba(0,0,0,.02); }
-    .rc-status-btn svg { width:12px; height:12px; color:#9ca3af; }
+    .rc-status-btn:hover { color:#0176d3; }
+    .rc-status-btn svg { width:11px; height:11px; color:#9ca3af; flex-shrink:0; }
     .rc-status-dropdown {
       position:absolute; top:calc(100% + 4px); left:0; z-index:50;
       background:#fff; border:1px solid #e5e7eb; border-radius:6px;
@@ -1318,29 +1629,29 @@
             <div style="padding: 0 16px 22px 30px;" id="rcSectionWrapper">
 
               <!-- Panel shell -->
-              <div class="panel" data-open="false" id="rcPanel" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;width:100%;">
+              <div class="panel slds-card-mimic" data-open="true" id="rcPanel" style="border:1px solid #dddbda;border-radius:4px;box-shadow:0 2px 2px 0 rgba(0,0,0,0.1);overflow:hidden;width:100%;background:#ffffff;">
 
-                <!-- Collapse toggle header -->
-                <div class="rc-toggle" id="rcToggle">
+                <!-- SLDS Card Header -->
+                <div class="rc-toggle" id="rcToggle" style="padding: 12px 16px; border-bottom: 1px solid #dddbda; background: #f3f3f3; cursor: default;">
                   <div class="rc-toggle-left">
-                    <div class="rc-obj-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="9" cy="7" r="3.5" stroke="currentColor" stroke-width="2"/>
-                        <path d="M3 21v-1.5A3.5 3.5 0 0 1 6.5 16h5A3.5 3.5 0 0 1 15 19.5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M21 21v-1.5a3.5 3.5 0 0 0-2.5-3.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <div class="rc-obj-icon" aria-hidden="true" style="background: #9050e9; border-radius: 4px; width: 32px; height: 32px;">
+                      <svg viewBox="0 0 24 24" fill="none" style="width: 20px; height: 20px;">
+                        <circle cx="9" cy="7" r="3.5" stroke="#fff" stroke-width="2"/>
+                        <path d="M3 21v-1.5A3.5 3.5 0 0 1 6.5 16h5A3.5 3.5 0 0 1 15 19.5V21" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M21 21v-1.5a3.5 3.5 0 0 0-2.5-3.36" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
                       </svg>
                     </div>
                     <div class="rc-toggle-stack">
-                      <span class="rc-toggle-title">
+                      <span class="rc-toggle-title" style="font-size: 16px; font-weight: 700; color: #181818;">
                         Related Contacts
-                        <svg class="rc-chev" viewBox="0 0 24 24" fill="none">
-                          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
                       </span>
                     </div>
                   </div>
-                  <span class="rc-toggle-meta" id="rcMeta">—</span>
+                  <!-- Standard SLDS Card Action Dropdown (visual only) -->
+                  <div style="width: 32px; height: 32px; border: 1px solid #dddbda; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #ffffff; color: #0176d3;">
+                     <svg viewBox="0 0 24 24" fill="none" style="width: 14px; height: 14px;"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
                 </div>
 
                 <!-- Body (hidden when collapsed) -->
@@ -2228,16 +2539,16 @@
       const isEmpty = !displayVal || displayVal === '—';
       const cls = (flagged && isEmpty) ? 'rc-missing-flag' : (extraClass || '');
       const label = isEmpty ? '—' : displayVal;
-      return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
-        <span class="rc-value ${cls}">${escapeHtml(label)}</span>${RC_PENCIL_SVG}
+      return `<div class="rc-editable-wrap" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
+        <span class="rc-value ${cls}">${escapeHtml(label)}</span><svg class="rc-edit-icon" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>`;
     }
 
     function rcMissingEl(field){
       const cfg = RC_FIELD_EDIT_CFG[field] || {type:'text'};
       const optsAttr = cfg.opts ? `data-opts="${cfg.opts.join('|')}"` : '';
-      return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
-        <span class="rc-missing-text">—</span>${RC_PENCIL_SVG}
+      return `<div class="rc-editable-wrap" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
+        <span class="rc-missing-text">—</span><svg class="rc-edit-icon" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>`;
     }
 
@@ -2355,78 +2666,160 @@
       inner.style.display = "block";
       const allFilled = rcOwnerIsQualifying(c) && rcOwnerFields(c).filter(v=>!rcHasVal(v)).length === 0;
       const bannerActive = rcOwnerIsQualifying(c);
-      const signalsBadge = allFilled ? ` <span class="rc-det-signals"><svg class="rc-signals-check" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Signals Identified</span>` : "";
-      const subtitle = rcHasVal(c.ownership) ? `${escapeHtml(c.relation)} · ${escapeHtml(c.ownership)} ownership${signalsBadge}` : `${escapeHtml(c.relation)}${signalsBadge}`;
+      
+      const ownBadge = rcHasVal(c.ownership) ? `<div class="rc-det-badge"><div class="rc-det-badge-dot"></div>${escapeHtml(c.ownership)} Ownership</div>` : '';
+      // Intelligence Signals Mock
+      const isOverdue = c.overdue;
+      const isHot = (c.status === 'Interested In Selling' || c.status === 'Negotiations/Review') && rcHasVal(c.ownership);
+      const isStale = !isOverdue && !isHot && Math.random() > 0.7; // Mock stale
+      
+      let intelBadge = '';
+      if (isOverdue) intelBadge = `<div class="rc-det-badge">Overdue</div>`;
+      else if (isHot) intelBadge = `<div class="rc-det-badge">Hot Lead</div>`;
+      else if (isStale) intelBadge = `<div class="rc-det-badge">Stale (7+ Days)</div>`;
+      else if (allFilled) intelBadge = `<div class="rc-det-badge success">Signals Identified</div>`;
+
+      const relBadge = c.relation ? `<div class="rc-det-badge">${escapeHtml(c.relation)}</div>` : '';
 
       inner.innerHTML = `
-        <div class="rc-det-header">
-          <div class="rc-det-icon owner">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>
+        <div class="rc-det-header" style="position:relative; z-index:10; flex-wrap:wrap;">
+          <div style="display:flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1; min-width: 0;">
+              <div class="rc-det-icon owner">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>
+              </div>
+              <div class="rc-det-header-text">
+                <div class="rc-det-name">${escapeHtml(c.name)}</div>
+                <div class="rc-det-badges">
+                  ${intelBadge}${relBadge}${ownBadge}
+                </div>
+              </div>
+            </div>
+            
+            <div class="rc-det-header-actions">
+              ${c.phone ? `<button class="rc-det-action-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>` : ''}
+              ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-ghost">View</a>` : ''}
+              <div class="rc-update-wrap">
+                <button class="rc-det-action-primary" onclick="this.nextElementSibling.classList.toggle('active')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Write Update
+                </button>
+                <div class="rc-update-module">
+                  <textarea class="rc-update-input" placeholder="Log call outcome, motivation, objections..."></textarea>
+                  <div class="rc-update-actions">
+                    <button class="rc-update-cancel" onclick="this.closest('.rc-update-module').classList.remove('active')">Cancel</button>
+                    <button class="rc-update-commit" onclick="this.closest('.rc-update-module').classList.remove('active'); alert('Update committed successfully.')">Commit Update</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rc-det-header-text">
-            <div class="rc-det-name">${escapeHtml(c.name)}</div>
-            <div class="rc-det-sub">${subtitle}</div>
-          </div>
-          ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-btn">View Full Record</a>` : ''}
         </div>
 
         ${rcRecordFlagHtml(c, true)}
 
         <div class="rc-record-body">
-
+          <div class="rc-record-left-panel">
           <div class="rc-section-block">
-            <div class="rc-section-header">
+            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
+              <svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="rc-section-header-title">Lead Details</span>
             </div>
             <div class="rc-section-body">
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Lead Status</span>
                   <div class="rc-value">${rcStatusFieldHtml(c)}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Offer Amount</span>
-                  <div class="rc-value offer">${rcHasVal(c.offer) ? (()=>{ const n=parseFloat(String(c.offer).replace(/[^0-9.]/g,'')); return isNaN(n)?escapeHtml(c.offer):'$'+Math.round(n).toLocaleString('en-US'); })() : '<span style="color:#b8bfca;font-weight:400">—</span>'}</div>
+                  <div class="rc-value">${rcHasVal(c.offer) ? (()=>{ const n=parseFloat(String(c.offer).replace(/[^0-9.]/g,'')); return isNaN(n)?escapeHtml(c.offer):'$'+Math.round(n).toLocaleString('en-US'); })() : '<span style="color:#b8bfca;font-weight:400">—</span>'}</div>
+                  </div>
                 </div>
               </div>
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Seller Motivation</span>
                   <div class="rc-value">${rcStyledDropdown(c.sellerMotivation,["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'],'sellerMotivation','—',true,bannerActive&&!rcHasVal(c.sellerMotivation))}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Owner Status</span>
                   <div class="rc-value">${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—',false,bannerActive&&!rcHasVal(c.ownerStatus))}</div>
+                  </div>
                 </div>
               </div>
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Follow-Up Date</span>
                   <div class="rc-value">${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'', bannerActive&&!rcHasVal(c.followUp))}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Ownership %</span>
                   <div class="rc-value">${rcEditableEl('ownership', rcHasVal(c.ownership)?c.ownership:'—','',bannerActive&&!rcHasVal(c.ownership))}</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="rc-section-block">
-            <div class="rc-section-header">
+            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
+              <svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="rc-section-header-title">Contact Info</span>
             </div>
             <div class="rc-section-body">
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Relationship</span>
                   <div class="rc-value">${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Phone</span>
                   <div class="rc-value">${rcEditableEl('phone', rcHasVal(c.phone)?c.phone:'—', rcHasVal(c.phone)?'link':'')}</div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+          </div>
+          
+          <div class="rc-record-right-panel">
+            <div class="rc-aw-pill-row">
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle email"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle event"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle call"><svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.03 21c.76 0 .98-.66.98-1.21v-3.42c0-.54-.45-.99-.99-.99z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle task"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div></div><div class="rc-aw-pill-right disabled"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+            </div>
+            <div class="rc-aw-filters-row">
+              <div class="rc-aw-filters-text">Filters: All time <span class="rc-aw-dot">•</span> All activities <span class="rc-aw-dot">•</span> All types</div>
+              <div class="rc-aw-gear-btn"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg></div>
+            </div>
+            <div class="rc-aw-actions-row">
+              <span>Refresh</span> <span class="rc-aw-dot">•</span> <span>Expand All</span>
+            </div>
+            <div class="rc-aw-accordion-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-90)"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              Upcoming &amp; Overdue
+            </div>
+            <div class="rc-aw-empty">
+              No activities to show.<br/>
+              Get started by sending an email, scheduling a task, and more.
+            </div>
+            <div class="rc-aw-divider"></div>
+            <div class="rc-aw-past">
+              No past activity. Past meetings and tasks marked as done show up here.
             </div>
           </div>
 
@@ -2439,85 +2832,159 @@
       const inner = document.getElementById(innerId);
       inner.style.display = "block";
 
+      const relBadge = c.relation ? `<div class="rc-det-badge">${escapeHtml(c.relation)}</div>` : '';
+
       inner.innerHTML = `
-        <div class="rc-det-header">
-          <div class="rc-det-icon other">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M460 90H60c-27 0-50 22-50 50v240c0 27 23 50 50 50h400c28 0 50-22 50-50V140c0-28-22-50-50-50zM248 372H104c-16 0-28-17-28-34 1-25 27-40 54-52 19-8 22-16 22-24s-5-16-12-22a55 55 0 0 1-17-41c0-32 19-58 52-58s52 27 52 58c0 17-6 32-17 41-7 6-12 13-12 22 0 8 2 16 22 23 27 12 53 28 54 53 3 17-10 34-26 34zm195-58c0 9-8 17-17 17h-75c-9 0-17-7-17-17v-25c0-9 8-17 17-17h75c9 0 17 7 17 17zm0-91c0 9-8 17-17 17H302c-9 0-17-7-17-17v-25c0-9 8-17 17-17h125c9 0 17 7 17 17v25z"/></svg>
+        <div class="rc-det-header" style="position:relative; z-index:10; flex-wrap:wrap;">
+          <div style="display:flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1; min-width: 0;">
+              <div class="rc-det-icon other">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="rc-det-header-text">
+                <div class="rc-det-name">${escapeHtml(c.name)}</div>
+                <div class="rc-det-badges">
+                  ${relBadge}
+                </div>
+              </div>
+            </div>
+            
+            <div class="rc-det-header-actions">
+              ${c.phone ? `<button class="rc-det-action-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>` : ''}
+              ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-ghost">View</a>` : ''}
+              <div class="rc-update-wrap">
+                <button class="rc-det-action-primary" onclick="this.nextElementSibling.classList.toggle('active')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Write Update
+                </button>
+                <div class="rc-update-module">
+                  <textarea class="rc-update-input" placeholder="Log call outcome, motivation, objections..."></textarea>
+                  <div class="rc-update-actions">
+                    <button class="rc-update-cancel" onclick="this.closest('.rc-update-module').classList.remove('active')">Cancel</button>
+                    <button class="rc-update-commit" onclick="this.closest('.rc-update-module').classList.remove('active'); alert('Update committed successfully.')">Commit Update</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rc-det-header-text">
-            <div class="rc-det-name">${escapeHtml(c.name)}</div>
-            <div class="rc-det-sub">${escapeHtml(c.relation)}</div>
-          </div>
-          ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-btn">View Full Record</a>` : ''}
         </div>
 
         ${rcRecordFlagHtml(c, false)}
 
         <div class="rc-record-body">
-
+          <div class="rc-record-left-panel">
           <div class="rc-section-block">
-            <div class="rc-section-header">
+            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
+              <svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="rc-section-header-title">Lead Details</span>
             </div>
             <div class="rc-section-body">
               <div class="rc-row">
                 <div class="rc-field rc-field--key">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Lead Status</span>
                   <div class="rc-value">${rcStatusFieldHtml(c)}</div>
+                  </div>
                 </div>
                 <div class="rc-field rc-field--key">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Contact Outcome</span>
                   <div class="rc-value">${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
+                  </div>
                 </div>
               </div>
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Owner Status</span>
                   <div class="rc-value">${rcStyledDropdown(c.ownerStatus,['Yes','Possibly','No'],'ownerStatus','—')}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Follow-Up Date</span>
                   <div class="rc-value">${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'')}</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="rc-section-block" id="sec-other-contact-${Math.random().toString(36).slice(2,7)}">
-            <div class="rc-section-header">
+            <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
+              <svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               <span class="rc-section-header-title">Contact Info</span>
             </div>
             <div class="rc-section-body">
               <!-- Row 1: Relationship | Address -->
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Relationship</span>
                   <div class="rc-value">${rcEditableEl('relation', rcHasVal(c.relation)?c.relation:'Unknown Relations', rcHasVal(c.relation)?'':'unknown-rel')}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Address</span>
                   <div class="rc-value">${rcEditableEl('address', (c.address&&c.address!=='Unknown'&&c.address!=='—')?c.address:'—','multiline')}</div>
+                  </div>
                 </div>
               </div>
               <!-- Row 2: Phone 1 | Phone 2 -->
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Phone 1</span>
                   <div class="rc-value">${rcPhoneRowHtml(c.phone,c.phoneStatus,'phoneStatus')}</div>
+                  </div>
                 </div>
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Phone 2</span>
                   <div class="rc-value">${rcPhoneRowHtml(c.phone2,c.phone2Status,'phone2Status')}</div>
+                  </div>
                 </div>
               </div>
               <!-- Row 3: Phone 3 | empty -->
               <div class="rc-row">
                 <div class="rc-field">
+                  <div class="rc-field-inner">
                   <span class="rc-label">Phone 3</span>
                   <div class="rc-value">${rcPhoneRowHtml(c.phone3,c.phone3Status,'phone3Status')}</div>
+                  </div>
                 </div>
                 <div class="rc-field"></div>
               </div>
+            </div>
+          </div>
+          </div>
+          
+          <div class="rc-record-right-panel">
+            <div class="rc-aw-pill-row">
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle email"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle event"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle call"><svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.03 21c.76 0 .98-.66.98-1.21v-3.42c0-.54-.45-.99-.99-.99z"/></svg></div></div><div class="rc-aw-pill-right"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+              <div class="rc-aw-pill"><div class="rc-aw-pill-left"><div class="rc-aw-circle task"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div></div><div class="rc-aw-pill-right disabled"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div></div>
+            </div>
+            <div class="rc-aw-filters-row">
+              <div class="rc-aw-filters-text">Filters: All time <span class="rc-aw-dot">•</span> All activities <span class="rc-aw-dot">•</span> All types</div>
+              <div class="rc-aw-gear-btn"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg></div>
+            </div>
+            <div class="rc-aw-actions-row">
+              <span>Refresh</span> <span class="rc-aw-dot">•</span> <span>Expand All</span>
+            </div>
+            <div class="rc-aw-accordion-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-90)"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              Upcoming &amp; Overdue
+            </div>
+            <div class="rc-aw-empty">
+              No activities to show.<br/>
+              Get started by sending an email, scheduling a task, and more.
+            </div>
+            <div class="rc-aw-divider"></div>
+            <div class="rc-aw-past">
+              No past activity. Past meetings and tasks marked as done show up here.
             </div>
           </div>
 
@@ -2531,10 +2998,20 @@
       const sorted = rcSortByStatus(data);
       sorted.forEach((c)=>{
         const isClosed = c.status === 'Closed';
+        let initials = "?";
+        if (c.name) {
+          const parts = c.name.trim().split(/\s+/);
+          if (parts.length > 1) initials = parts[0][0] + parts[parts.length - 1][0];
+          else initials = parts[0].substring(0, 2);
+          initials = initials.toUpperCase();
+        }
         const div = document.createElement("div");
         div.className = "rc-list-item";
         div.dataset.i = data.indexOf(c);
         div.innerHTML = `
+          <div class="rc-item-avatar">
+            ${escapeHtml(initials)}
+          </div>
           <div class="rc-item-body">
             <div class="rc-item-name-row">
               <span class="rc-item-name">${escapeHtml(c.name)}</span>
@@ -2644,10 +3121,11 @@
       });
     });
 
-    document.getElementById("rcToggle").addEventListener("click",()=>{
-      const p = document.getElementById("rcPanel");
-      p.dataset.open = p.dataset.open === "true" ? "false" : "true";
-    });
+    // Removed rcToggle click event so the SLDS Card stays permanently open
+    // document.getElementById("rcToggle").addEventListener("click",()=>{
+    //   const p = document.getElementById("rcPanel");
+    //   p.dataset.open = p.dataset.open === "true" ? "false" : "true";
+    // });
 
     document.addEventListener("click", e => {
       if(!e.target.closest(".rc-status-wrapper") && !e.target.closest(".rc-ph-disp-wrapper")){
@@ -3437,12 +3915,11 @@
       document.getElementById('trayAddRow').style.display='flex';
 
       list.innerHTML = filtered.map(function(t){
-        var tid    = t.id;
+        var i      = trayTasks.indexOf(t);
         var rowCls = 'tray-task-row'+(t.done?' done-row':'')+(isOverdue(t)?' overdue-row':'')+(isDueToday(t)?' today-row':'');
         var starFill  = t.starred ? '#f59e0b' : 'none';
         var starStroke = t.starred ? '#f59e0b' : '#c8d0db';
         var isDone = t.done;
-        var safeTid = String(tid).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
         /* Line 2 — contact desc with dark blue names */
         var contactDisplay = '';
@@ -3458,28 +3935,28 @@
         var dateLine = formatDueLine(t);
 
         /* Right action buttons: check ✓ | flag | × delete */
-        var checkBtn = '<button class="tray-act-btn'+(isDone?' done-btn':'')+'" onclick="event.stopPropagation();toggleTrayTask(\''+safeTid+'\')" title="Complete">'
+        var checkBtn = '<button class="tray-act-btn'+(isDone?' done-btn':'')+'" onclick="event.stopPropagation();toggleTrayTask('+i+')" title="Complete">'
           +(isDone
             ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             : '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>')
           +'</button>';
-        var flagBtn = '<button class="tray-act-flag'+(t.starred?' flagged':'')+'" onclick="event.stopPropagation();starTrayTask(\''+safeTid+'\')" title="Flag">'
+        var flagBtn = '<button class="tray-act-flag'+(t.starred?' flagged':'')+'" onclick="event.stopPropagation();starTrayTask('+i+')" title="Flag">'
           +'<svg width="10" height="10" viewBox="0 0 24 24" fill="'+(t.starred?'#fff':'none')+'" stroke="'+(t.starred?'#fff':'currentColor')+'" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'
           +'</button>';
-        var delBtn = '<button class="tray-act-chevron" onclick="event.stopPropagation();deleteTrayTask(\''+safeTid+'\')" title="Delete">'
+        var delBtn = '<button class="tray-act-chevron" onclick="event.stopPropagation();deleteTrayTask('+i+')" title="Delete">'
           +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
           +'</button>';
 
-        var editBtn = '<button class="tray-act-edit" onclick="event.stopPropagation();editTrayTask(\''+safeTid+'\')" title="Edit">'
+        var editBtn = '<button class="tray-act-edit" onclick="event.stopPropagation();editTrayTask('+i+')" title="Edit">'
           +'<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
           +'</button>';
 
         return '<div class="'+rowCls+'">'
-          +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask(\''+safeTid+'\')" title="Star">'
+          +'<button class="tray-star-btn" onclick="event.stopPropagation();starTrayTask('+i+')" title="Star">'
           +'<svg width="13" height="13" viewBox="0 0 24 24" fill="'+starFill+'" stroke="'+starStroke+'" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
           +'</button>'
           +'<div class="tray-task-body">'
-          +'<div><span class="tray-task-title-link'+(isDone?' done':'')+'" onmouseenter="trayTooltipTimer=setTimeout(function(){showTrayTooltipForRow(this,\''+safeTid+'\')}.bind(this),350)" onmouseleave="hideTrayTooltip()">'+escHtml(t.title)+'</span></div>'
+          +'<div><span class="tray-task-title-link'+(isDone?' done':'')+'" onmouseenter="trayTooltipTimer=setTimeout(function(){showTrayTooltipForRow(this,'+i+')}.bind(this),350)" onmouseleave="hideTrayTooltip()">'+escHtml(t.title)+'</span></div>'
           +descLine
           +dateLine
           +'</div>'
@@ -3488,24 +3965,18 @@
       }).join('');
     }
 
-    function toggleTrayTask(tid){
-      var t = trayTasks.find(function(x){ return x.id == tid; });
-      if(!t) return;
-      t.done = !t.done;
+    function toggleTrayTask(i){
+      trayTasks[i].done = !trayTasks[i].done;
       renderTrayTasks();
       saveTasksToMonday();
     }
-    function starTrayTask(tid){
-      var t = trayTasks.find(function(x){ return x.id == tid; });
-      if(!t) return;
-      t.starred = !t.starred;
+    function starTrayTask(i){
+      trayTasks[i].starred = !trayTasks[i].starred;
       renderTrayTasks();
       saveTasksToMonday();
     }
-    function deleteTrayTask(tid){
-      var idx = trayTasks.findIndex(function(x){ return x.id == tid; });
-      if(idx === -1) return;
-      trayTasks.splice(idx, 1);
+    function deleteTrayTask(i){
+      trayTasks.splice(i, 1);
       renderTrayTasks();
       saveTasksToMonday();
     }
@@ -3543,9 +4014,8 @@
       } catch(err) { console.warn('Task save error:', err); }
     }
 
-    function editTrayTask(tid){
-      var t = trayTasks.find(function(x){ return x.id == tid; });
-      if(!t) return;
+    function editTrayTask(i){
+      var t = trayTasks[i];
       // Populate form fields with existing task data
       document.getElementById('trayTaskInput').value    = t.title || '';
       document.getElementById('trayDueInput').value     = t.due   || '';
@@ -3561,11 +4031,11 @@
       var saveBtn = document.querySelector('#trayNewForm .tray-form-save');
       saveBtn.onclick = function(){
         if(!document.getElementById('trayTaskInput').value.trim()) return;
-        t.title    = document.getElementById('trayTaskInput').value.trim();
-        t.due      = document.getElementById('trayDueInput').value || null;
-        t.priority = document.getElementById('trayPriorityInput').value;
-        t.contact  = traySelectedContacts.length ? traySelectedContacts.slice() : null;
-        t.notes    = document.getElementById('trayNotesInput').value.trim() || null;
+        trayTasks[i].title    = document.getElementById('trayTaskInput').value.trim();
+        trayTasks[i].due      = document.getElementById('trayDueInput').value || null;
+        trayTasks[i].priority = document.getElementById('trayPriorityInput').value;
+        trayTasks[i].contact  = traySelectedContacts.length ? traySelectedContacts.slice() : null;
+        trayTasks[i].notes    = document.getElementById('trayNotesInput').value.trim() || null;
         renderTrayTasks();
         hideTrayForm();
         saveTasksToMonday();
@@ -3687,9 +4157,9 @@
     var trayTooltipEl=null;
     var trayTooltipTimer=null;
 
-    function showTrayTooltipForRow(titleEl, taskId){
+    function showTrayTooltipForRow(titleEl, taskIdx){
       hideTrayTooltip();
-      var t = trayTasks.find(function(x){ return x.id == taskId; });
+      var t = trayTasks[taskIdx];
       if(!t) return;
       var priorityColors={high:'#dc2626',normal:'#16a34a',low:'#9ca3af'};
       var priorityLabels={high:'High',normal:'Normal',low:'Low'};
@@ -3741,6 +4211,67 @@
 
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
+    const DUMMY_RECORD_DATA = {
+      name: "BERRY BENNIE FERRELL ESTATE OF",
+      taxes_owed: "$4,500",
+      equity: "$120,000",
+      appraisal: "$250,000",
+      heirs_identified: 4,
+      heirs_contacted: 4,
+      heirs_offered: 2,
+      ownership_secured: "100%",
+      heirs_identified_status: "Complete",
+      last_contact_date: "Oct 15, 2023",
+      last_contact_days_ago: "15 days ago",
+      obituary_link: "https://example.com/obituary",
+      ancestry_link: "https://example.com/ancestry",
+      zillow_link: "https://zillow.com",
+      tax_assessor_link: "https://example.com/tax",
+      google_maps_link: "https://maps.google.com",
+      birth_date: "Jan 14, 1945",
+      death_date: "Oct 02, 2021",
+      age: "76",
+      creation_log: "Created on Sep 12, 2023",
+      last_contacted: "Oct 15, 2023",
+      days_of_inactivity: "15",
+      activity_notes: "Left voicemail regarding the property.",
+      confirmed_owners: [
+        {
+          name: "James Gordon",
+          relationship: "Son",
+          owner_status: "Yes",
+          ownership_percent: "50%",
+          lead_status: "Interested In Selling",
+          follow_up_date: "May 10, 2026",
+          offer_made: true,
+          offer_amount: "$185,000",
+          phone_1: "713-555-0192",
+          phone_1_status: "Good",
+          seller_motivation: "Financial Hardship"
+        },
+        {
+          name: "Barbara Gordon",
+          relationship: "Daughter",
+          owner_status: "Yes",
+          ownership_percent: "50%",
+          lead_status: "Contacted",
+          follow_up_date: "May 12, 2026",
+          offer_made: false,
+          phone_1: "713-555-0193",
+          phone_1_status: "Good",
+          seller_motivation: "Doesn't want involvement"
+        },
+        {
+          name: "Harvey Dent",
+          relationship: "Attorney",
+          owner_status: "No",
+          lead_status: "In Progress",
+          phone_1: "713-555-0999",
+          phone_1_status: "Good",
+          contact_outcome: "Spoke To - Has No Info"
+        }
+      ]
+    };
     if (!extractIdsFromUrl().boardId) {
       setTimeout(() => window.RecordPage.applyData(DUMMY_RECORD_DATA), 200);
     }
