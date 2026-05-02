@@ -1641,6 +1641,41 @@
     .rc-inline-cancel:hover { color:#374151; }
     .rc-inline-clear { font-size:12px; color:#e57373; background:none; border:0; cursor:pointer; font-family:var(--font); padding:0; }
     .rc-inline-clear:hover { color:#c62828; text-decoration:underline; }
+    /* ── Write Update Toast ── */
+    .rc-update-toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 99999;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+    }
+    .rc-update-toast--visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .rc-update-toast--success {
+      background: #f0faf5;
+      color: #0e7a5a;
+      border: 1px solid #c6ead9;
+    }
+    .rc-update-toast--error {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
     .rc-det-sub .rc-owner-badge {
       display:inline-block; font-size:10.5px; font-weight:600;
       color:#5f6b7a; background:#f3f4f6; border:1px solid #e2e5ea;
@@ -2715,9 +2750,9 @@
       sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'dropdown_mkzspsm2' },
       ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'color_mktsdfhd' },
       contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'], columnId:'dropdown_mkzwr0f3' },
-      phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzfhq2' },
-      phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzdvd2' },
-      phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzw44e' },
+      phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected / No Longer In Service'], columnId:'status_1_mkkzfhq2' },
+      phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected / No Longer In Service'], columnId:'status_1_mkkzdvd2' },
+      phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected / No Longer In Service'], columnId:'status_1_mkkzw44e' },
       followUp:         { type:'date',   columnId:'date_mkzt8vfa' },
       phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_mkkz9bay' },
       phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3_mkkz1y89' },
@@ -2839,7 +2874,7 @@
     function rcPhoneRowHtml(phone, status, statusField){
       const phoneField = statusField === 'phoneStatus' ? 'phone' : statusField === 'phone2Status' ? 'phone2' : 'phone3';
       if(!phone || phone === "—") return rcMissingEl(phoneField);
-      const opts = ['Correct Number','Dial NA','Wrong Number','Disconnected'];
+      const opts = ['Correct Number','Dial NA','Wrong Number','Disconnected / No Longer In Service'];
       const optHtml = opts.map(o =>
         `<button class="rc-status-opt${o===status?' current':''}" data-action="setfield" data-field="${statusField}" data-val="${o}">${o}</button>`
       ).join('');
@@ -3017,7 +3052,6 @@
   const textarea = module.querySelector('.rc-update-input');
   const note = textarea ? textarea.value.trim() : '';
   if (!note) return;
-  module.classList.remove('active');
   const panel = btn.closest('.rc-pane');
   const paneId = panel ? panel.id : '';
   const dataArr = paneId === 'pane-owners' ? rcOwners : rcOthers;
@@ -3027,8 +3061,9 @@
   const { boardId, pulseId: globalPulseId } = getRcIds();
   const contactPulseId = c ? (c.pulseId || null) : null;
   const contactBoardId = c ? (c.boardId || boardId) : boardId;
+  let success = false;
   try {
-    await fetch(SAVE_WEBHOOK, {
+    const res = await fetch(RC_CHANGE_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3041,8 +3076,19 @@
         timestamp: new Date().toISOString()
       })
     });
+    success = res.ok;
   } catch(err) { console.warn('Write Update webhook error:', err); }
   if (textarea) textarea.value = '';
+  module.classList.remove('active');
+  // Show success/failure toast
+  const toast = document.createElement('div');
+  toast.className = 'rc-update-toast' + (success ? ' rc-update-toast--success' : ' rc-update-toast--error');
+  toast.innerHTML = success
+    ? '<svg width="14" height="14" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Update saved'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Failed to save';
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.classList.add('rc-update-toast--visible'); }, 10);
+  setTimeout(() => { toast.classList.remove('rc-update-toast--visible'); setTimeout(() => toast.remove(), 300); }, 3000);
 })(this)">Commit Update</button>
                   </div>
                 </div>
@@ -3071,7 +3117,7 @@
                 <div class="rc-field">
                   <div class="rc-field-inner">
                   <span class="rc-label">Offer Amount</span>
-                  <div class="rc-value">${rcHasVal(c.offer) ? (()=>{ const n=parseFloat(String(c.offer).replace(/[^0-9.]/g,'')); return isNaN(n)?escapeHtml(c.offer):'$'+Math.round(n).toLocaleString('en-US'); })() : '<span style="color:#b8bfca;font-weight:400">—</span>'}</div>
+                  <div class="rc-value">${rcEditableEl('offer', rcHasVal(c.offer)?c.offer:'—','')}</div>
                   </div>
                 </div>
               </div>
@@ -3222,7 +3268,6 @@
   const textarea = module.querySelector('.rc-update-input');
   const note = textarea ? textarea.value.trim() : '';
   if (!note) return;
-  module.classList.remove('active');
   const panel = btn.closest('.rc-pane');
   const paneId = panel ? panel.id : '';
   const dataArr = paneId === 'pane-owners' ? rcOwners : rcOthers;
@@ -3232,8 +3277,9 @@
   const { boardId, pulseId: globalPulseId } = getRcIds();
   const contactPulseId = c ? (c.pulseId || null) : null;
   const contactBoardId = c ? (c.boardId || boardId) : boardId;
+  let success = false;
   try {
-    await fetch(SAVE_WEBHOOK, {
+    const res = await fetch(RC_CHANGE_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3246,8 +3292,19 @@
         timestamp: new Date().toISOString()
       })
     });
+    success = res.ok;
   } catch(err) { console.warn('Write Update webhook error:', err); }
   if (textarea) textarea.value = '';
+  module.classList.remove('active');
+  // Show success/failure toast
+  const toast = document.createElement('div');
+  toast.className = 'rc-update-toast' + (success ? ' rc-update-toast--success' : ' rc-update-toast--error');
+  toast.innerHTML = success
+    ? '<svg width="14" height="14" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Update saved'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Failed to save';
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.classList.add('rc-update-toast--visible'); }, 10);
+  setTimeout(() => { toast.classList.remove('rc-update-toast--visible'); setTimeout(() => toast.remove(), 300); }, 3000);
 })(this)">Commit Update</button>
                   </div>
                 </div>
@@ -4598,7 +4655,6 @@
       document.body.appendChild(div);
       trayTooltipEl=div;
 
-      /* Measure actual text width then add header chrome: icon(28) + gap(9) + padding(24) + close(16) + gap(9) + border(2) */
       var canvas = document.createElement('canvas');
       var ctx = canvas.getContext('2d');
       ctx.font = '600 13px "Salesforce Sans","Inter",system-ui,sans-serif';
@@ -4624,8 +4680,6 @@
 
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
-    // Record data is loaded via window.RecordPage.applyData(payload) called from the Make.com webhook.
-    // No dummy data in production.
   </script>
 </body>
 </html>
