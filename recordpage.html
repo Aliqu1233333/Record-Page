@@ -2712,21 +2712,21 @@
     const RC_CLOSED_CHECK = `<svg style="width:13px;height:13px;flex-shrink:0;margin-top:1px" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
     const RC_FIELD_EDIT_CFG = {
-      sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'seller_motivation' },
-      ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'owner_status' },
-      contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'], columnId:'contact_outcome' },
-      phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_1_status' },
-      phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_2_status' },
-      phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'phone_3_status' },
-      followUp:         { type:'date',   columnId:'follow_up_date' },
-      phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_1' },
-      phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_2' },
-      phone3:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3' },
-      ownership:        { type:'text',   placeholder:'e.g. 25%', columnId:'ownership_percent' },
-      relation:         { type:'text',   placeholder:'e.g. Spouse, Son...', columnId:'relationship' },
+      sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'dropdown_mkzspsm2' },
+      ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'color_mktsdfhd' },
+      contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To – Not Productive','Text Conversation','Texted – Awaiting Reply'], columnId:'dropdown_mkzwr0f3' },
+      phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzfhq2' },
+      phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzdvd2' },
+      phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected'], columnId:'status_1_mkkzw44e' },
+      followUp:         { type:'date',   columnId:'date_mkzt8vfa' },
+      phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_mkkz9bay' },
+      phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3_mkkz1y89' },
+      phone3:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_4_mkkza3e3' },
+      ownership:        { type:'text',   placeholder:'e.g. 25%', columnId:'numeric_mkztrq1s' },
+      relation:         { type:'text',   placeholder:'e.g. Spouse, Son...', columnId:'label__1' },
       address:          { type:'text',   placeholder:'Enter address', columnId:'address' },
-      offer:            { type:'text',   placeholder:'e.g. $185,000 presented', columnId:'offer_amount' },
-      status:           { type:'select', columnId:'lead_status' },
+      offer:            { type:'text',   placeholder:'e.g. $185,000 presented', columnId:'numeric_mkzwzzrk' },
+      status:           { type:'select', columnId:'status_Mjj2xjsq' },
     };
 
     function rcEditableEl(field, displayVal, extraClass, flagged){
