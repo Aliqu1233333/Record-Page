@@ -2855,6 +2855,115 @@
     }
 
     // ── Render detail: unified record card with internal sections ──────────
+    // ── Shared milestone timeline builder — sorts entries by date descending ──
+    function rcBuildTimelineRows(c) {
+      const PHONE_SVG   = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.13 12 19.79 19.79 0 0 1 1.06 3.4 2 2 0 0 1 3.05 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+      const DOLLAR_SVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+      const FLAG_SVG    = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`;
+      const NOTE_SVG    = `<svg viewBox="0 0 520 520"><path d="m240 70-17-17c-5-5-12-5-17 0L100 158l-43-42c-5-5-12-5-17 0l-17 17c-5 5-5 12 0 17l59 59c5 5 11 7 17 7s12-2 17-7L240 87c4-4 4-12 0-17zm244 114H275c-9 0-16-7-16-16v-32c0-9 7-16 16-16h209c9 0 16 7 16 16v32c0 9-7 16-16 16zm0 143H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16zm-354 0H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm0 143H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm354 0H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16z"/></svg>`;
+
+      // Build candidate entries — only include if the value exists
+      const entries = [];
+
+      // Most Recent Update — only if column is filled
+      const updateVal = c.lastRecentUpdate;
+      if (updateVal) {
+        const dateStr = (typeof updateVal === 'object' ? updateVal.date : null) || '';
+        const noteStr = (typeof updateVal === 'object' ? updateVal.note : updateVal) || '';
+        entries.push({
+          dateStr,
+          dateObj: parseFlexibleDate(dateStr),
+          expandable: true,
+          iconBg: '#4bca81',
+          iconSvg: NOTE_SVG,
+          title: 'Most Recent Update',
+          sub: 'You had a Note',
+          note: noteStr
+        });
+      }
+
+      if (c.lastContact && c.lastContact !== '—') {
+        entries.push({
+          dateStr: c.lastContact,
+          dateObj: parseFlexibleDate(c.lastContact),
+          expandable: false,
+          iconBg: '#4bca81',
+          iconSvg: PHONE_SVG,
+          title: 'First Contact Made',
+          sub: 'Most recent contact'
+        });
+      }
+
+      if (c.offerDate && c.offerDate !== '—') {
+        entries.push({
+          dateStr: c.offerDate,
+          dateObj: parseFlexibleDate(c.offerDate),
+          expandable: false,
+          iconBg: '#00b0ab',
+          iconSvg: DOLLAR_SVG,
+          title: 'Offer Proposed',
+          sub: 'Last offer presented'
+        });
+      }
+
+      if (c.creationLog && c.creationLog !== '—') {
+        entries.push({
+          dateStr: c.creationLog,
+          dateObj: parseFlexibleDate(c.creationLog),
+          expandable: false,
+          iconBg: '#f97316',
+          iconSvg: FLAG_SVG,
+          title: 'Lead Created Date',
+          sub: 'Lead was created'
+        });
+      }
+
+      // Sort: most recent first; entries with no parseable date go last
+      entries.sort((a, b) => {
+        if (!a.dateObj && !b.dateObj) return 0;
+        if (!a.dateObj) return 1;
+        if (!b.dateObj) return -1;
+        return b.dateObj - a.dateObj;
+      });
+
+      if (!entries.length) return '';
+
+      const CHEV_HIDDEN = `<div class="rc-aw-timeline-chevron" style="visibility:hidden;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
+      const CHEV_VISIBLE = `<div class="rc-aw-timeline-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
+
+      return entries.map((e, i) => {
+        const mt = i > 0 ? ' style="margin-top:8px;"' : '';
+        const chevron = e.expandable ? CHEV_VISIBLE : CHEV_HIDDEN;
+        const onclick = e.expandable ? ` onclick="this.classList.toggle('expanded')"` : '';
+        const dropBtn = e.expandable
+          ? `<div class="rc-aw-timeline-drop-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>`
+          : '';
+        const body = e.expandable
+          ? `<div class="rc-aw-timeline-body">${escapeHtml(e.note || '')}</div>`
+          : '';
+        return `
+        <div class="rc-aw-timeline-row${e.expandable ? '' : ' rc-aw-timeline-row--static'}"${mt}${onclick}>
+          ${chevron}
+          <div class="rc-aw-timeline-icon-wrap">
+            <div class="rc-aw-timeline-icon" style="background:${e.iconBg};">${e.iconSvg}</div>
+          </div>
+          <div class="rc-aw-timeline-content">
+            <div class="rc-aw-timeline-top">
+              <div>
+                <div class="rc-aw-timeline-title"${e.expandable ? '' : ' style="cursor:default;"'}>${escapeHtml(e.title)}</div>
+                <div class="rc-aw-timeline-type">${escapeHtml(e.sub)}</div>
+              </div>
+              <div class="rc-aw-timeline-right">
+                <span class="rc-aw-timeline-date">${escapeHtml(e.dateStr)}</span>
+                ${dropBtn}
+              </div>
+            </div>
+            ${body}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
     function rcRenderDetailOwner(c, innerId, detailId){
       const det = document.getElementById(detailId);
       det.querySelector(".rc-detail-empty").style.display = "none";
@@ -3028,102 +3137,7 @@
             <div class="rc-aw-timeline">
               <div class="rc-aw-timeline-section-label">Past Activities</div>
               <div class="rc-aw-timeline-rows">
-              ${c.lastRecentUpdate ? `
-              <div class="rc-aw-timeline-row" onclick="this.classList.toggle('expanded')">
-                <div class="rc-aw-timeline-chevron">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#4bca81;">
-                    <svg viewBox="0 0 520 520"><path d="m240 70-17-17c-5-5-12-5-17 0L100 158l-43-42c-5-5-12-5-17 0l-17 17c-5 5-5 12 0 17l59 59c5 5 11 7 17 7s12-2 17-7L240 87c4-4 4-12 0-17zm244 114H275c-9 0-16-7-16-16v-32c0-9 7-16 16-16h209c9 0 16 7 16 16v32c0 9-7 16-16 16zm0 143H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16zm-354 0H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm0 143H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm354 0H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16z"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title">Most Recent Update</div>
-                      <div class="rc-aw-timeline-type">You had a Note</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml((c.lastRecentUpdate.date || c.lastRecentUpdate) + '')}</span>
-                      <div class="rc-aw-timeline-drop-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="rc-aw-timeline-body">${escapeHtml(c.lastRecentUpdate.note || c.lastRecentUpdate + '')}</div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.lastContact && c.lastContact !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#4bca81;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.13 12 19.79 19.79 0 0 1 1.06 3.4 2 2 0 0 1 3.05 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">First Contact Made</div>
-                      <div class="rc-aw-timeline-type">Most recent contact</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.lastContact)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.offerDate && c.offerDate !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#00b0ab;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">Offer Proposed</div>
-                      <div class="rc-aw-timeline-type">Last offer presented</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.offerDate)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.creationLog && c.creationLog !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#f97316;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">Lead Created Date</div>
-                      <div class="rc-aw-timeline-type">Lead was created</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.creationLog)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
+                ${rcBuildTimelineRows(c)}
               </div>
             </div>
             <div class="rc-aw-accordion-header">
@@ -3340,102 +3354,7 @@
             <div class="rc-aw-timeline">
               <div class="rc-aw-timeline-section-label">Past Activities</div>
               <div class="rc-aw-timeline-rows">
-              ${c.lastRecentUpdate ? `
-              <div class="rc-aw-timeline-row" onclick="this.classList.toggle('expanded')">
-                <div class="rc-aw-timeline-chevron">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#4bca81;">
-                    <svg viewBox="0 0 520 520"><path d="m240 70-17-17c-5-5-12-5-17 0L100 158l-43-42c-5-5-12-5-17 0l-17 17c-5 5-5 12 0 17l59 59c5 5 11 7 17 7s12-2 17-7L240 87c4-4 4-12 0-17zm244 114H275c-9 0-16-7-16-16v-32c0-9 7-16 16-16h209c9 0 16 7 16 16v32c0 9-7 16-16 16zm0 143H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16zm-354 0H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm0 143H98c-9 0-16-7-16-16v-32c0-9 7-16 16-16h32c9 0 16 7 16 16v32c1 9-7 16-16 16zm354 0H227c-9 0-16-7-16-16v-32c0-9 7-16 16-16h257c9 0 16 7 16 16v32c0 9-7 16-16 16z"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title">Most Recent Update</div>
-                      <div class="rc-aw-timeline-type">You had a Note</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml((c.lastRecentUpdate.date || c.lastRecentUpdate) + '')}</span>
-                      <div class="rc-aw-timeline-drop-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="rc-aw-timeline-body">${escapeHtml(c.lastRecentUpdate.note || c.lastRecentUpdate + '')}</div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.lastContact && c.lastContact !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#4bca81;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.13 12 19.79 19.79 0 0 1 1.06 3.4 2 2 0 0 1 3.05 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">First Contact Made</div>
-                      <div class="rc-aw-timeline-type">Most recent contact</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.lastContact)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.offerDate && c.offerDate !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#00b0ab;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">Offer Proposed</div>
-                      <div class="rc-aw-timeline-type">Last offer presented</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.offerDate)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
-              ${c.creationLog && c.creationLog !== '—' ? `
-              <div class="rc-aw-timeline-row rc-aw-timeline-row--static" style="margin-top:8px;">
-                <div class="rc-aw-timeline-chevron" style="visibility:hidden;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-                <div class="rc-aw-timeline-icon-wrap">
-                  <div class="rc-aw-timeline-icon" style="background:#f97316;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                  </div>
-                </div>
-                <div class="rc-aw-timeline-content">
-                  <div class="rc-aw-timeline-top">
-                    <div>
-                      <div class="rc-aw-timeline-title" style="cursor:default;">Lead Created Date</div>
-                      <div class="rc-aw-timeline-type">Lead was created</div>
-                    </div>
-                    <div class="rc-aw-timeline-right">
-                      <span class="rc-aw-timeline-date">${escapeHtml(c.creationLog)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              ` : ''}
+                ${rcBuildTimelineRows(c)}
               </div>
             </div>
             <div class="rc-aw-accordion-header">
