@@ -2939,9 +2939,12 @@
 
       // Most Recent Update — only if column is filled
       const updateVal = c.lastRecentUpdate;
-      const noteStr = (typeof updateVal === 'object' ? updateVal?.note : updateVal) || '';
-      if (updateVal && noteStr.trim()) {
-        const dateStr = (typeof updateVal === 'object' ? updateVal.date : null) || '';
+      // most_recent_update is a plain text column — always a string, never an object
+      const noteStr = (typeof updateVal === 'object' && updateVal !== null)
+        ? (updateVal.note ?? updateVal.text ?? String(updateVal))
+        : String(updateVal ?? '');
+      if (noteStr && noteStr.trim() && noteStr !== '—') {
+        const dateStr = (typeof updateVal === 'object' && updateVal !== null ? updateVal.date : null) || '';
         entries.push({
           dateStr,
           dateObj: parseFlexibleDate(dateStr),
@@ -3518,7 +3521,7 @@
         boardId:          c.board_id ?? c.boardId ?? null,
         mondayUrl:        c.monday_url ?? c.mondayUrl ?? null,
         lastContact:      c.contacted_date ?? c.lastContact ?? c.last_contact_date ?? "—",
-        lastRecentUpdate: c.most_recent_update ?? c.lastRecentUpdate ?? null,
+        lastRecentUpdate: c.most_recent_update ?? c.last_recent_update ?? c.lastRecentUpdate ?? null,
         creationLog:      c.creation_log ?? c.creationLog ?? null,
         offerDate:        c.offer_date ?? c.offerDate ?? null,
       };
