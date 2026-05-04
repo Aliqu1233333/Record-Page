@@ -2940,9 +2940,9 @@
       // Most Recent Update — only if column is filled
       const updateVal = c.lastRecentUpdate;
       // most_recent_update is a plain text column — always a string, never an object
-      const noteStr = (typeof updateVal === 'object' && updateVal !== null)
+      const noteStr = ((typeof updateVal === 'object' && updateVal !== null)
         ? (updateVal.note ?? updateVal.text ?? String(updateVal))
-        : String(updateVal ?? '');
+        : String(updateVal ?? '')).replace(/`/g, "'");
       if (noteStr && noteStr.trim() && noteStr !== '—') {
         const dateStr = (typeof updateVal === 'object' && updateVal !== null ? updateVal.date : null) || '';
         entries.push({
@@ -3039,6 +3039,10 @@
       }).join('');
     }
 
+    function rcBuildTimelineRowsSafe(c) {
+      try { return rcBuildTimelineRows(c); } catch(e) { console.warn('Timeline render error:', e); return ''; }
+    }
+
     function rcRenderDetailOwner(c, innerId, detailId){
       const det = document.getElementById(detailId);
       det.querySelector(".rc-detail-empty").style.display = "none";
@@ -3060,7 +3064,7 @@
 
       const relBadge = c.relation ? `<div class="rc-det-badge">${escapeHtml(c.relation)}</div>` : '';
 
-      inner.innerHTML = `
+      try { inner.innerHTML = `
         <div class="rc-det-header" style="position:relative; z-index:10; flex-wrap:wrap;">
           <div style="display:flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px;">
             <div style="display: flex; gap: 16px; align-items: center; flex: 1; min-width: 0;">
@@ -3181,7 +3185,7 @@
             <div class="rc-aw-timeline">
               <div class="rc-aw-timeline-section-label">Past Activities</div>
               <div class="rc-aw-timeline-rows">
-                ${rcBuildTimelineRows(c)}
+                ${rcBuildTimelineRowsSafe(c)}
               </div>
             </div>
             <div class="rc-aw-accordion-header">
@@ -3224,6 +3228,7 @@
           </div>
 
         </div>`;
+      } catch(e) { console.error('rcRenderDetailOwner error:', e, c); }
     }
 
     function rcRenderDetailOther(c, innerId, detailId){
@@ -3234,7 +3239,7 @@
 
       const relBadge = c.relation ? `<div class="rc-det-badge">${escapeHtml(c.relation)}</div>` : '';
 
-      inner.innerHTML = `
+      try { inner.innerHTML = `
         <div class="rc-det-header" style="position:relative; z-index:10; flex-wrap:wrap;">
           <div style="display:flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px;">
             <div style="display: flex; gap: 16px; align-items: center; flex: 1; min-width: 0;">
@@ -3367,7 +3372,7 @@
             <div class="rc-aw-timeline">
               <div class="rc-aw-timeline-section-label">Past Activities</div>
               <div class="rc-aw-timeline-rows">
-                ${rcBuildTimelineRows(c)}
+                ${rcBuildTimelineRowsSafe(c)}
               </div>
             </div>
             <div class="rc-aw-accordion-header">
@@ -3410,6 +3415,7 @@
           </div>
 
         </div>`;
+      } catch(e) { console.error('rcRenderDetailOther error:', e, c); }
     }
 
     function rcBuildList(data, listId, innerId, detailId, renderFn, isOwner){
