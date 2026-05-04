@@ -2942,7 +2942,11 @@
       // most_recent_update is a plain text column — always a string, never an object
       const noteStr = ((typeof updateVal === 'object' && updateVal !== null)
         ? (updateVal.note ?? updateVal.text ?? String(updateVal))
-        : String(updateVal ?? '')).replace(/`/g, "'");
+        : String(updateVal ?? ''))
+        .replace(/`/g, "'")
+        .replace(/\r\n/g, ' ')
+        .replace(/[\r\n]/g, ' ')
+        .trim();
       if (noteStr && noteStr.trim() && noteStr !== '—') {
         const dateStr = (typeof updateVal === 'object' && updateVal !== null ? updateVal.date : null) || '';
         entries.push({
