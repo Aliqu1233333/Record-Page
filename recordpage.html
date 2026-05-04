@@ -721,7 +721,7 @@
     .rc-toggle {
       display:flex; align-items:center; justify-content:space-between;
       padding:16px; cursor:pointer; user-select:none;
-      border-bottom:1px solid #e8e8e8; transition:background .15s;
+      transition:background .15s;
       border-radius: 12px 12px 0 0;
     }
     .rc-toggle:hover { background:#f3f3f3; }
@@ -1866,7 +1866,7 @@
               <div class="panel slds-card-mimic" data-open="true" id="rcPanel" style="border:1px solid #dddbda;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden;width:100%;background:#ffffff;">
 
                 <!-- SLDS Card Header -->
-                <div class="rc-toggle" id="rcToggle" style="padding: 14px 16px; border-bottom: 1px solid #e8e8e8; background: #f8f9fb;">
+                <div class="rc-toggle" id="rcToggle" style="padding: 14px 16px; background: #f8f9fb;">
                   <div class="rc-toggle-left">
                     <div class="rc-obj-icon" aria-hidden="true" style="background: #0176d3; border-radius: 6px; width: 37px; height: 37px;">
                       <svg viewBox="0 0 24 24" fill="none" style="width: 20px; height: 20px;">
@@ -2746,6 +2746,33 @@
     const RC_CROWN_SVG  = `<svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 15h16l2-10-5.5 4L10 2 5.5 9 0 5l2 10zm0 2h16v2H2v-2z"/></svg>`;
     const RC_CLOSED_CHECK = `<svg style="width:13px;height:13px;flex-shrink:0;margin-top:1px" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
+    // ── PER-BOARD SUBITEM COLUMN ID OVERRIDES ──────────────────────────────────
+    // Boards 9193383085 (your board) and Logan's board share the same subitem
+    // board (9193383321) and therefore the same column IDs — those are the
+    // defaults below.
+    // Damian's board (8559048464) uses subitem board 8559048533 which has
+    // different column IDs for several fields; those are listed in DAMIAN_OVERRIDES.
+    const DAMIAN_BOARD_ID   = '8559048464';
+    const DAMIAN_OVERRIDES  = {
+      // Field key       : columnId in Damian's subitem board
+      status            : 'status_Mjj2xjsq',   // same — confirmed identical
+      ownerStatus       : 'color_mkzdeyv',      // was color_mktsdfhd on your board
+      followUp          : 'date_mkwfwmpj',      // was date_mkzt8vfa on your board
+      ownership         : 'numeric_mm1jpkw8',  // was numeric_mkztrq1s on your board
+      sellerMotivation  : 'dropdown_mm1jcb02', // was dropdown_mkzspsm2 on your board
+      contactOutcome    : 'dropdown_mm1jfg5k', // was dropdown_mkzwr0f3 on your board
+      // Phone numbers and phone statuses are the same across all boards:
+      phone             : 'phone_mkkz9bay',
+      phone2            : 'phone_3_mkkz1y89',
+      phone3            : 'phone_4_mkkza3e3',
+      phoneStatus       : 'status_1_mkkzfhq2',
+      phone2Status      : 'status_1_mkkzdvd2',
+      phone3Status      : 'status_1_mkkzw44e',
+      relation          : 'label__1',
+      address           : 'text5__1',
+      offer             : 'numeric_mkzwzzrk',   // Damian has no offer amount col — falls back to default
+    };
+
     const RC_FIELD_EDIT_CFG = {
       sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'dropdown_mkzspsm2' },
       ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'color_mktsdfhd' },
@@ -2759,10 +2786,20 @@
       phone3:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_4_mkkza3e3' },
       ownership:        { type:'text',   placeholder:'e.g. 25%', columnId:'numeric_mkztrq1s' },
       relation:         { type:'text',   placeholder:'e.g. Spouse, Son...', columnId:'label__1' },
-      address:          { type:'text',   placeholder:'Enter address', columnId:'address' },
+      address:          { type:'text',   placeholder:'Enter address', columnId:'text5__1' },
       offer:            { type:'text',   placeholder:'e.g. $185,000 presented', columnId:'numeric_mkzwzzrk' },
       status:           { type:'select', columnId:'status_Mjj2xjsq' },
     };
+
+    // Returns the correct monday.com column ID for a given field key,
+    // taking into account which board the contact (subitem) belongs to.
+    function rcGetColumnId(field, contactBoardId) {
+      const boardId = String(contactBoardId || '');
+      if (boardId === DAMIAN_BOARD_ID && DAMIAN_OVERRIDES[field]) {
+        return DAMIAN_OVERRIDES[field];
+      }
+      return (RC_FIELD_EDIT_CFG[field] || {}).columnId || field;
+    }
 
     function rcEditableEl(field, displayVal, extraClass, flagged){
       const cfg = RC_FIELD_EDIT_CFG[field] || {type:'text'};
@@ -2902,9 +2939,9 @@
 
       // Most Recent Update — only if column is filled
       const updateVal = c.lastRecentUpdate;
-      if (updateVal) {
+      const noteStr = (typeof updateVal === 'object' ? updateVal?.note : updateVal) || '';
+      if (updateVal && noteStr.trim()) {
         const dateStr = (typeof updateVal === 'object' ? updateVal.date : null) || '';
-        const noteStr = (typeof updateVal === 'object' ? updateVal.note : updateVal) || '';
         entries.push({
           dateStr,
           dateObj: parseFlexibleDate(dateStr),
@@ -3663,10 +3700,9 @@
               if(!isNaN(num)) newVal = num + '%';
             }
             c[field] = newVal;
-            const cfg = RC_FIELD_EDIT_CFG[field]||{};
-            const colId = cfg.columnId || field;
             const cPulseId = c.pulseId || globalPulseId;
             const cBoardId = c.boardId || boardId;
+            const colId = rcGetColumnId(field, cBoardId);
             if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, newVal);
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
@@ -3683,10 +3719,9 @@
           if(!activeItem) return;
           const c = dataArr[+activeItem.dataset.i];
           c[field] = "—";
-          const cfg = RC_FIELD_EDIT_CFG[field]||{};
-          const colId = cfg.columnId || field;
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
+          const colId = rcGetColumnId(field, cBoardId);
           if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, "");
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
@@ -3714,7 +3749,7 @@
           document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
-          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, 'lead_status', newStatus);
+          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, rcGetColumnId('status', cBoardId), newStatus);
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
             .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
@@ -3733,9 +3768,9 @@
           c[field] = val;
           document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
           const cfg = RC_FIELD_EDIT_CFG[field]||{};
-          const colId = cfg.columnId || field;
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
+          const colId = rcGetColumnId(field, cBoardId);
           if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, val === '—' ? '' : val);
           renderFn(c, innerId, detailId);
           return;
