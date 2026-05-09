@@ -2683,6 +2683,39 @@
 
     function escapeHtml(str){ return String(str??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
     function formatValue(v){ if(v===null||v===undefined||v==="") return "—"; if(typeof v==="number") return String(v); if(typeof v==="boolean") return v?"Yes":"No"; return String(v); }
+
+    /**
+     * sanitizeMostRecentUpdate — robustly coerces any webhook shape for the
+     * most_recent_update field into a plain, display-safe string.
+     *
+     * Handles: null/undefined, plain string, Monday.com object shapes
+     * ({text, value, note, body, content}), nested objects, arrays.
+     * Strips all characters that can break template literals or innerHTML,
+     * and normalises whitespace/line endings.
+     */
+    function sanitizeMostRecentUpdate(raw) {
+      try {
+        if (raw === null || raw === undefined) return '';
+        // Monday.com sometimes returns an object — unwrap the text content
+        if (typeof raw === 'object' && !Array.isArray(raw)) {
+          raw = raw.note ?? raw.text ?? raw.value ?? raw.body ?? raw.content ?? '';
+          if (typeof raw === 'object') raw = JSON.stringify(raw); // last resort
+        }
+        if (Array.isArray(raw)) raw = raw.join(' ');
+        let s = String(raw);
+        // Normalise line endings to spaces so the value is safe in any context
+        s = s.replace(/\r\n/g, ' ').replace(/[\r\n\t]/g, ' ');
+        // Remove characters that break JS template literals or HTML attribute values
+        s = s.replace(/`/g, "'");
+        s = s.replace(/\$/g, '&#36;');  // prevent ${...} expansion if ever re-eval'd
+        // Collapse runs of whitespace to a single space and trim
+        s = s.replace(/\s{2,}/g, ' ').trim();
+        return s;
+      } catch(e) {
+        console.warn('sanitizeMostRecentUpdate error:', e);
+        return '';
+      }
+    }
     function cssEscape(s){ return String(s).replaceAll('"','\\"'); }
 
     let currentNoteContact=null, currentNoteContactIndex=null;
@@ -2939,14 +2972,9 @@
 
       // Most Recent Update — only if column is filled
       const updateVal = c.lastRecentUpdate;
-      // most_recent_update is a plain text column — always a string, never an object
-      const noteStr = ((typeof updateVal === 'object' && updateVal !== null)
-        ? (updateVal.note ?? updateVal.text ?? String(updateVal))
-        : String(updateVal ?? ''))
-        .replace(/`/g, "'")
-        .replace(/\r\n/g, ' ')
-        .replace(/[\r\n]/g, ' ')
-        .trim();
+      // lastRecentUpdate is already sanitized via sanitizeMostRecentUpdate() in rcMapContact.
+      // Re-run here as a safety net in case rcBuildTimelineRows is called with a raw contact object.
+      const noteStr = sanitizeMostRecentUpdate(updateVal);
       if (noteStr && noteStr.trim() && noteStr !== '—') {
         const dateStr = (typeof updateVal === 'object' && updateVal !== null ? updateVal.date : null) || '';
         entries.push({
@@ -3018,7 +3046,7 @@
           ? `<div class="rc-aw-timeline-drop-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>`
           : '';
         const body = e.expandable
-          ? `<div class="rc-aw-timeline-body">${escapeHtml(e.note || '')}</div>`
+          ? `<div class="rc-aw-timeline-body rc-aw-timeline-body--text"></div>`
           : '';
         return `
         <div class="rc-aw-timeline-row${e.expandable ? '' : ' rc-aw-timeline-row--static'}"${mt}${onclick}>
@@ -3045,6 +3073,20 @@
 
     function rcBuildTimelineRowsSafe(c) {
       try { return rcBuildTimelineRows(c); } catch(e) { console.warn('Timeline render error:', e); return ''; }
+    }
+
+    /**
+     * After rcBuildTimelineRows HTML is injected into `container`,
+     * fill any .rc-aw-timeline-body--text divs with the note text
+     * using textContent so special characters can never break the DOM.
+     */
+    function rcFillTimelineNoteBodies(container, noteText) {
+      if (!container || !noteText) return;
+      try {
+        container.querySelectorAll('.rc-aw-timeline-body--text').forEach(el => {
+          el.textContent = noteText;
+        });
+      } catch(e) { console.warn('rcFillTimelineNoteBodies error:', e); }
     }
 
     function rcRenderDetailOwner(c, innerId, detailId){
@@ -3232,6 +3274,8 @@
           </div>
 
         </div>`;
+      // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
+      rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
       } catch(e) { console.error('rcRenderDetailOwner error:', e, c); }
     }
 
@@ -3419,6 +3463,8 @@
           </div>
 
         </div>`;
+      // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
+      rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
       } catch(e) { console.error('rcRenderDetailOther error:', e, c); }
     }
 
@@ -3531,7 +3577,7 @@
         boardId:          c.board_id ?? c.boardId ?? null,
         mondayUrl:        c.monday_url ?? c.mondayUrl ?? null,
         lastContact:      c.contacted_date ?? c.lastContact ?? c.last_contact_date ?? "—",
-        lastRecentUpdate: c.most_recent_update ?? c.last_recent_update ?? c.lastRecentUpdate ?? null,
+        lastRecentUpdate: sanitizeMostRecentUpdate(c.most_recent_update ?? c.last_recent_update ?? c.lastRecentUpdate ?? null),
         creationLog:      c.creation_log ?? c.creationLog ?? null,
         offerDate:        c.offer_date ?? c.offerDate ?? null,
       };
