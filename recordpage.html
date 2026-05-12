@@ -833,6 +833,61 @@
     .rc-dot.active { background:var(--blue); }
     .rc-item-status-text { font-size:12px; color:#444e58; font-weight:500; line-height:1; }
 
+    /* ── Contact List Item Priority Tiers ── */
+    /* Tier 1: Owner — warm amber-gold, matches the owner icon color */
+    .rc-list-item.tier-owner {
+      border-left-color: #F4A623;
+      background: #fffdf7;
+    }
+    .rc-list-item.tier-owner:hover { background: #fef9ed; }
+    .rc-list-item.tier-owner.active { background: #fef9ed; border-left-color: #F4A623; }
+
+    /* Tier 2: Known relationship — Salesforce blue, same brand color already used everywhere */
+    .rc-list-item.tier-relation {
+      border-left-color: #0176d3;
+    }
+
+    /* Inline signal badges on list rows */
+    .rc-item-signals {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+    .rc-signal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10.5px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 3px;
+      line-height: 1.6;
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+    /* Owner badge — amber */
+    .rc-signal-badge.sig-owner {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    /* Relationship badge — soft blue */
+    .rc-signal-badge.sig-relation {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    /* Productive call badge — green */
+    .rc-signal-badge.sig-productive {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    /* Deceased badge — muted red */
+    .rc-signal-badge.sig-deceased {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     /* ── Detail panel — SLDS Record Layout ── */
     .rc-detail {
       flex: 1;
@@ -3482,8 +3537,25 @@
           else initials = parts[0].substring(0, 2);
           initials = initials.toUpperCase();
         }
+        // ── Priority tier & signal badges ──
+        const isOwner       = c.ownerStatusNorm === 'yes';
+        const hasRelation   = c.relation && c.relation !== '—' && !/unknown/i.test(c.relation);
+        const isDeceased    = /deceas/i.test(c.status) || /deceas/i.test(c.relation);
+        const isProductive  = /productive/i.test(c.contactOutcome) || c.status === 'Interested In Selling' || c.status === 'Negotiations/Review' || c.status === 'Accepted Offer';
+
+        let tierClass = '';
+        if (isOwner) tierClass = 'tier-owner';
+        else if (hasRelation) tierClass = 'tier-relation';
+
+        const signals = [];
+        if (isOwner)     signals.push('<span class="rc-signal-badge sig-owner">Owner</span>');
+        if (hasRelation) signals.push(`<span class="rc-signal-badge sig-relation">${escapeHtml(c.relation)}</span>`);
+        if (isProductive && !isOwner) signals.push('<span class="rc-signal-badge sig-productive">Productive</span>');
+        if (isDeceased)  signals.push('<span class="rc-signal-badge sig-deceased">Deceased</span>');
+        const signalsHtml = signals.length ? `<div class="rc-item-signals">${signals.join('')}</div>` : '';
+
         const div = document.createElement("div");
-        div.className = "rc-list-item";
+        div.className = "rc-list-item" + (tierClass ? ' ' + tierClass : '');
         div.dataset.i = data.indexOf(c);
         div.innerHTML = `
           <div class="rc-item-avatar">
@@ -3499,6 +3571,7 @@
               <span class="rc-dot ${c.statusOn?'active':''}"></span>
               <span class="rc-item-status-text">${escapeHtml(c.status||'New')}</span>
             </div>
+            ${signalsHtml}
           </div>`;
         div.addEventListener("click",()=>{
           list.querySelectorAll(".rc-list-item").forEach(el=>el.classList.remove("active"));
