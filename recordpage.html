@@ -798,8 +798,8 @@
 
     /* Row base */
     .rc-list-item {
-      display:flex; align-items:flex-start; gap: 12px;
-      padding: 12px;
+      display:flex; align-items:flex-start; gap: 10px;
+      padding: 10px 12px;
       cursor:pointer;
       border-left: 3px solid transparent;
       border-bottom: 1px solid #dddbda;
@@ -825,13 +825,58 @@
       flex-shrink: 0;
     }
 
-    .rc-item-body { flex:1; min-width:0; }
+    .rc-item-body { flex:1; min-width:0; overflow:hidden; }
     .rc-item-name { font-size:14px; font-weight:600; color:#0176d3; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .rc-item-sub { font-size:12px; color:#5f6b7a; margin-top:3px; line-height:1.3; }
-    .rc-item-status { display:flex; align-items:center; gap:6px; margin-top:5px; }
-    .rc-dot { width:5px; height:5px; border-radius:50%; background:#d1d5db; flex-shrink:0; margin-top:1px; }
-    .rc-dot.active { background:var(--blue); }
-    .rc-item-status-text { font-size:12px; color:#444e58; font-weight:500; line-height:1; }
+
+    /* Right column: status pill, top-aligned */
+    .rc-item-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-start;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    .rc-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-family: var(--font);
+      line-height: 1.6;
+    }
+    .rc-status-pill .rc-pill-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Cosmos-aligned status palette — warm to cold */
+    .rc-status-pill.pill-closed       { background: #EBF7F5; color: #024D4C; }
+    .rc-status-pill.pill-closed       .rc-pill-dot { background: #0B827C; }
+    .rc-status-pill.pill-accepted     { background: #CDEFC4; color: #07230E; }
+    .rc-status-pill.pill-accepted     .rc-pill-dot { background: #2E844A; }
+    .rc-status-pill.pill-negotiation  { background: #F0EAFF; color: #3E0F75; }
+    .rc-status-pill.pill-negotiation  .rc-pill-dot { background: #7526E3; }
+    .rc-status-pill.pill-interested   { background: #EAF5FF; color: #032D60; }
+    .rc-status-pill.pill-interested   .rc-pill-dot { background: #0176D3; }
+    .rc-status-pill.pill-contacted    { background: #DEF9F3; color: #014035; }
+    .rc-status-pill.pill-contacted    .rc-pill-dot { background: #06A59A; }
+    .rc-status-pill.pill-attempt3     { background: #FEF9EE; color: #4A2900; }
+    .rc-status-pill.pill-attempt3     .rc-pill-dot { background: #CA8501; }
+    .rc-status-pill.pill-attempt2     { background: #FEF9EE; color: #4A2900; }
+    .rc-status-pill.pill-attempt2     .rc-pill-dot { background: #E4A201; }
+    .rc-status-pill.pill-attempt1     { background: #FEF9EE; color: #4A2900; }
+    .rc-status-pill.pill-attempt1     .rc-pill-dot { background: #FCC003; }
+    .rc-status-pill.pill-skiptrace    { background: #FFDED5; color: #3E0900; }
+    .rc-status-pill.pill-skiptrace    .rc-pill-dot { background: #D83A00; }
+    .rc-status-pill.pill-noattempt    { background: #F3F3F3; color: #3E3E3C; }
+    .rc-status-pill.pill-noattempt    .rc-pill-dot { background: #939393; }
 
     /* ── Contact List Item Priority Tiers ── */
     /* Tier 1: Owner — warm amber-gold, matches the owner icon color */
@@ -3554,24 +3599,49 @@
         if (isDeceased)  signals.push('<span class="rc-signal-badge sig-deceased">Deceased</span>');
         const signalsHtml = signals.length ? `<div class="rc-item-signals">${signals.join('')}</div>` : '';
 
+        // Map status → Cosmos pill class
+        const STATUS_PILL_MAP = {
+          'Closed':                  'pill-closed',
+          'Accepted Offer':          'pill-accepted',
+          'Negotiations/Review':     'pill-negotiation',
+          'Interested In Selling':   'pill-interested',
+          'Contacted':               'pill-contacted',
+          'Attempt 3 - No Answer':   'pill-attempt3',
+          'Attempt 2 - No Answer':   'pill-attempt2',
+          'Attempt 1 - No Answer':   'pill-attempt1',
+          'Re-Skiptrace':            'pill-skiptrace',
+        };
+        // Shorten some labels so they fit comfortably in the narrow pill
+        const STATUS_LABEL_MAP = {
+          'Attempt 3 - No Answer': 'Attempt 3',
+          'Attempt 2 - No Answer': 'Attempt 2',
+          'Attempt 1 - No Answer': 'Attempt 1',
+          'Negotiations/Review':   'Negotiating',
+          'Interested In Selling': 'Interested',
+          'Accepted Offer':        'Accepted',
+        };
+        const statusKey   = c.status || 'New';
+        const pillClass   = STATUS_PILL_MAP[statusKey] || 'pill-noattempt';
+        const pillLabel   = STATUS_LABEL_MAP[statusKey] || statusKey;
+        const ownershipStr = c.ownership && c.ownership !== '—' ? ` · ${escapeHtml(c.ownership)}` : '';
+
         const div = document.createElement("div");
         div.className = "rc-list-item" + (tierClass ? ' ' + tierClass : '');
         div.dataset.i = data.indexOf(c);
         div.innerHTML = `
-          <div class="rc-item-avatar">
-            ${escapeHtml(initials)}
-          </div>
+          <div class="rc-item-avatar">${escapeHtml(initials)}</div>
           <div class="rc-item-body">
             <div class="rc-item-name-row">
               <span class="rc-item-name">${escapeHtml(c.name)}</span>
               ${isClosed ? RC_CLOSED_CHECK : ''}
             </div>
-            <div class="rc-item-sub">${escapeHtml(c.relation)}${c.ownership && c.ownership !== "—" ? " · " + escapeHtml(c.ownership) : ""}</div>
-            <div class="rc-item-status">
-              <span class="rc-dot ${c.statusOn?'active':''}"></span>
-              <span class="rc-item-status-text">${escapeHtml(c.status||'New')}</span>
-            </div>
+            ${ownershipStr ? `<div style="font-size:11px;color:#6b7280;margin-top:2px;">${ownershipStr.replace(' · ','')}</div>` : ''}
             ${signalsHtml}
+          </div>
+          <div class="rc-item-right">
+            <span class="rc-status-pill ${pillClass}">
+              <span class="rc-pill-dot"></span>${escapeHtml(pillLabel)}
+            </span>
           </div>`;
         div.addEventListener("click",()=>{
           list.querySelectorAll(".rc-list-item").forEach(el=>el.classList.remove("active"));
