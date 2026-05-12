@@ -798,8 +798,8 @@
 
     /* Row base */
     .rc-list-item {
-      display:flex; align-items:flex-start; gap: 10px;
-      padding: 10px 12px;
+      display:flex; align-items:flex-start; gap: 12px;
+      padding: 12px 12px 12px 10px;
       cursor:pointer;
       border-left: 3px solid transparent;
       border-bottom: 1px solid #dddbda;
@@ -857,37 +857,43 @@
     }
 
     /* Cosmos-aligned status palette — warm to cold */
+    /* Closed — deep teal, most positive */
     .rc-status-pill.pill-closed       { background: #EBF7F5; color: #024D4C; }
     .rc-status-pill.pill-closed       .rc-pill-dot { background: #0B827C; }
-    .rc-status-pill.pill-accepted     { background: #CDEFC4; color: #07230E; }
-    .rc-status-pill.pill-accepted     .rc-pill-dot { background: #2E844A; }
+    /* Accepted Offer — slightly lighter teal, one step below closed */
+    .rc-status-pill.pill-accepted     { background: #DEF9F3; color: #014035; }
+    .rc-status-pill.pill-accepted     .rc-pill-dot { background: #06A59A; }
+    /* Negotiations/Review — purple, distinct from teal family */
     .rc-status-pill.pill-negotiation  { background: #F0EAFF; color: #3E0F75; }
     .rc-status-pill.pill-negotiation  .rc-pill-dot { background: #7526E3; }
+    /* Interested in Selling — Salesforce blue */
     .rc-status-pill.pill-interested   { background: #EAF5FF; color: #032D60; }
     .rc-status-pill.pill-interested   .rc-pill-dot { background: #0176D3; }
-    .rc-status-pill.pill-contacted    { background: #DEF9F3; color: #014035; }
-    .rc-status-pill.pill-contacted    .rc-pill-dot { background: #06A59A; }
+    /* Contacted — teal-adjacent, softer */
+    .rc-status-pill.pill-contacted    { background: #E8F9F6; color: #024D4C; }
+    .rc-status-pill.pill-contacted    .rc-pill-dot { background: #3BA755; }
+    /* Attempts — stepped amber/yellow family, darker = more attempts */
     .rc-status-pill.pill-attempt3     { background: #FEF9EE; color: #4A2900; }
     .rc-status-pill.pill-attempt3     .rc-pill-dot { background: #CA8501; }
     .rc-status-pill.pill-attempt2     { background: #FEF9EE; color: #4A2900; }
     .rc-status-pill.pill-attempt2     .rc-pill-dot { background: #E4A201; }
     .rc-status-pill.pill-attempt1     { background: #FEF9EE; color: #4A2900; }
     .rc-status-pill.pill-attempt1     .rc-pill-dot { background: #FCC003; }
+    /* Re-Skiptrace — hot orange, action needed */
     .rc-status-pill.pill-skiptrace    { background: #FFDED5; color: #3E0900; }
     .rc-status-pill.pill-skiptrace    .rc-pill-dot { background: #D83A00; }
+    /* No Attempt — neutral gray, cold/default */
     .rc-status-pill.pill-noattempt    { background: #F3F3F3; color: #3E3E3C; }
     .rc-status-pill.pill-noattempt    .rc-pill-dot { background: #939393; }
 
     /* ── Contact List Item Priority Tiers ── */
-    /* Tier 1: Owner — warm amber-gold, matches the owner icon color */
+    /* Tier 1: Owner — amber border accent only, no background tint */
     .rc-list-item.tier-owner {
       border-left-color: #F4A623;
-      background: #fffdf7;
     }
-    .rc-list-item.tier-owner:hover { background: #fef9ed; }
-    .rc-list-item.tier-owner.active { background: #fef9ed; border-left-color: #F4A623; }
+    .rc-list-item.tier-owner.active { border-left-color: #F4A623; }
 
-    /* Tier 2: Known relationship — Salesforce blue, same brand color already used everywhere */
+    /* Tier 2: Known relationship — Salesforce blue border */
     .rc-list-item.tier-relation {
       border-left-color: #0176d3;
     }
@@ -912,20 +918,25 @@
       white-space: nowrap;
       font-family: var(--font);
     }
-    /* Owner badge — amber */
+    /* Owner badge — muted amber, restrained */
     .rc-signal-badge.sig-owner {
-      background: #fef3c7;
-      color: #92400e;
+      background: #FEF9EE;
+      color: #4A2900;
     }
-    /* Relationship badge — soft blue */
+    /* Relationship badge — soft blue-gray */
     .rc-signal-badge.sig-relation {
-      background: #dbeafe;
-      color: #1e40af;
+      background: #EAF5FF;
+      color: #032D60;
     }
-    /* Productive call badge — green */
+    /* No-relation badge — muted red, lowest visual weight, pushed to bottom by sort */
+    .rc-signal-badge.sig-norelation {
+      background: #FFF0F0;
+      color: #8C1C13;
+    }
+    /* Productive call badge — teal, matches contacted palette */
     .rc-signal-badge.sig-productive {
-      background: #d1fae5;
-      color: #065f46;
+      background: #DEF9F3;
+      color: #014035;
     }
     /* Deceased badge — muted red */
     .rc-signal-badge.sig-deceased {
@@ -3030,7 +3041,15 @@
     }
 
     const RC_STATUS_PRIORITY = {'Closed':10,'Accepted Offer':9,'Negotiations/Review':8,'Interested In Selling':7,'Contacted':6,'Attempt 3 - No Answer':5,'Attempt 2 - No Answer':4,'Attempt 1 - No Answer':3,'Re-Skiptrace':2,'New':1,'Not Interested':0};
-    function rcSortByStatus(data){ return [...data].sort((a,b) => (RC_STATUS_PRIORITY[b.status]??1) - (RC_STATUS_PRIORITY[a.status]??1)); }
+    function rcIsNoRelation(c){ return !c.relation || c.relation === '—' || /no.?relation/i.test(c.relation) || /unknown/i.test(c.relation); }
+    function rcSortByStatus(data){
+      return [...data].sort((a,b) => {
+        const aNoRel = rcIsNoRelation(a) ? 1 : 0;
+        const bNoRel = rcIsNoRelation(b) ? 1 : 0;
+        if(aNoRel !== bNoRel) return aNoRel - bNoRel; // no-relation sinks to bottom
+        return (RC_STATUS_PRIORITY[b.status]??1) - (RC_STATUS_PRIORITY[a.status]??1);
+      });
+    }
 
     function rcStatusTextHtml(c, isOwner){
       const fields = isOwner ? rcOwnerFields(c) : [];
@@ -3584,7 +3603,8 @@
         }
         // ── Priority tier & signal badges ──
         const isOwner       = c.ownerStatusNorm === 'yes';
-        const hasRelation   = c.relation && c.relation !== '—' && !/unknown/i.test(c.relation);
+        const noRelation    = rcIsNoRelation(c);
+        const hasRelation   = !noRelation;
         const isDeceased    = /deceas/i.test(c.status) || /deceas/i.test(c.relation);
         const isProductive  = /productive/i.test(c.contactOutcome) || c.status === 'Interested In Selling' || c.status === 'Negotiations/Review' || c.status === 'Accepted Offer';
 
@@ -3593,10 +3613,11 @@
         else if (hasRelation) tierClass = 'tier-relation';
 
         const signals = [];
-        if (isOwner)     signals.push('<span class="rc-signal-badge sig-owner">Owner</span>');
-        if (hasRelation) signals.push(`<span class="rc-signal-badge sig-relation">${escapeHtml(c.relation)}</span>`);
+        if (isOwner)       signals.push('<span class="rc-signal-badge sig-owner">Owner</span>');
+        if (hasRelation)   signals.push(`<span class="rc-signal-badge sig-relation">${escapeHtml(c.relation)}</span>`);
+        if (noRelation && !isOwner) signals.push('<span class="rc-signal-badge sig-norelation">No Relation</span>');
         if (isProductive && !isOwner) signals.push('<span class="rc-signal-badge sig-productive">Productive</span>');
-        if (isDeceased)  signals.push('<span class="rc-signal-badge sig-deceased">Deceased</span>');
+        if (isDeceased)    signals.push('<span class="rc-signal-badge sig-deceased">Deceased</span>');
         const signalsHtml = signals.length ? `<div class="rc-item-signals">${signals.join('')}</div>` : '';
 
         // Map status → Cosmos pill class
