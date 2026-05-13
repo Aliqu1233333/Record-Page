@@ -389,13 +389,14 @@
     .orc-table thead th.sort-desc .sort-icon svg:last-child { opacity: 1; }
 
     .orc-table tbody td {
-      padding: 8px 12px;
+      padding: 0 12px;
       border-bottom: 1px solid #f3f4f6;
       vertical-align: middle;
       color: #111827;
       font-size: 14px;
+      height: 80px;
     }
-    .orc-table tbody td:first-child { padding: 8px 6px 8px 14px; }
+    .orc-table tbody td:first-child { padding: 0 6px 0 14px; }
     .orc-table tbody tr:last-child td { border-bottom: 0; }
 
     .orc-table tbody tr { background: white; transition: background 0.1s ease; }
@@ -800,6 +801,7 @@
     .rc-list-item {
       display:flex; align-items:center; gap: 12px;
       padding: 14px 12px 14px 10px;
+      min-height: 80px;
       cursor:pointer;
       border-left: 3px solid transparent;
       border-bottom: 1px solid #dddbda;
@@ -4906,8 +4908,25 @@
 
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
-    // Record data is loaded via window.RecordPage.applyData(payload) called from the Make.com webhook.
-    // No dummy data in production.
+
+    // ── TEST DATA ── remove before production ──
+    rcPopulateFromPayload({ confirmed_owners: [
+      // Tier 1: Owners with known relationships
+      { name:"Margaret Caldwell",  relationship:"Spouse",       owner_status:"Yes", ownership_percent:50, lead_status:"Accepted Offer",        contact_outcome:"Spoke To – Productive", phone_1:"713-555-0101", address:"4821 Elmwood Dr, Houston TX 77004" },
+      { name:"Derek Caldwell",     relationship:"Son",          owner_status:"Yes", ownership_percent:25, lead_status:"Negotiations/Review",    contact_outcome:"Spoke To – Productive", phone_1:"713-555-0102", address:"4821 Elmwood Dr, Houston TX 77004" },
+      { name:"Patricia Okafor",    relationship:"Daughter",     owner_status:"Yes", ownership_percent:25, lead_status:"Contacted",              contact_outcome:"Spoke To - Has No Info", phone_1:"713-555-0103", address:"912 Rosehill Ln, Cypress TX 77429" },
+      // Tier 2: Known relationship, not owner
+      { name:"James Caldwell",     relationship:"Brother",      owner_status:"No",  ownership_percent:0,  lead_status:"Interested In Selling",  contact_outcome:"Spoke To – Productive", phone_1:"713-555-0104", address:"220 Oak Creek Blvd, Katy TX 77450" },
+      { name:"Sandra Nguyen",      relationship:"Sister",       owner_status:"No",  ownership_percent:0,  lead_status:"Contacted",              contact_outcome:"Spoke To - Has No Info", phone_1:"832-555-0105", address:"3310 Magnolia Ave, Pearland TX 77584" },
+      { name:"Robert Caldwell Jr", relationship:"Grandson",     owner_status:"No",  ownership_percent:0,  lead_status:"Attempt 3 - No Answer",  contact_outcome:"—",                     phone_1:"281-555-0106", address:"—" },
+      { name:"Helen Tran",         relationship:"Granddaughter",owner_status:"No",  ownership_percent:0,  lead_status:"Attempt 2 - No Answer",  contact_outcome:"—",                     phone_1:"346-555-0107", address:"—" },
+      { name:"Curtis Moore",       relationship:"Nephew",       owner_status:"No",  ownership_percent:0,  lead_status:"Attempt 1 - No Answer",  contact_outcome:"—",                     phone_1:"713-555-0108", address:"—" },
+      { name:"Dorothy Simmons",    relationship:"Deceased",     owner_status:"No",  ownership_percent:0,  lead_status:"Re-Skiptrace",           contact_outcome:"—",                     phone_1:"—",            address:"—" },
+      // No-relation — sink to bottom
+      { name:"Marcus Bell",        relationship:"No-Relation",  owner_status:"No",  ownership_percent:0,  lead_status:"Contacted",              contact_outcome:"Spoke To - Has No Info", phone_1:"713-555-0109", address:"—" },
+      { name:"Yvonne Fletcher",    relationship:"No-Relation",  owner_status:"No",  ownership_percent:0,  lead_status:"Attempt 1 - No Answer",  contact_outcome:"—",                     phone_1:"832-555-0110", address:"—" },
+      { name:"Terrence Webb",      relationship:"Unknown Relations", owner_status:"No", ownership_percent:0, lead_status:"No Attempt",          contact_outcome:"—",                     phone_1:"—",            address:"—" },
+    ]});
   </script>
 </body>
 </html>
