@@ -3024,7 +3024,7 @@
       </div>`;
     }
 
-    const RC_STATUS_OPTS = ['Re-Skiptrace','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed','Not Interested'];
+    const RC_STATUS_OPTS = ['Re-Skiptrace','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed','Not Interested in selling'];
 
     function rcStatusFieldHtml(c){
       const dotCls = c.statusOn ? 'on' : '';
@@ -3041,7 +3041,7 @@
       </div>`;
     }
 
-    const RC_STATUS_PRIORITY = {'Closed':10,'Accepted Offer':9,'Negotiations/Review':8,'Interested In Selling':7,'Contacted':6,'Attempt 3 - No Answer':5,'Attempt 2 - No Answer':4,'Attempt 1 - No Answer':3,'Re-Skiptrace':2,'New':1,'Not Interested':0};
+    const RC_STATUS_PRIORITY = {'Closed':10,'Accepted Offer':9,'Negotiations/Review':8,'Interested In Selling':7,'Contacted':6,'Attempt 3 - No Answer':5,'Attempt 2 - No Answer':4,'Attempt 1 - No Answer':3,'Re-Skiptrace':2,'New':1,'Not Interested in selling':0};
     function rcIsNoRelation(c){ return !c.relation || c.relation === '—' || /no.?relation/i.test(c.relation) || /unknown/i.test(c.relation); }
     function rcSortByStatus(data){
       return [...data].sort((a,b) => {
