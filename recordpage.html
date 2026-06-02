@@ -764,13 +764,362 @@
     /* Tab panes */
     .rc-pane { display:none; }
     .rc-pane.active {
-      display:flex;
-      align-items:stretch;
+      display:block;
       min-height: 440px;
       background: #ffffff;
     }
 
-    /* ── Left list — SLDS Split View ── */
+    /* =====================================================================
+       COSMOS LIST-VIEW TABLE  (.rct-*)  — 1:1 Salesforce data-table replica
+       ===================================================================== */
+    .rct-view { width: 100%; background: #ffffff; }
+
+    .rct-scroll {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 600px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .rct-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "Salesforce Sans", var(--font), system-ui, sans-serif;
+      font-size: 13px;
+      color: #181818;
+      table-layout: auto;
+      white-space: nowrap;
+    }
+
+    /* ── Header row ── */
+    .rct-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f3f3f3;
+      color: #444;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: left;
+      padding: 8px 12px;
+      height: 32px;
+      border-bottom: 1px solid #c9c9c9;
+      border-right: 1px solid #e5e5e5;
+      vertical-align: middle;
+      user-select: none;
+      letter-spacing: .01em;
+    }
+    .rct-table thead th:last-child { border-right: none; }
+
+    .rct-th-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .rct-th-label { display: inline-flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; }
+    .rct-sort-arrow { width: 12px; height: 12px; color: #444; flex-shrink: 0; }
+    .rct-th-chevron {
+      width: 14px; height: 14px; color: #706e6b; flex-shrink: 0;
+      opacity: .9; cursor: pointer; border-radius: 3px; padding: 1px;
+    }
+    .rct-th-chevron:hover { background: #e0e0e0; }
+
+    /* numeric / right-aligned header + cells */
+    .rct-table th.rct-num .rct-th-inner,
+    .rct-table td.rct-num { text-align: right; justify-content: flex-end; }
+    .rct-table td.rct-num { text-align: right; }
+
+    /* checkbox + row-number columns */
+    .rct-col-check { width: 38px; min-width: 38px; text-align: center; padding: 8px 6px; }
+    .rct-col-rownum {
+      width: 34px; min-width: 34px; text-align: right;
+      color: #706e6b; font-weight: 400; padding: 8px 8px;
+    }
+    .rct-table thead th.rct-col-rownum { color: transparent; }
+
+    .rct-checkbox {
+      width: 14px; height: 14px;
+      border: 1px solid #b0adab;
+      border-radius: 3px;
+      background: #fff;
+      display: inline-block;
+      vertical-align: middle;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .rct-checkbox.checked { background: #0176d3; border-color: #0176d3; }
+    .rct-checkbox.checked::after {
+      content: ""; position: absolute; left: 4px; top: 1px;
+      width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* overflow ⋯ button in header far-right */
+    .rct-th-overflow { width: 44px; min-width: 44px; text-align: center; }
+    .rct-overflow-btn {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid #c9c9c9; background: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #444;
+    }
+    .rct-overflow-btn:hover { background: #f3f3f3; }
+
+    /* ── Body rows ── */
+    .rct-table tbody td {
+      padding: 0 12px;
+      height: 40px;
+      border-bottom: 1px solid #e5e5e5;
+      vertical-align: middle;
+      background: #fff;
+      transition: background .08s;
+    }
+    .rct-row { cursor: pointer; }
+    .rct-row:hover td { background: #f3f2f2; }
+    .rct-row.rct-selected td {
+      background: #ecf2f9;
+      border-top: 1px solid #1b5297;
+      border-bottom: 1px solid #1b5297;
+    }
+
+    .rct-link {
+      color: #0176d3;
+      text-decoration: none;
+      font-weight: 400;
+    }
+    .rct-row:hover .rct-link { text-decoration: underline; }
+    .rct-name-cell { font-weight: 400; }
+
+    .rct-truncate {
+      display: inline-block;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .rct-muted { color: #939393; }
+
+    .rct-name-wrap { display: inline-flex; align-items: center; gap: 8px; }
+    .rct-edit-pencil {
+      width: 12px; height: 12px; color: #939393;
+      flex-shrink: 0;
+    }
+
+    /* ── Editable cells (Cosmos inline edit) ── */
+    .rct-cell-editable {
+      position: relative;
+      cursor: pointer;
+    }
+    .rct-cell-editable .rct-cell-display {
+      display: inline-block;
+      max-width: calc(100% - 20px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    /* small grey pencil at the right edge — only on THIS cell's hover */
+    .rct-cell-pencil {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 18px; height: 18px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 0;
+      border-radius: 3px;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .1s;
+      padding: 0;
+    }
+    .rct-cell-pencil .rct-edit-pencil { width: 12px; height: 12px; color: #939393; }
+    /* show only when hovering the specific cell (not the whole row) */
+    .rct-cell-editable:hover .rct-cell-pencil { opacity: 1; }
+    .rct-cell-pencil:hover .rct-edit-pencil { color: #5c5c5c; }
+    .rct-cell-editable.rct-editing { background: #fff !important; box-shadow: inset 0 0 0 2px #0176d3; padding: 0; }
+    .rct-cell-editable.rct-editing .rct-cell-pencil { display: none; }
+
+    /* the in-cell editor */
+    .rct-cell-edit {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      padding: 2px 4px;
+    }
+    .rct-cell-input {
+      flex: 1;
+      min-width: 0;
+      font-family: var(--font);
+      font-size: 13px;
+      color: #181818;
+      border: 1px solid #c9c9c9;
+      border-radius: 4px;
+      padding: 4px 6px;
+      height: 28px;
+      background: #fff;
+      outline: none;
+    }
+    .rct-cell-input:focus { border-color: #0176d3; box-shadow: 0 0 0 1px #0176d3; }
+    select.rct-cell-select { cursor: pointer; }
+    .rct-cell-edit-actions { display: inline-flex; gap: 2px; flex-shrink: 0; }
+    .rct-cell-save, .rct-cell-cancel {
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid #c9c9c9;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      padding: 0;
+    }
+    .rct-cell-save svg, .rct-cell-cancel svg { width: 14px; height: 14px; }
+    .rct-cell-save { color: #0b827c; }
+    .rct-cell-save:hover { background: #ebf7f5; border-color: #0b827c; }
+    .rct-cell-cancel { color: #706e6b; }
+    .rct-cell-cancel:hover { background: #f3f3f3; border-color: #b0adab; }
+
+    /* status pill reuse inside table */
+    .rct-table .rc-status-pill { font-size: 11px; }
+
+    /* ── Per-column font sizes ──
+       Name, Relationship, Phones: ~0.5pt down from default (13px → 12.67px)
+       Lead Status pill: 10px
+       Owner Status: ~0.5pt down from default (13px → 12.33px) ── */
+    .rct-name-cell,
+    .rct-name-cell .rct-link,
+    .rct-cell-editable[data-field="relation"] .rct-cell-display,
+    .rct-cell-editable[data-field="phone"] .rct-cell-display,
+    .rct-cell-editable[data-field="phone2"] .rct-cell-display {
+      font-size: 12.67px;
+    }
+    .rct-cell-editable[data-field="status"] .rc-status-pill {
+      font-size: 10px;
+    }
+    .rct-cell-editable[data-field="ownerStatus"] .rct-cell-display {
+      font-size: 12.33px;
+    }
+
+    /* contact-outcome soft tag */
+    .rct-outcome {
+      display: inline-block; font-size: 12px; color: #3e3e3c;
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* empty state */
+    .rct-empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: #939393;
+      font-size: 13px;
+    }
+
+    /* ── Inline "Add a contact" row ── */
+    .rct-add-row td { background: #fff; border-bottom: 1px solid #e5e5e5; height: 40px; }
+    .rct-add-row { cursor: pointer; }
+    .rct-add-row:hover td { background: #f3f2f2; }
+    .rct-add-prompt { padding: 0 12px; }
+    .rct-add-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #939393;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font);
+    }
+    .rct-add-row:hover .rct-add-inner { color: #6b7280; }
+    .rct-add-inner svg { width: 15px; height: 15px; }
+
+    /* Active entry row */
+    .rct-add-active td { background: #fff !important; border-bottom: 1px solid #e5e5e5; padding: 4px 6px; vertical-align: middle; }
+    .rct-add-cell .rct-cell-input {
+      width: 100%;
+      min-width: 70px;
+      font-family: var(--font);
+      font-size: 12px;
+      color: #181818;
+      border: 1px solid #c9c9c9;
+      border-radius: 4px;
+      padding: 5px 6px;
+      height: 28px;
+      background: #fff;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .rct-add-cell select.rct-cell-input { cursor: pointer; }
+    .rct-add-cell .rct-cell-input:focus { border-color: #0176d3; box-shadow: 0 0 0 1px #0176d3; }
+    .rct-add-cell .rct-cell-input.rc-input-error { border-color: #c23934; box-shadow: 0 0 0 1px #c23934; }
+    .rct-add-actions { white-space: nowrap; text-align: right; padding-right: 10px !important; }
+    .rct-add-actions .rct-cell-save,
+    .rct-add-actions .rct-cell-cancel {
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid #c9c9c9; border-radius: 4px; background: #fff;
+      cursor: pointer; padding: 0; margin-left: 2px; vertical-align: middle;
+    }
+    .rct-add-actions .rct-cell-save svg,
+    .rct-add-actions .rct-cell-cancel svg { width: 14px; height: 14px; }
+    .rct-add-actions .rct-cell-save { color: #0b827c; }
+    .rct-add-actions .rct-cell-save:hover { background: #ebf7f5; border-color: #0b827c; }
+    .rct-add-actions .rct-cell-save.rct-saving { opacity: .6; pointer-events: none; }
+    .rct-add-actions .rct-cell-cancel { color: #706e6b; }
+    .rct-add-actions .rct-cell-cancel:hover { background: #f3f3f3; border-color: #b0adab; }
+
+
+
+    /* ── Cosmos breadcrumb / back bar above the opened record ── */
+    .rc-record-view { width: 100%; }
+    .rc-back-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #e5e5e5;
+      background: #fafaf9;
+    }
+    .rc-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      appearance: none;
+      border: 1px solid #c9c9c9;
+      background: #fff;
+      color: #0176d3;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 12px 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: background .1s, border-color .1s;
+    }
+    .rc-back-btn:hover { background: #f3f3f3; border-color: #b0adab; }
+    .rc-back-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .rc-back-crumb {
+      font-family: var(--font);
+      font-size: 13px;
+      color: #706e6b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+    .rc-back-crumb .rc-crumb-sep { color: #c9c9c9; }
+    .rc-back-crumb .rc-crumb-current { color: #181818; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* The opened record fills full width now (no left list beside it) */
+    .rc-record-view .rc-detail {
+      width: 100%;
+      border: none;
+    }
+
+    /* ── Left list — SLDS Split View (legacy, now unused) ── */
     .rc-list {
       width: 320px;
       flex-shrink: 0;
@@ -2618,47 +2967,57 @@
 
                   <!-- Pane: Confirmed Owners -->
                   <div class="rc-pane active" id="pane-owners">
-                    <div class="rc-list" id="list-owners"></div>
-                    <div class="rc-detail" id="detail-owners">
-                      <div class="rc-detail-empty">
-                        <div class="rc-empty-block">
-                          <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                          </svg>
-                          <div class="rc-empty-title">Select a contact</div>
-                          <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                    <!-- Cosmos list-view table (default native view) -->
+                    <div class="rct-view" id="tableview-owners"></div>
+                    <!-- Full record view (revealed on row click) -->
+                    <div class="rc-record-view" id="recordview-owners" style="display:none;">
+                      <div class="rc-detail" id="detail-owners">
+                        <div class="rc-detail-empty" style="display:none;">
+                          <div class="rc-empty-block">
+                            <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                              <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                              <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <div class="rc-empty-title">Select a contact</div>
+                            <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                          </div>
                         </div>
+                        <div class="rc-detail-inner" id="inner-owners"></div>
                       </div>
-                      <div class="rc-detail-inner" id="inner-owners"></div>
                     </div>
                   </div>
 
                   <!-- Pane: Other Contacts -->
                   <div class="rc-pane" id="pane-other">
-                    <div class="rc-list" id="list-other"></div>
-                    <div class="rc-detail" id="detail-other">
-                      <div class="rc-detail-empty">
-                        <div class="rc-empty-block">
-                          <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
-                            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                            <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                          </svg>
-                          <div class="rc-empty-title">Select a contact</div>
-                          <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                    <!-- Cosmos list-view table (default native view) -->
+                    <div class="rct-view" id="tableview-other"></div>
+                    <!-- Full record view (revealed on row click) -->
+                    <div class="rc-record-view" id="recordview-other" style="display:none;">
+                      <div class="rc-detail" id="detail-other">
+                        <div class="rc-detail-empty" style="display:none;">
+                          <div class="rc-empty-block">
+                            <svg class="rc-empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                              <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                              <path d="M21 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <div class="rc-empty-title">Select a contact</div>
+                            <div class="rc-empty-sub">Choose a contact from the list to view their details</div>
+                          </div>
                         </div>
+                        <div class="rc-detail-inner" id="inner-other"></div>
                       </div>
-                      <div class="rc-detail-inner" id="inner-other"></div>
                     </div>
                   </div>
 
                 </div><!-- /.rc-body -->
               </div><!-- /#rcPanel -->
             </div><!-- /#rcSectionWrapper -->
+
+
 
             </div>
 
@@ -4229,89 +4588,561 @@
       } catch(e) { console.error('rcRenderDetailOther error:', e, c); }
     }
 
+    // Status → Cosmos pill mapping (shared by table + detail)
+    const RCT_STATUS_PILL_MAP = {
+      'Closed':                  'pill-closed',
+      'Accepted Offer':          'pill-accepted',
+      'Negotiations/Review':     'pill-negotiation',
+      'Interested In Selling':   'pill-interested',
+      'Contacted':               'pill-contacted',
+      'Attempt 3 - No Answer':   'pill-attempt3',
+      'Attempt 2 - No Answer':   'pill-attempt2',
+      'Attempt 1 - No Answer':   'pill-attempt1',
+      'Re-Skiptrace':            'pill-skiptrace',
+    };
+
+    function rctStatusPill(statusKey){
+      const key = statusKey || 'New';
+      const pillClass = RCT_STATUS_PILL_MAP[key] || 'pill-noattempt';
+      return `<span class="rc-status-pill ${pillClass}"><span class="rc-pill-dot"></span>${escapeHtml(key)}</span>`;
+    }
+
+    function rctText(v, cls){
+      if(!v || v === '—') return `<span class="rct-muted">—</span>`;
+      return `<span class="${cls||''}">${escapeHtml(v)}</span>`;
+    }
+
+    // ── Columns for the Cosmos list view (tailored subitem columns) ──
+    // Name | Relationship | Lead Status | Owner Status | Contact Outcome | Phone 1 | Phone 2
+    // `field` maps to RC_FIELD_EDIT_CFG (column IDs + edit type) for inline editing.
+    const RCT_COLUMNS = [
+      { key:'name',           label:'Name',            num:false, editable:false },
+      { key:'relation',       label:'Relationship',    num:false, editable:true, field:'relation' },
+      { key:'status',         label:'Lead Status',     num:false, editable:true, field:'status' },
+      { key:'ownerStatus',    label:'Owner Status',    num:false, editable:true, field:'ownerStatus' },
+      { key:'contactOutcome', label:'Contact Outcome', num:false, editable:true, field:'contactOutcome' },
+      { key:'phone',          label:'Phone 1',         num:false, editable:true, field:'phone' },
+      { key:'phone2',         label:'Phone 2',         num:false, editable:true, field:'phone2' },
+    ];
+
+    // Lead Status options (Cosmos pill statuses) for the inline dropdown.
+    const RCT_STATUS_OPTS = [
+      'New','No Attempt','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer',
+      'Re-Skiptrace','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'
+    ];
+
+    const RCT_CHEVRON = `<svg class="rct-th-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    const RCT_SORT_ARROW = `<svg class="rct-sort-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>`;
+    const RCT_PENCIL = `<svg class="rct-edit-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+    const RCT_OVERFLOW = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>`;
+
+    // Inner display markup for a cell value (no <td> wrapper)
+    function rctCellInner(c, col){
+      switch(col.key){
+        case 'name':
+          return `<a href="#" class="rct-link rct-truncate" onclick="return false;">${escapeHtml(c.name||'—')}</a>`;
+        case 'relation':
+          return rctText(c.relation, 'rct-truncate');
+        case 'status':
+          return rctStatusPill(c.status);
+        case 'ownerStatus':
+          return rctText(c.ownerStatus);
+        case 'contactOutcome':
+          return (c.contactOutcome && c.contactOutcome!=='—') ? `<span class="rct-outcome">${escapeHtml(c.contactOutcome)}</span>` : `<span class="rct-muted">—</span>`;
+        case 'phone':
+          return (c.phone && c.phone!=='—') ? `<a class="rct-link" href="tel:${escapeHtml(String(c.phone).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone)}</a>` : `<span class="rct-muted">—</span>`;
+        case 'phone2':
+          return (c.phone2 && c.phone2!=='—') ? `<a class="rct-link" href="tel:${escapeHtml(String(c.phone2).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone2)}</a>` : `<span class="rct-muted">—</span>`;
+        default:
+          return rctText(c[col.key]);
+      }
+    }
+
+    function rctCell(c, col){
+      if(col.key === 'name'){
+        // Name opens the record; not editable
+        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}</span></td>`;
+      }
+      if(col.editable){
+        // Editable cell: hover reveals pencil; click pencil (or cell) edits in place
+        return `<td class="rct-cell-editable" data-field="${col.field}">
+          <span class="rct-cell-display">${rctCellInner(c, col)}</span>
+          <button class="rct-cell-pencil" type="button" aria-label="Edit ${escapeHtml(col.label)}" tabindex="-1">${RCT_PENCIL}</button>
+        </td>`;
+      }
+      return `<td>${rctCellInner(c, col)}</td>`;
+    }
+
+    // Build the Cosmos list-view table. Keeps original signature; derives
+    // tableview / recordview container IDs from the detailId suffix.
     function rcBuildList(data, listId, innerId, detailId, renderFn, isOwner){
-      const list = document.getElementById(listId);
-      if(!list) return;
-      list.innerHTML = "";
+      const suffix     = detailId.replace('detail-', '');           // "owners" | "other"
+      const tableView  = document.getElementById('tableview-' + suffix);
+      const recordView = document.getElementById('recordview-' + suffix);
+      if(!tableView) return;
+
+      // Preserve the current view: if a record is already open for this pane
+      // (e.g. this call is a post-edit refresh), keep the record visible and
+      // only rebuild the underlying table behind it. Otherwise show the table.
+      const recordOpen = recordView && recordView.style.display === 'block';
+      if(!recordOpen){
+        if(recordView) recordView.style.display = 'none';
+        tableView.style.display = 'block';
+      }
+
       const sorted = rcSortByStatus(data);
-      sorted.forEach((c)=>{
-        const isClosed = c.status === 'Closed';
-        let initials = "?";
-        if (c.name) {
-          const parts = c.name.trim().split(/\s+/);
-          if (parts.length > 1) initials = parts[0][0] + parts[parts.length - 1][0];
-          else initials = parts[0].substring(0, 2);
-          initials = initials.toUpperCase();
-        }
-        // ── Priority tier & signal badges ──
-        const isOwner       = c.ownerStatusNorm === 'yes';
-        const noRelation    = rcIsNoRelation(c);
-        const hasRelation   = !noRelation;
-        const isDeceased    = /deceas/i.test(c.status) || /deceas/i.test(c.relation);
-        const isProductive  = /productive/i.test(c.contactOutcome) || c.status === 'Interested In Selling' || c.status === 'Negotiations/Review' || c.status === 'Accepted Offer';
+      // Note: even with no contacts we still render the table so the
+      // "Add a contact" row is available to create the first one.
 
-        let tierClass = '';
-        if (isOwner) tierClass = 'tier-owner';
-        else if (hasRelation) tierClass = 'tier-relation';
-
-        const signals = [];
-        if (hasRelation)   signals.push(`<span class="rc-signal-badge sig-relation">${escapeHtml(c.relation)}</span>`);
-        if (noRelation && !isOwner) signals.push('<span class="rc-signal-badge sig-norelation">No Relation</span>');
-        if (isProductive && !isOwner) signals.push('<span class="rc-signal-badge sig-productive">Productive</span>');
-        if (isDeceased)    signals.push('<span class="rc-signal-badge sig-deceased">Deceased</span>');
-        const signalsHtml = signals.length ? `<div class="rc-item-signals">${signals.join('')}</div>` : '';
-
-        // Map status → Cosmos pill class
-        const STATUS_PILL_MAP = {
-          'Closed':                  'pill-closed',
-          'Accepted Offer':          'pill-accepted',
-          'Negotiations/Review':     'pill-negotiation',
-          'Interested In Selling':   'pill-interested',
-          'Contacted':               'pill-contacted',
-          'Attempt 3 - No Answer':   'pill-attempt3',
-          'Attempt 2 - No Answer':   'pill-attempt2',
-          'Attempt 1 - No Answer':   'pill-attempt1',
-          'Re-Skiptrace':            'pill-skiptrace',
-        };
-        // Shorten some labels so they fit comfortably in the narrow pill
-        const STATUS_LABEL_MAP = {
-          'Attempt 3 - No Answer': 'Attempt 3',
-          'Attempt 2 - No Answer': 'Attempt 2',
-          'Attempt 1 - No Answer': 'Attempt 1',
-          'Negotiations/Review':   'Negotiating',
-          'Interested In Selling': 'Interested',
-          'Accepted Offer':        'Accepted',
-        };
-        const statusKey   = c.status || 'New';
-        const pillClass   = STATUS_PILL_MAP[statusKey] || 'pill-noattempt';
-        const pillLabel   = STATUS_LABEL_MAP[statusKey] || statusKey;
-        const ownershipStr = c.ownership && c.ownership !== '—' ? ` · ${escapeHtml(c.ownership)}` : '';
-
-        const div = document.createElement("div");
-        div.className = "rc-list-item" + (tierClass ? ' ' + tierClass : '');
-        div.dataset.i = data.indexOf(c);
-        div.innerHTML = `
-          <div class="rc-item-avatar">${escapeHtml(initials)}</div>
-          <div class="rc-item-body">
-            <div class="rc-item-name-row">
-              <span class="rc-item-name">${escapeHtml(c.name)}</span>
-              ${isClosed ? RC_CLOSED_CHECK : ''}
-            </div>
-            ${ownershipStr ? `<div style="font-size:11px;color:#6b7280;margin-top:2px;">${ownershipStr.replace(' · ','')}</div>` : ''}
-            ${signalsHtml}
+      const headCells = RCT_COLUMNS.map((col, idx) => {
+        const sortArrow = idx === 0 ? RCT_SORT_ARROW : '';
+        return `<th class="${col.num ? 'rct-num' : ''}">
+          <div class="rct-th-inner">
+            <span class="rct-th-label">${escapeHtml(col.label)}${sortArrow}</span>
+            ${RCT_CHEVRON}
           </div>
-          <div class="rc-item-right">
-            <span class="rc-status-pill ${pillClass}">
-              <span class="rc-pill-dot"></span>${escapeHtml(pillLabel)}
-            </span>
-          </div>`;
-        div.addEventListener("click",()=>{
-          list.querySelectorAll(".rc-list-item").forEach(el=>el.classList.remove("active"));
-          div.classList.add("active");
-          renderFn(c, innerId, detailId);
+        </th>`;
+      }).join('');
+
+      const bodyRows = sorted.map((c) => {
+        const realIdx = data.indexOf(c);
+        const cells = RCT_COLUMNS.map(col => rctCell(c, col)).join('');
+        return `<tr class="rct-row" data-i="${realIdx}">
+          <td class="rct-col-rownum"></td>
+          <td class="rct-col-check"><span class="rct-checkbox" onclick="event.stopPropagation(); this.classList.toggle('checked');"></span></td>
+          ${cells}
+        </tr>`;
+      }).join('');
+
+      tableView.innerHTML = `
+        <div class="rct-scroll">
+          <table class="rct-table">
+            <thead>
+              <tr>
+                <th class="rct-col-rownum"></th>
+                <th class="rct-col-check"><span class="rct-checkbox" onclick="event.stopPropagation(); var on=this.classList.toggle('checked'); var t=this.closest('table'); t.querySelectorAll('tbody .rct-checkbox').forEach(function(cb){ cb.classList.toggle('checked', on); });"></span></th>
+                ${headCells}
+                <th class="rct-th-overflow"><span class="rct-overflow-btn" onclick="event.stopPropagation();">${RCT_OVERFLOW}</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>`;
+
+      // append row-number values + wire clicks
+      const tbody = tableView.querySelector('tbody');
+      tbody.innerHTML = bodyRows;
+      // pad each data row with a trailing cell to align under the overflow column
+      tbody.querySelectorAll('.rct-row').forEach((tr, n) => {
+        tr.querySelector('.rct-col-rownum').textContent = (n + 1);
+        const pad = document.createElement('td');
+        tr.appendChild(pad);
+
+        // Row click → open the full record … unless an editable cell handles it
+        tr.addEventListener('click', (e) => {
+          if(e.target.closest('.rct-cell-editable')) return;   // edits handled below
+          if(e.target.closest('a')) return;                    // phone tel: links
+          const c = data[+tr.dataset.i];
+          if(!c) return;
+          rcOpenRecord(c, suffix, innerId, detailId, renderFn);
         });
-        list.appendChild(div);
+
+        // Editable cells → begin inline edit on click (pencil or cell body)
+        tr.querySelectorAll('.rct-cell-editable').forEach(td => {
+          td.addEventListener('click', (e) => {
+            // let phone tel: links work normally unless the pencil was clicked
+            const onPencil = !!e.target.closest('.rct-cell-pencil');
+            if(!onPencil && e.target.closest('a')) return;
+            e.stopPropagation();
+            if(td.classList.contains('rct-editing')) return;
+            const c = data[+tr.dataset.i];
+            if(!c) return;
+            rctBeginCellEdit(td, c, suffix, innerId, detailId, renderFn, data);
+          });
+        });
       });
+
+      // ── Inline "Add a contact" row (always the last gridline) ──
+      rctAppendAddRow(tbody, sorted.length, suffix, innerId, detailId, renderFn, data);
+    }
+
+    // Builds the persistent add-contact row, and (when activated) swaps it into
+    // an editable entry row spanning all tailored columns.
+    function rctAppendAddRow(tbody, nextRowNum, suffix, innerId, detailId, renderFn, data){
+      const tr = document.createElement('tr');
+      tr.className = 'rct-add-row';
+      const totalCols = 2 /* rownum + check */ + RCT_COLUMNS.length + 1 /* overflow pad */;
+      tr.innerHTML = `
+        <td class="rct-col-rownum">${nextRowNum + 1}</td>
+        <td class="rct-col-check"></td>
+        <td class="rct-add-prompt" colspan="${RCT_COLUMNS.length + 1}">
+          <span class="rct-add-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add a contact
+          </span>
+        </td>`;
+      tr.addEventListener('click', (e) => {
+        e.stopPropagation();
+        rctActivateAddRow(tr, suffix, innerId, detailId, renderFn, data);
+      });
+      tbody.appendChild(tr);
+    }
+
+    // Convert the add-row into an inline entry row with inputs/selects per column.
+    function rctActivateAddRow(tr, suffix, innerId, detailId, renderFn, data){
+      if(tr.classList.contains('rct-add-active')) return;
+      rctCloseEditor();   // close any open cell editor first
+      tr.classList.add('rct-add-active');
+      tr.classList.remove('rct-add-row');
+
+      const editorFor = (col) => {
+        const field = col.field || col.key;   // Name column has no .field; use its key
+        if(field === 'status'){
+          return `<select class="rct-cell-input rct-cell-select" data-field="status">${
+            RCT_STATUS_OPTS.map(o => `<option value="${escapeHtml(o)}"${o==='New'?' selected':''}>${escapeHtml(o)}</option>`).join('')
+          }</select>`;
+        }
+        const cfg = RC_FIELD_EDIT_CFG[field] || { type:'text' };
+        if(cfg.type === 'select' && cfg.opts){
+          return `<select class="rct-cell-input rct-cell-select" data-field="${field}"><option value="">—</option>${
+            cfg.opts.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')
+          }</select>`;
+        }
+        const ph = field === 'name' ? 'Name *'
+                 : field === 'relation' ? 'Relationship'
+                 : (cfg.placeholder || '');
+        return `<input type="text" class="rct-cell-input" data-field="${field}" placeholder="${escapeHtml(ph)}">`;
+      };
+
+      const cellsHtml = RCT_COLUMNS.map(col => `<td class="rct-add-cell">${editorFor(col)}</td>`).join('');
+      tr.innerHTML = `
+        <td class="rct-col-rownum">${tr.querySelector('.rct-col-rownum') ? tr.querySelector('.rct-col-rownum').textContent : ''}</td>
+        <td class="rct-col-check"></td>
+        ${cellsHtml}
+        <td class="rct-add-actions">
+          <button class="rct-cell-save" type="button" title="Save contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="rct-cell-cancel" type="button" title="Cancel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </td>`;
+
+      const nameInput = tr.querySelector('[data-field="name"]');
+      if(nameInput) nameInput.focus();
+
+      const cancel = () => {
+        rcBuildList(data, 'list-' + suffix, innerId, detailId, renderFn, suffix === 'owners');
+      };
+      const save = () => rctCommitAddRow(tr, suffix, innerId, detailId, renderFn, data);
+
+      tr.querySelector('.rct-cell-save').addEventListener('click', (e)=>{ e.stopPropagation(); save(); });
+      tr.querySelector('.rct-cell-cancel').addEventListener('click', (e)=>{ e.stopPropagation(); cancel(); });
+      // Enter on any input saves; Escape cancels
+      tr.querySelectorAll('.rct-cell-input').forEach(inp => {
+        inp.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter'){ e.preventDefault(); save(); }
+          else if(e.key === 'Escape'){ e.preventDefault(); cancel(); }
+        });
+        inp.addEventListener('click', e=>e.stopPropagation());
+      });
+      tr.addEventListener('click', e=>e.stopPropagation());
+    }
+
+    async function rctCommitAddRow(tr, suffix, innerId, detailId, renderFn, data){
+      const get = (field) => { const el = tr.querySelector(`[data-field="${field}"]`); return el ? el.value.trim() : ''; };
+      const name = get('name');
+      const nameInput = tr.querySelector('[data-field="name"]');
+
+      // Name required
+      if(!name){
+        if(nameInput){ nameInput.classList.add('rc-input-error'); nameInput.focus(); }
+        return;
+      }
+      if(nameInput) nameInput.classList.remove('rc-input-error');
+
+      const phone1Raw = get('phone');
+      const phone2Raw = get('phone2');
+      const { boardId, pulseId } = getRcIds();
+
+      const payload = {
+        type:            'create_contact',
+        parent_board_id: boardId || '',
+        parent_pulse_id: pulseId || '',
+        name:            name,
+        relationship:    get('relation'),
+        lead_status:     get('status') || 'New',
+        owner_status:    get('ownerStatus'),
+        contact_outcome: get('contactOutcome'),
+        phone_1:         phone1Raw.replace(/[^0-9+]/g,''),
+        phone_2:         phone2Raw.replace(/[^0-9+]/g,''),
+        timestamp:       new Date().toISOString()
+      };
+
+      // Loading state on the save button
+      const saveBtn = tr.querySelector('.rct-cell-save');
+      if(saveBtn){ saveBtn.classList.add('rct-saving'); saveBtn.disabled = true; }
+
+      // Fire-and-forget, matching fireRcWebhook: Make.com webhooks can trip
+      // browser CORS on the *response* even when the request succeeds, so we
+      // treat a completed send (no thrown network error) as success rather
+      // than gating on res.ok.
+      let ok = true;
+      try {
+        await fetch(RC_CREATE_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch(err){
+        console.warn('Create contact webhook error:', err);
+        ok = false;
+      }
+
+      if(ok){
+        const mapped = rcMapContact({
+          name:            payload.name,
+          relationship:    payload.relationship,
+          lead_status:     payload.lead_status,
+          owner_status:    payload.owner_status,
+          contact_outcome: payload.contact_outcome,
+          phone_1:         phone1Raw,
+          phone_2:         phone2Raw,
+          board_id:        boardId,
+          pulse_id:        null
+        });
+        if(mapped.ownerStatusNorm === 'yes') rcOwners.push(mapped);
+        else rcOthers.push(mapped);
+
+        rcUpdateMeta();
+        rcBuildList(rcOwners, 'list-owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner, true);
+        rcBuildList(rcOthers, 'list-other',  'inner-other',  'detail-other',  rcRenderDetailOther, false);
+
+        // If the contact landed in the other tab, switch to it
+        const targetTab = mapped.ownerStatusNorm === 'yes' ? 'tab-owners' : 'tab-other';
+        const curPane = (suffix === 'owners') ? 'tab-owners' : 'tab-other';
+        if(targetTab !== curPane){ const t = document.getElementById(targetTab); if(t) t.click(); }
+
+        rcShowCreateToast(true);
+      } else {
+        if(saveBtn){ saveBtn.classList.remove('rct-saving'); saveBtn.disabled = false; }
+        rcShowCreateToast(false);
+      }
+    }
+
+    // ── Inline cell editing (Cosmos-style) ──────────────────────────────
+    // Reuses the same RC_FIELD_EDIT_CFG, rcGetColumnId and fireRcWebhook
+    // pipeline as the full record page, so saves commit to Make.com identically.
+    let rctOpenEditor = null;   // { restore: fn } for the currently-open editor
+
+    function rctCloseEditor(){
+      if(rctOpenEditor && rctOpenEditor.restore){
+        try { rctOpenEditor.restore(); } catch(_){}
+      }
+      rctOpenEditor = null;
+    }
+
+    function rctBeginCellEdit(td, c, suffix, innerId, detailId, renderFn, data){
+      // Close any other open editor first
+      rctCloseEditor();
+
+      const field = td.dataset.field;
+      const cfg   = RC_FIELD_EDIT_CFG[field] || { type:'text' };
+      const display = td.querySelector('.rct-cell-display');
+      const prevHtml = td.innerHTML;
+
+      td.classList.add('rct-editing');
+
+      // Build the editor control
+      let editorHtml = '';
+      const curRaw = (c[field] == null || c[field] === '—') ? '' : String(c[field]);
+
+      if(field === 'status'){
+        const opts = RCT_STATUS_OPTS.map(o => `<option value="${escapeHtml(o)}"${o===c.status?' selected':''}>${escapeHtml(o)}</option>`).join('');
+        editorHtml = `<select class="rct-cell-input rct-cell-select">${opts}</select>`;
+      } else if(cfg.type === 'select' && cfg.opts){
+        const opts = ['<option value="">—</option>'].concat(
+          cfg.opts.map(o => `<option value="${escapeHtml(o)}"${o===curRaw?' selected':''}>${escapeHtml(o)}</option>`)
+        ).join('');
+        editorHtml = `<select class="rct-cell-input rct-cell-select">${opts}</select>`;
+      } else {
+        const ph = cfg.placeholder ? ` placeholder="${escapeHtml(cfg.placeholder)}"` : '';
+        editorHtml = `<input type="text" class="rct-cell-input"${ph} value="${escapeHtml(curRaw)}">`;
+      }
+
+      td.innerHTML = `<div class="rct-cell-edit">
+        ${editorHtml}
+        <div class="rct-cell-edit-actions">
+          <button class="rct-cell-save" type="button" title="Save">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="rct-cell-cancel" type="button" title="Cancel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>`;
+
+      const input = td.querySelector('.rct-cell-input');
+      const restore = () => { td.classList.remove('rct-editing'); td.innerHTML = prevHtml; };
+      rctOpenEditor = { restore };
+
+      // focus
+      if(input){ input.focus(); if(input.select) input.select(); }
+
+      const commit = () => {
+        const val = input ? input.value.trim() : '';
+        rctCommitCellEdit(c, field, val, suffix, innerId, detailId, renderFn, data);
+      };
+
+      // Wire save / cancel
+      td.querySelector('.rct-cell-save').addEventListener('click', (e)=>{ e.stopPropagation(); commit(); });
+      td.querySelector('.rct-cell-cancel').addEventListener('click', (e)=>{ e.stopPropagation(); rctCloseEditor(); });
+
+      // keyboard: Enter saves, Esc cancels
+      if(input){
+        input.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+          else if(e.key === 'Escape'){ e.preventDefault(); rctCloseEditor(); }
+        });
+      }
+      // prevent clicks inside the editor from bubbling to row/document
+      td.querySelector('.rct-cell-edit').addEventListener('click', e=>e.stopPropagation());
+    }
+
+    function rctCommitCellEdit(c, field, rawVal, suffix, innerId, detailId, renderFn, data){
+      const { boardId, pulseId: globalPulseId } = getRcIds();
+
+      let newVal = rawVal;
+      let webhookVal = rawVal;
+
+      if(rawVal === ''){
+        newVal = '—';
+        webhookVal = '';
+      } else if(field === 'phone' || field === 'phone2'){
+        newVal = formatPhone(rawVal);          // display formatting
+        webhookVal = rawVal.replace(/[^0-9+]/g,'');
+      } else if(field === 'status'){
+        newVal = rawVal;
+        c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(rawVal);
+        webhookVal = rawVal;
+      }
+
+      c[field] = newVal;
+
+      const cPulseId = c.pulseId || globalPulseId;
+      const cBoardId = c.boardId || boardId;
+      const colId = rcGetColumnId(field, cBoardId);
+      if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
+
+      rctOpenEditor = null;   // editor will be removed by the rebuild
+
+      // Rebuild the table (and the open record, if any) so the new value shows.
+      rcBuildList(data, 'list-' + suffix, innerId, detailId, renderFn, suffix === 'owners');
+      // If the record for this contact is open, refresh it too
+      const recordView = document.getElementById('recordview-' + suffix);
+      if(recordView && recordView.style.display === 'block'){
+        renderFn(c, innerId, detailId);
+      }
+
+      rctShowSaveToast();
+    }
+
+    function rctShowSaveToast(){
+      const toast = document.createElement('div');
+      toast.className = 'rc-update-toast rc-update-toast--success';
+      toast.innerHTML = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Saved';
+      document.body.appendChild(toast);
+      setTimeout(()=>toast.classList.add('rc-update-toast--visible'), 10);
+      setTimeout(()=>{ toast.classList.remove('rc-update-toast--visible'); setTimeout(()=>toast.remove(), 300); }, 2200);
+    }
+
+    // Click outside an open cell editor closes it (without saving)
+    document.addEventListener('click', (e)=>{
+      if(rctOpenEditor && !e.target.closest('.rct-cell-editable.rct-editing')){
+        rctCloseEditor();
+      }
+    });
+
+    // Tracks which contact (data index) is currently open per pane, so the
+    // existing inline-edit / status / re-render handlers can resolve "the
+    // active contact" now that there is no persistent .rc-list-item.active.
+    const rcActiveIndex = { owners: null, other: null };
+
+    // Returns an object shaped like the old active list item ({dataset:{i}})
+    // so legacy handlers continue to work unchanged.
+    function rcGetActiveItem(paneId){
+      const suffix = paneId.replace('pane-', '');
+      const idx = rcActiveIndex[suffix];
+      if(idx == null) return null;
+      return { dataset: { i: String(idx) }, classList: { add(){}, remove(){} } };
+    }
+    window.rcGetActiveItem = rcGetActiveItem;
+
+    // Open a contact's full subitem record (existing detail renderer) and
+    // show a Cosmos breadcrumb back-bar above it.
+    function rcOpenRecord(c, suffix, innerId, detailId, renderFn){
+      const tableView  = document.getElementById('tableview-' + suffix);
+      const recordView = document.getElementById('recordview-' + suffix);
+      if(!recordView) return;
+
+      // Remember the open contact for legacy active-item lookups
+      const dataArr = suffix === 'owners' ? rcOwners : rcOthers;
+      rcActiveIndex[suffix] = dataArr.indexOf(c);
+
+      // Inject / refresh the back-bar at the top of the record view
+      let backBar = recordView.querySelector('.rc-back-bar');
+      const crumbName = escapeHtml(c.name || 'Contact');
+      const tabLabel  = suffix === 'owners' ? 'Confirmed Owners' : 'Other Contacts';
+      const backBarHtml = `
+        <button class="rc-back-btn" type="button" onclick="rcBackToList('${suffix}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to list
+        </button>
+        <span class="rc-back-crumb">
+          <span>${tabLabel}</span>
+          <span class="rc-crumb-sep">›</span>
+          <span class="rc-crumb-current">${crumbName}</span>
+        </span>`;
+      if(!backBar){
+        backBar = document.createElement('div');
+        backBar.className = 'rc-back-bar';
+        recordView.insertBefore(backBar, recordView.firstChild);
+      }
+      backBar.innerHTML = backBarHtml;
+
+      // Render the full record into the existing detail container
+      renderFn(c, innerId, detailId);
+
+      // Swap views
+      tableView.style.display = 'none';
+      recordView.style.display = 'block';
+      if(recordView.scrollIntoView) recordView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Return to the native list view
+    function rcBackToList(suffix){
+      const tableView  = document.getElementById('tableview-' + suffix);
+      const recordView = document.getElementById('recordview-' + suffix);
+      if(recordView) recordView.style.display = 'none';
+      if(tableView){
+        tableView.style.display = 'block';
+        if(tableView.scrollIntoView) tableView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+    window.rcBackToList = rcBackToList;
+
+    // ── NEW CONTACT (inline add row) webhook ──
+    const RC_CREATE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
+
+    function rcShowCreateToast(success){
+      const toast = document.createElement('div');
+      toast.className = 'rc-update-toast ' + (success ? 'rc-update-toast--success' : 'rc-update-toast--error');
+      const checkSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const warnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      toast.innerHTML = success ? (checkSvg + ' Contact created') : (warnSvg + ' Failed to create contact');
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add('rc-update-toast--visible'), 10);
+      setTimeout(() => { toast.classList.remove('rc-update-toast--visible'); setTimeout(() => toast.remove(), 300); }, 2800);
     }
 
     function rcUpdateMeta(){
@@ -4418,8 +5249,7 @@
       const panel = btn.closest('.rc-pane');
       const paneId = panel ? panel.id : '';
       const dataArr = paneId === 'pane-owners' ? rcOwners : rcOthers;
-      const listEl = document.getElementById(paneId ? paneId.replace('pane-', 'list-') : '');
-      const activeItem = listEl ? listEl.querySelector('.rc-list-item.active') : null;
+      const activeItem = paneId ? rcGetActiveItem(paneId) : null;
       const contact = activeItem ? dataArr[+activeItem.dataset.i] : null;
       const { boardId, pulseId: globalPulseId } = getRcIds();
       const contactPulseId = contact ? (contact.pulseId || null) : null;
@@ -4465,7 +5295,7 @@
           const pane = wrap.closest(".rc-pane");
           if(!pane) return;
           const dataArr = pane.id === 'pane-owners' ? rcOwners : rcOthers;
-          const activeItem = document.getElementById(pane.id.replace('pane-','list-')).querySelector('.rc-list-item.active');
+          const activeItem = rcGetActiveItem(pane.id);
           const c = activeItem ? dataArr[+activeItem.dataset.i] : null;
           if(!c) return;
           const rawVal = c[field];
@@ -4565,7 +5395,7 @@
           const field = el.closest("[data-action='inline-save']").dataset.field;
           const wrap  = el.closest(".rc-editable");
           const input = wrap.querySelector(`[data-field="${field}"]`);
-          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          const activeItem = rcGetActiveItem(paneId);
           if(!activeItem || !input) return;
           const c = dataArr[+activeItem.dataset.i];
           if(input.value && input.value !== "Select…"){
@@ -4607,8 +5437,6 @@
             if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
-          document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
-            .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
           renderFn(c, innerId, detailId);
           return;
         }
@@ -4616,7 +5444,7 @@
         if(el.closest("[data-action='inline-clear']")){
           e.stopPropagation();
           const field = el.closest("[data-action='inline-clear']").dataset.field;
-          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          const activeItem = rcGetActiveItem(paneId);
           if(!activeItem) return;
           const c = dataArr[+activeItem.dataset.i];
           c[field] = "—";
@@ -4625,15 +5453,13 @@
           const colId = rcGetColumnId(field, cBoardId);
           if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, "");
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
-          document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
-            .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
           renderFn(c, innerId, detailId);
           return;
         }
 
         if(el.closest("[data-action='inline-cancel']")){
           e.stopPropagation();
-          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          const activeItem = rcGetActiveItem(paneId);
           if(activeItem) renderFn(dataArr[+activeItem.dataset.i], innerId, detailId);
           return;
         }
@@ -4642,7 +5468,7 @@
           e.stopPropagation();
           const btn = el.closest("[data-action='setstatus']");
           const newStatus = btn.dataset.val;
-          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          const activeItem = rcGetActiveItem(paneId);
           if(!activeItem) return;
           /* Visual press feedback on the clicked chevron */
           btn.style.filter = 'brightness(0.82)';
@@ -4659,8 +5485,6 @@
             const cBoardId = c.boardId || boardId;
             if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, rcGetColumnId('status', cBoardId), newStatus);
             rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
-            document.getElementById(paneId.replace("pane-","list-")).querySelectorAll(".rc-list-item")
-              .forEach(item=>{ if(+item.dataset.i===+activeItem.dataset.i) item.classList.add("active"); });
             renderFn(c, innerId, detailId);
           }, 300);
           return;
@@ -4671,7 +5495,7 @@
           const btn = el.closest("[data-action='setfield']");
           const field = btn.dataset.field;
           const val = btn.dataset.val;
-          const activeItem = document.getElementById(paneId.replace("pane-","list-")).querySelector(".rc-list-item.active");
+          const activeItem = rcGetActiveItem(paneId);
           if(!activeItem) return;
           const c = dataArr[+activeItem.dataset.i];
           c[field] = val;
