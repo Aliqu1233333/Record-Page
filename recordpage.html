@@ -2510,7 +2510,7 @@
                   <img
                     src="https://raw.githubusercontent.com/Aliqu1233333/Record-Page/main/Toast.jpg"
                     alt="Action Step Completed"
-                    style="width:140px;height:140px;object-fit:contain;position:relative;z-index:1;border-radius:12px;"
+                    style="width:196px;height:196px;object-fit:contain;position:relative;z-index:1;border-radius:12px;"
                   />
                 </div>
                   <div class="nas-celebrate-title">Action Step Completed!</div>
@@ -5788,27 +5788,43 @@
       function nasFireConfetti() {
         var canvas = document.getElementById('nasConfettiCanvas');
         if (!canvas) return;
-        var rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width  = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        canvas.width  = canvas.offsetWidth  || 648;
+        canvas.height = canvas.offsetHeight || 400;
         var ctx = canvas.getContext('2d');
         var pieces = [];
-        var colors = ['#0176d3','#2E844A','#FF906E','#FCC003','#a855f7','#f43f5e','#06A59A','#FF5D2D'];
-        for (var i = 0; i < 80; i++) {
-          pieces.push({
-            x: canvas.width / 2 + (Math.random() - 0.5) * 60,
-            y: canvas.height * 0.35,
-            vx: (Math.random() - 0.5) * 14,
-            vy: -(Math.random() * 10 + 5),
-            w: Math.random() * 8 + 4,
-            h: Math.random() * 4 + 3,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            rot: Math.random() * 360,
-            rotV: (Math.random() - 0.5) * 8,
-            alpha: 1,
-            gravity: 0.35
-          });
+        var colors = ['#0176d3','#2E844A','#FF906E','#FCC003','#a855f7','#f43f5e','#06A59A','#FF5D2D','#ffffff','#fcdde3','#f9e3b6'];
+
+        function spawnBurst(cx, cy, count) {
+          for (var i = 0; i < count; i++) {
+            var angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.8;
+            var speed = Math.random() * 18 + 8;
+            var isCircle = Math.random() > 0.6;
+            pieces.push({
+              x: cx + (Math.random() - 0.5) * 40,
+              y: cy + (Math.random() - 0.5) * 20,
+              vx: Math.cos(angle) * speed * (Math.random() * 0.6 + 0.7),
+              vy: Math.sin(angle) * speed * (Math.random() * 0.6 + 0.7) - 4,
+              w: Math.random() * 10 + 5,
+              h: isCircle ? 0 : Math.random() * 5 + 3,
+              r: isCircle ? Math.random() * 5 + 3 : 0,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              rot: Math.random() * 360,
+              rotV: (Math.random() - 0.5) * 12,
+              alpha: 1,
+              gravity: 0.28 + Math.random() * 0.2,
+              born: Date.now()
+            });
+          }
         }
+
+        // First burst — center of modal
+        spawnBurst(canvas.width / 2, canvas.height * 0.3, 120);
+        // Second burst — spread across top after 200ms
+        setTimeout(function() {
+          spawnBurst(canvas.width * 0.25, canvas.height * 0.2, 50);
+          spawnBurst(canvas.width * 0.75, canvas.height * 0.2, 50);
+        }, 200);
+
         var start = null;
         function draw(ts) {
           if (!start) start = ts;
@@ -5818,17 +5834,24 @@
             p.x  += p.vx;
             p.vy += p.gravity;
             p.y  += p.vy;
+            p.vx *= 0.99;
             p.rot += p.rotV;
-            p.alpha = Math.max(0, 1 - elapsed / 2200);
+            p.alpha = Math.max(0, 1 - elapsed / 3200);
             ctx.save();
             ctx.globalAlpha = p.alpha;
             ctx.translate(p.x, p.y);
             ctx.rotate(p.rot * Math.PI / 180);
             ctx.fillStyle = p.color;
-            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            if (p.r > 0) {
+              ctx.beginPath();
+              ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            }
             ctx.restore();
           });
-          if (elapsed < 2400) requestAnimationFrame(draw);
+          if (elapsed < 3400) requestAnimationFrame(draw);
           else ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         requestAnimationFrame(draw);
