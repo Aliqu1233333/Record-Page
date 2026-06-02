@@ -800,10 +800,10 @@
       background: #f3f3f3;
       color: #444;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 13.67px;
       text-align: left;
-      padding: 8px 12px;
-      height: 32px;
+      padding: 12px 12px;
+      height: 44px;
       border-bottom: 1px solid #c9c9c9;
       border-right: 1px solid #e5e5e5;
       vertical-align: middle;
@@ -841,7 +841,7 @@
     /* ── Body rows ── */
     .rct-table tbody td {
       padding: 0 12px;
-      height: 40px;
+      height: 46px;
       border-bottom: 1px solid #e5e5e5;
       vertical-align: middle;
       background: #fff;
@@ -958,29 +958,29 @@
     .rct-table .rc-status-pill { font-size: 11px; }
 
     /* ── Per-column font sizes ──
-       All filled lead columns bumped +1.2pt (1.6px) so they read larger
+       Filled lead columns: +1.2pt then +0.5pt more so they read larger
        inside the embedded CRM widget.
-       Name, Relationship, Phones: 14.27px
-       Lead Status pill: 11.6px
-       Owner Status: 13.93px
-       Contact Outcome: 13.6px (set on .rct-outcome below) ── */
+       Name, Relationship, Phones: 14.94px
+       Lead Status pill: 12.27px
+       Owner Status: 14.6px
+       Contact Outcome: 14.27px (set on .rct-outcome below) ── */
     .rct-name-cell,
     .rct-name-cell .rct-link,
     .rct-cell-editable[data-field="relation"] .rct-cell-display,
     .rct-cell-editable[data-field="phone"] .rct-cell-display,
     .rct-cell-editable[data-field="phone2"] .rct-cell-display {
-      font-size: 14.27px;
+      font-size: 14.94px;
     }
     .rct-cell-editable[data-field="status"] .rc-status-pill {
-      font-size: 11.6px;
+      font-size: 12.27px;
     }
     .rct-cell-editable[data-field="ownerStatus"] .rct-cell-display {
-      font-size: 13.93px;
+      font-size: 14.6px;
     }
 
     /* contact-outcome soft tag */
     .rct-outcome {
-      display: inline-block; font-size: 13.6px; color: #3e3e3c;
+      display: inline-block; font-size: 14.27px; color: #3e3e3c;
       max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
@@ -997,7 +997,7 @@
     }
 
     /* ── Inline "Add a contact" row ── */
-    .rct-add-row td { background: #fff; border-bottom: 1px solid #e5e5e5; height: 40px; }
+    .rct-add-row td { background: #fff; border-bottom: 1px solid #e5e5e5; height: 46px; }
     .rct-add-row { cursor: pointer; }
     .rct-add-row:hover td { background: #f3f2f2; }
     .rct-add-prompt { padding: 0 12px; }
