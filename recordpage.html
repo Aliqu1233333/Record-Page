@@ -831,41 +831,12 @@
     .rct-table td.rct-num { text-align: right; justify-content: flex-end; }
     .rct-table td.rct-num { text-align: right; }
 
-    /* checkbox + row-number columns */
-    .rct-col-check { width: 38px; min-width: 38px; text-align: center; padding: 8px 6px; }
+    /* row-number column */
     .rct-col-rownum {
       width: 34px; min-width: 34px; text-align: right;
       color: #706e6b; font-weight: 400; padding: 8px 8px;
     }
     .rct-table thead th.rct-col-rownum { color: transparent; }
-
-    .rct-checkbox {
-      width: 14px; height: 14px;
-      border: 1px solid #b0adab;
-      border-radius: 3px;
-      background: #fff;
-      display: inline-block;
-      vertical-align: middle;
-      cursor: pointer;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .rct-checkbox.checked { background: #0176d3; border-color: #0176d3; }
-    .rct-checkbox.checked::after {
-      content: ""; position: absolute; left: 4px; top: 1px;
-      width: 4px; height: 8px; border: solid #fff; border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
-    }
-
-    /* overflow ⋯ button in header far-right */
-    .rct-th-overflow { width: 44px; min-width: 44px; text-align: center; }
-    .rct-overflow-btn {
-      width: 26px; height: 26px; border-radius: 50%;
-      border: 1px solid #c9c9c9; background: #fff;
-      display: inline-flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #444;
-    }
-    .rct-overflow-btn:hover { background: #f3f3f3; }
 
     /* ── Body rows ── */
     .rct-table tbody td {
@@ -987,28 +958,35 @@
     .rct-table .rc-status-pill { font-size: 11px; }
 
     /* ── Per-column font sizes ──
-       Name, Relationship, Phones: ~0.5pt down from default (13px → 12.67px)
-       Lead Status pill: 10px
-       Owner Status: ~0.5pt down from default (13px → 12.33px) ── */
+       All filled lead columns bumped +1.2pt (1.6px) so they read larger
+       inside the embedded CRM widget.
+       Name, Relationship, Phones: 14.27px
+       Lead Status pill: 11.6px
+       Owner Status: 13.93px
+       Contact Outcome: 13.6px (set on .rct-outcome below) ── */
     .rct-name-cell,
     .rct-name-cell .rct-link,
     .rct-cell-editable[data-field="relation"] .rct-cell-display,
     .rct-cell-editable[data-field="phone"] .rct-cell-display,
     .rct-cell-editable[data-field="phone2"] .rct-cell-display {
-      font-size: 12.67px;
+      font-size: 14.27px;
     }
     .rct-cell-editable[data-field="status"] .rc-status-pill {
-      font-size: 10px;
+      font-size: 11.6px;
     }
     .rct-cell-editable[data-field="ownerStatus"] .rct-cell-display {
-      font-size: 12.33px;
+      font-size: 13.93px;
     }
 
     /* contact-outcome soft tag */
     .rct-outcome {
-      display: inline-block; font-size: 12px; color: #3e3e3c;
+      display: inline-block; font-size: 13.6px; color: #3e3e3c;
       max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+
+    /* phone cell + teal "correct number" check */
+    .rct-phone-wrap { display: inline-flex; align-items: center; gap: 5px; }
+    .rct-correct-check { width: 13px; height: 13px; flex-shrink: 0; }
 
     /* empty state */
     .rct-empty {
@@ -4021,10 +3999,14 @@
     function rcIsNoRelation(c){ return !c.relation || c.relation === '—' || /no.?relation/i.test(c.relation) || /unknown/i.test(c.relation); }
     function rcSortByStatus(data){
       return [...data].sort((a,b) => {
+        // Primary: lead status, closest-to-closed first
+        const pa = RC_STATUS_PRIORITY[a.status] ?? 1;
+        const pb = RC_STATUS_PRIORITY[b.status] ?? 1;
+        if(pb !== pa) return pb - pa;
+        // Tiebreaker within the same status: no-relation contacts sink
         const aNoRel = rcIsNoRelation(a) ? 1 : 0;
         const bNoRel = rcIsNoRelation(b) ? 1 : 0;
-        if(aNoRel !== bNoRel) return aNoRel - bNoRel; // no-relation sinks to bottom
-        return (RC_STATUS_PRIORITY[b.status]??1) - (RC_STATUS_PRIORITY[a.status]??1);
+        return aNoRel - bNoRel;
       });
     }
 
@@ -4634,9 +4616,12 @@
     const RCT_CHEVRON = `<svg class="rct-th-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
     const RCT_SORT_ARROW = `<svg class="rct-sort-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6 13 12 19 18 13"/></svg>`;
     const RCT_PENCIL = `<svg class="rct-edit-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-    const RCT_OVERFLOW = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>`;
 
     // Inner display markup for a cell value (no <td> wrapper)
+    // Small teal check circle shown next to a phone when it's the "Correct Number"
+    const RCT_CORRECT_CHECK = `<svg class="rct-correct-check" viewBox="0 0 12 12" fill="none" aria-label="Correct number"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    function rctIsCorrect(status){ return String(status||'').trim().toLowerCase() === 'correct number'; }
+
     function rctCellInner(c, col){
       switch(col.key){
         case 'name':
@@ -4650,9 +4635,13 @@
         case 'contactOutcome':
           return (c.contactOutcome && c.contactOutcome!=='—') ? `<span class="rct-outcome">${escapeHtml(c.contactOutcome)}</span>` : `<span class="rct-muted">—</span>`;
         case 'phone':
-          return (c.phone && c.phone!=='—') ? `<a class="rct-link" href="tel:${escapeHtml(String(c.phone).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone)}</a>` : `<span class="rct-muted">—</span>`;
+          return (c.phone && c.phone!=='—')
+            ? `<span class="rct-phone-wrap"><a class="rct-link" href="tel:${escapeHtml(String(c.phone).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone)}</a>${rctIsCorrect(c.phoneStatus) ? RCT_CORRECT_CHECK : ''}</span>`
+            : `<span class="rct-muted">—</span>`;
         case 'phone2':
-          return (c.phone2 && c.phone2!=='—') ? `<a class="rct-link" href="tel:${escapeHtml(String(c.phone2).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone2)}</a>` : `<span class="rct-muted">—</span>`;
+          return (c.phone2 && c.phone2!=='—')
+            ? `<span class="rct-phone-wrap"><a class="rct-link" href="tel:${escapeHtml(String(c.phone2).replace(/[^0-9+]/g,''))}" onclick="event.stopPropagation();">${escapeHtml(c.phone2)}</a>${rctIsCorrect(c.phone2Status) ? RCT_CORRECT_CHECK : ''}</span>`
+            : `<span class="rct-muted">—</span>`;
         default:
           return rctText(c[col.key]);
       }
@@ -4709,7 +4698,6 @@
         const cells = RCT_COLUMNS.map(col => rctCell(c, col)).join('');
         return `<tr class="rct-row" data-i="${realIdx}">
           <td class="rct-col-rownum"></td>
-          <td class="rct-col-check"><span class="rct-checkbox" onclick="event.stopPropagation(); this.classList.toggle('checked');"></span></td>
           ${cells}
         </tr>`;
       }).join('');
@@ -4720,9 +4708,7 @@
             <thead>
               <tr>
                 <th class="rct-col-rownum"></th>
-                <th class="rct-col-check"><span class="rct-checkbox" onclick="event.stopPropagation(); var on=this.classList.toggle('checked'); var t=this.closest('table'); t.querySelectorAll('tbody .rct-checkbox').forEach(function(cb){ cb.classList.toggle('checked', on); });"></span></th>
                 ${headCells}
-                <th class="rct-th-overflow"><span class="rct-overflow-btn" onclick="event.stopPropagation();">${RCT_OVERFLOW}</span></th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -4732,11 +4718,8 @@
       // append row-number values + wire clicks
       const tbody = tableView.querySelector('tbody');
       tbody.innerHTML = bodyRows;
-      // pad each data row with a trailing cell to align under the overflow column
       tbody.querySelectorAll('.rct-row').forEach((tr, n) => {
         tr.querySelector('.rct-col-rownum').textContent = (n + 1);
-        const pad = document.createElement('td');
-        tr.appendChild(pad);
 
         // Row click → open the full record … unless an editable cell handles it
         tr.addEventListener('click', (e) => {
@@ -4771,11 +4754,9 @@
     function rctAppendAddRow(tbody, nextRowNum, suffix, innerId, detailId, renderFn, data){
       const tr = document.createElement('tr');
       tr.className = 'rct-add-row';
-      const totalCols = 2 /* rownum + check */ + RCT_COLUMNS.length + 1 /* overflow pad */;
       tr.innerHTML = `
         <td class="rct-col-rownum">${nextRowNum + 1}</td>
-        <td class="rct-col-check"></td>
-        <td class="rct-add-prompt" colspan="${RCT_COLUMNS.length + 1}">
+        <td class="rct-add-prompt" colspan="${RCT_COLUMNS.length}">
           <span class="rct-add-inner">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add a contact
@@ -4817,7 +4798,6 @@
       const cellsHtml = RCT_COLUMNS.map(col => `<td class="rct-add-cell">${editorFor(col)}</td>`).join('');
       tr.innerHTML = `
         <td class="rct-col-rownum">${tr.querySelector('.rct-col-rownum') ? tr.querySelector('.rct-col-rownum').textContent : ''}</td>
-        <td class="rct-col-check"></td>
         ${cellsHtml}
         <td class="rct-add-actions">
           <button class="rct-cell-save" type="button" title="Save contact">
