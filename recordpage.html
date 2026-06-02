@@ -338,11 +338,311 @@
       margin: 2px 0;
     }
 
+    /* =====================================================
+       OTHER RELATED CONTACTS TABLE — UPGRADED
+       ===================================================== */
+    .orc-wrap { padding: 0 0 14px; }
+    .orc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      min-width: 820px;
+    }
 
+    .orc-table thead th {
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #6b7280;
+      padding: 8px 12px;
+      background: #fafbfc;
+      border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease, color 0.1s ease;
+      position: relative;
+    }
+    .orc-table thead th:last-child { border-right: none; cursor: default; }
+    .orc-table thead th:first-child { padding: 8px 6px 8px 14px; cursor: default; }
+    .orc-table thead th:not(:first-child):not(:last-child):hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    .orc-table thead th .sort-icon {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-left: 4px;
+      vertical-align: middle;
+      opacity: 0.35;
+      transition: opacity 0.1s ease;
+    }
+    .orc-table thead th:hover .sort-icon { opacity: 0.7; }
+    .orc-table thead th.sort-asc .sort-icon,
+    .orc-table thead th.sort-desc .sort-icon { opacity: 1; color: #0176d3; }
+    .orc-table thead th.sort-asc .sort-icon svg:first-child { opacity: 1; }
+    .orc-table thead th.sort-asc .sort-icon svg:last-child { opacity: 0.25; }
+    .orc-table thead th.sort-desc .sort-icon svg:first-child { opacity: 0.25; }
+    .orc-table thead th.sort-desc .sort-icon svg:last-child { opacity: 1; }
 
+    .orc-table tbody td {
+      padding: 0 12px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+      color: #111827;
+      font-size: 14px;
+      height: 80px;
+    }
+    .orc-table tbody td:first-child { padding: 0 6px 0 14px; }
+    .orc-table tbody tr:last-child td { border-bottom: 0; }
 
+    .orc-table tbody tr { background: white; transition: background 0.1s ease; }
+    .orc-table tbody tr:nth-child(even) { background: #fafbfc; }
+    .orc-table tbody tr:hover { background: #eef4fb !important; }
 
+    .orc-idx {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #0176d3;
+      text-align: right;
+      min-width: 22px;
+      padding-right: 4px;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
 
+    .orc-table .orc-name { font-weight: 600; color: #0176d3; text-decoration: none; cursor: pointer; font-size: 14px; }
+    .orc-table .orc-name:hover { text-decoration: underline; }
+    .orc-table .orc-name-plain { font-weight: 600; color: #111827; font-size: 14px; }
+    .orc-table .orc-rel { color: #6b7280; font-size: 12.5px; }
+    .orc-table .orc-phone { color: #0176d3; font-weight: 500; text-decoration: none; white-space: nowrap; font-size: 13.5px; }
+    .orc-table .orc-phone:hover { text-decoration: underline; }
+    .orc-table .orc-empty { color: #9ca3af; }
+
+    .orc-status-wrap { position: relative; display: inline-flex; align-items: center; }
+    .orc-status-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: none; border: none; padding: 3px 2px;
+      font-family: var(--font); font-size: 13.5px; font-weight: 500; color: #374151;
+      cursor: pointer; border-radius: 4px; transition: background 0.1s ease; white-space: nowrap;
+    }
+    .orc-status-btn:hover { background: #f3f4f6; }
+    .orc-status-btn .orc-chevron { width: 13px; height: 13px; color: #9ca3af; flex-shrink: 0; transition: transform 0.15s ease; }
+    .orc-status-wrap.open .orc-chevron { transform: rotate(180deg); }
+    .orc-status-btn .orc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: #d1d5db; }
+    .orc-status-btn .orc-status-dot.green  { background: #10b981; }
+    .orc-status-btn .orc-status-dot.amber  { background: #f59e0b; }
+    .orc-status-btn .orc-status-dot.red    { background: #ef4444; }
+    .orc-status-btn .orc-status-dot.blue   { background: #0176d3; }
+    .orc-status-btn .orc-status-dot.purple { background: #7c3aed; }
+    .orc-status-btn .orc-status-dot.none   { background: #d1d5db; }
+
+    .orc-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10); min-width: 170px; padding: 4px 0; display: none;
+    }
+    .orc-status-wrap.open .orc-dropdown { display: block; }
+    .orc-status-wrap.drop-up .orc-dropdown { top: auto; bottom: calc(100% + 4px); }
+    .orc-dropdown-item {
+      display: flex; align-items: center; gap: 9px; padding: 7px 14px;
+      font-size: 13.5px; font-weight: 500; color: #111827; cursor: pointer;
+      transition: background 0.1s ease; white-space: nowrap;
+    }
+    .orc-dropdown-item:hover { background: #f3f4f6; }
+    .orc-dropdown-item.selected { color: #0176d3; }
+    .orc-dropdown-item .orc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .orc-dropdown-divider { height: 1px; background: #f3f4f6; margin: 4px 0; }
+
+    /* ---------- ORC TOOLBAR ---------- */
+    .orc-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .orc-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #fff;
+      color: #374151;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s ease, border-color 0.1s ease;
+      white-space: nowrap;
+      position: relative;
+    }
+    .orc-tool-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+    .orc-tool-btn.active { background: #f3f4f6; border-color: #d1d5db; }
+    .orc-filter-badge {
+      background: #6b7280;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 1px 5px;
+      line-height: 1.4;
+      margin-left: 1px;
+    }
+
+    /* ---------- ORC PANELS (sort / filter) ---------- */
+    .orc-panel {
+      display: none;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin: 0 0 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+      animation: panelIn 0.12s ease;
+    }
+    .orc-panel.open { display: block; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .orc-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .orc-panel-title { font-size: 11.5px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+    .orc-panel-clear { background: none; border: none; font-family: var(--font); font-size: 12px; color: #9ca3af; cursor: pointer; padding: 0; transition: color 0.1s ease; }
+    .orc-panel-clear:hover { color: #374151; }
+    .orc-panel-body { padding: 10px 14px 12px; }
+    .orc-sort-row { display: flex; align-items: center; gap: 8px; }
+    .orc-panel-select {
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-family: var(--font);
+      font-size: 12.5px;
+      color: #374151;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      flex: 1;
+      transition: border-color 0.1s ease;
+    }
+    .orc-panel-select:focus { border-color: #0176d3; box-shadow: 0 0 0 2px rgba(1,118,211,0.1); }
+    .orc-panel-label { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+    .orc-panel-apply {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #374151;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s ease, border-color 0.1s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .orc-panel-apply:hover { background: #f3f4f6; border-color: #9ca3af; }
+
+    /* ---------- PHONE CELL status btn tweak (smaller for stacked layout) ---------- */
+    .orc-phone-status-wrap .orc-status-btn { font-size: 12px; padding: 1px 2px; }
+
+    /* ---------- CHARACTERISTICS DROPDOWN ---------- */
+    .inline-toggle{ padding: 0 16px 7px 30px; }
+    .toggle-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px 0; cursor:pointer; user-select:none;
+      background: transparent; border: none;
+      border-radius: 0; margin: 0 0 8px;
+    }
+    .toggle-head:hover .toggle-title{ color: #0176d3; }
+    .toggle-left{ display:flex; align-items:center; gap:8px; min-width:0; }
+    .toggle-btn{
+      width: 16px; height: 16px; border-radius: 0; border: none; background: transparent;
+      color: #032D60; display:inline-flex; align-items:center; justify-content:center; padding: 0;
+      cursor:pointer; flex: 0 0 auto;
+    }
+    .toggle-btn:focus{ outline:none; }
+    .chev{ width: 14px; height: 14px; color: #032D60; transition: transform .14s ease; flex: 0 0 auto; }
+    .inline-toggle[data-open="true"] .chev{ transform: rotate(90deg); }
+    .toggle-title{ font-size: 16px; font-weight: 600; color:#032D60; letter-spacing: .08px; white-space:nowrap; transition: color .12s; }
+    .toggle-body{ display:none; padding: 0 0 2px; }
+    .inline-toggle[data-open="true"] .toggle-body{ display:block; }
+
+    /* ---------- RELATED CONTACTS TABLE ---------- */
+    .table-wrap{ padding: 0 0 14px; overflow-x: auto; overflow-y: visible; }
+    table{ width:100%; border-collapse: collapse; font-size: 16.5px; background: #fff; min-width: 1100px; }
+    thead th{
+      text-align:left; font-size: 15.5px; color: #6b7280; font-weight: 600;
+      padding: 12px 16px; background: #fafbfc; border-bottom: 1px solid #e5e7eb; white-space: nowrap;
+    }
+    tbody td{ padding: 14px 16px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; font-size: 16.5px; color: #374151; }
+    tbody tr:last-child td{ border-bottom: 0; }
+    tbody tr{ background: white; transition: background 0.15s ease; }
+    tbody tr:hover{ background: #f9fafb; }
+    .td-muted{ color: #9ca3af; font-size: 15.5px; }
+    .td-link{ color: var(--blue); cursor:pointer; font-weight: 600; font-size: 16.5px; }
+    .td-link:hover{ text-decoration: underline; }
+    a.td-link{ text-decoration: none; }
+    a.td-link:hover{ text-decoration: underline; }
+    .status{ display:inline-flex; align-items:center; gap:7px; font-size: 15.5px; font-weight: 500; }
+    .dot{ width:8px; height:8px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0; }
+    .dot.good{ background: #10b981; }
+    .dot.warn{ background: #f59e0b; }
+    .quick-actions{ display: flex; gap: 6px; }
+    .quick-actions .btn{ font-size: 14px; padding: 6px 10px; border-radius: 6px; }
+    .phone-link{ color: var(--blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+    .phone-link:hover{ text-decoration: underline; }
+
+    /* Add Note Modal */
+    .note-modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,0.15); display: none; z-index: 10000; pointer-events: none; }
+    .note-modal-overlay.active{ display: block; pointer-events: auto; }
+    .note-modal{
+      position: absolute; background: white; border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
+      width: 400px; max-height: 500px; display: flex; flex-direction: column; z-index: 10001;
+    }
+    .note-modal-header{ padding: 14px 16px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
+    .note-modal-title{ font-size: 16px; font-weight: 600; color: #111827; }
+    .note-modal-close{ width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; padding: 0; }
+    .note-modal-close:hover{ background: #f3f4f6; color: #111827; }
+    .note-modal-body{ padding: 16px; overflow-y: auto; flex: 1; }
+    .note-contact-info{ background: #f9fafb; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12.5px; color: #6b7280; }
+    .note-contact-name{ font-weight: 600; color: #111827; font-size: 14px; }
+    .note-textarea{ width: 100%; min-height: 120px; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: var(--font); font-size: 14px; resize: vertical; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+    .note-textarea:focus{ border-color: #0176d3; box-shadow: 0 0 0 3px rgba(1,118,211,0.1); }
+    .note-modal-footer{ padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 8px; }
+    .note-btn{ padding: 8px 16px; border-radius: 6px; font-family: var(--font); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; border: none; }
+    .note-btn-cancel{ background: white; color: #6b7280; border: 1px solid #d1d5db; }
+    .note-btn-cancel:hover{ background: #f9fafb; border-color: #9ca3af; }
+    .note-btn-save{ background: #0176d3; color: white; }
+    .note-btn-save:hover{ background: #0161b3; }
+    .note-btn-save:disabled{ background: #9ca3af; cursor: not-allowed; }
+    .note-char-count{ text-align: right; margin-top: 6px; font-size: 11px; color: #9ca3af; }
+
+    .hint{ padding: 10px 16px 14px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); background: #fbfcfe; }
+
+    /* ---------- SUB-TABS ---------- */
+    .sub-tabs-bar{ display: flex; gap: 24px; padding: 0 0 8px 0; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+    .sub-tab{
+      appearance: none; border: 0; background: transparent; font-family: var(--font);
+      font-size: 14px; padding: 8px 0; color: var(--muted); cursor: pointer;
+      position: relative; font-weight: 500; transition: color .12s ease;
+    }
+    .sub-tab[aria-selected="true"]{ color: var(--text); font-weight: 600; }
+    .sub-tab[aria-selected="true"]::after{ content: ""; position: absolute; left: 0; right: 0; bottom: -9px; height: 2px; background: var(--blue); }
+    .sub-tab:hover{ color: var(--text); }
+    .sub-tab:focus{ outline: none; }
+    .sub-tab-pane{ display: none; }
+    .sub-tab-pane.active{ display: block; }
+    #subpane-confirmed table{ min-width: 1100px; }
 
     /* ---------- LOADING OVERLAY ---------- */
     #loadingOverlay{
@@ -421,6 +721,12 @@
       font-family: "Salesforce Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
     }
 
+    /* Static section header — no collapse */
+    .rc-toggle { display: none; }
+    .rc-toggle-left { display: none; }
+    .rc-toggle-stack { display: none; }
+    .rc-toggle-title { display: none; }
+    .rc-chev { display: none; }
 
     .rc-body { display:block; }
 
@@ -1757,7 +2063,7 @@
 
     /* ══ Celebration animation — staged sequence ══ */
     .nas-celebrate-anim {
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       animation: nasBounceIn .65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
       animation-delay: 0.35s;
       opacity: 0;
@@ -1781,7 +2087,7 @@
     }
     .nas-celebrate-footer {
       display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-      padding: 12px 28px 16px;
+      padding: 10px 20px 14px;
       background: #f3f4f6;
       animation: nasFadeUp .6s ease both;
       animation-delay: 1.8s;
@@ -1805,7 +2111,7 @@
       background: #f3f4f6;
       border-radius: 16px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-      width: 648px; max-width: calc(100vw - 32px);
+      width: 551px; max-width: calc(100vw - 32px);
       overflow: hidden;
       animation: nasModalIn .3s cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: 0.1s;
@@ -1813,7 +2119,7 @@
       text-align: center;
     }
     .nas-celebrate-body {
-      padding: 18px 58px 10px;
+      padding: 12px 40px 8px;
       display: flex; flex-direction: column; align-items: center; gap: 0;
       position: relative;
     }
@@ -1825,7 +2131,7 @@
     .nas-celebrate-icon svg { width: 52px; height: 52px; }
     .nas-celebrate-title {
       font-size: 28px; font-weight: 400; color: #032D60;
-      font-family: var(--font); margin-bottom: 10px; line-height: 1.3;
+      font-family: var(--font); margin-bottom: 6px; margin-top: -6px; line-height: 1.3;
     }
     .nas-celebrate-sub {
       font-size: 16px; font-weight: 400; color: #706e6b;
@@ -2367,6 +2673,28 @@
     </div>
   </div>
 
+  <div class="note-modal-overlay" id="noteModalOverlay">
+    <div class="note-modal">
+      <div class="note-modal-header">
+        <h3 class="note-modal-title">Add Note</h3>
+        <button class="note-modal-close" id="noteModalClose" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="note-modal-body">
+        <div class="note-contact-info">
+          <div class="note-contact-name" id="noteContactName">—</div>
+          <div id="noteContactRelation">—</div>
+        </div>
+        <textarea class="note-textarea" id="noteTextarea" placeholder="Add your note here..." maxlength="5000"></textarea>
+        <div class="note-char-count"><span id="noteCharCount">0</span> / 5000 characters</div>
+      </div>
+      <div class="note-modal-footer">
+        <button class="note-btn note-btn-cancel" id="noteBtnCancel">Cancel</button>
+        <button class="note-btn note-btn-save" id="noteBtnSave">Save Note</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const COLUMN_ID_MAP = {};
@@ -2471,10 +2799,35 @@
           if (daysEl) daysEl.textContent = daysAgoStr || formatted;
         }
         if (Array.isArray(payload.confirmed_owners)) {
+          renderConfirmedOwners(payload.confirmed_owners);
+          renderOtherContacts(payload.confirmed_owners);
           updateActionBannerFromContacts(payload.confirmed_owners);
           rcPopulateFromPayload(payload);
         } else {
           updateActionBannerFromContacts([]);
+        }
+        computeContactsSummary(payload);
+
+        // ── Populate Next Action Step from payload ──────────────────────────
+        const nasStep = payload['next_action_step'] || payload['next_action_step'] || '';
+        const nasDate = payload['Action_Date'] || payload['action_date'] || '';
+        if (window.nasSetStep && (nasStep || nasDate)) {
+          const stepVal = (nasStep && nasStep !== '—') ? nasStep : '';
+          // Format date if ISO YYYY-MM-DD, otherwise pass as-is
+          let dateDisp = '';
+          if (nasDate && nasDate !== '—') {
+            try {
+              const p = String(nasDate).split('-');
+              if (p.length === 3) {
+                const d = new Date(+p[0], +p[1]-1, +p[2]);
+                const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                dateDisp = MN[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+              } else {
+                dateDisp = nasDate;
+              }
+            } catch(e) { dateDisp = nasDate; }
+          }
+          setTimeout(function() { window.nasSetStep(stepVal, dateDisp); }, 200);
         }
         // ── Load tasks from task_data column ─────────────────────────────
         if (payload.task_data) {
@@ -2580,6 +2933,322 @@
       });
     });
 
+    function leadStatusDot(status){
+      if (!status || status === "—") return `<span class="td-muted">—</span>`;
+      const s = String(status).toLowerCase().trim();
+      let color = '#d1d5db';
+      if (s.includes('re-skiptrace'))            color = '#d1d5db';
+      else if (s.includes('attempt 1'))          color = '#9ca3af';
+      else if (s.includes('attempt 2'))          color = '#6b7280';
+      else if (s.includes('attempt 3'))          color = '#93c5fd';
+      else if (s.includes('contacted'))          color = '#60a5fa';
+      else if (s.includes('interested'))         color = '#3b82f6';
+      else if (s.includes('negotiation') || s.includes('review')) color = '#2563eb';
+      else if (s.includes('accepted'))           color = '#1d4ed8';
+      else if (s.includes('closed'))             color = '#1e3a8a';
+      return `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:500;color:#374151;font-family:'Inter',var(--font);"><span style="width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>${escapeHtml(status)}</span>`;
+    }
+
+    function formatPhoneForTel(phone){ if (!phone) return ''; return phone.replace(/\D/g, ''); }
+    function formatPhoneDisplay(phone){
+      if (!phone || phone === "—") return null;
+      const digits = String(phone).replace(/\D/g, '');
+      const d = digits.length === 11 && digits[0] === '1' ? digits.slice(1) : digits;
+      if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+      return phone;
+    }
+
+    function calcDaysAgo(dateStr){
+      if (!dateStr || dateStr === "—") return null;
+      const d = parseFlexibleDate(dateStr);
+      if (!d) return null;
+      const days = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+      if (days === 0) return "Today"; if (days === 1) return "1 day ago"; return `${days} days ago`;
+    }
+
+    function renderConfirmedOwners(contacts){
+      const tbody = document.getElementById("confirmedOwnersTbody");
+      if (!tbody) return;
+      const confirmed = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() === "yes");
+      const STATUS_ORDER = ["closed","accepted offer","negotiations","review","interested in selling","contacted","attempt 3","attempt 2","attempt 1","re-skiptrace"];
+      const statusRank = (s) => { const v = String(s || "").toLowerCase().trim(); const idx = STATUS_ORDER.findIndex(k => v.includes(k)); return idx === -1 ? STATUS_ORDER.length : idx; };
+      const sorted = [...confirmed].sort((a, b) => statusRank(a.lead_status || a.leadStatus) - statusRank(b.lead_status || b.leadStatus));
+      const rows = sorted.map((c, index) => {
+        const ownershipPercent = c.ownership_percent ?? c.ownershipPercent ?? "—";
+        const lastContact      = c.contacted_date ?? c.lastContact ?? null;
+        const leadStatus       = c.lead_status ?? c.leadStatus ?? null;
+        const followupDate     = c.follow_up_date ?? c.followupDate ?? null;
+        const offerMade        = c.offer_made ?? c.offerMade ?? false;
+        const offerAmount      = c.offer_amount ?? c.offerAmount ?? "—";
+        const mondayUrl        = c.monday_url ?? c.mondayUrl ?? null;
+        const phone1           = formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null);
+        const daysAgo = calcDaysAgo(lastContact);
+        let lastContactColor = '#374151';
+        if (daysAgo) { const match = daysAgo.match(/(\d+)/); if (match) { const days = parseInt(match[1]); if (days >= 12) lastContactColor = '#dc2626'; else if (days >= 6) lastContactColor = '#f59e0b'; } }
+        let followupCell = `<span class="td-muted">—</span>`;
+        if (followupDate && followupDate !== "—") {
+          const fpDate = parseFlexibleDate(followupDate);
+          if (fpDate) {
+            const today = startOfDay(new Date()); const fp = startOfDay(fpDate);
+            const diffDays = Math.floor((fp - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) { const overdue = Math.abs(diffDays); followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#dc2626;font-weight:500;">Overdue by ${overdue} day${overdue===1?'':'s'}</div></div>`; }
+            else if (diffDays === 0) { followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#f59e0b;font-weight:500;">Due today</div></div>`; }
+            else { followupCell = `<div><div style="font-weight:600;color:#111827;">${escapeHtml(followupDate)}</div><div style="font-size:12px;color:#9ca3af;">Upcoming in ${diffDays} day${diffDays===1?'':'s'}</div></div>`; }
+          }
+        }
+        const isClosed = String(c.lead_status || "").trim().toLowerCase() === "closed";
+        const closedBadge = isClosed ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:6px;vertical-align:middle;"><svg style="width:9px;height:9px;" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></span>` : '';
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0;">${mondayUrl?`<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="td-link">${escapeHtml(c.name??"—")}</a>`:`<span style="font-weight:600;">${escapeHtml(c.name??"—")}</span>`}${closedBadge}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+              ${c.relationship?`<span style="font-size:12px;color:#9ca3af;">${escapeHtml(c.relationship)}</span>`:''}
+              ${c.relationship&&ownershipPercent&&ownershipPercent!=="—"&&ownershipPercent!==0&&ownershipPercent!=="0"?`<span style="font-size:11px;color:#cbd5e1;">·</span>`:''}
+              ${ownershipPercent&&ownershipPercent!=="—"&&ownershipPercent!==0&&ownershipPercent!=="0"?`<span style="font-size:12px;font-weight:700;color:#0176d3;">${escapeHtml(String(ownershipPercent))}%</span>`:''}
+            </div>
+          </td>
+          <td>${leadStatusDot(leadStatus)}</td>
+          <td>${lastContact&&lastContact!=="—"?`<div style="font-weight:600;">${escapeHtml(lastContact)}</div><div style="font-size:12px;color:${lastContactColor};">${daysAgo||''}</div>`:`<span class="td-muted">Not contacted</span>`}</td>
+          <td>${followupCell}</td>
+          <td>${offerMade?`<div style="font-weight:600;">Presented</div><div style="font-size:12px;color:#6b7280;">${offerAmount&&offerAmount!=="—"?"$"+Math.round(parseFloat(String(offerAmount).replace(/[^0-9.]/g,""))).toLocaleString("en-US"):"—"}</div>`:`<span class="td-muted">No offer</span>`}</td>
+          <td>${phone1?`<a href="tel:${formatPhoneForTel(phone1)}" style="font-weight:500;color:#0176d3;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(phone1)}</a>`:`<span class="td-muted">—</span>`}</td>
+          <td><div class="quick-actions"><button class="btn add-note-btn" type="button" data-contact-index="${index}">Add Note</button></div></td>
+        </tr>`;
+      }).join("");
+      tbody.innerHTML = rows || `<tr><td class="td-muted" colspan="8">No Confirmed Owners</td></tr>`;
+      tbody.querySelectorAll('.add-note-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); const idx = parseInt(e.target.getAttribute('data-contact-index')); openNoteModal(sorted[idx], idx, e.target); });
+      });
+    }
+
+    function renderOtherContacts(contacts){
+      const tbody = document.getElementById("otherContactsTbody");
+      if (!tbody) return;
+      const others = (contacts || []).filter(c => String(c.owner_status || "").trim().toLowerCase() !== "yes");
+      const LEAD_STATUS_OPTS = [{ value:"Referral",dot:"green"},{ value:"In Progress",dot:"blue"},{ value:"Contacted",dot:"green"},{ value:"Not Reached",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Do Not Call",dot:"red"},{ value:"Closed",dot:"purple"}];
+      const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
+      function dotClass(value, opts) { if (!value||value==="—") return "none"; const match = opts.find(o => o.value.toLowerCase()===String(value).toLowerCase()); return match?match.dot:"none"; }
+      function statusDropdown(value, opts, fieldKey, rowIdx) {
+        const current = value||"—"; const dot = dotClass(current,opts); const id=`orc-dd-${fieldKey}-${rowIdx}`;
+        return `<div class="orc-status-wrap" id="${id}" data-field="${fieldKey}" data-row="${rowIdx}" data-opts="${fieldKey==='lead_status'?'lead':'phone'}"><button class="orc-status-btn" type="button" data-dd="${id}" data-current="${escapeHtml(current)}"><span class="orc-status-dot ${dot}"></span><span class="orc-status-label">${escapeHtml(current)}</span><svg class="orc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button></div>`;
+      }
+
+      const rows = others.map((c,i) => {
+        const mondayUrl = c.monday_url??c.mondayUrl??null;
+        const leadStatus = c.lead_status??c.leadStatus??null;
+        const phone1 = formatPhoneDisplay(c.phone_1??c.phone1??null);
+        const phone1Status = c.phone_1_status??c.phone1Status??null;
+        const phone2 = formatPhoneDisplay(c.phone_2??c.phone2??null);
+        const phone2Status = c.phone_2_status??c.phone2Status??null;
+
+        function phoneStatusTag(status) {
+          if (!status || status === '—') return '';
+          const PHONE_STATUS_OPTS = [{ value:"Good",dot:"green"},{ value:"No Answer",dot:"amber"},{ value:"Wrong Number",dot:"red"},{ value:"Disconnected",dot:"red"},{ value:"Left Voicemail",dot:"blue"},{ value:"Do Not Call",dot:"red"}];
+          const colors = { green:'#10b981', amber:'#f59e0b', red:'#ef4444', blue:'#0176d3', none:'#d1d5db' };
+          const match = PHONE_STATUS_OPTS.find(o => o.value.toLowerCase() === String(status).toLowerCase());
+          const dotColor = match ? colors[match.dot] : colors.none;
+          return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:#9ca3af;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:${dotColor};flex-shrink:0;display:inline-block;"></span>${escapeHtml(status)}</span>`;
+        }
+
+        function phoneCell(phone, status, fieldKey, rowIdx) {
+          if (!phone) return `<span class="orc-empty">—</span>`;
+          const telLink = `<a href="tel:${formatPhoneForTel(phone)}" class="orc-phone">${escapeHtml(phone)}</a>`;
+          const tag = phoneStatusTag(status);
+          return `<div style="display:flex;flex-direction:column;gap:2px;">${telLink}${tag}</div>`;
+        }
+
+        return `<tr data-orc-row="${i}">
+          <td class="orc-idx">${i + 1}</td>
+          <td>${mondayUrl?`<a href="${mondayUrl}" target="_blank" rel="noopener noreferrer" class="orc-name">${escapeHtml(c.name??"—")}</a>`:`<span class="orc-name-plain">${escapeHtml(c.name??"—")}</span>`}</td>
+          <td class="orc-rel">${escapeHtml(c.relationship??"—")}</td>
+          <td>${statusDropdown(leadStatus,LEAD_STATUS_OPTS,'lead_status',i)}</td>
+          <td>${phoneCell(phone1, phone1Status, 'phone_1_status', i)}</td>
+          <td>${phoneCell(phone2, phone2Status, 'phone_2_status', i)}</td>
+        </tr>`;
+      }).join("");
+      tbody.innerHTML = rows || `<tr><td class="orc-empty" colspan="6" style="padding:16px;color:#9ca3af;">No other related contacts.</td></tr>`;
+
+      document.querySelectorAll('.orc-table thead th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          const field = th.getAttribute('data-sort');
+          const isAsc = th.classList.contains('sort-asc');
+          document.querySelectorAll('.orc-table thead th').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+          th.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+          const dir = isAsc ? -1 : 1;
+          const rowEls = Array.from(tbody.querySelectorAll('tr'));
+          rowEls.sort((a, b) => {
+            const aIdx = parseInt(a.getAttribute('data-orc-row'));
+            const bIdx = parseInt(b.getAttribute('data-orc-row'));
+            const aVal = String(others[aIdx]?.[field] ?? others[aIdx]?.[(field.replace(/_([a-z])/g, (_,c)=>c.toUpperCase()))] ?? '').toLowerCase();
+            const bVal = String(others[bIdx]?.[field] ?? others[bIdx]?.[(field.replace(/_([a-z])/g, (_,c)=>c.toUpperCase()))] ?? '').toLowerCase();
+            return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+          });
+          rowEls.forEach(r => tbody.appendChild(r));
+        });
+      });
+
+      let orcPortal = document.getElementById('orcPortal');
+      if (!orcPortal) { orcPortal = document.createElement('div'); orcPortal.id='orcPortal'; orcPortal.className='orc-dropdown'; orcPortal.style.position='fixed'; orcPortal.style.zIndex='9999'; document.body.appendChild(orcPortal); }
+      let activeWrap = null;
+      function closePortal() { orcPortal.style.display='none'; orcPortal.innerHTML=''; if(activeWrap){activeWrap.classList.remove('open');activeWrap=null;} }
+      tbody.querySelectorAll('.orc-status-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); const ddId=btn.getAttribute('data-dd'); const wrap=document.getElementById(ddId);
+          if(activeWrap===wrap){closePortal();return;} closePortal();
+          const fieldKey=wrap.getAttribute('data-field'); const rowIdx=parseInt(wrap.getAttribute('data-row'));
+          const optsKey=wrap.getAttribute('data-opts'); const opts=optsKey==='lead'?LEAD_STATUS_OPTS:PHONE_STATUS_OPTS;
+          const current=btn.getAttribute('data-current');
+          orcPortal.innerHTML = opts.map(o=>`<div class="orc-dropdown-item${o.value===current?' selected':''}" data-value="${escapeHtml(o.value)}" data-dot="${o.dot}" data-ddid="${ddId}"><span class="orc-status-dot ${o.dot}"></span>${escapeHtml(o.value)}</div>`).join('');
+          const rect=btn.getBoundingClientRect(); const portalH=opts.length*35+8;
+          orcPortal.style.display='block'; orcPortal.style.minWidth=Math.max(rect.width,170)+'px';
+          orcPortal.style.top = (window.innerHeight-rect.bottom<portalH+8&&rect.top>portalH) ? (rect.top-portalH-4)+'px' : (rect.bottom+4)+'px';
+          orcPortal.style.left=rect.left+'px'; wrap.classList.add('open'); activeWrap=wrap;
+          orcPortal.querySelectorAll('.orc-dropdown-item').forEach(item=>{
+            item.addEventListener('click',(ev)=>{ ev.stopPropagation(); const val=item.getAttribute('data-value'); const dot=item.getAttribute('data-dot'); const wId=item.getAttribute('data-ddid'); const w=document.getElementById(wId); const b=w.querySelector('.orc-status-btn'); b.querySelector('.orc-status-dot').className=`orc-status-dot ${dot}`; b.querySelector('.orc-status-label').textContent=val; b.setAttribute('data-current',val); closePortal(); });
+          });
+        });
+      });
+      document.addEventListener('click', closePortal);
+      document.addEventListener('keydown', (e)=>{if(e.key==='Escape')closePortal();});
+
+      initOrcToolbar(others);
+    }
+
+    let _orcData = [];
+
+    function initOrcToolbar(others) {
+      _orcData = others;
+      const toolbar = document.getElementById('orcToolbar');
+      if (toolbar) toolbar.style.display = 'flex';
+
+      function closeAllPanels() {
+        document.getElementById('orcSortPanel')?.classList.remove('open');
+        document.getElementById('orcFilterPanel')?.classList.remove('open');
+        document.getElementById('orcSortBtn')?.classList.remove('active');
+        document.getElementById('orcFilterBtn')?.classList.remove('active');
+      }
+
+      document.getElementById('orcSortBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const panel = document.getElementById('orcSortPanel');
+        const isOpen = panel.classList.contains('open');
+        closeAllPanels();
+        if (!isOpen) { panel.classList.add('open'); document.getElementById('orcSortBtn').classList.add('active'); }
+      });
+
+      document.getElementById('orcFilterBtn')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const panel = document.getElementById('orcFilterPanel');
+        const isOpen = panel.classList.contains('open');
+        closeAllPanels();
+        if (!isOpen) { panel.classList.add('open'); document.getElementById('orcFilterBtn').classList.add('active'); }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#orcSortPanel') && !e.target.closest('#orcSortBtn') &&
+            !e.target.closest('#orcFilterPanel') && !e.target.closest('#orcFilterBtn')) {
+          closeAllPanels();
+        }
+      });
+
+      document.getElementById('orcSortApply')?.addEventListener('click', () => {
+        const field = document.getElementById('orcSortField').value;
+        const dir = document.getElementById('orcSortDir').value === 'asc' ? 1 : -1;
+        if (!field) return;
+        const tbody = document.getElementById('otherContactsTbody');
+        const rowEls = Array.from(tbody.querySelectorAll('tr'));
+        rowEls.sort((a, b) => {
+          const ai = parseInt(a.getAttribute('data-orc-row'));
+          const bi = parseInt(b.getAttribute('data-orc-row'));
+          const aVal = String(others[ai]?.[field] ?? '').toLowerCase();
+          const bVal = String(others[bi]?.[field] ?? '').toLowerCase();
+          return aVal < bVal ? -dir : aVal > bVal ? dir : 0;
+        });
+        rowEls.forEach(r => tbody.appendChild(r));
+        closeAllPanels();
+      });
+
+      document.getElementById('orcSortClear')?.addEventListener('click', () => {
+        document.getElementById('orcSortField').value = '';
+        document.getElementById('orcSortDir').value = 'asc';
+        const tbody = document.getElementById('otherContactsTbody');
+        const rowEls = Array.from(tbody.querySelectorAll('tr'));
+        rowEls.sort((a,b) => parseInt(a.getAttribute('data-orc-row')) - parseInt(b.getAttribute('data-orc-row')));
+        rowEls.forEach(r => tbody.appendChild(r));
+        closeAllPanels();
+      });
+
+      function applyFilters() {
+        const leadFilter = document.getElementById('orcFilterLeadStatus').value.toLowerCase();
+        const phone1Filter = document.getElementById('orcFilterPhone1').value.toLowerCase();
+        const hasPhone2Filter = document.getElementById('orcFilterHasPhone2').value;
+        const tbody = document.getElementById('otherContactsTbody');
+        let activeFilters = 0;
+        if (leadFilter) activeFilters++;
+        if (phone1Filter) activeFilters++;
+        if (hasPhone2Filter) activeFilters++;
+        const badge = document.getElementById('orcFilterBadge');
+        if (badge) { badge.style.display = activeFilters > 0 ? 'inline' : 'none'; badge.textContent = activeFilters; }
+        document.getElementById('orcFilterBtn')?.classList.toggle('active', activeFilters > 0);
+        tbody.querySelectorAll('tr').forEach(row => {
+          const idx = parseInt(row.getAttribute('data-orc-row'));
+          const c = others[idx];
+          if (!c) return;
+          let show = true;
+          if (leadFilter) { const ls = String(c.lead_status ?? c.leadStatus ?? '').toLowerCase(); if (!ls.includes(leadFilter)) show = false; }
+          if (phone1Filter) { const ps = String(c.phone_1_status ?? c.phone1Status ?? '').toLowerCase(); if (!ps.includes(phone1Filter)) show = false; }
+          if (hasPhone2Filter === 'yes') { const p2 = c.phone_2 ?? c.phone2 ?? null; if (!p2) show = false; }
+          if (hasPhone2Filter === 'no') { const p2 = c.phone_2 ?? c.phone2 ?? null; if (p2) show = false; }
+          row.style.display = show ? '' : 'none';
+        });
+        closeAllPanels();
+      }
+
+      document.getElementById('orcFilterApply')?.addEventListener('click', applyFilters);
+
+      document.getElementById('orcFilterClear')?.addEventListener('click', () => {
+        document.getElementById('orcFilterLeadStatus').value = '';
+        document.getElementById('orcFilterPhone1').value = '';
+        document.getElementById('orcFilterHasPhone2').value = '';
+        const badge = document.getElementById('orcFilterBadge');
+        if (badge) badge.style.display = 'none';
+        document.getElementById('orcFilterBtn')?.classList.remove('active');
+        const tbody = document.getElementById('otherContactsTbody');
+        tbody.querySelectorAll('tr').forEach(row => { row.style.display = ''; });
+        closeAllPanels();
+      });
+
+      document.getElementById('orcExportBtn')?.addEventListener('click', () => {
+        const headers = ['#','Name','Relationship','Lead Status','Phone 1','Phone 1 Status','Phone 2','Phone 2 Status'];
+        const rows = others.map((c, i) => [
+          i + 1,
+          c.name ?? '',
+          c.relationship ?? '',
+          c.lead_status ?? c.leadStatus ?? '',
+          formatPhoneDisplay(c.phone_1 ?? c.phone1 ?? null) ?? '',
+          c.phone_1_status ?? c.phone1Status ?? '',
+          formatPhoneDisplay(c.phone_2 ?? c.phone2 ?? null) ?? '',
+          c.phone_2_status ?? c.phone2Status ?? ''
+        ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'related_contacts.csv'; a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    const subTabs = Array.from(document.querySelectorAll(".sub-tab"));
+    const subPanes = Array.from(document.querySelectorAll(".sub-tab-pane"));
+    subTabs.forEach(subTab => {
+      subTab.addEventListener("click", () => {
+        subTabs.forEach(t => t.setAttribute("aria-selected","false"));
+        subPanes.forEach(p => p.classList.remove("active"));
+        subTab.setAttribute("aria-selected","true");
+        document.getElementById(subTab.getAttribute("aria-controls")).classList.add("active");
+      });
+    });
 
     async function saveToMonday(fieldKey, newValue) {
       const columnId = COLUMN_ID_MAP[fieldKey];
@@ -2671,6 +3340,14 @@
       banner.classList.add("show");
     }
 
+    function computeContactsSummary(payload){
+      const el=document.getElementById("contactsSummary"); if(!el) return;
+      const allSubitems=Array.isArray(payload?.confirmed_owners)?payload.confirmed_owners:[];
+      const confirmedOwners=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()==="yes");
+      const owners=confirmedOwners.length;
+      const unrelated=allSubitems.filter(c=>String(c.owner_status||"").trim().toLowerCase()!=="yes").length;
+      el.textContent=`${allSubitems.length} Total Contacts · ${owners} Owners · ${unrelated} Unrelated`;
+    }
 
     function extractIdsFromUrl(){
       let urlParams=window.location.search;
@@ -2734,6 +3411,32 @@
     }
     function cssEscape(s){ return String(s).replaceAll('"','\\"'); }
 
+    let currentNoteContact=null, currentNoteContactIndex=null;
+    function openNoteModal(contact,contactIndex,buttonElement){
+      currentNoteContact=contact; currentNoteContactIndex=contactIndex;
+      document.getElementById('noteContactName').textContent=contact.name||'—';
+      const ownerPct=contact.ownership_percent??contact.ownershipPercent??'—';
+      document.getElementById('noteContactRelation').textContent=contact.relationship?`${contact.relationship} • ${ownerPct}% ownership`:`${ownerPct}% ownership`;
+      document.getElementById('noteTextarea').value=''; document.getElementById('noteCharCount').textContent='0';
+      const overlay=document.getElementById('noteModalOverlay'); const modal=overlay.querySelector('.note-modal');
+      modal.style.position='fixed'; modal.style.top='50%'; modal.style.left='50%'; modal.style.transform='translate(-50%,-50%)';
+      overlay.classList.add('active'); setTimeout(()=>{document.getElementById('noteTextarea').focus();},100);
+    }
+    function closeNoteModal(){ document.getElementById('noteModalOverlay').classList.remove('active'); currentNoteContact=null; currentNoteContactIndex=null; }
+    async function saveNote(){
+      const noteText=document.getElementById('noteTextarea').value.trim();
+      if(!noteText){alert('Please enter a note before saving.');return;}
+      const saveBtn=document.getElementById('noteBtnSave'); saveBtn.disabled=true; saveBtn.textContent='Saving...';
+      try{ console.log('Note:',{contactName:currentNoteContact?.name,note:noteText,timestamp:new Date().toISOString(),...extractIdsFromUrl()}); await new Promise(r=>setTimeout(r,500)); closeNoteModal(); showSaveToast("success"); }
+      catch(error){ console.error('Error saving note:',error); alert('Failed to save note.'); }
+      finally{ saveBtn.disabled=false; saveBtn.textContent='Save Note'; }
+    }
+    document.getElementById('noteModalClose').addEventListener('click',closeNoteModal);
+    document.getElementById('noteBtnCancel').addEventListener('click',closeNoteModal);
+    document.getElementById('noteBtnSave').addEventListener('click',saveNote);
+    document.getElementById('noteModalOverlay').addEventListener('click',(e)=>{if(e.target.id==='noteModalOverlay')closeNoteModal();});
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&document.getElementById('noteModalOverlay').classList.contains('active'))closeNoteModal();});
+    document.getElementById('noteTextarea').addEventListener('input',(e)=>{document.getElementById('noteCharCount').textContent=e.target.value.length;});
 
     // =====================================================================
     // RELATED CONTACTS COMPONENT — Data, Rendering, Webhook
@@ -4846,39 +5549,23 @@
     renderTrayTasks();
     document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&utilityTasksOpen) toggleTasksTray(); });
 
+    /* ── All test data — single source of truth ── */
+
 
     /* ══ Next Action Step Logic ══ */
     (function() {
       var nasCurrentStep = '';
       var nasCurrentDue  = '';
+      var NAS_WEBHOOK = 'https://hook.us1.make.com/c2jp97d9aq9a9d9gjhr5bm9lfg1gwm9o';
 
-      // Dedicated webhook for the Next Action Step column routing (handled in Make).
-      var NAS_WEBHOOK = "https://hook.us1.make.com/c2jp97d9aq9a9d9gjhr5bm9lfg1gwm9o";
-
-      // Fire the NAS webhook. action: 'clear' on completion, 'set' on create/update.
-      // Make routes to the correct columns, so no column IDs are sent.
-      var _nasWebhookLastFired = 0;
-      function fireNasWebhook(action, step, dueIso) {
-        var now = Date.now();
-        // Debounce rapid double-fires of the same action
-        if (now - _nasWebhookLastFired < 800) return;
-        _nasWebhookLastFired = now;
-        var ids = (typeof extractIdsFromUrl === 'function') ? extractIdsFromUrl() : { boardId: null, pulseId: null };
-        var payload = {
-          action: action,                         // 'clear' | 'set'
-          boardId: ids.boardId,
-          pulseId: ids.pulseId,
-          next_action_step: action === 'clear' ? '' : (step || ''),
-          due_date:         action === 'clear' ? '' : (dueIso || ''),
-          timestamp: new Date().toISOString()
-        };
+      function nasFireWebhook(step, due) {
         try {
           fetch(NAS_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          }).catch(function(err){ console.warn('NAS webhook error:', err); });
-        } catch (err) { console.warn('NAS webhook error:', err); }
+            body: JSON.stringify({ next_action_step: step || '', follow_up_date: due || '' })
+          });
+        } catch(e) { console.warn('NAS webhook error:', e); }
       }
 
       function nasRenderDue(dueDateStr) {
@@ -4979,10 +5666,8 @@
         } catch(e) {}
 
         nasSetStep(newStep, dispDue);
+        nasFireWebhook(newStep, newDue);
         closeOverlay('nasNextOverlay');
-
-        // Send the new action step + due date (ISO) to Make.
-        fireNasWebhook('set', newStep, newDue);
 
         var chip = document.getElementById('nasSection');
         if (chip) {
@@ -5070,11 +5755,13 @@
       }
 
       document.addEventListener('DOMContentLoaded', function() {
-        /* Complete button → celebration modal + clear columns in Make */
+        /* Complete button → celebration modal + confetti */
         var completeBtn = document.getElementById('nasCompleteBtn');
         if (completeBtn) completeBtn.addEventListener('click', function() {
-          fireNasWebhook('clear');
+          // Clear columns immediately when marked complete
+          nasFireWebhook('', '');
           openOverlay('nasCelebrateOverlay');
+          // confetti removed
         });
 
         /* Celebration: skip → just close */
@@ -5082,6 +5769,7 @@
         if (skipBtn) skipBtn.addEventListener('click', function() {
           closeOverlay('nasCelebrateOverlay');
           nasSetStep('', '');
+          nasFireWebhook('', '');
         });
 
         /* Celebration: set next step → close celebrate, open next after 200ms */
