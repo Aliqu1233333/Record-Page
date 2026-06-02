@@ -5643,28 +5643,6 @@
           if (badge) { badge.style.display = 'none'; badge.style.fontSize=''; badge.style.fontWeight=''; badge.style.opacity=''; }
         }
       }
-        var d = new Date(dueDateStr + 'T00:00:00');
-        var today = new Date(); today.setHours(0,0,0,0);
-        var formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        var isOverdue = d < today;
-        var warnIcon = '<svg viewBox="0 0 12 12" fill="none" style="width:10px;height:10px;flex-shrink:0;"><path d="M6 1L11 10H1L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r="0.5" fill="currentColor"/></svg>';
-        if (isOverdue) {
-          el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;background:#fcdde3;color:#b90d5a;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;">' + warnIcon + 'Due Date: ' + formatted + '</span>';
-          el.className = 'nas-due nas-overdue';
-          if (badge) {
-            badge.className = 'nas-overdue-badge nas-badge--overdue';
-            badge.style.display = 'inline-flex';
-            badge.style.fontSize = '';
-            badge.style.fontWeight = '';
-            badge.style.opacity = '';
-            badge.innerHTML = warnIcon + 'Overdue';
-          }
-        } else {
-          el.textContent = 'Due Date: ' + formatted;
-          el.className = 'nas-due';
-          if (badge) { badge.style.display = 'none'; badge.style.fontSize=''; badge.style.fontWeight=''; badge.style.opacity=''; }
-        }
-      }
 
       function nasSetStep(val, due) {
         nasCurrentStep = val || '';
