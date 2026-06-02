@@ -2111,7 +2111,7 @@
       background: #f3f4f6;
       border-radius: 16px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-      width: 551px; max-width: calc(100vw - 32px);
+      width: 490px; max-width: calc(100vw - 32px);
       overflow: hidden;
       animation: nasModalIn .3s cubic-bezier(0.22, 1, 0.36, 1) both;
       animation-delay: 0.1s;
@@ -2119,7 +2119,7 @@
       text-align: center;
     }
     .nas-celebrate-body {
-      padding: 12px 40px 8px;
+      padding: 10px 32px 6px;
       display: flex; flex-direction: column; align-items: center; gap: 0;
       position: relative;
     }
@@ -2130,12 +2130,12 @@
     }
     .nas-celebrate-icon svg { width: 52px; height: 52px; }
     .nas-celebrate-title {
-      font-size: 28px; font-weight: 400; color: #032D60;
-      font-family: var(--font); margin-bottom: 6px; margin-top: -6px; line-height: 1.3;
+      font-size: 24px; font-weight: 400; color: #032D60;
+      font-family: var(--font); margin-bottom: 4px; margin-top: -4px; line-height: 1.3;
     }
     .nas-celebrate-sub {
-      font-size: 16px; font-weight: 400; color: #706e6b;
-      font-family: var(--font); line-height: 1.5; max-width: 400px;
+      font-size: 14px; font-weight: 400; color: #706e6b;
+      font-family: var(--font); line-height: 1.5; max-width: 340px;
     }
     .nas-celebrate-footer {
       display: flex; align-items: center; justify-content: flex-end; gap: 12px;
@@ -2446,6 +2446,12 @@
                   </div>
                   <div class="nas-value nas-empty" id="nasValue">No action step set — click to add one</div>
                   <div class="nas-due" id="nasDue"></div>
+                  <div id="nasNoDateWarn" style="display:none;margin-top:5px;">
+                    <span class="nas-overdue-badge nas-badge--warning" id="nasNoDatePill" style="cursor:pointer;font-size:11px;font-weight:500;opacity:1;">
+                      <svg viewBox="0 0 12 12" fill="none" style="width:10px;height:10px;flex-shrink:0;"><path d="M6 1L11 10H1L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r="0.5" fill="currentColor"/></svg>
+                      Add a Next Action Completion Date
+                    </span>
+                  </div>
                 </div>
                 <div class="nas-actions">
                   <button class="nas-edit-btn" id="nasEditBtn">Edit</button>
@@ -2509,7 +2515,7 @@
                   <img
                     src="https://raw.githubusercontent.com/Aliqu1233333/Record-Page/main/Flag.png"
                     alt="Action Step Completed"
-                    style="width:344px;height:344px;object-fit:contain;position:relative;border-radius:12px;"
+                    style="width:282px;height:282px;object-fit:contain;position:relative;border-radius:12px;"
                   />
                 </div>
                   <div class="nas-celebrate-title">Action Step Completed!</div>
@@ -2522,7 +2528,35 @@
               </div>
             </div>
 
-            <!-- ══ MODAL 2: SET NEXT ACTION ══ -->
+            <!-- ══ MINI DATE MODAL ══ -->
+            <div class="nas-modal-overlay" id="nasDateOnlyOverlay">
+              <div class="nas-next-modal" style="width:340px;">
+                <div class="nas-next-header">
+                  <div class="nas-next-title" style="font-size:17px;">Set Completion Date</div>
+                  <button class="nas-next-close" id="nasDateOnlyClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="nas-next-body" style="padding:20px 24px 16px;">
+                  <div class="nas-next-field">
+                    <label class="nas-next-field-label">Due Date<span class="req">*</span></label>
+                    <div class="dp-wrap" id="dpWrapDateOnly">
+                      <div class="dp-input-row">
+                        <input class="dp-text" id="nasDateOnlyInput" type="text" placeholder="Select a date" readonly>
+                        <button class="dp-icon-btn" type="button" tabindex="-1">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </button>
+                      </div>
+                      <div class="dp-calendar" id="dpCalDateOnly"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="nas-next-footer" style="padding:12px 24px 18px;">
+                  <button class="nas-next-cancel" id="nasDateOnlyCancel">Cancel</button>
+                  <button class="nas-next-save" id="nasDateOnlySave">Save</button>
+                </div>
+              </div>
+            </div>
             <div class="nas-modal-overlay" id="nasNextOverlay">
               <div class="nas-next-modal">
                 <div class="nas-next-header">
@@ -2817,12 +2851,14 @@
           let dateDisp = '';
           if (nasDate && nasDate !== '—') {
             try {
+              // Try ISO YYYY-MM-DD first
               const p = String(nasDate).split('-');
-              if (p.length === 3) {
+              if (p.length === 3 && p[0].length === 4) {
                 const d = new Date(+p[0], +p[1]-1, +p[2]);
                 const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
                 dateDisp = MN[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
               } else {
+                // Already human-readable e.g. "Jun 5, 2026" — use as-is
                 dateDisp = nasDate;
               }
             } catch(e) { dateDisp = nasDate; }
@@ -5560,10 +5596,16 @@
 
       function nasFireWebhook(step, due) {
         try {
+          var ids = extractIdsFromUrl ? extractIdsFromUrl() : { boardId: null, pulseId: null };
           fetch(NAS_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ next_action_step: step || '', follow_up_date: due || '' })
+            body: JSON.stringify({
+              boardId:          ids.boardId  || '',
+              pulseId:          ids.pulseId  || '',
+              next_action_step: step || '',
+              follow_up_date:   due  || ''
+            })
           });
         } catch(e) { console.warn('NAS webhook error:', e); }
       }
@@ -5571,12 +5613,36 @@
       function nasRenderDue(dueDateStr) {
         var el = document.getElementById('nasDue');
         var badge = document.getElementById('nasOverdueBadge');
+        var noDateWarn = document.getElementById('nasNoDateWarn');
         if (!el) return;
         if (!dueDateStr) {
           el.innerHTML = ''; el.className = 'nas-due';
           if (badge) { badge.style.display = 'none'; badge.style.fontSize=''; badge.style.fontWeight=''; badge.style.opacity=''; }
+          if (noDateWarn) noDateWarn.style.display = (nasCurrentStep && nasCurrentStep !== '—') ? 'block' : 'none';
           return;
         }
+        if (noDateWarn) noDateWarn.style.display = 'none';
+        var d = new Date(dueDateStr + 'T00:00:00');
+        if (isNaN(d.getTime())) d = new Date(dueDateStr);
+        var today = new Date(); today.setHours(0,0,0,0);
+        var formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        var isOverdue = d < today;
+        var warnIcon = '<svg viewBox="0 0 12 12" fill="none" style="width:10px;height:10px;flex-shrink:0;"><path d="M6 1L11 10H1L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r="0.5" fill="currentColor"/></svg>';
+        if (isOverdue) {
+          el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;background:#fcdde3;color:#b90d5a;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;">' + warnIcon + 'Due Date: ' + formatted + '</span>';
+          el.className = 'nas-due nas-overdue';
+          if (badge) {
+            badge.className = 'nas-overdue-badge nas-badge--overdue';
+            badge.style.display = 'inline-flex';
+            badge.style.fontSize = ''; badge.style.fontWeight = ''; badge.style.opacity = '';
+            badge.innerHTML = warnIcon + 'Overdue';
+          }
+        } else {
+          el.textContent = 'Due Date: ' + formatted;
+          el.className = 'nas-due';
+          if (badge) { badge.style.display = 'none'; badge.style.fontSize=''; badge.style.fontWeight=''; badge.style.opacity=''; }
+        }
+      }
         var d = new Date(dueDateStr + 'T00:00:00');
         var today = new Date(); today.setHours(0,0,0,0);
         var formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -5807,6 +5873,46 @@
         if (nextSave) nextSave.addEventListener('click', saveNextStep);
 
         /* No overlay click-to-close — must use X or Cancel button */
+
+        /* ── Mini date-only modal ── */
+        var noDatePill    = document.getElementById('nasNoDatePill');
+        var dateOnlyClose = document.getElementById('nasDateOnlyClose');
+        var dateOnlyCancel= document.getElementById('nasDateOnlyCancel');
+        var dateOnlySave  = document.getElementById('nasDateOnlySave');
+
+        function openDateOnly() {
+          var dpW = document.getElementById('dpWrapDateOnly');
+          var dpC = document.getElementById('dpCalDateOnly');
+          var dpT = document.getElementById('nasDateOnlyInput');
+          if (dpW && dpC && dpT && window.dpInitInline) {
+            window.dpInitInline(dpW, dpC, dpT, '');
+          }
+          openOverlay('nasDateOnlyOverlay');
+        }
+
+        if (noDatePill)     noDatePill.addEventListener('click', openDateOnly);
+        if (dateOnlyClose)  dateOnlyClose.addEventListener('click', function(){ closeOverlay('nasDateOnlyOverlay'); });
+        if (dateOnlyCancel) dateOnlyCancel.addEventListener('click', function(){ closeOverlay('nasDateOnlyOverlay'); });
+        if (dateOnlySave)   dateOnlySave.addEventListener('click', function() {
+          var dpW = document.getElementById('dpWrapDateOnly');
+          var isoVal = dpW && dpW._dpGet ? dpW._dpGet() : '';
+          if (!isoVal) {
+            var row = dpW && dpW.querySelector('.dp-input-row');
+            if (row) { row.style.borderColor='#c23934'; row.style.boxShadow='0 0 0 1px #c23934'; setTimeout(function(){ row.style.borderColor=''; row.style.boxShadow=''; }, 2000); }
+            return;
+          }
+          // Format for display
+          var dispDue = isoVal;
+          try {
+            var p = isoVal.split('-');
+            var d = new Date(+p[0], +p[1]-1, +p[2]);
+            var MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            dispDue = MN[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+          } catch(e) {}
+          nasSetStep(nasCurrentStep, dispDue);
+          nasFireWebhook(nasCurrentStep, isoVal);
+          closeOverlay('nasDateOnlyOverlay');
+        });
       });
 
       window.nasSetStep = nasSetStep;
