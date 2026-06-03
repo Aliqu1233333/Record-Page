@@ -863,6 +863,28 @@
     .rct-row:hover .rct-link { text-decoration: underline; }
     .rct-name-cell { font-weight: 400; }
 
+    /* ── List-view task indicator badge ── */
+    .rct-task-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      padding: 1px 7px 1px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.6;
+      white-space: nowrap;
+      vertical-align: middle;
+      font-family: var(--font);
+    }
+    .rct-task-badge svg { width: 10px; height: 10px; flex-shrink: 0; }
+    .rct-task-badge--overdue { background: #fcdde3; color: #b90d5a; }
+    .rct-task-badge--upcoming { background: #def9f3; color: #014035; }
+
+    /* Task milestone row note body inherits the standard detail-card styling */
+    .ms-task-row .ms-detail-value { white-space: pre-wrap; word-break: break-word; }
+
     .rct-truncate {
       display: inline-block;
       max-width: 220px;
@@ -4037,6 +4059,34 @@
       </div>`;
     }
 
+    // ── Tasks tagged to a given contact (by name) from the To Do List ──────
+    // Returns only active (not-done) tasks, each annotated with overdue/upcoming
+    // state, sorted soonest-due first (undated last).
+    function rcTasksForContact(c){
+      try {
+        if(!c || !c.name || c.name === '—') return [];
+        if(typeof trayTasks === 'undefined' || !Array.isArray(trayTasks)) return [];
+        const today = new Date(); today.setHours(0,0,0,0);
+        const matched = trayTasks.filter(t => {
+          if(t.done) return false;
+          if(!t.contact) return false;
+          const names = Array.isArray(t.contact) ? t.contact : [t.contact];
+          return names.some(n => String(n).trim().toLowerCase() === String(c.name).trim().toLowerCase());
+        }).map(t => {
+          let dueDate = null, overdue = false;
+          if(t.due){ const d = parseFlexibleDate(t.due); if(d){ d.setHours(0,0,0,0); dueDate = d; overdue = d < today; } }
+          return { task:t, dueDate, overdue };
+        });
+        matched.sort((a,b) => {
+          if(!a.dueDate && !b.dueDate) return 0;
+          if(!a.dueDate) return 1;
+          if(!b.dueDate) return -1;
+          return a.dueDate - b.dueDate;
+        });
+        return matched;
+      } catch(e){ console.warn('rcTasksForContact error:', e); return []; }
+    }
+
     // ── Render detail: unified record card with internal sections ──────────
     // ── Shared milestone timeline builder — sorts entries by date descending ──
     function rcBuildTimelineRows(c) {
@@ -4114,6 +4164,63 @@
           el.textContent = noteText;
         });
       } catch(e) { console.warn('rcFillTimelineNoteBodies error:', e); }
+    }
+
+    // ── Task rows for the Upcoming & Overdue milestone section ──────────────
+    // One expandable row per active task tagged to this contact. Overdue rows
+    // render red (matching the follow-up overdue treatment); upcoming rows
+    // render teal/green. The left chevron expands to reveal the task's notes.
+    function rcBuildTaskRows(c){
+      try {
+        const TASK_SVG = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+        const CHEV_SVG = '<svg viewBox="0 0 16 16"><path d="M5.5 3.5l5 4.5-5 4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        const tasks = rcTasksForContact(c);
+        if(!tasks.length) return '';
+        return tasks.map(({task, dueDate, overdue}) => {
+          const iconColor  = overdue ? '#dc2626' : '#5ebcb3';
+          const titleColor = overdue ? '#dc2626' : '#4aad52';
+          const hasNotes   = task.notes && String(task.notes).trim();
+          const dateLabel  = dueDate
+            ? dueDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+            : 'No due date';
+          const dateColor  = overdue ? '#dc2626' : '#6b7280';
+          const dateWeight = overdue ? '600' : '400';
+          const sub        = overdue ? 'Task overdue — action needed' : (dueDate ? 'Upcoming task' : 'Task — no due date set');
+          const detId      = 'ms-task-det-' + Math.random().toString(36).slice(2,7);
+          const toggleBtn  = hasNotes
+            ? `<button class="ms-toggle-btn-row" onclick="(function(btn){var d=btn.closest('.ms-activity').querySelector('.ms-detail-card');var h=d.classList.toggle('ms-hidden');btn.querySelector('svg').style.transform=h?'':'rotate(90deg)';})(this)" aria-label="Expand task notes">${CHEV_SVG}</button>`
+            : `<button class="ms-toggle-btn-row ms-no-action" disabled aria-label="No notes">${CHEV_SVG}</button>`;
+          const detailBlock = hasNotes
+            ? `<div id="${detId}" class="ms-detail-card ms-hidden"><div class="ms-detail-label">Task Notes</div><div class="ms-detail-value ms-task-note-body"></div></div>`
+            : '';
+          return `<div class="ms-activity ms-task-row">
+            ${toggleBtn}
+            <div class="ms-icon-circle" style="background:${iconColor};">${TASK_SVG}</div>
+            <div class="ms-activity-content">
+              <div class="ms-activity-header">
+                <div class="ms-activity-title-row">
+                  <span class="ms-activity-title" style="cursor:default;color:${titleColor};">${escapeHtml(task.title || 'Task')}</span>
+                </div>
+                <div class="ms-activity-meta">
+                  <span class="ms-activity-timestamp" style="color:${dateColor};font-weight:${dateWeight};">${escapeHtml(dateLabel)}</span>
+                </div>
+              </div>
+              <div class="ms-activity-subtitle">${sub}</div>
+              ${detailBlock}
+            </div>
+          </div>`;
+        }).join('');
+      } catch(e){ console.warn('rcBuildTaskRows error:', e); return ''; }
+    }
+
+    // Fill task-note bodies via textContent (safe against special characters).
+    function rcFillTaskNoteBodies(container, c){
+      if(!container) return;
+      try {
+        const tasks = rcTasksForContact(c).filter(t => t.task.notes && String(t.task.notes).trim());
+        const bodies = container.querySelectorAll('.ms-task-note-body');
+        bodies.forEach((el, i) => { if(tasks[i]) el.textContent = tasks[i].task.notes; });
+      } catch(e){ console.warn('rcFillTaskNoteBodies error:', e); }
     }
 
 
@@ -4363,13 +4470,15 @@
                   </div>
                 </div>`;
               })() : ''}
-              <div class="ms-empty-state">No upcoming follow-ups set or overdue.</div>
+              ${rcBuildTaskRows(c)}
+              ${(!rcHasVal(c.followUp) && !rcTasksForContact(c).length) ? '<div class="ms-empty-state">No upcoming follow-ups or tasks.</div>' : ''}
             </div>
           </div>
 
         </div>`;
       // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
       rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
+      rcFillTaskNoteBodies(inner, c);
       } catch(e) { console.error('rcRenderDetailOwner error:', e, c); }
     }
 
@@ -4560,13 +4669,15 @@
                   </div>
                 </div>`;
               })() : ''}
-              <div class="ms-empty-state">No upcoming follow-ups set or overdue.</div>
+              ${rcBuildTaskRows(c)}
+              ${(!rcHasVal(c.followUp) && !rcTasksForContact(c).length) ? '<div class="ms-empty-state">No upcoming follow-ups or tasks.</div>' : ''}
             </div>
           </div>
 
         </div>`;
       // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
       rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
+      rcFillTaskNoteBodies(inner, c);
       } catch(e) { console.error('rcRenderDetailOther error:', e, c); }
     }
 
@@ -4622,6 +4733,27 @@
     const RCT_CORRECT_CHECK = `<svg class="rct-correct-check" viewBox="0 0 12 12" fill="none" aria-label="Correct number"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     function rctIsCorrect(status){ return String(status||'').trim().toLowerCase() === 'correct number'; }
 
+    // ── List-view task indicator ──────────────────────────────────────────
+    // Returns 'overdue' if any active tagged task is overdue, else 'upcoming'
+    // if any active tagged task exists, else null. Overdue takes priority.
+    function rctTaskState(c){
+      try {
+        const tasks = rcTasksForContact(c);
+        if(!tasks.length) return null;
+        return tasks.some(t => t.overdue) ? 'overdue' : 'upcoming';
+      } catch(e){ return null; }
+    }
+
+    function rctTaskBadge(c){
+      const state = rctTaskState(c);
+      if(!state) return '';
+      const label = state === 'overdue' ? 'Overdue task' : 'Upcoming task';
+      return `<span class="rct-task-badge rct-task-badge--${state}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        ${label}
+      </span>`;
+    }
+
     function rctCellInner(c, col){
       switch(col.key){
         case 'name':
@@ -4650,7 +4782,7 @@
     function rctCell(c, col){
       if(col.key === 'name'){
         // Name opens the record; not editable
-        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}</span></td>`;
+        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}${rctTaskBadge(c)}</span></td>`;
       }
       if(col.editable){
         // Editable cell: hover reveals pencil; click pencil (or cell) edits in place
@@ -5111,6 +5243,27 @@
     }
     window.rcBackToList = rcBackToList;
 
+    // Re-sync the Related Contacts widget after any task mutation so the
+    // list-view task badges and the open record's milestone task rows reflect
+    // the current To Do List state. Rebuilds both tables (which preserves an
+    // open record) and re-renders whichever record is currently open.
+    function rcRefreshAfterTaskChange(){
+      try {
+        if(typeof rcOwners === 'undefined' || typeof rcOthers === 'undefined') return;
+        rcBuildList(rcOwners, 'list-owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner, true);
+        rcBuildList(rcOthers, 'list-other',  'inner-other',  'detail-other',  rcRenderDetailOther, false);
+        [['owners', rcOwners, 'inner-owners', 'detail-owners', rcRenderDetailOwner],
+         ['other',  rcOthers, 'inner-other',  'detail-other',  rcRenderDetailOther]].forEach(([suffix, arr, innerId, detailId, fn]) => {
+          const recordView = document.getElementById('recordview-' + suffix);
+          if(recordView && recordView.style.display === 'block'){
+            const idx = rcActiveIndex[suffix];
+            if(idx != null && arr[idx]) fn(arr[idx], innerId, detailId);
+          }
+        });
+      } catch(e){ console.warn('rcRefreshAfterTaskChange error:', e); }
+    }
+    window.rcRefreshAfterTaskChange = rcRefreshAfterTaskChange;
+
     // ── NEW CONTACT (inline add row) webhook ──
     const RC_CREATE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
@@ -5186,7 +5339,7 @@
         phone3:           formatPhone(c.phone_3 ?? c.phone3 ?? "—"),
         phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
         contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
-        address:          c.address ?? "—",
+        address:          c.address ?? c.contact_address ?? c.text5__1 ?? c.full_address ?? c.mailing_address ?? "—",
         keyContact:       !!(c.key_contact ?? c.keyContact ?? false),
         notes:            c.notes ?? "",
         pulseId:          c.pulse_id ?? c.pulseId ?? c.id ?? null,
@@ -5879,6 +6032,7 @@
         };
       });
       renderTrayTasks();
+      if(window.rcRefreshAfterTaskChange) rcRefreshAfterTaskChange();
     }
 
     var utilityTasksOpen = false;
@@ -6146,6 +6300,7 @@
       trayTasks[i].done = !trayTasks[i].done;
       renderTrayTasks();
       saveTasksToMonday();
+      if(window.rcRefreshAfterTaskChange) rcRefreshAfterTaskChange();
     }
     function starTrayTask(i){
       trayTasks[i].starred = !trayTasks[i].starred;
@@ -6156,6 +6311,7 @@
       trayTasks.splice(i, 1);
       renderTrayTasks();
       saveTasksToMonday();
+      if(window.rcRefreshAfterTaskChange) rcRefreshAfterTaskChange();
     }
 
     // Writes the full trayTasks array to the Monday long text column
@@ -6216,6 +6372,7 @@
         renderTrayTasks();
         hideTrayForm();
         saveTasksToMonday();
+        if(window.rcRefreshAfterTaskChange) rcRefreshAfterTaskChange();
         // Restore save button to original create behavior
         saveBtn.onclick = saveTrayTask;
       };
@@ -6267,6 +6424,7 @@
       renderTrayTasks();
       hideTrayForm();
       saveTasksToMonday();
+      if(window.rcRefreshAfterTaskChange) rcRefreshAfterTaskChange();
     }
 
     /* ── CONTACT MULTI-SELECT ── */
