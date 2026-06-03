@@ -4705,7 +4705,7 @@
 
     // Lead Status options (Cosmos pill statuses) for the inline dropdown.
     const RCT_STATUS_OPTS = [
-      'New','No Attempt','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer',
+      'No Attempt','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer',
       'Re-Skiptrace','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'
     ];
 
@@ -4897,7 +4897,7 @@
         const field = col.field || col.key;   // Name column has no .field; use its key
         if(field === 'status'){
           return `<select class="rct-cell-input rct-cell-select" data-field="status">${
-            RCT_STATUS_OPTS.map(o => `<option value="${escapeHtml(o)}"${o==='New'?' selected':''}>${escapeHtml(o)}</option>`).join('')
+            RCT_STATUS_OPTS.map(o => `<option value="${escapeHtml(o)}"${o==='No Attempt'?' selected':''}>${escapeHtml(o)}</option>`).join('')
           }</select>`;
         }
         const cfg = RC_FIELD_EDIT_CFG[field] || { type:'text' };
@@ -4947,6 +4947,11 @@
     }
 
     async function rctCommitAddRow(tr, suffix, innerId, detailId, renderFn, data){
+      // Prevent double-submit: if a save for this row is already running
+      // (e.g. the user pressed Enter twice during the Make round-trip), ignore
+      // the repeat so we never create duplicate contacts.
+      if(tr.dataset.saving === '1') return;
+
       const get = (field) => { const el = tr.querySelector(`[data-field="${field}"]`); return el ? el.value.trim() : ''; };
       const name = get('name');
       const nameInput = tr.querySelector('[data-field="name"]');
@@ -4958,23 +4963,34 @@
       }
       if(nameInput) nameInput.classList.remove('rc-input-error');
 
+      // Lock this row for the duration of the create.
+      tr.dataset.saving = '1';
+
       const phone1Raw = get('phone');
       const phone2Raw = get('phone2');
       const { boardId, pulseId } = getRcIds();
 
+      // Base payload — always present. Optional fields are added below only
+      // when the user actually entered a value, so Monday never receives an
+      // empty value for a status/dropdown column (which it rejects).
       const payload = {
         type:            'create_contact',
         parent_board_id: boardId || '',
         parent_pulse_id: pulseId || '',
         name:            name,
-        relationship:    get('relation'),
-        lead_status:     get('status') || 'New',
-        owner_status:    get('ownerStatus'),
-        contact_outcome: get('contactOutcome'),
-        phone_1:         phone1Raw.replace(/[^0-9+]/g,''),
-        phone_2:         phone2Raw.replace(/[^0-9+]/g,''),
+        lead_status:     get('status') || 'No Attempt',
         timestamp:       new Date().toISOString()
       };
+      const relationVal = get('relation');
+      if(relationVal)               payload.relationship    = relationVal;
+      const ownerStatusVal = get('ownerStatus');
+      if(ownerStatusVal)            payload.owner_status    = ownerStatusVal;
+      const contactOutcomeVal = get('contactOutcome');
+      if(contactOutcomeVal)         payload.contact_outcome = contactOutcomeVal;
+      const phone1Digits = phone1Raw.replace(/[^0-9+]/g,'');
+      if(phone1Digits)              payload.phone_1         = phone1Digits;
+      const phone2Digits = phone2Raw.replace(/[^0-9+]/g,'');
+      if(phone2Digits)              payload.phone_2         = phone2Digits;
 
       // Loading state on the save button
       const saveBtn = tr.querySelector('.rct-cell-save');
@@ -5047,6 +5063,7 @@
         }
       } else {
         if(saveBtn){ saveBtn.classList.remove('rct-saving'); saveBtn.disabled = false; }
+        tr.dataset.saving = '';   // release lock so the user can retry
         rcShowCreateToast(false);
       }
     }
