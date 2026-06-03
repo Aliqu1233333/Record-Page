@@ -2410,13 +2410,29 @@
       color: #fff;
       border: none;
       border-radius: 999px;
-      font-size: 13px; font-weight: 500;
+      font-size: 13px; font-weight: 600;
       font-family: var(--font); cursor: pointer;
       white-space: nowrap;
-      transition: background .12s ease, transform .08s ease;
+      box-shadow: 0 1px 2px rgba(12,41,18,0.18);
+      transition: background .15s ease, transform .15s cubic-bezier(0.34,1.56,0.64,1), box-shadow .15s ease, filter .15s ease;
     }
-    .nas-complete-btn:hover { background: #194E31; }
-    .nas-complete-btn:active { transform: translateY(2px); filter: brightness(0.88); }
+    .nas-complete-btn:hover {
+      background: #246b3c;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(46,132,74,0.34), 0 2px 4px rgba(12,41,18,0.18);
+    }
+    .nas-complete-btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 3px rgba(12,41,18,0.25);
+      filter: brightness(0.9);
+    }
+    /* "Pressed/committing" state during the deliberate delay before the reward */
+    .nas-complete-btn.nas-pressing {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.22), 0 1px 2px rgba(12,41,18,0.18);
+      background: #246b3c;
+      pointer-events: none;
+    }
     .nas-complete-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
     .nas-overdue-badge {
       display: inline-flex;
@@ -2547,6 +2563,42 @@
       from { transform: translateY(10px); opacity: 0; }
       to   { transform: translateY(0);    opacity: 1; }
     }
+
+    /* ── Next-step success reward (animated checkmark) ── */
+    .nas-next-success {
+      display: none;
+      position: absolute; inset: 0; z-index: 20;
+      background: #fff; border-radius: 16px;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; text-align: center; padding: 24px;
+    }
+    .nas-next-success.show { display: flex; animation: nasSuccessFade .25s ease both; }
+    @keyframes nasSuccessFade { from { opacity: 0; } to { opacity: 1; } }
+    .nas-next-success-check { width: 88px; height: 88px; margin-bottom: 14px; }
+    .nas-next-success-check svg { width: 88px; height: 88px; }
+    .nas-check-circle {
+      stroke: #2E844A; stroke-width: 3;
+      stroke-dasharray: 151; stroke-dashoffset: 151;
+      animation: nasCircleDraw .45s cubic-bezier(0.65,0,0.45,1) forwards;
+    }
+    .nas-check-mark {
+      stroke: #2E844A; stroke-width: 4;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 40; stroke-dashoffset: 40;
+      animation: nasMarkDraw .3s cubic-bezier(0.65,0,0.45,1) .4s forwards;
+    }
+    @keyframes nasCircleDraw { to { stroke-dashoffset: 0; } }
+    @keyframes nasMarkDraw   { to { stroke-dashoffset: 0; } }
+    .nas-next-success-title {
+      font-size: 21px; font-weight: 600; color: #032D60; font-family: var(--font);
+      opacity: 0; animation: nasSuccessUp .4s ease .55s forwards;
+    }
+    .nas-next-success-sub {
+      font-size: 14px; color: #706e6b; font-family: var(--font);
+      opacity: 0; animation: nasSuccessUp .4s ease .7s forwards;
+    }
+    @keyframes nasSuccessUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
     .nas-next-header {
       padding: 24px 32px 20px;
       border-bottom: 1px solid #e5e7eb;
@@ -2835,9 +2887,9 @@
                 <div class="nas-actions">
                   <button class="nas-edit-btn" id="nasEditBtn">Edit</button>
                   <div class="nas-divider"></div>
-                  <button class="nas-complete-btn" id="nasCompleteBtn" aria-label="Mark action step as complete">
+                  <button class="nas-complete-btn" id="nasCompleteBtn" aria-label="Mark action step as completed">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                    Mark Complete
+                    Mark As Completed
                   </button>
                 </div>
               </div>
@@ -2937,7 +2989,17 @@
               </div>
             </div>
             <div class="nas-modal-overlay" id="nasNextOverlay">
-              <div class="nas-next-modal">
+              <div class="nas-next-modal" style="position:relative;">
+                <div class="nas-next-success" id="nasNextSuccess">
+                  <div class="nas-next-success-check">
+                    <svg viewBox="0 0 52 52" aria-hidden="true">
+                      <circle class="nas-check-circle" cx="26" cy="26" r="24" fill="none"/>
+                      <path class="nas-check-mark" fill="none" d="M14 27l8 8 16-18"/>
+                    </svg>
+                  </div>
+                  <div class="nas-next-success-title">Next Step Locked In</div>
+                  <div class="nas-next-success-sub">You're making progress!</div>
+                </div>
                 <div class="nas-next-header">
                   <div class="nas-next-title">Set Next Action Step</div>
                   <button class="nas-next-close" id="nasNextClose">
@@ -6741,6 +6803,8 @@
         if(si) si.value = nasCurrentStep !== '—' ? nasCurrentStep : '';
         if(di) di.value = nasCurrentDue || '';
         if(ni) ni.value = '';
+        var successEl = document.getElementById('nasNextSuccess');
+        if(successEl) successEl.classList.remove('show');
         openOverlay('nasNextOverlay');
         setTimeout(function(){ if(si) { si.focus(); si.select(); } }, 120);
       }
@@ -6771,19 +6835,33 @@
           dispDue = MN[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
         } catch(e) {}
 
+        // Commit the data immediately…
         nasSetStep(newStep, dispDue);
         nasFireWebhook(newStep, newDue);
-        closeOverlay('nasNextOverlay');
 
-        var chip = document.getElementById('nasSection');
-        if (chip) {
-          chip.style.background = '#f0fdf4';
-          chip.style.boxShadow  = '0 2px 8px rgba(46,132,74,0.14), 0 1px 2px rgba(0,0,0,0.04)';
-          setTimeout(function(){
-            chip.style.background = '#e8f2fc';
-            chip.style.boxShadow  = '0 2px 8px rgba(1,118,211,0.13), 0 1px 3px rgba(0,0,0,0.06)';
-          }, 1800);
+        // …then reward the behavior with a short checkmark animation before
+        // closing, so setting the next step feels like an accomplishment.
+        var successEl = document.getElementById('nasNextSuccess');
+        if (successEl) {
+          // restart the animation cleanly
+          successEl.classList.remove('show');
+          void successEl.offsetWidth;
+          successEl.classList.add('show');
         }
+        setTimeout(function() {
+          closeOverlay('nasNextOverlay');
+          if (successEl) successEl.classList.remove('show');
+
+          var chip = document.getElementById('nasSection');
+          if (chip) {
+            chip.style.background = '#f0fdf4';
+            chip.style.boxShadow  = '0 2px 8px rgba(46,132,74,0.14), 0 1px 2px rgba(0,0,0,0.04)';
+            setTimeout(function(){
+              chip.style.background = '#e8f2fc';
+              chip.style.boxShadow  = '0 2px 8px rgba(1,118,211,0.13), 0 1px 3px rgba(0,0,0,0.06)';
+            }, 1800);
+          }
+        }, 1500);
       }
 
       /* ── Confetti burst ── */
@@ -6864,10 +6942,22 @@
         /* Complete button → celebration modal + confetti */
         var completeBtn = document.getElementById('nasCompleteBtn');
         if (completeBtn) completeBtn.addEventListener('click', function() {
-          // Clear columns immediately when marked complete
-          nasFireWebhook('', '');
-          openOverlay('nasCelebrateOverlay');
-          // confetti removed
+          // If there's no action step yet, there's nothing to "complete" —
+          // open the edit view so the user sets one instead of being told
+          // they completed something that never existed.
+          if (!nasCurrentStep || nasCurrentStep === '—') {
+            openEdit();
+            return;
+          }
+          // Deliberate ~0.25s press before the reward, so the action feels
+          // weighty and earned rather than instant/lightweight.
+          completeBtn.classList.add('nas-pressing');
+          setTimeout(function() {
+            completeBtn.classList.remove('nas-pressing');
+            // Clear columns when marked complete
+            nasFireWebhook('', '');
+            openOverlay('nasCelebrateOverlay');
+          }, 250);
         });
 
         /* Celebration: skip → just close */
@@ -6889,6 +6979,8 @@
             if(si) si.value = '';
             if(di) di.value = '';
             if(ni) ni.value = '';
+            var successEl = document.getElementById('nasNextSuccess');
+            if(successEl) successEl.classList.remove('show');
             openOverlay('nasNextOverlay');
             setTimeout(function(){ if(si) si.focus(); }, 120);
           }, 200);
