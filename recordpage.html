@@ -2458,12 +2458,28 @@
 
     /* ══ Celebration animation — staged sequence ══ */
     .nas-celebrate-anim {
-      margin-bottom: 6px;
+      margin-bottom: -28px;
       animation: nasBounceIn .65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
       animation-delay: 0.35s;
       opacity: 0;
       position: relative;
       z-index: 1;
+    }
+    /* Gentle "waving in the breeze" sway — pivots near the pole base.
+       Starts after the bounce-in lands so the two don't conflict. */
+    #nasCelebrateAnim img {
+      transform-origin: 50% 85%;
+      animation: nasFlagWave 3.2s ease-in-out 1.1s infinite;
+    }
+    @keyframes nasFlagWave {
+      0%   { transform: rotate(0deg)    scale(1);     }
+      25%  { transform: rotate(1.6deg)  scale(1.012); }
+      50%  { transform: rotate(0deg)    scale(1);     }
+      75%  { transform: rotate(-1.6deg) scale(1.012); }
+      100% { transform: rotate(0deg)    scale(1);     }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #nasCelebrateAnim img { animation: none; }
     }
     @keyframes nasBounceIn {
       0%   { transform: scale(0.3) translateY(12px); opacity: 0; }
@@ -2526,7 +2542,7 @@
     .nas-celebrate-icon svg { width: 52px; height: 52px; }
     .nas-celebrate-title {
       font-size: 24px; font-weight: 400; color: #032D60;
-      font-family: var(--font); margin-bottom: 4px; margin-top: -4px; line-height: 1.3;
+      font-family: var(--font); margin-bottom: 10px; margin-top: -4px; line-height: 1.3;
     }
     .nas-celebrate-sub {
       font-size: 14px; font-weight: 400; color: #706e6b;
