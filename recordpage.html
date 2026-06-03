@@ -882,6 +882,35 @@
     .rct-task-badge--overdue { background: #fcdde3; color: #b90d5a; }
     .rct-task-badge--upcoming { background: #def9f3; color: #014035; }
 
+    /* "Creating…" pending badge (optimistic create state) */
+    .rct-pending-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 8px;
+      padding: 1px 8px 1px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.6;
+      white-space: nowrap;
+      vertical-align: middle;
+      font-family: var(--font);
+      background: #e8f0fe;
+      color: #0250d9;
+    }
+    .rct-pending-spinner {
+      width: 9px; height: 9px;
+      border: 1.5px solid rgba(2,80,217,.3);
+      border-top-color: #0250d9;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: rctPendingSpin .7s linear infinite;
+    }
+    @keyframes rctPendingSpin { to { transform: rotate(360deg); } }
+    /* A pending row is non-interactive until confirmed */
+    .rct-row.rct-row-pending { opacity: .72; pointer-events: none; }
+
     /* Task milestone row note body inherits the standard detail-card styling */
     .ms-task-row .ms-detail-value { white-space: pre-wrap; word-break: break-word; }
 
@@ -4739,6 +4768,13 @@
       </span>`;
     }
 
+    // "Creating…" badge shown on a contact while its Monday item is being
+    // created (optimistic UI). Takes priority over the task badge.
+    function rctPendingBadge(c){
+      if(!c || !c._pending) return '';
+      return `<span class="rct-pending-badge"><span class="rct-pending-spinner"></span>Creating…</span>`;
+    }
+
     function rctCellInner(c, col){
       switch(col.key){
         case 'name':
@@ -4767,7 +4803,7 @@
     function rctCell(c, col){
       if(col.key === 'name'){
         // Name opens the record; not editable
-        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}${rctTaskBadge(c)}</span></td>`;
+        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}${c._pending ? rctPendingBadge(c) : rctTaskBadge(c)}</span></td>`;
       }
       if(col.editable){
         // Editable cell: hover reveals pencil; click pencil (or cell) edits in place
@@ -4813,7 +4849,7 @@
       const bodyRows = sorted.map((c) => {
         const realIdx = data.indexOf(c);
         const cells = RCT_COLUMNS.map(col => rctCell(c, col)).join('');
-        return `<tr class="rct-row" data-i="${realIdx}">
+        return `<tr class="rct-row${c._pending ? ' rct-row-pending' : ''}" data-i="${realIdx}">
           <td class="rct-col-rownum"></td>
           ${cells}
         </tr>`;
@@ -4992,9 +5028,33 @@
       const phone2Digits = phone2Raw.replace(/[^0-9+]/g,'');
       if(phone2Digits)              payload.phone_2         = phone2Digits;
 
-      // Loading state on the save button
-      const saveBtn = tr.querySelector('.rct-cell-save');
-      if(saveBtn){ saveBtn.classList.add('rct-saving'); saveBtn.disabled = true; }
+      // ── Optimistic UI ──────────────────────────────────────────────────
+      // Add the contact to the list immediately (with a "Creating…" badge) so
+      // it doesn't feel like nothing happened during Make's create round-trip.
+      // We confirm it on success, or remove it on failure.
+      const optimistic = rcMapContact({
+        name:            payload.name,
+        relationship:    payload.relationship,
+        lead_status:     payload.lead_status,
+        owner_status:    payload.owner_status,
+        contact_outcome: payload.contact_outcome,
+        phone_1:         phone1Raw,
+        phone_2:         phone2Raw,
+        board_id:        boardId,
+        pulse_id:        null
+      });
+      optimistic._pending = true;
+      const optimisticArr = optimistic.ownerStatusNorm === 'yes' ? rcOwners : rcOthers;
+      optimisticArr.push(optimistic);
+
+      rcUpdateMeta();
+      rcBuildList(rcOwners, 'list-owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner, true);
+      rcBuildList(rcOthers, 'list-other',  'inner-other',  'detail-other',  rcRenderDetailOther, false);
+
+      // If the contact landed in the other tab, switch to it so the user sees it
+      const optimisticTab = optimistic.ownerStatusNorm === 'yes' ? 'tab-owners' : 'tab-other';
+      const optimisticCurPane = (suffix === 'owners') ? 'tab-owners' : 'tab-other';
+      if(optimisticTab !== optimisticCurPane){ const t = document.getElementById(optimisticTab); if(t) t.click(); }
 
       // Send to Make and attempt to read the response so we can capture the
       // newly-created subitem's IDs. Make.com can trip browser CORS on the
@@ -5030,28 +5090,15 @@
       }
 
       if(ok){
-        const mapped = rcMapContact({
-          name:            payload.name,
-          relationship:    payload.relationship,
-          lead_status:     payload.lead_status,
-          owner_status:    payload.owner_status,
-          contact_outcome: payload.contact_outcome,
-          phone_1:         phone1Raw,
-          phone_2:         phone2Raw,
-          board_id:        newBoardId || boardId,
-          pulse_id:        newPulseId
-        });
-        if(mapped.ownerStatusNorm === 'yes') rcOwners.push(mapped);
-        else rcOthers.push(mapped);
+        // Confirm the optimistic contact: clear the pending badge and attach
+        // the real Monday IDs so edits target the correct item.
+        optimistic._pending = false;
+        if(newPulseId != null) optimistic.pulseId = newPulseId;
+        if(newBoardId != null) optimistic.boardId = newBoardId;
 
         rcUpdateMeta();
         rcBuildList(rcOwners, 'list-owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner, true);
         rcBuildList(rcOthers, 'list-other',  'inner-other',  'detail-other',  rcRenderDetailOther, false);
-
-        // If the contact landed in the other tab, switch to it
-        const targetTab = mapped.ownerStatusNorm === 'yes' ? 'tab-owners' : 'tab-other';
-        const curPane = (suffix === 'owners') ? 'tab-owners' : 'tab-other';
-        if(targetTab !== curPane){ const t = document.getElementById(targetTab); if(t) t.click(); }
 
         // If we didn't get an item ID back, edits to this contact can't be
         // saved yet (no target item). Warn the user to refresh so the record
@@ -5062,8 +5109,13 @@
           rcShowCreateToast(true);
         }
       } else {
-        if(saveBtn){ saveBtn.classList.remove('rct-saving'); saveBtn.disabled = false; }
-        tr.dataset.saving = '';   // release lock so the user can retry
+        // Roll back the optimistic contact so a failed create doesn't leave a
+        // ghost row behind.
+        const idx = optimisticArr.indexOf(optimistic);
+        if(idx > -1) optimisticArr.splice(idx, 1);
+        rcUpdateMeta();
+        rcBuildList(rcOwners, 'list-owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner, true);
+        rcBuildList(rcOthers, 'list-other',  'inner-other',  'detail-other',  rcRenderDetailOther, false);
         rcShowCreateToast(false);
       }
     }
