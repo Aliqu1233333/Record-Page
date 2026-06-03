@@ -4980,17 +4980,34 @@
       const saveBtn = tr.querySelector('.rct-cell-save');
       if(saveBtn){ saveBtn.classList.add('rct-saving'); saveBtn.disabled = true; }
 
-      // Fire-and-forget, matching fireRcWebhook: Make.com webhooks can trip
-      // browser CORS on the *response* even when the request succeeds, so we
-      // treat a completed send (no thrown network error) as success rather
-      // than gating on res.ok.
+      // Send to Make and attempt to read the response so we can capture the
+      // newly-created subitem's IDs. Make.com can trip browser CORS on the
+      // *response* even when the create succeeds, so we treat a completed send
+      // (no thrown network error) as success, and separately try to parse any
+      // returned IDs. If CORS blocks the body, newPulseId stays null and we
+      // fall back gracefully (see below).
       let ok = true;
+      let newPulseId = null;
+      let newBoardId = null;
       try {
-        await fetch(RC_CREATE_WEBHOOK, {
+        const res = await fetch(RC_CREATE_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        // Try to read the returned IDs. Wrapped separately so a CORS-blocked
+        // or non-JSON body never flips the create to a failure.
+        try {
+          const data = await res.json();
+          if (data && typeof data === 'object') {
+            newPulseId = data.pulse_id ?? data.pulseId ?? data.item_id ?? data.itemId ?? data.id ?? null;
+            newBoardId = data.board_id ?? data.boardId ?? data.subitem_board_id ?? data.subitemBoardId ?? null;
+            if (newPulseId != null) newPulseId = String(newPulseId);
+            if (newBoardId != null) newBoardId = String(newBoardId);
+          }
+        } catch(parseErr) {
+          console.warn('Could not read create-contact response body (likely CORS):', parseErr);
+        }
       } catch(err){
         console.warn('Create contact webhook error:', err);
         ok = false;
@@ -5005,8 +5022,8 @@
           contact_outcome: payload.contact_outcome,
           phone_1:         phone1Raw,
           phone_2:         phone2Raw,
-          board_id:        boardId,
-          pulse_id:        null
+          board_id:        newBoardId || boardId,
+          pulse_id:        newPulseId
         });
         if(mapped.ownerStatusNorm === 'yes') rcOwners.push(mapped);
         else rcOthers.push(mapped);
@@ -5020,7 +5037,14 @@
         const curPane = (suffix === 'owners') ? 'tab-owners' : 'tab-other';
         if(targetTab !== curPane){ const t = document.getElementById(targetTab); if(t) t.click(); }
 
-        rcShowCreateToast(true);
+        // If we didn't get an item ID back, edits to this contact can't be
+        // saved yet (no target item). Warn the user to refresh so the record
+        // re-loads with its real Monday ID.
+        if(newPulseId == null){
+          rcShowCreateToast(true, 'Contact created — refresh to edit it');
+        } else {
+          rcShowCreateToast(true);
+        }
       } else {
         if(saveBtn){ saveBtn.classList.remove('rct-saving'); saveBtn.disabled = false; }
         rcShowCreateToast(false);
@@ -5252,12 +5276,13 @@
     // ── NEW CONTACT (inline add row) webhook ──
     const RC_CREATE_WEBHOOK = "https://hook.us1.make.com/gfas8blpn55qzbswmnm1xbfana63eywm";
 
-    function rcShowCreateToast(success){
+    function rcShowCreateToast(success, customMsg){
       const toast = document.createElement('div');
       toast.className = 'rc-update-toast ' + (success ? 'rc-update-toast--success' : 'rc-update-toast--error');
       const checkSvg = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5.5" fill="#0e7a5a"/><path d="M3.5 6.2l1.8 1.8 3.2-3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       const warnSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-      toast.innerHTML = success ? (checkSvg + ' Contact created') : (warnSvg + ' Failed to create contact');
+      const label = customMsg ? escapeHtml(customMsg) : (success ? 'Contact created' : 'Failed to create contact');
+      toast.innerHTML = (success ? checkSvg : warnSvg) + ' ' + label;
       document.body.appendChild(toast);
       setTimeout(() => toast.classList.add('rc-update-toast--visible'), 10);
       setTimeout(() => { toast.classList.remove('rc-update-toast--visible'); setTimeout(() => toast.remove(), 300); }, 2800);
