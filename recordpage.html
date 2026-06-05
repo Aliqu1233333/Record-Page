@@ -271,13 +271,13 @@
       display: flex;
       flex-direction: column;
       padding: 10px 0 4px 0;
-      border-bottom: 1px solid #d4d7dc;
+      border-bottom: 1px solid #ebedf0;
       min-width: 0;
     }
     .slds-col-left { padding-right: 20px; }
     .slds-col-right { padding-left: 24px; }
-    .slds-col-left .slds-field:last-child { border-bottom: 1px solid #d4d7dc; }
-    .slds-col-right .slds-field:last-child { border-bottom: 1px solid #d4d7dc; }
+    .slds-col-left .slds-field:last-child { border-bottom: 1px solid #ebedf0; }
+    .slds-col-right .slds-field:last-child { border-bottom: 1px solid #ebedf0; }
 
     .slds-label {
       font-size: 12px;
@@ -315,7 +315,7 @@
 
     .edit{
       opacity: 0;
-      transition: opacity .1s ease, color .1s ease;
+      transition: opacity .1s ease, color .1s ease, background .1s ease;
       color: #c4c9d4;
       cursor: pointer;
       flex: 0 0 auto;
@@ -338,9 +338,30 @@
       outline:none;
     }
     .inline-input:focus{
-      border-color: #6b7280;
-      box-shadow: 0 0 0 1px #6b7280;
+      border-color: #032d60;
+      box-shadow: 0 0 0 1px #032d60;
     }
+
+    /* Small save button shown in the edit state */
+    .inline-save-btn{
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin-left: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: #032d60;
+      color: #fff;
+      cursor: pointer;
+      transition: filter .1s ease, transform .06s ease;
+    }
+    .inline-save-btn:hover{ filter: brightness(1.15); }
+    .inline-save-btn:active{ transform: translateY(1px); }
+    .inline-save-btn svg{ width: 12px; height: 12px; display: block; }
 
     /* ── Full-width multiline field (e.g. Fact Pattern Notes) ── */
     .slds-field-full {
@@ -407,8 +428,8 @@
       min-height: 60px;
     }
     .inline-textarea:focus{
-      border-color: #6b7280;
-      box-shadow: 0 0 0 1px #6b7280;
+      border-color: #032d60;
+      box-shadow: 0 0 0 1px #032d60;
     }
 
     .slds-field.stalled .value-text{ color: var(--stalled-text); font-weight: 600; }
@@ -3073,7 +3094,7 @@
                 <div class="slds-col-right">
                   <div class="slds-field fpn-field" data-field="Fact_Pattern_Notes">
                     <div class="fpn-stack">
-                      <div class="slds-label">Fact Pattern</div>
+                      <div class="slds-label">Fact Pattern Notes</div>
                       <div class="slds-value"><span class="value-text multiline" data-editable="true" data-multiline="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                     </div>
                   </div>
@@ -3944,6 +3965,14 @@
         input.value=oldValue;
         const left = document.createElement("div"); left.style.flex="1"; left.style.minWidth="0"; left.appendChild(input);
         valueWrap.insertBefore(left, valueWrap.firstChild);
+        // Small save button on the right of the edit field
+        const saveBtn = document.createElement("button");
+        saveBtn.type = "button";
+        saveBtn.className = "inline-save-btn";
+        saveBtn.title = "Save";
+        saveBtn.setAttribute("aria-label", "Save");
+        saveBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+        valueWrap.insertBefore(saveBtn, pencil);
         if (isMultiline) {
           const autoGrow = () => { input.style.height = "auto"; input.style.height = input.scrollHeight + "px"; };
           input.addEventListener("input", autoGrow);
@@ -3952,12 +3981,15 @@
         let committed = false;
         const commit = async () => {
           if(committed) return; committed=true;
+          saveBtn.remove();
           const newValue = input.value.trim();
           valueText.textContent=newValue; left.remove(); valueText.style.display=""; pencil.style.display="";
           if (isMultiline) { const t1 = field.querySelector(".fpn-toggle"); if (t1) t1.style.display = ""; refreshFpnToggles(); }
           if(newValue!==oldValue){ await saveToMonday(fieldKey, newValue); showSaveToast("success"); }
         };
-        const cancel = () => { if(committed) return; committed=true; left.remove(); valueText.style.display=""; pencil.style.display=""; if (isMultiline) { const t2 = field.querySelector(".fpn-toggle"); if (t2) t2.style.display = ""; refreshFpnToggles(); } };
+        const cancel = () => { if(committed) return; committed=true; saveBtn.remove(); left.remove(); valueText.style.display=""; pencil.style.display=""; if (isMultiline) { const t2 = field.querySelector(".fpn-toggle"); if (t2) t2.style.display = ""; refreshFpnToggles(); } };
+        // mousedown fires before the input's blur, so the button commits reliably
+        saveBtn.addEventListener("mousedown", (me)=>{ me.preventDefault(); commit(); });
         input.addEventListener("blur",commit);
         input.addEventListener("keydown",(ke)=>{ if(ke.key==="Enter"&&!isMultiline){ke.preventDefault();commit();} if(ke.key==="Enter"&&isMultiline&&(ke.metaKey||ke.ctrlKey)){ke.preventDefault();commit();} if(ke.key==="Escape")cancel(); });
         input.focus(); if(!isMultiline) input.select();
