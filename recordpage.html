@@ -527,6 +527,133 @@
     .orc-table .orc-phone:hover { text-decoration: underline; }
     .orc-table .orc-empty { color: #9ca3af; }
 
+    /* ── Other Contacts: "has an update" speech-bubble marker + popup ── */
+    /* Shows a speech-bubble icon with a small count badge after the contact
+       name when that contact has a most_recent_update. Purely a visual marker
+       (no sort/data changes). Hover (desktop) or tap (touch) reveals a popup
+       styled to match the "next action step" tooltip. */
+    .orc-name-cell { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+    .orc-update-flag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #0176d3;            /* Cosmos brand blue */
+      cursor: default;
+      position: relative;
+      padding: 2px;
+      border-radius: 5px;
+      transition: background 0.12s ease, color 0.12s ease;
+      vertical-align: middle;
+    }
+    .orc-update-flag:hover,
+    .orc-update-flag.is-open { color: #015ba7; }
+    .orc-update-icon { position: relative; display: inline-flex; align-items: center; }
+    .orc-update-flag .orc-update-bubble { width: 17px; height: 17px; display: block; }
+    /* Count badge — small dark circle, like the reference */
+    .orc-update-count {
+      position: absolute;
+      right: -6px;
+      bottom: -5px;
+      min-width: 14px;
+      height: 14px;
+      padding: 0 3px;
+      border-radius: 8px;
+      background: #514f6e;       /* muted dark, matches reference */
+      color: #fff;
+      font-size: 9.5px;
+      font-weight: 700;
+      line-height: 14px;
+      text-align: center;
+      box-sizing: border-box;
+      border: 1.5px solid #fff;  /* keeps it crisp over the row */
+      letter-spacing: 0;
+    }
+
+    /* Floating popup — rendered at document.body level (position:fixed) so it
+       floats over everything and is never clipped by the table's scroll
+       container. Styled like the "next action step" (.tray-tooltip) card. */
+    .orc-update-popup {
+      position: fixed;
+      z-index: 100000;
+      width: max-content;
+      min-width: 220px;
+      max-width: 300px;
+      background: #fff;
+      border: 1px solid #dddbda;
+      border-radius: 8px;
+      box-shadow: 0 6px 22px rgba(0,0,0,.20);
+      padding: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px);
+      transition: opacity 0.13s ease, transform 0.13s ease, visibility 0.13s;
+      text-align: left;
+      pointer-events: none;
+    }
+    .orc-update-popup.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    /* Arrow — class toggles which side it points (below vs above the marker) */
+    .orc-update-popup .orc-update-arrow {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+    }
+    .orc-update-popup.below .orc-update-arrow { bottom: 100%; border-bottom: 9px solid #dddbda; }
+    .orc-update-popup.below .orc-update-arrow::after {
+      content: ''; position: absolute; left: -8px; top: 1.5px;
+      border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 8px solid #fff;
+    }
+    .orc-update-popup.above .orc-update-arrow { top: 100%; border-top: 9px solid #dddbda; }
+    .orc-update-popup.above .orc-update-arrow::after {
+      content: ''; position: absolute; left: -8px; bottom: 1.5px;
+      border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #fff;
+    }
+    /* Header: green "Recent Update" icon circle + title, with gridline beneath */
+    .orc-update-popup-header {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      border-radius: 8px 8px 0 0;
+    }
+    .orc-update-popup-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #4aad52;       /* original "Most Recent Update" green */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .orc-update-popup-icon svg { width: 15px; height: 15px; fill: #fff; }
+    .orc-update-popup-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0250d9;
+      line-height: 1.3;
+    }
+    .orc-update-popup-body {
+      padding: 9px 12px 11px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #3e3e3c;
+      font-weight: 400;
+      white-space: normal;
+      word-break: break-word;
+      max-height: 220px;
+      overflow-y: auto;
+      border-radius: 0 0 8px 8px;
+    }
+
     .orc-status-wrap { position: relative; display: inline-flex; align-items: center; }
     .orc-status-btn {
       display: inline-flex; align-items: center; gap: 5px;
@@ -2029,7 +2156,6 @@
       border-bottom: 1px solid #e5e5e5;
       flex: 1;
     }
-    .rc-field:hover { background: #f3f3f3; }
     .rc-field:hover .rc-edit-icon { opacity: 1; }
 
     /* Field label — SLDS 2 bold label style (per native screenshots) */
@@ -2083,6 +2209,40 @@
     }
     .rc-field:hover .rc-edit-icon { opacity: 1; }
     .rc-edit-icon:hover { color: #0176d3; }
+
+    /* ── Combined Offer field: "Offer Made" checkbox + Offer Amount inline ── */
+    .rc-offer-combo { display: flex; align-items: center; gap: 10px; }
+    .rc-offer-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .rc-offer-box {
+      width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      border: 1.5px solid #c2c8d0;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .12s ease, border-color .12s ease;
+      flex-shrink: 0;
+    }
+    .rc-offer-box svg { width: 11px; height: 11px; opacity: 0; transition: opacity .1s ease; }
+    .rc-offer-check.checked .rc-offer-box { background: #0e7a5a; border-color: #0e7a5a; }
+    .rc-offer-check.checked .rc-offer-box svg { opacity: 1; }
+    .rc-offer-check:hover .rc-offer-box { border-color: #0e7a5a; }
+    .rc-offer-check-label { font-size: 13.5px; font-weight: 500; color: #514f6e; white-space: nowrap; }
+    .rc-offer-check.checked .rc-offer-check-label { color: #0e7a5a; }
+    /* The amount sits to the right; muted/locked until offer is marked made */
+    .rc-offer-amount { display: flex; align-items: center; min-width: 0; }
+    .rc-offer-amount.locked { opacity: 0.45; pointer-events: none; }
+    .rc-offer-amount.locked .rc-edit-icon { display: none; }
+    .rc-offer-sep { width: 1px; height: 18px; background: #e5e5e5; flex-shrink: 0; }
 
     .rc-value.link { color: var(--blue); cursor: pointer; font-weight: 500; }
     .rc-value.link:hover { text-decoration: underline; }
@@ -4113,6 +4273,107 @@
 
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
 
+    /* Update marker → floating popup (rendered at body level so it's never
+       clipped by the table's scroll container). Hover + focus + tap all open
+       it; it flips above/below the marker based on available viewport space. */
+    (function initUpdateFlagInteractions(){
+      const NOTE_ICON = '<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>';
+      let popup = null, currentFlag = null, hideTimer = null;
+
+      function ensurePopup(){
+        if (popup) return popup;
+        popup = document.createElement('div');
+        popup.className = 'orc-update-popup';
+        popup.innerHTML =
+          '<span class="orc-update-arrow"></span>' +
+          '<div class="orc-update-popup-header">' +
+            '<span class="orc-update-popup-icon">' + NOTE_ICON + '</span>' +
+            '<span class="orc-update-popup-title">Recent Update</span>' +
+          '</div>' +
+          '<div class="orc-update-popup-body"></div>';
+        document.body.appendChild(popup);
+        // Keep open while the cursor is over the popup itself.
+        popup.addEventListener('mouseenter', () => { clearTimeout(hideTimer); });
+        popup.addEventListener('mouseleave', scheduleHide);
+        return popup;
+      }
+
+      function positionPopup(flag){
+        const p = ensurePopup();
+        p.querySelector('.orc-update-popup-body').textContent = flag.getAttribute('data-update-text') || '';
+        // Measure off-screen first.
+        p.style.visibility = 'hidden';
+        p.classList.add('visible');
+        const r = flag.getBoundingClientRect();
+        const pw = p.offsetWidth, ph = p.offsetHeight;
+        const gap = 12, margin = 8;
+        // Horizontal: center on the marker, clamp to viewport.
+        let left = r.left + r.width/2 - pw/2;
+        left = Math.max(margin, Math.min(left, window.innerWidth - pw - margin));
+        // Vertical: prefer below; flip above if not enough room below.
+        const spaceBelow = window.innerHeight - r.bottom;
+        const placeBelow = spaceBelow >= ph + gap + margin || spaceBelow >= r.top;
+        let top = placeBelow ? (r.bottom + gap) : (r.top - ph - gap);
+        p.classList.toggle('below', placeBelow);
+        p.classList.toggle('above', !placeBelow);
+        // Point the arrow at the marker center.
+        const arrow = p.querySelector('.orc-update-arrow');
+        const arrowLeft = Math.max(12, Math.min(pw - 12, (r.left + r.width/2) - left));
+        arrow.style.left = arrowLeft + 'px';
+        p.style.left = left + 'px';
+        p.style.top = top + 'px';
+        p.style.visibility = '';
+      }
+
+      function showFor(flag){
+        clearTimeout(hideTimer);
+        currentFlag = flag;
+        flag.classList.add('is-open');
+        positionPopup(flag);
+        ensurePopup().classList.add('visible');
+      }
+      function hideNow(){
+        if (popup) popup.classList.remove('visible');
+        if (currentFlag) currentFlag.classList.remove('is-open');
+        currentFlag = null;
+      }
+      function scheduleHide(){ clearTimeout(hideTimer); hideTimer = setTimeout(hideNow, 120); }
+
+      // Hover (desktop)
+      document.addEventListener('mouseover', (e) => {
+        const flag = e.target.closest && e.target.closest('[data-update-flag]');
+        if (flag) showFor(flag);
+      });
+      document.addEventListener('mouseout', (e) => {
+        const flag = e.target.closest && e.target.closest('[data-update-flag]');
+        if (flag && !(e.relatedTarget && popup && popup.contains(e.relatedTarget))) scheduleHide();
+      });
+      // Tap (touch) / click toggles
+      document.addEventListener('click', (e) => {
+        const flag = e.target.closest && e.target.closest('[data-update-flag]');
+        if (flag) {
+          e.stopPropagation();
+          if (currentFlag === flag) { hideNow(); } else { showFor(flag); }
+        } else if (!(popup && popup.contains(e.target))) {
+          hideNow();
+        }
+      });
+      // Keyboard
+      document.addEventListener('keydown', (e) => {
+        const flag = e.target.closest && e.target.closest('[data-update-flag]');
+        if (flag && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); (currentFlag===flag)?hideNow():showFor(flag); }
+        else if (e.key === 'Escape') { hideNow(); }
+      });
+      document.addEventListener('focusout', (e) => {
+        const flag = e.target.closest && e.target.closest('[data-update-flag]');
+        if (flag) scheduleHide();
+      });
+      // Reposition/hide on scroll or resize so it doesn't detach from the marker.
+      window.addEventListener('scroll', () => { if (currentFlag) hideNow(); }, true);
+      window.addEventListener('resize', () => { if (currentFlag) hideNow(); });
+    })();
+
+
     function escapeHtml(str){ return String(str??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
     function formatValue(v){ if(v===null||v===undefined||v==="") return "—"; if(typeof v==="number") return String(v); if(typeof v==="boolean") return v?"Yes":"No"; return String(v); }
 
@@ -4274,6 +4535,24 @@
       const label = isEmpty ? '—' : displayVal;
       return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
         <span class="rc-value ${cls}">${escapeHtml(label)}</span><svg class="rc-edit-icon" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>`;
+    }
+
+    /* Combined Offer control: a checkbox for "Offer Made" plus the inline
+       Offer Amount field. The amount is locked (muted, non-editable) until
+       the box is checked. Reuses rcEditableEl for the amount so inline-edit
+       and the existing webhook save path keep working unchanged. */
+    function rcOfferComboEl(c){
+      const made = !!(c.offerMade);
+      const amountDisplay = rcHasVal(c.offer) ? ('$' + (Number(String(c.offer).replace(/[^0-9.]/g,'')).toLocaleString('en-US') || String(c.offer).replace(/[^0-9.]/g,''))) : '—';
+      const CHECK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.2l2.6 2.6L10 3.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      return `<div class="rc-offer-combo">
+        <span class="rc-offer-check${made?' checked':''}" role="checkbox" aria-checked="${made?'true':'false'}" tabindex="0" data-offer-toggle>
+          <span class="rc-offer-box">${CHECK}</span>
+          <span class="rc-offer-check-label">Offer Made</span>
+        </span>
+        <span class="rc-offer-sep"></span>
+        <span class="rc-offer-amount${made?'':' locked'}">${rcEditableEl('offer', made ? amountDisplay : '—', '')}</span>
       </div>`;
     }
 
@@ -4585,14 +4864,16 @@
     function rcBuildChevronTrack(currentStatus) {
       const current = String(currentStatus || '').trim();
       const idx = LS_STAGES.findIndex(s => s.toLowerCase() === current.toLowerCase());
-      const activeIdx = idx === -1 ? 0 : idx;
+      // When the status isn't one of the chevron stages (e.g. brand-new leads
+      // on "No Attempt"), nothing is highlighted — all stages stay pending.
+      const activeIdx = idx;
 
       const items = LS_STAGES.map((stage, i) => {
         let cls = 'ls-pending';
-        if (i < activeIdx)        cls = 'ls-done';
-        else if (i === activeIdx) cls = 'ls-active';
-        const wrapCls = i === activeIdx ? 'ls-chev-wrap ls-active-wrap' : 'ls-chev-wrap';
-        const inner = i < activeIdx
+        if (activeIdx >= 0 && i < activeIdx)        cls = 'ls-done';
+        else if (activeIdx >= 0 && i === activeIdx) cls = 'ls-active';
+        const wrapCls = (activeIdx >= 0 && i === activeIdx) ? 'ls-chev-wrap ls-active-wrap' : 'ls-chev-wrap';
+        const inner = (activeIdx >= 0 && i < activeIdx)
           ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;pointer-events:none;"><polyline points="20 6 9 17 4 12"/></svg>`
           : `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;">${escapeHtml(stage)}</span>`;
         return `<div class="${wrapCls}">
@@ -4679,8 +4960,8 @@
                 </div>
                 <div class="rc-field">
                   <div class="rc-field-inner">
-                  <span class="rc-label">Offer Amount</span>
-                  <div class="rc-value">${rcEditableEl('offer', rcHasVal(c.offer) ? Number(String(c.offer).replace(/[^0-9.]/g,'')).toLocaleString('en-US') || c.offer : '—', '')}</div>
+                  <span class="rc-label">Offer Status &amp; Offer Amount</span>
+                  <div class="rc-value">${rcOfferComboEl(c)}</div>
                   </div>
                 </div>
               </div>
@@ -4906,6 +5187,15 @@
                   </div>
                 </div>
               </div>
+              <div class="rc-row">
+                <div class="rc-field">
+                  <div class="rc-field-inner">
+                  <span class="rc-label">Offer Status &amp; Offer Amount</span>
+                  <div class="rc-value">${rcOfferComboEl(c)}</div>
+                  </div>
+                </div>
+                <div class="rc-field"></div>
+              </div>
             </div>
           </div>
 
@@ -5040,7 +5330,7 @@
       { key:'name',           label:'Name',            num:false, editable:false },
       { key:'relation',       label:'Relationship',    num:false, editable:true, field:'relation' },
       { key:'status',         label:'Lead Status',     num:false, editable:true, field:'status' },
-      { key:'ownerStatus',    label:'Owner Status',    num:false, editable:true, field:'ownerStatus' },
+      { key:'address',        label:'Address',         num:false, editable:true, field:'address' },
       { key:'contactOutcome', label:'Contact Outcome', num:false, editable:true, field:'contactOutcome' },
       { key:'phone',          label:'Phone 1',         num:false, editable:true, field:'phone' },
       { key:'phone2',         label:'Phone 2',         num:false, editable:true, field:'phone2' },
@@ -5097,8 +5387,10 @@
           return rctText(c.relation, 'rct-truncate');
         case 'status':
           return rctStatusPill(c.status);
-        case 'ownerStatus':
-          return rctText(c.ownerStatus);
+        case 'address':
+          return (c.address && c.address!=='—' && c.address!=='Unknown')
+            ? `<span class="rct-truncate" style="font-size:13.5px;" title="${escapeHtml(c.address)}">${escapeHtml(c.address)}</span>`
+            : `<span class="rct-muted">—</span>`;
         case 'contactOutcome':
           return (c.contactOutcome && c.contactOutcome!=='—') ? `<span class="rct-outcome">${escapeHtml(c.contactOutcome)}</span>` : `<span class="rct-muted">—</span>`;
         case 'phone':
@@ -5114,10 +5406,21 @@
       }
     }
 
+    function rctUpdateFlag(c){
+      const txt = (c && typeof c.lastRecentUpdate === 'string') ? c.lastRecentUpdate.trim() : '';
+      if(!txt) return '';
+      // Single speech-bubble marker (original style the user preferred).
+      const bubble = '<svg class="orc-update-bubble" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
+      // Update text is stored on the element; the floating popup reads it on hover.
+      return `<span class="orc-update-flag" tabindex="0" role="button" aria-label="This contact has an update" data-update-flag data-update-text="${escapeHtml(txt)}">
+        <span class="orc-update-icon">${bubble}</span>
+      </span>`;
+    }
+
     function rctCell(c, col){
       if(col.key === 'name'){
         // Name opens the record; not editable
-        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}${c._pending ? rctPendingBadge(c) : rctTaskBadge(c)}</span></td>`;
+        return `<td class="rct-name-cell"><span class="rct-name-wrap">${rctCellInner(c, col)}${rctUpdateFlag(c)}${c._pending ? rctPendingBadge(c) : rctTaskBadge(c)}</span></td>`;
       }
       if(col.editable){
         // Editable cell: hover reveals pencil; click pencil (or cell) edits in place
@@ -5861,6 +6164,22 @@
         const el = e.target;
         const dataArr = getLiveData();
         const { boardId, pulseId: globalPulseId } = getRcIds();
+
+        // ── "Offer Made" checkbox toggle ──
+        if(el.closest("[data-offer-toggle]")){
+          e.stopPropagation();
+          const activeItem = rcGetActiveItem(paneId);
+          const c = activeItem ? dataArr[+activeItem.dataset.i] : null;
+          if(!c) return;
+          c.offerMade = !c.offerMade;
+          const cPulseId = c.pulseId || globalPulseId;
+          const cBoardId = c.boardId || boardId;
+          const colId = rcGetColumnId('offerMade', cBoardId);
+          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, c.offerMade ? 'true' : 'false');
+          rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
+          renderFn(c, innerId, detailId);
+          return;
+        }
 
         if(el.closest("[data-action='openstatus']")){
           e.stopPropagation();
