@@ -3750,6 +3750,7 @@
         try {
           const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: "dropdown_mm1aybze", value: "Complete" }) });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
         } catch (err) { console.error("Failed to update Ownership Map:", err); }
       }
     }
@@ -4093,6 +4094,7 @@
         const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId, value: newValue }) });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         console.log(`✓ Saved "${fieldKey}" (${columnId}) → "${newValue}"`);
+        if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
       } catch (err) { console.error(`✗ Failed to save ${fieldKey}:`, err); showSaveToast("error"); }
     }
 
@@ -4270,6 +4272,57 @@
       }catch(error){ console.error('Error fetching data from Make.com:',error); }
       finally{ hideLoading(); }
     }
+
+    // ── Silent background refresh ────────────────────────────────────────
+    // Re-fetches the record from Make WITHOUT showing the loading overlay,
+    // and skips the refresh if the user is mid-edit so we never wipe out
+    // what they're typing. Used to auto-pull changes right after the user
+    // makes an edit (e.g. adds an update or tags an owner), so the new data
+    // appears without a manual page refresh.
+    let _silentRefreshTimer = null;
+    let _silentRefreshInFlight = false;
+
+    function isUserEditing(){
+      // An inline field/textarea is open, or a modal/note dialog is active.
+      if (document.querySelector('.inline-input, .inline-textarea, .rc-inline-edit')) return true;
+      if (document.querySelector('.rc-update-module.active')) return true;
+      const noteOverlay = document.getElementById('noteModalOverlay');
+      if (noteOverlay && noteOverlay.classList.contains('active')) return true;
+      const ae = document.activeElement;
+      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return true;
+      return false;
+    }
+
+    async function silentRefresh(){
+      if (_silentRefreshInFlight) return;
+      if (isUserEditing()) {
+        // Don't clobber an in-progress edit — try again shortly.
+        scheduleSilentRefresh(2500);
+        return;
+      }
+      const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if(!boardId || !pulseId) return;
+      _silentRefreshInFlight = true;
+      try{
+        const response = await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
+        if(!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        // One more guard: user may have started editing during the fetch.
+        if (isUserEditing()) { scheduleSilentRefresh(2500); return; }
+        window.RecordPage.applyData(data);
+      }catch(error){ console.warn('Silent refresh failed:', error); }
+      finally{ _silentRefreshInFlight = false; }
+    }
+
+    // Schedule a silent refresh after `delay` ms (default 2500). The delay
+    // gives the Make scenario / monday webhooks time to actually write the
+    // change before we re-read it. Repeated calls collapse into one.
+    function scheduleSilentRefresh(delay){
+      clearTimeout(_silentRefreshTimer);
+      _silentRefreshTimer = setTimeout(silentRefresh, typeof delay === 'number' ? delay : 2500);
+    }
+    window.scheduleSilentRefresh = scheduleSilentRefresh;
 
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
 
@@ -4459,6 +4512,9 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue })
         });
+        // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
+        // without a manual refresh.
+        if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
       } catch(err) { console.warn("RC webhook error:", err); }
     }
 
@@ -6125,6 +6181,10 @@
         });
         success = res.ok;
       } catch(err) { console.warn('Write Update webhook error:', err); }
+      // Re-pull so the new update appears in the contact's view without a
+      // manual refresh. Slightly longer delay — updates can take a moment to
+      // land on the subitem.
+      if (success && typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh(3500);
       if (textarea) textarea.value = '';
       if (module) module.classList.remove('active');
       const toast = document.createElement('div');
