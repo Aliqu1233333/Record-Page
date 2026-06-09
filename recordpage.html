@@ -4538,11 +4538,11 @@
     // defaults below.
     // Damian's board (8559048464) uses subitem board 8559048533 which has
     // different column IDs for several fields; those are listed in DAMIAN_OVERRIDES.
-    const DAMIAN_BOARD_ID   = '8559048464';
+    const DAMIAN_BOARD_ID   = '8559048533';   // Damian's SUBITEM board (main board is 8559048464)
     const DAMIAN_OVERRIDES  = {
       // Field key       : columnId in Damian's subitem board
       status            : 'status_Mjj2xjsq',   // same — confirmed identical
-      offeramount       : 'numeric_mm45vyed',
+      offer             : 'numeric_mm45vyed',   // Damian's offer amount column
       ownerStatus       : 'color_mkzdeyv',      // was color_mktsdfhd on your board
       followUp          : 'date_mkwfwmpj',      // was date_mkzt8vfa on your board
       ownership         : 'numeric_mm1jpkw8',  // was numeric_mkztrq1s on your board
@@ -4557,7 +4557,6 @@
       phone3Status      : 'status_1_mkkzw44e',
       relation          : 'label__1',
       address           : 'text5__1',
-      offer             : 'numeric_mkzwzzrk',   // Damian has no offer amount col — falls back to default
     };
 
     // Logan's subitem board (18334684356) has its own column IDs for several
