@@ -3748,7 +3748,11 @@
       const { boardId, pulseId } = extractIdsFromUrl();
       if (boardId && pulseId) {
         try {
-          const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: "dropdown_mm1aybze", value: "Complete" }) });
+          // Ownership Map is a MAIN-item column and its ID differs per board.
+          // Your board: dropdown_mm1aybze · Logan's board (18334683949): dropdown_mm1jj215
+          const OWNERSHIP_MAP_COLS = { '18334683949': 'dropdown_mm1jj215' };
+          const ownershipMapCol = OWNERSHIP_MAP_COLS[String(boardId)] || 'dropdown_mm1aybze';
+          const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: ownershipMapCol, value: "Complete" }) });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
         } catch (err) { console.error("Failed to update Ownership Map:", err); }
@@ -4555,6 +4559,24 @@
       offer             : 'numeric_mkzwzzrk',   // Damian has no offer amount col — falls back to default
     };
 
+    // Logan's subitem board (18334684356) has its own column IDs for several
+    // fields. Without these overrides, edits fall through to RC_FIELD_EDIT_CFG
+    // (your board's IDs) and write to columns that don't exist on Logan's board,
+    // so the change silently fails. Fields not listed here are identical to the
+    // defaults (status, ownerStatus, relation, address, phones, phone statuses).
+    const LOGAN_BOARD_ID    = '18334684356';
+    const LOGAN_OVERRIDES   = {
+      // Field key       : columnId in Logan's subitem board
+      followUp          : 'date_mky0n1b0',      // was date_mkzt8vfa on your board
+      ownership         : 'numeric_mm1j12az',   // was numeric_mkztrq1s on your board
+      offer             : 'numeric_mm1jrmh3',   // was numeric_mkzwzzrk on your board
+      sellerMotivation  : 'dropdown_mm1jyw9s',  // was dropdown_mkzspsm2 on your board
+      contactOutcome    : 'dropdown_mm1j8fvs',  // was dropdown_mkzwr0f3 on your board
+      stalledReason     : 'dropdown_mm1jvfcy',  // Logan-specific
+      offerDate         : 'date_mm2za0wt',      // Logan-specific
+      mostRecentUpdate  : 'text_mm2zkabs',      // Logan-specific
+    };
+
     const RC_FIELD_EDIT_CFG = {
       sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'dropdown_mkzspsm2' },
       ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'color_mktsdfhd' },
@@ -4579,6 +4601,9 @@
       const boardId = String(contactBoardId || '');
       if (boardId === DAMIAN_BOARD_ID && DAMIAN_OVERRIDES[field]) {
         return DAMIAN_OVERRIDES[field];
+      }
+      if (boardId === LOGAN_BOARD_ID && LOGAN_OVERRIDES[field]) {
+        return LOGAN_OVERRIDES[field];
       }
       return (RC_FIELD_EDIT_CFG[field] || {}).columnId || field;
     }
