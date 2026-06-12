@@ -1627,6 +1627,18 @@
     .rc-det-badge-dot { display: none; }
     .rc-det-badge-dot.success { background: #0176d3; }
 
+    .rc-mail-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500; padding: 2px 9px;
+      border-radius: 999px; font-family: var(--font); white-space: nowrap;
+    }
+    .rc-mail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .rc-mail-badge.mb-gray  { background: #f1f1f1; color: #5f5e5a; }
+    .rc-mail-badge.mb-amber { background: #fef3c7; color: #92400e; }
+    .rc-mail-badge.mb-blue  { background: #dbeafe; color: #1e40af; }
+    .rc-mail-badge.mb-green { background: #d1fae5; color: #065f46; }
+    .rc-mail-badge.mb-red   { background: #fee2e2; color: #991b1b; }
+
     /* ── Header Actions ── */
     .rc-det-header-actions {
       display: flex;
@@ -2600,6 +2612,13 @@
     .ls-chev.ls-done    { background: #62c97e; color: #0C2912; }
     .ls-chev.ls-active  { background: #1f5eae; color: #ffffff; font-weight: 600; }
     .ls-chev.ls-pending { background: #f3f3f3; color: #6b7280; }
+    .ls-chev.ls-mail-alert { background: #fee2e2; color: #991b1b; font-weight: 600; }
+    /* Visually separate the read-only Mailer Sent milestone from the clickable stages */
+    .ls-chev-wrap.ls-mail-milestone { margin-left: 10px; }
+    .ls-chev-wrap.ls-mail-milestone::before {
+      content: ""; position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
+      width: 1px; height: 20px; background: #d8dde3;
+    }
 
     /* ══ Next Action Step — SLDS2 floating chip ══ */
     .nas-section {
@@ -4951,7 +4970,7 @@
       'Closed'
     ];
 
-    function rcBuildChevronTrack(currentStatus) {
+    function rcBuildChevronTrack(currentStatus, contact) {
       const current = String(currentStatus || '').trim();
       const idx = LS_STAGES.findIndex(s => s.toLowerCase() === current.toLowerCase());
       // When the status isn't one of the chevron stages (e.g. brand-new leads
@@ -4972,7 +4991,34 @@
       }).join('');
 
       return `<div class="ls-chevron-wrap">
-        <div class="ls-chevron-track">${items}</div>
+        <div class="ls-chevron-track">${items}${rcMailerMilestone(contact)}</div>
+      </div>`;
+    }
+
+    // A read-only milestone appended to the lead track that reflects the
+    // mailer status (not clickable — it mirrors PostGrid, it doesn't set status).
+    function rcMailerMilestone(contact){
+      if(!contact) return '';
+      var s = (contact.mailStatus || '').trim();
+      var sent = !!(s && s !== '—');
+      // Map mailer status → milestone visual state.
+      var doneStates = ['In Transit','Delivered'];
+      var cls, label = 'Mailer Sent', title = 'Mailer Sent';
+      if(!sent){ cls = 'ls-pending'; title = 'No mailer sent'; }
+      else if(s === 'Cancelled' || s === 'Returned'){ cls = 'ls-mail-alert'; label = 'Mailer: ' + s; title = label; }
+      else if(doneStates.indexOf(s) !== -1){ cls = 'ls-done'; label = 'Mailer: ' + s; title = label; }
+      else { cls = 'ls-active'; label = 'Mailer: ' + s; title = label; }
+
+      var dateStr = '';
+      if(sent && contact.mailDate){
+        var d = (typeof parseFlexibleDate === 'function') ? parseFlexibleDate(contact.mailDate) : null;
+        if(d){ dateStr = ' (' + (d.getMonth()+1) + '/' + d.getDate() + ')'; }
+      }
+      var inner = (cls === 'ls-done')
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;margin-right:3px;pointer-events:none;"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}${escapeHtml(dateStr)}</span>`
+        : `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;">${escapeHtml(label)}${escapeHtml(dateStr)}</span>`;
+      return `<div class="ls-chev-wrap ls-mail-milestone">
+        <div class="ls-chev ${cls}" title="${escapeHtml(title)}" style="cursor:default;">${inner}</div>
       </div>`;
     }
     // ─────────────────────────────────────────────────────────────────────
@@ -5011,6 +5057,7 @@
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;">
                   ${c.status && c.status !== 'New' ? `<div class="rc-det-badge">${escapeHtml(c.status)}</div>` : ''}
                   ${intelBadge}
+                  ${rcMailBadge(c)}
                 </div>
               </div>
             </div>
@@ -5041,7 +5088,7 @@
 
         <div class="rc-record-body">
           <div class="rc-record-left-panel">
-          <div class="ls-chevron-inner">${rcBuildChevronTrack(c.status)}</div>
+          <div class="ls-chevron-inner">${rcBuildChevronTrack(c.status, c)}</div>
 
           <div class="rc-section-block">
             <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
@@ -5227,6 +5274,7 @@
                 <div class="rc-det-name">${escapeHtml(c.name)}</div>
                 <div class="rc-det-badges">
                   ${c.status && c.status !== 'New' ? `<div class="rc-det-badge">${escapeHtml(c.status)}</div>` : ''}
+                  ${rcMailBadge(c)}
                 </div>
               </div>
             </div>
@@ -5257,7 +5305,7 @@
 
         <div class="rc-record-body">
           <div class="rc-record-left-panel">
-          <div class="ls-chevron-inner">${rcBuildChevronTrack(c.status)}</div>
+          <div class="ls-chevron-inner">${rcBuildChevronTrack(c.status, c)}</div>
 
           <div class="rc-section-block">
             <div class="rc-section-header" onclick="this.closest('.rc-section-block').classList.toggle('collapsed')">
@@ -6176,7 +6224,32 @@
         lastRecentUpdate: sanitizeMostRecentUpdate(c.most_recent_update ?? c.last_recent_update ?? c.lastRecentUpdate ?? null),
         creationLog:      c.creation_log ?? c.creationLog ?? null,
         offerDate:        c.offer_date ?? c.offerDate ?? null,
+        mailStatus:       c.mailer_status ?? c.mailStatus ?? c.color_mm4813jm ?? "—",
+        mailDate:         c.mailed_date ?? c.mailDate ?? c.date_mm48ztkf ?? null,
+        postgridId:       c.postgrid_id ?? c.postgridId ?? c.text_mm48kbwa ?? null,
+        mailTemplate:     c.mailer_template ?? c.mailTemplate ?? c.text_mm48v7hj ?? null,
       };
+    }
+
+    // Renders a colored badge reflecting the heir/owner's mailer status.
+    function rcMailBadge(c){
+      var s = (c.mailStatus || '').trim();
+      if(!s || s === '—') return '';
+      var map = {
+        'Queued':     {cls:'mb-gray',  dot:'#9aa3af'},
+        'Printing':   {cls:'mb-amber', dot:'#f59e0b'},
+        'In Transit': {cls:'mb-blue',  dot:'#3b82f6'},
+        'Delivered':  {cls:'mb-green', dot:'#10b981'},
+        'Cancelled':  {cls:'mb-red',   dot:'#ef4444'},
+        'Returned':   {cls:'mb-red',   dot:'#b91c1c'}
+      };
+      var m = map[s] || {cls:'mb-gray', dot:'#9aa3af'};
+      var dateStr = '';
+      if(c.mailDate){
+        var d = (typeof parseFlexibleDate === 'function') ? parseFlexibleDate(c.mailDate) : null;
+        if(d){ dateStr = ' · ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + String(d.getFullYear()).slice(2); }
+      }
+      return '<div class="rc-mail-badge ' + m.cls + '"><span class="rc-mail-dot" style="background:'+m.dot+'"></span>Mailer: ' + escapeHtml(s) + escapeHtml(dateStr) + '</div>';
     }
 
     function rcPopulateFromPayload(payload){
