@@ -2385,11 +2385,11 @@
       border-bottom: 1px solid #e5e7eb;
     }
     .ms-card-title {
-      font-family: 'Inter', var(--font);
-      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15.5px;
       font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      letter-spacing: 0;
+      text-transform: none;
       color: #122349;
     }
     .ms-section-label {
@@ -2471,7 +2471,16 @@
       display: flex; align-items: center; gap: 6px;
       flex-shrink: 0; margin-left: 12px;
     }
-    .ms-activity-timestamp { font-size: 12px; color: #6b7280; white-space: nowrap; font-weight: 700; }
+    .ms-activity-timestamp {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: #3e3e3c;
+      line-height: 1.5;
+      text-align: right;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
     .ms-activity-subtitle { font-size: 12.5px; color: #6b7280; margin-top: 1px; }
     .ms-sub-contact { color: #0176d3; font-weight: 600; }
     .ms-mail-status { display:inline-flex; align-items:center; gap:5px; padding:1px 8px; border-radius:100px; font-size:11.5px; font-weight:600; margin-left:4px; vertical-align:middle; }
@@ -4266,6 +4275,21 @@
       const t=Date.parse(s); if(!isNaN(t)) return new Date(t); return null;
     }
 
+    // Formats a milestone date as "June 12th" / "August 15th" (no year).
+    // Returns the original string untouched if it can't be parsed.
+    function formatMilestoneDate(input){
+      const d = parseFlexibleDate(input);
+      if(!d) return (input == null ? '' : String(input));
+      const months = ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'];
+      const day = d.getDate();
+      let suffix = 'th';
+      if(day % 10 === 1 && day !== 11) suffix = 'st';
+      else if(day % 10 === 2 && day !== 12) suffix = 'nd';
+      else if(day % 10 === 3 && day !== 13) suffix = 'rd';
+      return months[d.getMonth()] + ' ' + day + suffix;
+    }
+
     function updateActionBannerFromContacts(confirmedOwners){
       const banner=document.getElementById("actionBanner"); const textNode=document.getElementById("actionBannerText");
       if(!banner||!textNode) return;
@@ -4905,7 +4929,7 @@
                 <span class="ms-activity-title" style="${e.expandable?'cursor:pointer':'cursor:default'}">${escapeHtml(e.title)}</span>
               </div>
               <div class="ms-activity-meta">
-                <span class="ms-activity-timestamp">${escapeHtml(e.dateStr)}</span>
+                <span class="ms-activity-timestamp">${escapeHtml(e.dateStr ? formatMilestoneDate(e.dateStr) : '')}</span>
               </div>
             </div>
             <div class="ms-activity-subtitle">${e.subHtml}</div>
@@ -8723,8 +8747,15 @@
     document.getElementById('mlrRecipMeta').textContent = (rel && rel!=='—') ? (rel + ' · heir contact') : 'Heir contact';
 
     var warn = document.getElementById('mlrDupeWarn');
-    if(contact.mailDate){
-      document.getElementById('mlrDupeText').textContent = 'You mailed this person on ' + contact.mailDate + '. Sending again will produce a duplicate.';
+    // Only warn when THIS specific individual has already been mailed (real date
+    // or status). Other related contacts being mailed is fine — we just can't
+    // send to the same person twice.
+    var _mDate = (contact.mailDate && String(contact.mailDate).trim() !== '' && String(contact.mailDate).trim() !== '—') ? contact.mailDate : null;
+    var _mStatus = (contact.mailStatus && String(contact.mailStatus).trim() !== '' && String(contact.mailStatus).trim() !== '—') ? String(contact.mailStatus).trim() : null;
+    if(_mDate || _mStatus){
+      var whenTxt = _mDate ? (' on ' + (typeof formatMilestoneDate === 'function' ? formatMilestoneDate(_mDate) : _mDate)) : '';
+      document.getElementById('mlrDupeText').textContent =
+        'You already mailed this person' + whenTxt + '. Sending again will produce a duplicate to the same individual.';
       warn.style.display = 'flex';
     } else { warn.style.display = 'none'; }
 
