@@ -8210,7 +8210,9 @@
     font-size:13px; font-weight:700; color:#444; letter-spacing:0; text-transform:none;
     margin-bottom:4px; line-height:1.25; display:flex; align-items:center; gap:2px;
   }
-  .mlr-req-star{ color:#ba0517; font-weight:700; margin-right:1px; }
+  .mlr-req-star{ color:#ba0517; font-weight:700; margin-right:1px; display:none; }
+  /* The asterisk is only shown while a required field is still empty */
+  .mlr-field.is-empty .mlr-req-star{ display:inline; }
 
   /* The input shell holds the input + an optional trailing check icon */
   .mlr-input-shell{ position:relative; display:flex; align-items:center; }
@@ -8226,15 +8228,15 @@
   .mlr-input:hover{ border-color:#9a9a9a; }
   .mlr-input:focus{ border:1px solid #032d60; box-shadow:0 0 0 1px #032d60; }
   /* Leave room for the trailing check icon when present */
-  .mlr-field.has-check .mlr-input{ padding-right:38px; }
+  .mlr-field.has-check .mlr-input{ padding-right:34px; }
 
   /* Confirmed (valid + reviewed) → green check inside the field on the right */
   .mlr-field-check{
     position:absolute; right:11px; top:50%; transform:translateY(-50%);
-    width:20px; height:20px; border-radius:50%; background:#2e844a;
+    width:16px; height:16px; border-radius:50%; background:#2e844a;
     display:none; align-items:center; justify-content:center; pointer-events:none;
   }
-  .mlr-field-check svg{ width:12px; height:12px; color:#fff; }
+  .mlr-field-check svg{ width:9px; height:9px; color:#fff; }
   .mlr-field.confirmed .mlr-field-check{ display:flex; }
 
   /* Error / required-empty → red border, pink fill, helper text */
@@ -8348,7 +8350,7 @@
         <div id="mlrTemplates">
           <div class="mlr-tpl" data-tpl="1" onclick="mlrPickTpl('1')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 1 — Taxes Under Suit</div><div class="mlr-tpl-desc">Strong urgency</div></div></div>
           <div class="mlr-tpl" data-tpl="2" onclick="mlrPickTpl('2')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 2 — Tax Delinquency</div><div class="mlr-tpl-desc">Property behind on taxes</div></div></div>
-          <div class="mlr-tpl" data-tpl="3" onclick="mlrPickTpl('3')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 3 — Broad Net</div><div class="mlr-tpl-desc">General outreach to spark a reply</div></div></div>
+          <div class="mlr-tpl" data-tpl="3" onclick="mlrPickTpl('3')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 3 — Broad Net</div><div class="mlr-tpl-desc">General Outreach</div></div></div>
         </div>
       </div>
       <div class="mlr-page" data-page="4">
@@ -8433,7 +8435,8 @@
   // ── Deceased owner name cleanup ──
   // County records arrive messy: "MARSH KENNETH R ESTATE OF", "SMITH JOHN & MARY",
   // last-name-first ordering, trailing suffixes, "ESTATE OF" / "ET AL" noise.
-  // Goal: a clean, human, title-cased name while preserving "Estate Of" when present.
+  // Goal: a clean, human, title-cased name. "ESTATE OF" and other legal noise
+  // are removed entirely (we only want the person's name).
   function cleanDeceasedOwner(raw){
     if(raw == null) return '';
     var s = String(raw).trim();
@@ -8442,8 +8445,7 @@
     // Normalise separators and whitespace.
     s = s.replace(/\s+/g, ' ').trim();
 
-    // Detect & strip an "ESTATE OF" marker (in any position) — re-appended at the end.
-    var hasEstate = /\bESTATE\s+OF\b/i.test(s) || /\bEST\s+OF\b/i.test(s) || /\bESTATE\b/i.test(s);
+    // Remove any "ESTATE OF" / "ESTATE" marker entirely — never kept.
     s = s.replace(/\bESTATE\s+OF\b/ig, ' ')
          .replace(/\bEST\s+OF\b/ig, ' ')
          .replace(/\bESTATE\b/ig, ' ');
@@ -8459,7 +8461,7 @@
          .replace(/\bDEC['D]?\b/ig, ' ');
 
     s = s.replace(/\s+/g, ' ').trim().replace(/[,&]+\s*$/,'').trim();
-    if(!s) return hasEstate ? 'Estate' : '';
+    if(!s) return '';
 
     // Multiple owners ("SMITH JOHN & MARY") — keep the first party only for the salutation.
     var firstParty = s.split(/\s*&\s*|\s+AND\s+/i)[0].trim();
@@ -8482,7 +8484,6 @@
       return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
     }).join(' ').trim();
 
-    if(hasEstate) titled = (titled ? titled + ' ' : '') + 'Estate Of';
     return titled.replace(/\s+/g,' ').trim();
   }
 
@@ -8603,8 +8604,14 @@
 
     // A letter field that already holds real data starts pre-confirmed.
     function filled(v){ return !!(v && String(v).trim() && String(v).trim() !== '—'); }
-    var relRaw = contact.relation || contact.relationship || '';
-    var relVal = filled(relRaw) ? properName(relRaw) : '';
+    // Relationship must never carry an "Unknown Relation(s)" placeholder — blank it.
+    function cleanRelation(v){
+      if(!filled(v)) return '';
+      var s = properName(v);
+      if(/^\s*unknown(\s+relation(s)?)?\s*$/i.test(s) || /no.?relation/i.test(s)) return '';
+      return s;
+    }
+    var relVal = cleanRelation(contact.relation || contact.relationship || '');
     var decVal = cleanDeceasedOwner(rec.deceased_owner) || '';
     var taxVal = formatTaxBalance(rec.taxes_owed) || '';
     var subVal = buildSubjectAddress(rec) || '';
@@ -8627,7 +8634,7 @@
       state:   { label:'State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked:false },
       zip:     { label:'Zip code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked:false },
       relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked:false },
-      deceased:{ label:'Deceased owner', value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked:false },
+      deceased:{ label:"Deceased Owner's Name", value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked:false },
       taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked:false },
       subject: { label:'Subject address', value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked:false },
       county:  { label:'County', value: couVal, valid:filled(couVal), zone:'letter', gate:true, checked:false }
@@ -8660,19 +8667,28 @@
     window.openMailer(c);
   };
 
-  // Build one SLDS-style field: bold label (+ asterisk if required), bordered
-  // input, trailing green check when confirmed, and a hidden "Complete this
-  // field" helper that appears in the error state.
+  // Build one SLDS-style field: bold label, bordered input, trailing green
+  // check when confirmed, and a hidden "Complete this field" helper for errors.
+  // The required asterisk shows only while the field is empty; once it has a
+  // value the asterisk is hidden.
   function mlrBuildCard(key, f){
     var field = document.createElement('div');
     var required = !!f.gate;                 // gated fields are required
-    field.className = 'mlr-field' + (required ? ' has-check' : '');
+    var startEmpty = !(f.value && String(f.value).trim());
+    field.className = 'mlr-field'
+      + (required ? ' has-check' : '')
+      + (required && startEmpty ? ' is-empty' : '');
     field.dataset.key = key;
 
+    var noteHtml = required
+      ? '<span class="mlr-req-star">*</span>'
+      : '<span class="mlr-field-optional">(Suggested)</span>';
+
+    // Star sits before the label text (only visible while empty, via .is-empty).
     var labelHtml = '<label class="mlr-field-label" for="mlr-in-'+key+'">'
-      + (required ? '<span class="mlr-req-star">*</span>' : '')
+      + (required ? noteHtml : '')
       + f.label
-      + (required ? '' : '<span class="mlr-field-optional">(optional)</span>')
+      + (required ? '' : noteHtml)
       + '</label>';
 
     var checkHtml = required
@@ -8701,6 +8717,7 @@
       f.checked = false;
       field.classList.remove('confirmed');
       field.classList.remove('error');
+      if(required){ field.classList.toggle('is-empty', input.value.trim() === ''); }
       updateConfirmBar();
       updateNextEnabled();
     });
@@ -8874,6 +8891,19 @@
   var MAILER_WEBHOOK = "https://hook.us1.make.com/bltf2bcrarcw8ayndj9q9nc7m9ocdnmb";
   var _mlrSending = false;
 
+  // Split a display name into first + last for PostGrid {{first_name}} {{last_name}}.
+  // "Gerald Marsh" → {first:"Gerald", last:"Marsh"}.
+  // Single-token names go to first; 3+ tokens keep the last token as last name
+  // and everything before it as the first/middle.
+  function splitName(full){
+    var s = String(full || '').trim().replace(/\s+/g,' ');
+    if(!s) return { first:'', last:'' };
+    var parts = s.split(' ');
+    if(parts.length === 1) return { first:parts[0], last:'' };
+    var last = parts.pop();
+    return { first: parts.join(' '), last: last };
+  }
+
   function mlrUuid(){
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
       var r = Math.random()*16|0, v = c==='x' ? r : (r&0x3|0x8); return v.toString(16);
@@ -8884,6 +8914,7 @@
     if(_mlrSending) return;
     var c = state.contact || {};
     var f = state.fields;
+    var nm = splitName(f.name.value);
 
     var payload = {
       type: 'send_mail',
@@ -8894,9 +8925,11 @@
       subitem_board_id: c.boardId || c.board_id || null,
       record_pulse_id: (typeof getRcIds === 'function' ? (getRcIds().pulseId || null) : null),
       record_board_id: (typeof getRcIds === 'function' ? (getRcIds().boardId || null) : null),
-      // Structured recipient (PostGrid 'to')
+      // Structured recipient (PostGrid 'to') — firstName/lastName for mapping
       to: {
         name:            f.name.value,
+        firstName:       nm.first,
+        lastName:        nm.last,
         addressLine1:    f.street.value,
         city:            f.city.value,
         provinceOrState: f.state.value,
@@ -8906,6 +8939,8 @@
       // Every field shown in the panel, flat for easy mapping in Make
       fields: {
         recipient_name:  f.name.value,
+        first_name:      nm.first,
+        last_name:       nm.last,
         street_address:  f.street.value,
         city:            f.city.value,
         state:           f.state.value,
@@ -8919,6 +8954,8 @@
       // Template merge variables (PostGrid mergeVariables)
       merge_vars: {
         heir_name:        f.name.value,
+        first_name:       nm.first,
+        last_name:        nm.last,
         relationship:     f.relation.value || '',
         deceased_name:    f.deceased.value || '',
         tax_balance:      f.taxes.value || '',
