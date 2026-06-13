@@ -2474,6 +2474,8 @@
     .ms-activity-timestamp { font-size: 12px; color: #6b7280; white-space: nowrap; font-weight: 700; }
     .ms-activity-subtitle { font-size: 12.5px; color: #6b7280; margin-top: 1px; }
     .ms-sub-contact { color: #0176d3; font-weight: 600; }
+    .ms-mail-status { display:inline-flex; align-items:center; gap:5px; padding:1px 8px; border-radius:100px; font-size:11.5px; font-weight:600; margin-left:4px; vertical-align:middle; }
+    .ms-mail-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
     .ms-detail-card {
       margin-top: 8px;
       background: #f3f3f3; border: 1px solid #e5e7eb; border-radius: 6px;
@@ -4837,6 +4839,7 @@
       const DOLLAR_SVG  = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>';
       const FLAG_SVG    = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>';
       const NOTE_SVG    = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>';
+      const MAIL_SVG    = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>';
       const CHEV_SVG    = '<svg viewBox="0 0 16 16"><path d="M5.5 3.5l5 4.5-5 4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       const nameHtml = (c.name && c.name !== '—') ? `<span class="ms-sub-contact">${escapeHtml(c.name)}</span>` : 'this lead';
 
@@ -4851,6 +4854,26 @@
       }
       if (c.offerDate && c.offerDate !== '—') {
         entries.push({ id:'ms-row-offer',   expandable:false, iconColor:'#a855f7', iconSvg:DOLLAR_SVG, title:'Offer Proposed',      subHtml:'You made an offer to ' + nameHtml, dateStr:c.offerDate });
+      }
+      // Mailer milestone — shown once a letter has been sent (has a status and/or date).
+      var _mailStatus = (c.mailStatus && c.mailStatus !== '—') ? String(c.mailStatus).trim() : '';
+      if (_mailStatus || (c.mailDate && c.mailDate !== '—')) {
+        var statusColors = {
+          'Queued':'#9aa3af','Printing':'#f59e0b','In Transit':'#3b82f6',
+          'Delivered':'#10b981','Cancelled':'#ef4444','Returned':'#b91c1c'
+        };
+        var dotColor = statusColors[_mailStatus] || '#0176d3';
+        var statusPill = _mailStatus
+          ? ' <span class="ms-mail-status" style="background:'+dotColor+'1a;color:'+dotColor+';">'
+            + '<span class="ms-mail-dot" style="background:'+dotColor+';"></span>'
+            + escapeHtml(_mailStatus) + '</span>'
+          : '';
+        entries.push({
+          id:'ms-row-mailer', expandable:false, iconColor:'#0176d3', iconSvg:MAIL_SVG,
+          title:'Mailer Sent',
+          subHtml:'A letter was mailed to ' + nameHtml + statusPill,
+          dateStr: (c.mailDate && c.mailDate !== '—') ? c.mailDate : ''
+        });
       }
       if (c.creationLog && c.creationLog !== '—') {
         entries.push({ id:'ms-row-created', expandable:false, iconColor:'#8e9bac', iconSvg:FLAG_SVG,   title:'Lead Created Date',   subHtml:'Lead was created',     dateStr:c.creationLog });
@@ -5053,10 +5076,7 @@
             </div>
             
             <div class="rc-det-header-actions">
-              <button class="rc-det-action-mail" onclick="openMailerById('${escapeHtml(String(c.pulseId||''))}')" title="Send a physical letter via PostGrid">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
-                Send Mail
-              </button>
+              ${rcSendMailButton(c)}
               ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-ghost">View</a>` : ''}
               <div class="rc-update-wrap">
                 <button class="rc-det-action-primary" onclick="this.nextElementSibling.classList.toggle('active')">
@@ -5270,10 +5290,7 @@
             </div>
             
             <div class="rc-det-header-actions">
-              <button class="rc-det-action-mail" onclick="openMailerById('${escapeHtml(String(c.pulseId||''))}')" title="Send a physical letter via PostGrid">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
-                Send Mail
-              </button>
+              ${rcSendMailButton(c)}
               ${c.mondayUrl ? `<a href="${escapeHtml(c.mondayUrl)}" target="_blank" rel="noopener noreferrer" class="rc-det-action-ghost">View</a>` : ''}
               <div class="rc-update-wrap">
                 <button class="rc-det-action-primary" onclick="this.nextElementSibling.classList.toggle('active')">
@@ -6214,11 +6231,28 @@
         lastRecentUpdate: sanitizeMostRecentUpdate(c.most_recent_update ?? c.last_recent_update ?? c.lastRecentUpdate ?? null),
         creationLog:      c.creation_log ?? c.creationLog ?? null,
         offerDate:        c.offer_date ?? c.offerDate ?? null,
-        mailStatus:       c.mailer_status ?? c.mailStatus ?? c.color_mm4813jm ?? "—",
-        mailDate:         c.mailed_date ?? c.mailDate ?? c.date_mm48ztkf ?? null,
+        mailStatus:       c.Mailer_Status ?? c.mailer_status ?? c.mailStatus ?? c.color_mm4813jm ?? "—",
+        mailDate:         c.Mailed_Date ?? c.mailed_date ?? c.mailDate ?? c.date_mm48ztkf ?? null,
         postgridId:       c.postgrid_id ?? c.postgridId ?? c.text_mm48kbwa ?? null,
-        mailTemplate:     c.mailer_template ?? c.mailTemplate ?? c.text_mm48v7hj ?? null,
+        mailTemplate:     c.Mailer_Template ?? c.mailer_template ?? c.mailTemplate ?? c.text_mm48v7hj ?? null,
       };
+    }
+
+    // Renders the Send Mail button. Once a letter has already gone out to this
+    // contact (a mail status or mailed date exists), the button is blurred and
+    // disabled to prevent sending a duplicate piece.
+    function rcSendMailButton(c){
+      var MAIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>';
+      var s = (c.mailStatus && c.mailStatus !== '—') ? String(c.mailStatus).trim() : '';
+      var alreadySent = !!s || !!(c.mailDate && c.mailDate !== '—');
+      if (alreadySent) {
+        var lbl = s ? ('Mail ' + s) : 'Mail Sent';
+        return '<button class="rc-det-action-mail is-sent" disabled aria-disabled="true" '
+          + 'title="A letter has already been sent to this contact">'
+          + MAIL_ICON + escapeHtml(lbl) + '</button>';
+      }
+      return '<button class="rc-det-action-mail" onclick="openMailerById(\'' + escapeHtml(String(c.pulseId||'')) + '\')" '
+        + 'title="Send a physical letter via PostGrid">' + MAIL_ICON + 'Send Mail</button>';
     }
 
     // Renders a colored badge reflecting the heir/owner's mailer status.
@@ -8176,7 +8210,7 @@
   .mlr-step-dot.done{ background:#2E844A; color:#fff; border-color:#2E844A; }
   .mlr-step-line{ flex:1 1 auto; height:2px; background:#ececec; border-radius:2px; }
   .mlr-step-line.done{ background:#2E844A; }
-  .mlr-body{ padding:16px 28px 8px; overflow-y:auto; flex:1 1 auto; }
+  .mlr-body{ padding:22px 32px 14px; overflow-y:auto; flex:1 1 auto; }
   .mlr-page{ display:none; animation:mlrPageIn .2s ease both; }
   .mlr-page.active{ display:block; }
   @keyframes mlrPageIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
@@ -8198,7 +8232,7 @@
   .mlr-zone-sub{ font-size:12px; color:#9aa3af; font-weight:400; }
 
   /* Grid: recipient & letter zones lay fields out two-up; some span full width */
-  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:18px; row-gap:12px; align-items:start; }
+  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:22px; row-gap:18px; align-items:start; }
   .mlr-span2{ grid-column:1 / -1; }
   /* Recipient row: Street gets the wide column, Zip the narrow one */
   .mlr-grid-recipient{ grid-template-columns:2fr 1fr; }
@@ -8291,26 +8325,69 @@
   .mlr-success{ position:absolute; inset:0; background:#fff; border-radius:16px; z-index:20; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; padding:28px; }
   .mlr-success.show{ display:flex; animation:mlrFade .25s ease both; }
   @keyframes mlrFade{ from{opacity:0;} to{opacity:1;} }
-  .mlr-success svg{ width:84px; height:84px; margin-bottom:12px; }
-  .mlr-succ-circle{ stroke:#2E844A; stroke-width:3; stroke-dasharray:151; stroke-dashoffset:151; animation:mlrCircle .45s cubic-bezier(0.65,0,0.45,1) forwards; }
-  .mlr-succ-mark{ stroke:#2E844A; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:40; stroke-dashoffset:40; animation:mlrMark .3s cubic-bezier(0.65,0,0.45,1) .4s forwards; }
-  @keyframes mlrCircle{ to{ stroke-dashoffset:0; } }
-  @keyframes mlrMark{ to{ stroke-dashoffset:0; } }
+
+  /* ── Mail-delivery animation (envelope flies in, lid seals, motion lines) ── */
+  .mlr-mail-anim{ position:relative; width:120px; height:92px; margin-bottom:18px; }
+  .mlr-mail-anim svg{ width:120px; height:92px; overflow:visible; }
+  .mlr-env-body{ fill:#eaf3fb; stroke:#0176d3; stroke-width:2.4; stroke-linejoin:round; }
+  .mlr-env-flap{ fill:none; stroke:#0176d3; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:120; stroke-dashoffset:120; animation:mlrFlap .5s cubic-bezier(0.65,0,0.45,1) .45s forwards; }
+  .mlr-env-check{ stroke:#2E844A; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; fill:none;
+    stroke-dasharray:32; stroke-dashoffset:32; opacity:0; animation:mlrEnvCheck .35s ease .95s forwards; }
+  /* whole envelope flies up from below + settles */
+  .mlr-env-group{ animation:mlrEnvFly .6s cubic-bezier(0.22,1,0.36,1) both; transform-origin:50% 50%; }
+  /* speed/motion lines trailing the envelope */
+  .mlr-env-line{ stroke:#9cc6ec; stroke-width:2.6; stroke-linecap:round; opacity:0; }
+  .mlr-env-line.l1{ animation:mlrZip .5s ease .15s 1; }
+  .mlr-env-line.l2{ animation:mlrZip .5s ease .28s 1; }
+  .mlr-env-line.l3{ animation:mlrZip .5s ease .40s 1; }
+  @keyframes mlrEnvFly{ 0%{ transform:translateY(34px) scale(.9); opacity:0; } 60%{ opacity:1; } 100%{ transform:translateY(0) scale(1); opacity:1; } }
+  @keyframes mlrFlap{ to{ stroke-dashoffset:0; } }
+  @keyframes mlrEnvCheck{ from{ opacity:0; } to{ stroke-dashoffset:0; opacity:1; } }
+  @keyframes mlrZip{ 0%{ opacity:0; transform:translateX(10px); } 40%{ opacity:1; } 100%{ opacity:0; transform:translateX(-14px); } }
+
+  /* spinner shown while we wait on the webhook response */
+  .mlr-send-spinner{ width:46px; height:46px; margin-bottom:16px; border:4px solid #e3e9f2; border-top-color:#0176d3; border-radius:50%; animation:mlrSpin .8s linear infinite; }
+  @keyframes mlrSpin{ to{ transform:rotate(360deg); } }
+
   .mlr-succ-title{ font-size:20px; font-weight:600; color:#032D60; }
   .mlr-succ-sub{ font-size:13.5px; color:#706e6b; }
+  /* error state for failed send */
+  .mlr-success.is-error .mlr-succ-title{ color:#ba0517; }
   /* heir-header mail trigger — matches rc-det-action-ghost family */
   .rc-det-action-mail{ display:inline-flex; align-items:center; gap:6px; background:#ffffff; color:#0176d3; border:1px solid #dddbda; font-family:var(--font); font-size:14px; font-weight:700; padding:6px 16px; border-radius:100px !important; cursor:pointer; white-space:nowrap; transition:background .12s ease, transform .08s ease; }
   .rc-det-action-mail:hover{ background:#f3f3f3; }
   .rc-det-action-mail:active{ transform:translateY(2px); filter:brightness(0.93); }
   .rc-det-action-mail svg{ width:14px; height:14px; }
+  /* Already-mailed: blurred + non-interactive so no duplicate piece can be sent */
+  .rc-det-action-mail.is-sent{ cursor:not-allowed; color:#8a94a6; border-color:#e3e6ea; background:#f4f6f8; opacity:0.55; filter:blur(0.7px); pointer-events:none; }
+  .rc-det-action-mail.is-sent:hover{ background:#f4f6f8; }
 </style>
 
 <div class="mlr-overlay" id="mailerOverlay">
   <div class="mlr-modal" style="position:relative;">
     <div class="mlr-success" id="mlrSuccess">
-      <svg viewBox="0 0 88 88" fill="none"><circle class="mlr-succ-circle" cx="44" cy="44" r="24"/><path class="mlr-succ-mark" d="M33 45 l7 7 l15 -16"/></svg>
-      <div class="mlr-succ-title">Mail queued</div>
-      <div class="mlr-succ-sub" id="mlrSuccSub">Your letter is on its way.</div>
+      <!-- Sending state: spinner while we await the webhook's JSON response -->
+      <div class="mlr-send-spinner" id="mlrSendSpinner" style="display:none;"></div>
+      <!-- Success state: mail-delivery animation -->
+      <div class="mlr-mail-anim" id="mlrMailAnim" style="display:none;">
+        <svg viewBox="0 0 120 92" fill="none">
+          <!-- motion lines -->
+          <line class="mlr-env-line l1" x1="8"  y1="30" x2="30" y2="30"/>
+          <line class="mlr-env-line l2" x1="2"  y1="46" x2="26" y2="46"/>
+          <line class="mlr-env-line l3" x1="8"  y1="62" x2="30" y2="62"/>
+          <g class="mlr-env-group">
+            <!-- envelope body -->
+            <rect class="mlr-env-body" x="34" y="22" width="74" height="52" rx="5"/>
+            <!-- sealing flap -->
+            <path class="mlr-env-flap" d="M36 26 L71 50 L106 26"/>
+            <!-- delivered check -->
+            <path class="mlr-env-check" d="M58 50 l9 9 l16 -18"/>
+          </g>
+        </svg>
+      </div>
+      <div class="mlr-succ-title" id="mlrSuccTitle">Sending…</div>
+      <div class="mlr-succ-sub" id="mlrSuccSub">Contacting the mail service…</div>
     </div>
     <div class="mlr-header">
       <div>
@@ -8628,11 +8705,11 @@
     // press "Confirm Information" — confirmation can't be skipped.
     state.confirmed = false;
     state.fields = {
-      name:    { label:'Recipient name', value:name, valid:filled(name), zone:'recipient', gate:true, checked:false },
-      street:  { label:'Street address', value:p.street || '', valid:!!p.street, zone:'recipient', gate:true, checked:false },
-      city:    { label:'City', value:p.city || '', valid:!!p.city, zone:'recipient', gate:true, checked:false },
-      state:   { label:'State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked:false },
-      zip:     { label:'Zip code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked:false },
+      name:    { label:'Recipient Name', value:name, valid:filled(name), zone:'recipient', gate:true, checked:false },
+      street:  { label:'Recipient Address', value:p.street || '', valid:!!p.street, zone:'recipient', gate:true, checked:false },
+      city:    { label:'Recipient City', value:p.city || '', valid:!!p.city, zone:'recipient', gate:true, checked:false },
+      state:   { label:'Recipient State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked:false },
+      zip:     { label:'Recipient Zip Code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked:false },
       relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked:false },
       deceased:{ label:"Deceased Owner's Name", value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked:false },
       taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked:false },
@@ -8654,7 +8731,11 @@
     renderConfirmFields();
     mlrGoto(1);
     document.getElementById('mailerOverlay').classList.add('open');
-    document.getElementById('mlrSuccess').classList.remove('show');
+    var _succReset = document.getElementById('mlrSuccess');
+    _succReset.classList.remove('show');
+    _succReset.classList.remove('is-error');
+    var _sp = document.getElementById('mlrSendSpinner'); if(_sp) _sp.style.display = 'none';
+    var _ma = document.getElementById('mlrMailAnim'); if(_ma) _ma.style.display = 'none';
   };
 
   window.mlrClose = function(){ document.getElementById('mailerOverlay').classList.remove('open'); };
@@ -8795,12 +8876,7 @@
     var host = document.getElementById('mlrConfirmFields');
     host.innerHTML = '';
 
-    // ── Recipient zone ──
-    var recHead = document.createElement('div');
-    recHead.className = 'mlr-zone-head';
-    recHead.innerHTML = '<span>Recipient</span><span class="mlr-zone-sub">Where the letter is mailed</span>';
-    host.appendChild(recHead);
-
+    // ── Recipient zone (no header label — fields are self-describing) ──
     var recGrid = document.createElement('div');
     recGrid.className = 'mlr-grid mlr-grid-recipient';
     var nameCard = mlrBuildCard('name', state.fields.name);
@@ -8814,15 +8890,10 @@
     recGrid.appendChild(mlrBuildCard('state', state.fields.state));
     host.appendChild(recGrid);
 
-    // ── Letter details zone ──
-    var letHead = document.createElement('div');
-    letHead.className = 'mlr-zone-head';
-    letHead.style.marginTop = '16px';
-    letHead.innerHTML = '<span>Letter details</span><span class="mlr-zone-sub">Merged in \u00b7 this mailing only</span>';
-    host.appendChild(letHead);
-
+    // ── Letter details zone (no header label) ──
     var letGrid = document.createElement('div');
     letGrid.className = 'mlr-grid';
+    letGrid.style.marginTop = '20px';
     // Subject address spans full width — it's a long one-line address.
     var subjCard = mlrBuildCard('subject', state.fields.subject);
     subjCard.classList.add('mlr-span2');
@@ -8970,30 +9041,95 @@
     var origLabel = nextBtn ? nextBtn.textContent : '';
     if(nextBtn){ nextBtn.disabled = true; nextBtn.textContent = 'Sending…'; }
 
+    // Bring up the overlay in its "sending" state right away, then wait for the
+    // webhook to tell us whether the send actually succeeded.
+    var succ      = document.getElementById('mlrSuccess');
+    var spinner   = document.getElementById('mlrSendSpinner');
+    var mailAnim  = document.getElementById('mlrMailAnim');
+    var titleEl   = document.getElementById('mlrSuccTitle');
+    var subEl     = document.getElementById('mlrSuccSub');
+
+    succ.classList.remove('is-error');
+    spinner.style.display = 'block';
+    mailAnim.style.display = 'none';
+    titleEl.textContent = 'Sending…';
+    subEl.textContent   = 'Contacting the mail service…';
+    succ.classList.add('show');
+
+    // Interpret the webhook's JSON response. The Make scenario returns a body
+    // indicating success/failure; we treat it flexibly across shapes.
+    function isOkResponse(data, httpOk){
+      if(data && typeof data === 'object'){
+        if(data.success === true || data.ok === true) return true;
+        if(data.success === false || data.ok === false) return false;
+        if(typeof data.status === 'string'){
+          var s = data.status.toLowerCase();
+          if(s === 'success' || s === 'ok' || s === 'queued' || s === 'sent') return true;
+          if(s === 'error' || s === 'failed' || s === 'failure') return false;
+        }
+        if(typeof data.result === 'string'){
+          var r = data.result.toLowerCase();
+          if(r === 'success' || r === 'ok') return true;
+          if(r === 'error' || r === 'failed') return false;
+        }
+      }
+      if(typeof data === 'string'){
+        var t = data.trim().toLowerCase();
+        if(t === 'success' || t === 'ok' || t === 'accepted') return true;
+        if(t === 'error' || t === 'failed' || t === 'failure') return false;
+      }
+      // No explicit verdict in the body → fall back to the HTTP status.
+      return !!httpOk;
+    }
+
+    var sendOk = false;
     try {
-      await fetch(MAILER_WEBHOOK, {
+      var res = await fetch(MAILER_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      // Make/CORS may block reading the response body; a completed POST is success.
+      var bodyText = '';
+      try { bodyText = await res.text(); } catch(e){ bodyText = ''; }
+      var parsed = null;
+      if(bodyText){ try { parsed = JSON.parse(bodyText); } catch(e){ parsed = bodyText; } }
+      sendOk = isOkResponse(parsed, res.ok);
     } catch(err){
       console.warn('Mailer webhook error:', err);
+      sendOk = false;
     }
 
-    // Optimistically refresh so any status write-back surfaces without manual reload.
-    if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
+    if(sendOk){
+      // Success → play the mail-delivery animation, then refresh + close.
+      if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
+      spinner.style.display = 'none';
+      // Re-trigger the animation by reflowing the node.
+      mailAnim.style.display = 'block';
+      void mailAnim.offsetWidth;
+      titleEl.textContent = 'Mail on its way';
+      subEl.textContent =
+        'Letter to ' + (f.name.value || 'recipient') + ' sent (Template ' + state.template + ').';
 
-    var succ = document.getElementById('mlrSuccess');
-    document.getElementById('mlrSuccSub').textContent =
-      'Letter to ' + (f.name.value || 'recipient') + ' queued (Template ' + state.template + ').';
-    succ.classList.add('show');
+      setTimeout(function(){
+        mlrClose();
+        _mlrSending = false;
+        if(nextBtn){ nextBtn.disabled = false; nextBtn.textContent = origLabel; }
+      }, 2400);
+    } else {
+      // Failure → show an error state and let the user retry.
+      succ.classList.add('is-error');
+      spinner.style.display = 'none';
+      mailAnim.style.display = 'none';
+      titleEl.textContent = 'Send failed';
+      subEl.textContent = 'We couldn\u2019t confirm the mail went out. Please try again.';
 
-    setTimeout(function(){
-      mlrClose();
-      _mlrSending = false;
-      if(nextBtn){ nextBtn.disabled = false; nextBtn.textContent = origLabel; }
-    }, 1900);
+      setTimeout(function(){
+        succ.classList.remove('show');
+        succ.classList.remove('is-error');
+        _mlrSending = false;
+        if(nextBtn){ nextBtn.disabled = false; nextBtn.textContent = origLabel; }
+      }, 2600);
+    }
   }
 
   document.addEventListener('click', function(e){ var ov=document.getElementById('mailerOverlay'); if(e.target===ov) mlrClose(); });
