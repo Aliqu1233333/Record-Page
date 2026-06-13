@@ -8480,6 +8480,19 @@
   function properName(v){ try { return (typeof toProperName==='function') ? toProperName(v) : v; } catch(e){ return v; } }
   function properAddr(v){ try { return (typeof toProperAddress==='function') ? toProperAddress(v) : v; } catch(e){ return v; } }
 
+  // Strip everything that isn't a letter, space, hyphen, or apostrophe from a
+  // person's name — removes numbers and special characters (e.g. "&", commas,
+  // "#", digits) so names load clean. Hyphens/apostrophes stay for names like
+  // "O'Brien" or "Smith-Jones". Collapses any resulting double spaces.
+  function stripNameChars(v){
+    if(v == null) return '';
+    return String(v)
+      .replace(/[^A-Za-z\s'\-]/g, ' ')   // drop digits & special chars
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s*-\s*/g, '-')           // tidy spaced hyphens
+      .trim();
+  }
+
   function cleanAddress(raw){
     if(!raw) return '';
     var s = String(raw).trim();
@@ -8690,8 +8703,11 @@
   window.openMailer = function(contact){
     contact = contact || {};
     state.step = 1; state.contact = contact; state.template = null;
+    // Clear any template highlight left over from a previous send so the
+    // Choose Template page opens with nothing pre-selected.
+    document.querySelectorAll('.mlr-tpl').forEach(function(el){ el.classList.remove('sel'); });
 
-    var name = properName(contact.name || '—');
+    var name = stripNameChars(properName(contact.name || '—'));
     var cleaned = properAddr(cleanAddress(contact.address));
     state.address = cleaned;
     var addrValid = looksMailable(cleaned);
@@ -8710,7 +8726,7 @@
       return s;
     }
     var relVal = cleanRelation(contact.relation || contact.relationship || '');
-    var decVal = cleanDeceasedOwner(rec.deceased_owner) || '';
+    var decVal = stripNameChars(cleanDeceasedOwner(rec.deceased_owner)) || '';
     var taxVal = formatTaxBalance(rec.taxes_owed) || '';
     var subVal = buildSubjectAddress(rec) || '';
     var couVal = inferCounty(
@@ -8734,7 +8750,7 @@
       relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked:false },
       deceased:{ label:"Deceased Owner's Name", value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked:false },
       taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked:false },
-      subject: { label:'Subject address', value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked:false },
+      subject: { label:"Deceased Owner's Property", value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked:false },
       county:  { label:'County', value: couVal, valid:filled(couVal), zone:'letter', gate:true, checked:false }
     };
 
