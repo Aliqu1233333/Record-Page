@@ -8176,7 +8176,7 @@
   .mlr-step-dot.done{ background:#2E844A; color:#fff; border-color:#2E844A; }
   .mlr-step-line{ flex:1 1 auto; height:2px; background:#ececec; border-radius:2px; }
   .mlr-step-line.done{ background:#2E844A; }
-  .mlr-body{ padding:22px 28px 8px; overflow-y:auto; flex:1 1 auto; }
+  .mlr-body{ padding:16px 28px 8px; overflow-y:auto; flex:1 1 auto; }
   .mlr-page{ display:none; animation:mlrPageIn .2s ease both; }
   .mlr-page.active{ display:block; }
   @keyframes mlrPageIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
@@ -8188,69 +8188,79 @@
   .mlr-intro-note{ font-size:12.5px; color:#5e6470; background:#fbfbfb; border:1px solid #eee; border-left:3px solid #0176d3; border-radius:0 8px 8px 0; padding:10px 14px; line-height:1.5; }
   .mlr-confirm-q{ font-size:15px; font-weight:500; color:#122349; margin-bottom:14px; }
 
-  /* ── Confirm Details: flat, compact field rows (SLDS Cosmos) ── */
-  /* The whole zone is one flat surface; individual fields have no boxes,
-     just hairline dividers. Dense, modern, no wasted vertical space. */
-  .mlr-field-card{
-    display:flex; align-items:flex-start; gap:12px;
-    border:0; border-radius:0; background:transparent;
-    padding:17px 10px 16px; margin:0;
-    border-bottom:1px solid #edf0f3;
-    transition:background .12s ease;
-    position:relative;
+  /* ══════════════════════════════════════════════════════════════════
+     Confirm Details — native SLDS 2 form inputs
+     Bold label above a bordered input; required fields flag red with
+     a "Complete this field" helper; confirmed fields show a green check.
+     ══════════════════════════════════════════════════════════════════ */
+  .mlr-zone-head{ display:flex; align-items:baseline; gap:8px; margin:0 0 8px; padding:0; }
+  .mlr-zone-head > span:first-child{ font-size:13px; font-weight:700; color:#181818; letter-spacing:0; text-transform:none; }
+  .mlr-zone-sub{ font-size:12px; color:#9aa3af; font-weight:400; }
+
+  /* Grid: recipient & letter zones lay fields out two-up; some span full width */
+  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:18px; row-gap:12px; align-items:start; }
+  .mlr-span2{ grid-column:1 / -1; }
+  /* Recipient row: Street gets the wide column, Zip the narrow one */
+  .mlr-grid-recipient{ grid-template-columns:2fr 1fr; }
+
+  /* Individual field block */
+  .mlr-field{ display:flex; flex-direction:column; min-width:0; margin-bottom:0; }
+  .mlr-field-label{
+    font-family:var(--font, "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif);
+    font-size:13px; font-weight:700; color:#444; letter-spacing:0; text-transform:none;
+    margin-bottom:4px; line-height:1.25; display:flex; align-items:center; gap:2px;
   }
-  .mlr-field-card:hover{ background:#fafbfc; }
-  /* Recipient zone laid out as a tight 2-col grid; letter zone as a single list */
-  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:28px; row-gap:0; align-items:stretch; }
-  .mlr-grid .mlr-field-card{ padding-left:10px; padding-right:10px; }
-  /* Hide the divider on the last row of each visual group */
-  .mlr-span2{ margin:0; }
-  .mlr-span2.mlr-field-card{ border-bottom:1px solid #edf0f3; }
+  .mlr-req-star{ color:#ba0517; font-weight:700; margin-right:1px; }
 
-  .mlr-zone-head{ display:flex; align-items:baseline; gap:8px; margin:0 0 6px; padding:0 8px; }
-  .mlr-zone-head > span:first-child{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#5e6470; }
-  .mlr-zone-sub{ font-size:11px; color:#9aa3af; font-weight:400; }
+  /* The input shell holds the input + an optional trailing check icon */
+  .mlr-input-shell{ position:relative; display:flex; align-items:center; }
+  .mlr-input{
+    width:100%; box-sizing:border-box;
+    font-family:inherit; font-size:14px; color:#181818;
+    background:#fff; border:1px solid #c9c9c9; border-radius:8px;
+    padding:8px 12px; line-height:1.3;
+    transition:border-color .1s ease, box-shadow .1s ease, background .1s ease;
+    outline:none;
+  }
+  .mlr-input::placeholder{ color:#b0b0b0; }
+  .mlr-input:hover{ border-color:#9a9a9a; }
+  .mlr-input:focus{ border:1px solid #032d60; box-shadow:0 0 0 1px #032d60; }
+  /* Leave room for the trailing check icon when present */
+  .mlr-field.has-check .mlr-input{ padding-right:38px; }
 
-  /* Flat surface that holds a group of field rows — one panel, hairline dividers inside */
-  .mlr-zone-surface{ background:#fff; border:1px solid #e8ebef; border-radius:10px; box-shadow:0 1px 0 rgba(0,0,0,.02); overflow:hidden; padding:4px 10px; }
-  /* Drop the divider on the visually last row of each surface */
-  .mlr-zone-surface > .mlr-field-card:last-child{ border-bottom:0; }
-  .mlr-zone-surface > .mlr-grid:last-child > .mlr-field-card:nth-last-child(-n+2){ border-bottom:0; }
-  /* The grid's two columns get a faint vertical separation via column-gap only */
+  /* Confirmed (valid + reviewed) → green check inside the field on the right */
+  .mlr-field-check{
+    position:absolute; right:11px; top:50%; transform:translateY(-50%);
+    width:20px; height:20px; border-radius:50%; background:#2e844a;
+    display:none; align-items:center; justify-content:center; pointer-events:none;
+  }
+  .mlr-field-check svg{ width:12px; height:12px; color:#fff; }
+  .mlr-field.confirmed .mlr-field-check{ display:flex; }
 
-  /* Confirm checkbox — smaller, flatter */
-  .mlr-check{ width:17px; height:17px; flex:0 0 auto; margin-top:2px; border-radius:5px; border:1.5px solid #c9cfd8; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .12s; }
-  .mlr-check:hover{ border-color:#0176d3; }
-  .mlr-check.on{ background:#2E844A; border-color:#2E844A; }
-  .mlr-check svg{ width:11px; height:11px; color:#fff; opacity:0; transition:opacity .12s; }
-  .mlr-check.on svg{ opacity:1; }
-  .mlr-check.disabled{ cursor:not-allowed; opacity:.45; }
+  /* Error / required-empty → red border, pink fill, helper text */
+  .mlr-field.error .mlr-input{ border-color:#ba0517; box-shadow:0 0 0 1px #ba0517; background:#fef1ee; }
+  .mlr-field.error .mlr-input:focus{ border-color:#ba0517; box-shadow:0 0 0 1px #ba0517; }
+  .mlr-field-help{ display:none; font-size:12px; color:#ba0517; margin-top:4px; line-height:1.25; }
+  .mlr-field.error .mlr-field-help{ display:block; }
 
-  /* Confirmed state: subtle — a green left accent + faint tint, not a full green box */
-  .mlr-field-card.checked{ background:#f6fbf7; }
-  .mlr-field-card.checked::before{ content:""; position:absolute; left:0; top:9px; bottom:9px; width:2px; border-radius:2px; background:#2E844A; }
-  .mlr-field-card.invalid{ background:#fef6f6; }
-  .mlr-field-card.invalid::before{ content:""; position:absolute; left:0; top:9px; bottom:9px; width:2px; border-radius:2px; background:#ef4444; }
+  /* Optional field (Relationship): a quiet 'Optional' note, never errors */
+  .mlr-field-optional{ font-size:11px; font-weight:400; color:#9aa3af; margin-left:4px; }
 
-  .mlr-field-label{ font-family:var(--font, "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif); font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#9aa3af; line-height:1.2; }
-  .mlr-field-value{ font-size:14px; font-weight:500; color:#1f2937; margin-top:6px; line-height:1.3; word-break:break-word; }
-  .mlr-field-value.muted{ color:#b91c1c; font-style:italic; }
-  /* Empty optional field (e.g. Relationship): quiet grey 'Add' hint */
-  .mlr-field-value.is-empty{ color:#c2c8d0; font-weight:400; font-style:italic; }
-  .mlr-field-value.is-empty::before{ content:"Add"; }
-  /* Empty REQUIRED field: red 'Required' flag so it's obvious what's blocking */
-  .mlr-field-card.invalid .mlr-field-value.is-empty{ color:#dc2626; font-style:italic; }
-  .mlr-field-card.invalid .mlr-field-value.is-empty::before{ content:"Required"; }
-  .mlr-field-edit{ margin-top:5px; width:100%; border:1px solid #dddbda; border-radius:7px; padding:6px 9px; font-family:inherit; font-size:13.5px; color:#1f2937; outline:none; box-sizing:border-box; }
-  .mlr-field-edit:focus{ border-color:#0176d3; box-shadow:0 0 0 1px #0176d3; }
-
-  /* Letter-context fields: same flat treatment, pencil affordance on the left */
-  .mlr-field-card.context{ background:transparent; }
-  .mlr-field-card.context:hover{ background:#fafbfc; }
-  .mlr-field-card.context.checked{ background:#f6fbf7; }
-  .mlr-pencil{ width:17px; height:17px; flex:0 0 auto; margin-top:2px; display:flex; align-items:center; justify-content:center; color:#c2c8d0; transition:color .12s; }
-  .mlr-field-card.context:hover .mlr-pencil{ color:#0176d3; }
-  .mlr-pencil svg{ width:12px; height:12px; }
+  /* "Confirm Information" action row */
+  .mlr-confirm-bar{ margin-top:14px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .mlr-confirm-btn{
+    font-family:inherit; font-size:13.5px; font-weight:600;
+    border:1px solid #032d60; background:#fff; color:#032d60;
+    border-radius:8px; padding:8px 16px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .mlr-confirm-btn:hover{ background:#f3f7fb; }
+  .mlr-confirm-btn svg{ width:15px; height:15px; }
+  .mlr-confirm-btn.done{ background:#2e844a; border-color:#2e844a; color:#fff; cursor:default; }
+  .mlr-confirm-btn.done:hover{ background:#2e844a; }
+  .mlr-confirm-hint{ font-size:12px; color:#706e6b; }
+  .mlr-confirm-hint.error{ color:#ba0517; font-weight:500; }
   .mlr-context-note{ display:flex; gap:9px; align-items:flex-start; margin:6px 0 12px; padding:9px 12px; background:#f4f7fb; border:1px solid #e3ebf5; border-radius:10px; font-size:12px; color:#46566b; line-height:1.45; }
   .mlr-context-note svg{ width:14px; height:14px; flex:0 0 auto; margin-top:1px; color:#0176d3; }
   .mlr-context-note b{ font-weight:700; color:#122349; }
@@ -8336,9 +8346,9 @@
       <div class="mlr-page" data-page="3">
         <div class="mlr-confirm-q">Which letter template?</div>
         <div id="mlrTemplates">
-          <div class="mlr-tpl" data-tpl="1" onclick="mlrPickTpl('1')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 1</div><div class="mlr-tpl-desc">Soft intro — first touch</div></div></div>
-          <div class="mlr-tpl" data-tpl="2" onclick="mlrPickTpl('2')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 2</div><div class="mlr-tpl-desc">Follow-up — already attempted contact</div></div></div>
-          <div class="mlr-tpl" data-tpl="3" onclick="mlrPickTpl('3')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 3</div><div class="mlr-tpl-desc">Formal — regarding the estate</div></div></div>
+          <div class="mlr-tpl" data-tpl="1" onclick="mlrPickTpl('1')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 1 — Taxes Under Suit</div><div class="mlr-tpl-desc">Strong urgency</div></div></div>
+          <div class="mlr-tpl" data-tpl="2" onclick="mlrPickTpl('2')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 2 — Tax Delinquency</div><div class="mlr-tpl-desc">Property behind on taxes</div></div></div>
+          <div class="mlr-tpl" data-tpl="3" onclick="mlrPickTpl('3')"><div class="mlr-tpl-radio"></div><div><div class="mlr-tpl-name">Template 3 — Broad Net</div><div class="mlr-tpl-desc">General outreach to spark a reply</div></div></div>
         </div>
       </div>
       <div class="mlr-page" data-page="4">
@@ -8604,21 +8614,23 @@
       rec.subject_zip || p.zip
     ) || '';
 
-    // gate:true  → must be valid (non-empty) AND confirmed before proceeding.
-    // gate:false → optional (Relationship); never blocks the Next button.
-    // 'valid' reflects whether the field is actually filled, so empty required
-    //  fields render flagged and keep Next disabled until corrected.
+    // gate:true  → required: must be non-empty AND confirmed via the
+    //   "Confirm Information" button before Next unlocks.
+    // gate:false → optional (Relationship); never blocks Next, never errors.
+    // All fields start UNCONFIRMED (checked:false) so the user is forced to
+    // press "Confirm Information" — confirmation can't be skipped.
+    state.confirmed = false;
     state.fields = {
-      name:    { label:'Recipient name', value:name, valid:filled(name), zone:'recipient', gate:true, checked: filled(name) },
-      street:  { label:'Street address', value:p.street || '', valid:!!p.street, zone:'recipient', gate:true, checked: filled(p.street) },
-      city:    { label:'City', value:p.city || '', valid:!!p.city, zone:'recipient', gate:true, checked: filled(p.city) },
-      state:   { label:'State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked: filled(p.state) },
-      zip:     { label:'Zip code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked: filled(p.zip) },
-      relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked: filled(relVal) },
-      deceased:{ label:'Deceased owner', value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked: filled(decVal) },
-      taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked: filled(taxVal) },
-      subject: { label:'Subject address', value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked: filled(subVal) },
-      county:  { label:'County', value: couVal, valid:filled(couVal), zone:'letter', gate:true, checked: filled(couVal) }
+      name:    { label:'Recipient name', value:name, valid:filled(name), zone:'recipient', gate:true, checked:false },
+      street:  { label:'Street address', value:p.street || '', valid:!!p.street, zone:'recipient', gate:true, checked:false },
+      city:    { label:'City', value:p.city || '', valid:!!p.city, zone:'recipient', gate:true, checked:false },
+      state:   { label:'State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked:false },
+      zip:     { label:'Zip code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked:false },
+      relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked:false },
+      deceased:{ label:'Deceased owner', value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked:false },
+      taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked:false },
+      subject: { label:'Subject address', value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked:false },
+      county:  { label:'County', value: couVal, valid:filled(couVal), zone:'letter', gate:true, checked:false }
     };
 
     document.getElementById('mlrAvatar').textContent = initials(name);
@@ -8648,57 +8660,118 @@
     window.openMailer(c);
   };
 
+  // Build one SLDS-style field: bold label (+ asterisk if required), bordered
+  // input, trailing green check when confirmed, and a hidden "Complete this
+  // field" helper that appears in the error state.
   function mlrBuildCard(key, f){
-    var card = document.createElement('div');
-    card.className = 'mlr-field-card' + (f.valid ? '' : ' invalid') + (f.zone==='letter' ? ' context' : '');
-    card.dataset.key = key;
-    var control = f.gate
-      ? '<div class="mlr-check' + ((f.gate && f.valid)?'':' disabled') + '" data-key="'+key+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
-      : '<div class="mlr-pencil" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>';
-    card.innerHTML = control +
-      '<div style="flex:1 1 auto; min-width:0;"><div class="mlr-field-label">'+ f.label +'</div>'+
-      '<div class="mlr-field-value'+ (f.valid?'':' muted') + (f.value?'':' is-empty') +'" data-display="'+key+'">'+ (f.value || '') +'</div>'+
-      '<input class="mlr-field-edit" data-edit="'+key+'" value="'+ (f.value||'').replace(/"/g,'&quot;') +'" style="display:none;"></div>';
+    var field = document.createElement('div');
+    var required = !!f.gate;                 // gated fields are required
+    field.className = 'mlr-field' + (required ? ' has-check' : '');
+    field.dataset.key = key;
 
-    var checkEl = card.querySelector('.mlr-check');
+    var labelHtml = '<label class="mlr-field-label" for="mlr-in-'+key+'">'
+      + (required ? '<span class="mlr-req-star">*</span>' : '')
+      + f.label
+      + (required ? '' : '<span class="mlr-field-optional">(optional)</span>')
+      + '</label>';
 
-    // Toggle the confirm checkbox (only when the field is valid).
-    function onCheckClick(){
-      if(!f.valid) return;
-      f.checked = !f.checked;
-      checkEl.classList.toggle('on', f.checked);
-      card.classList.toggle('checked', f.checked);
-      updateNextEnabled();
-    }
-    if(checkEl){
-      if(f.gate && f.valid && f.checked){ checkEl.classList.add('on'); card.classList.add('checked'); }
-      checkEl.addEventListener('click', onCheckClick);
-    }
+    var checkHtml = required
+      ? '<span class="mlr-field-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
+      : '';
 
-    var disp = card.querySelector('[data-display="'+key+'"]');
-    var edit = card.querySelector('[data-edit="'+key+'"]');
-    disp.style.cursor='pointer'; disp.title='Click to edit (this mailing only)';
-    disp.addEventListener('click', function(){ disp.style.display='none'; edit.style.display='block'; edit.focus(); });
-    edit.addEventListener('blur', function(){
-      f.value = edit.value.trim();
-      f.valid = (f.value !== '');
-      disp.textContent = f.value || '';
-      disp.classList.toggle('is-empty', !f.value);
-      disp.classList.toggle('muted', false); // not used for empties anymore; flag comes from .invalid
-      disp.style.display=''; edit.style.display='none';
-      if(f.gate){
-        // Editing a gated field clears its confirmation; user must re-check.
-        f.checked = false;
-        if(checkEl){
-          checkEl.classList.remove('on');
-          checkEl.classList.toggle('disabled', !f.valid); // re-enable once it has a value
-        }
-        card.classList.remove('checked');
-        card.classList.toggle('invalid', !f.valid);
-      }
+    field.innerHTML = labelHtml
+      + '<div class="mlr-input-shell">'
+      +   '<input class="mlr-input" id="mlr-in-'+key+'" data-input="'+key+'" '
+      +     'value="'+ (f.value||'').replace(/"/g,'&quot;') +'" '
+      +     'placeholder="'+ (required ? 'Enter '+f.label.toLowerCase() : 'Optional') +'" '
+      +     'autocomplete="off" spellcheck="false">'
+      +   checkHtml
+      + '</div>'
+      + '<div class="mlr-field-help">Complete this field</div>';
+
+    var input = field.querySelector('[data-input="'+key+'"]');
+
+    // Reflect confirmed state on initial render (only if already reviewed).
+    if(required && f.valid && f.checked){ field.classList.add('confirmed'); }
+
+    // Typing in a field clears its confirmed/error state; it must be re-confirmed.
+    input.addEventListener('input', function(){
+      f.value = input.value;
+      f.valid = (input.value.trim() !== '');
+      f.checked = false;
+      field.classList.remove('confirmed');
+      field.classList.remove('error');
+      updateConfirmBar();
       updateNextEnabled();
     });
-    return card;
+    input.addEventListener('blur', function(){
+      f.value = input.value.trim();
+      input.value = f.value;
+      f.valid = (f.value !== '');
+    });
+
+    return field;
+  }
+
+  // Run validation for the "Confirm Information" button. Marks empty required
+  // fields with the red error state; confirms the valid ones with a green check.
+  function mlrConfirmInformation(){
+    var allOk = true;
+    Object.keys(state.fields).forEach(function(k){
+      var f = state.fields[k];
+      var field = document.querySelector('.mlr-field[data-key="'+k+'"]');
+      if(!field) return;
+      if(!f.gate){ return; }                 // optional fields are skipped
+      var input = field.querySelector('.mlr-input');
+      f.value = (input ? input.value.trim() : f.value || '');
+      if(input) input.value = f.value;
+      f.valid = (f.value !== '');
+      if(f.valid){
+        f.checked = true;
+        field.classList.remove('error');
+        field.classList.add('confirmed');
+      } else {
+        f.checked = false;
+        allOk = false;
+        field.classList.remove('confirmed');
+        field.classList.add('error');
+      }
+    });
+    state.confirmed = allOk;
+    updateConfirmBar();
+    updateNextEnabled();
+    if(!allOk){
+      // Focus the first empty required field.
+      var firstErr = document.querySelector('.mlr-field.error .mlr-input');
+      if(firstErr) firstErr.focus();
+    }
+  }
+  window.mlrConfirmInformation = mlrConfirmInformation;
+
+  // Keep the confirm bar (button label + hint) in sync with field state.
+  function updateConfirmBar(){
+    var btn = document.getElementById('mlrConfirmBtn');
+    var hint = document.getElementById('mlrConfirmHint');
+    if(!btn || !hint) return;
+    var done = allChecked();
+    state.confirmed = done;
+    if(done){
+      btn.classList.add('done');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Information confirmed';
+      hint.textContent = 'All required details verified.';
+      hint.classList.remove('error');
+    } else {
+      btn.classList.remove('done');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Confirm information';
+      var anyError = document.querySelector('.mlr-field.error');
+      if(anyError){
+        hint.textContent = 'Some required fields need attention.';
+        hint.classList.add('error');
+      } else {
+        hint.textContent = 'Review the details, then confirm to continue.';
+        hint.classList.remove('error');
+      }
+    }
   }
 
   function renderConfirmFields(){
@@ -8711,40 +8784,44 @@
     recHead.innerHTML = '<span>Recipient</span><span class="mlr-zone-sub">Where the letter is mailed</span>';
     host.appendChild(recHead);
 
-    var recSurface = document.createElement('div');
-    recSurface.className = 'mlr-zone-surface';
-
+    var recGrid = document.createElement('div');
+    recGrid.className = 'mlr-grid mlr-grid-recipient';
     var nameCard = mlrBuildCard('name', state.fields.name);
     nameCard.classList.add('mlr-span2');
-    recSurface.appendChild(nameCard);
-
-    var recGrid = document.createElement('div');
-    recGrid.className = 'mlr-grid';
-    ['street','city','state','zip'].forEach(function(k){ recGrid.appendChild(mlrBuildCard(k, state.fields[k])); });
-    recSurface.appendChild(recGrid);
-    host.appendChild(recSurface);
+    recGrid.appendChild(nameCard);
+    // Street takes the wider column; Zip sits next to it on the same row.
+    recGrid.appendChild(mlrBuildCard('street', state.fields.street));
+    recGrid.appendChild(mlrBuildCard('zip', state.fields.zip));
+    // City + State share the next row.
+    recGrid.appendChild(mlrBuildCard('city', state.fields.city));
+    recGrid.appendChild(mlrBuildCard('state', state.fields.state));
+    host.appendChild(recGrid);
 
     // ── Letter details zone ──
     var letHead = document.createElement('div');
     letHead.className = 'mlr-zone-head';
-    letHead.style.marginTop = '20px';
+    letHead.style.marginTop = '16px';
     letHead.innerHTML = '<span>Letter details</span><span class="mlr-zone-sub">Merged in \u00b7 this mailing only</span>';
     host.appendChild(letHead);
 
-    var letSurface = document.createElement('div');
-    letSurface.className = 'mlr-zone-surface';
-
+    var letGrid = document.createElement('div');
+    letGrid.className = 'mlr-grid';
     // Subject address spans full width — it's a long one-line address.
     var subjCard = mlrBuildCard('subject', state.fields.subject);
     subjCard.classList.add('mlr-span2');
-    letSurface.appendChild(subjCard);
-
-    var letGrid = document.createElement('div');
-    letGrid.className = 'mlr-grid';
+    letGrid.appendChild(subjCard);
     ['relation','deceased','taxes','county'].forEach(function(k){ letGrid.appendChild(mlrBuildCard(k, state.fields[k])); });
-    letSurface.appendChild(letGrid);
-    host.appendChild(letSurface);
+    host.appendChild(letGrid);
 
+    // ── Confirm Information bar ──
+    var bar = document.createElement('div');
+    bar.className = 'mlr-confirm-bar';
+    bar.innerHTML =
+      '<button type="button" class="mlr-confirm-btn" id="mlrConfirmBtn" onclick="mlrConfirmInformation()"></button>'
+      + '<span class="mlr-confirm-hint" id="mlrConfirmHint"></span>';
+    host.appendChild(bar);
+
+    updateConfirmBar();
     updateNextEnabled();
   }
 
