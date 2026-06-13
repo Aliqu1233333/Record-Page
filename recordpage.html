@@ -2386,7 +2386,7 @@
     }
     .ms-card-title {
       font-family: 'Inter', sans-serif;
-      font-size: 15.5px;
+      font-size: 18.5px;
       font-weight: 700;
       letter-spacing: 0;
       text-transform: none;
@@ -2428,11 +2428,13 @@
       z-index: 0;
     }
     .ms-activity:last-child::before { display: none; }
-    /* Spine gradients — set per row id */
+    /* Default spine so every row connects downward as a timeline */
+    .ms-activity::before { background: #d8dce3; }
+    /* Spine gradients — set per row id (override default where defined) */
+    #ms-row-mailer::before   { background: linear-gradient(to bottom, #0176d3, #a855f7); }
     #ms-row-contact::before  { background: linear-gradient(to bottom, #4aad52, #a855f7); }
     #ms-row-offer::before    { background: linear-gradient(to bottom, #a855f7, #8e9bac); }
     #ms-row-created::before  { background: linear-gradient(to bottom, #8e9bac, #4aad52); }
-    #ms-row-update::before   { display: none; }
     .ms-toggle-btn-row {
       display: flex; align-items: center; justify-content: center;
       width: 20px; height: 20px;
@@ -2473,7 +2475,7 @@
     }
     .ms-activity-timestamp {
       font-family: 'Inter', sans-serif;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 400;
       color: #3e3e3c;
       line-height: 1.5;
@@ -8356,8 +8358,6 @@
   .mlr-env-body{ fill:#eaf3fb; stroke:#0176d3; stroke-width:2.4; stroke-linejoin:round; }
   .mlr-env-flap{ fill:none; stroke:#0176d3; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;
     stroke-dasharray:120; stroke-dashoffset:120; animation:mlrFlap .5s cubic-bezier(0.65,0,0.45,1) .45s forwards; }
-  .mlr-env-check{ stroke:#2E844A; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; fill:none;
-    stroke-dasharray:32; stroke-dashoffset:32; opacity:0; animation:mlrEnvCheck .35s ease .95s forwards; }
   /* whole envelope flies up from below + settles */
   .mlr-env-group{ animation:mlrEnvFly .6s cubic-bezier(0.22,1,0.36,1) both; transform-origin:50% 50%; }
   /* speed/motion lines trailing the envelope */
@@ -8367,7 +8367,6 @@
   .mlr-env-line.l3{ animation:mlrZip .5s ease .40s 1; }
   @keyframes mlrEnvFly{ 0%{ transform:translateY(34px) scale(.9); opacity:0; } 60%{ opacity:1; } 100%{ transform:translateY(0) scale(1); opacity:1; } }
   @keyframes mlrFlap{ to{ stroke-dashoffset:0; } }
-  @keyframes mlrEnvCheck{ from{ opacity:0; } to{ stroke-dashoffset:0; opacity:1; } }
   @keyframes mlrZip{ 0%{ opacity:0; transform:translateX(10px); } 40%{ opacity:1; } 100%{ opacity:0; transform:translateX(-14px); } }
 
   /* spinner shown while we wait on the webhook response */
@@ -8405,8 +8404,6 @@
             <rect class="mlr-env-body" x="34" y="22" width="74" height="52" rx="5"/>
             <!-- sealing flap -->
             <path class="mlr-env-flap" d="M36 26 L71 50 L106 26"/>
-            <!-- delivered check -->
-            <path class="mlr-env-check" d="M58 50 l9 9 l16 -18"/>
           </g>
         </svg>
       </div>
