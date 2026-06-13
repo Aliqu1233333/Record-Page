@@ -5002,35 +5002,14 @@
       }).join('');
 
       return `<div class="ls-chevron-wrap">
-        <div class="ls-chevron-track">${items}${rcMailerMilestone(contact)}</div>
+        <div class="ls-chevron-track">${items}</div>
       </div>`;
     }
 
-    // A read-only milestone appended to the lead track that reflects the
-    // mailer status (not clickable — it mirrors PostGrid, it doesn't set status).
+    // The Mailer Sent milestone has been removed from the lead status chevron.
+    // (Mailer status is still surfaced via the per-contact mail badge.)
     function rcMailerMilestone(contact){
-      if(!contact) return '';
-      var s = (contact.mailStatus || '').trim();
-      var sent = !!(s && s !== '—');
-      // Map mailer status → milestone visual state.
-      var doneStates = ['In Transit','Delivered'];
-      var cls, label = 'Mailer Sent', title = 'Mailer Sent';
-      if(!sent){ cls = 'ls-pending'; title = 'No mailer sent'; }
-      else if(s === 'Cancelled' || s === 'Returned'){ cls = 'ls-mail-alert'; label = 'Mailer: ' + s; title = label; }
-      else if(doneStates.indexOf(s) !== -1){ cls = 'ls-done'; label = 'Mailer: ' + s; title = label; }
-      else { cls = 'ls-active'; label = 'Mailer: ' + s; title = label; }
-
-      var dateStr = '';
-      if(sent && contact.mailDate){
-        var d = (typeof parseFlexibleDate === 'function') ? parseFlexibleDate(contact.mailDate) : null;
-        if(d){ dateStr = ' (' + (d.getMonth()+1) + '/' + d.getDate() + ')'; }
-      }
-      var inner = (cls === 'ls-done')
-        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0;margin-right:3px;pointer-events:none;"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(label)}${escapeHtml(dateStr)}</span>`
-        : `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;">${escapeHtml(label)}${escapeHtml(dateStr)}</span>`;
-      return `<div class="ls-chev-wrap ls-mail-milestone">
-        <div class="ls-chev ${cls}" title="${escapeHtml(title)}" style="cursor:default;">${inner}</div>
-      </div>`;
+      return '';
     }
     // ─────────────────────────────────────────────────────────────────────
 
@@ -8213,17 +8192,17 @@
   /* The whole zone is one flat surface; individual fields have no boxes,
      just hairline dividers. Dense, modern, no wasted vertical space. */
   .mlr-field-card{
-    display:flex; align-items:flex-start; gap:10px;
+    display:flex; align-items:flex-start; gap:12px;
     border:0; border-radius:0; background:transparent;
-    padding:9px 8px 8px; margin:0;
+    padding:17px 10px 16px; margin:0;
     border-bottom:1px solid #edf0f3;
     transition:background .12s ease;
     position:relative;
   }
   .mlr-field-card:hover{ background:#fafbfc; }
   /* Recipient zone laid out as a tight 2-col grid; letter zone as a single list */
-  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:18px; row-gap:0; align-items:stretch; }
-  .mlr-grid .mlr-field-card{ padding-left:8px; padding-right:8px; }
+  .mlr-grid{ display:grid; grid-template-columns:1fr 1fr; column-gap:28px; row-gap:0; align-items:stretch; }
+  .mlr-grid .mlr-field-card{ padding-left:10px; padding-right:10px; }
   /* Hide the divider on the last row of each visual group */
   .mlr-span2{ margin:0; }
   .mlr-span2.mlr-field-card{ border-bottom:1px solid #edf0f3; }
@@ -8233,7 +8212,7 @@
   .mlr-zone-sub{ font-size:11px; color:#9aa3af; font-weight:400; }
 
   /* Flat surface that holds a group of field rows — one panel, hairline dividers inside */
-  .mlr-zone-surface{ background:#fff; border:1px solid #e8ebef; border-radius:10px; box-shadow:0 1px 0 rgba(0,0,0,.02); overflow:hidden; padding:2px 8px; }
+  .mlr-zone-surface{ background:#fff; border:1px solid #e8ebef; border-radius:10px; box-shadow:0 1px 0 rgba(0,0,0,.02); overflow:hidden; padding:4px 10px; }
   /* Drop the divider on the visually last row of each surface */
   .mlr-zone-surface > .mlr-field-card:last-child{ border-bottom:0; }
   .mlr-zone-surface > .mlr-grid:last-child > .mlr-field-card:nth-last-child(-n+2){ border-bottom:0; }
@@ -8249,17 +8228,20 @@
 
   /* Confirmed state: subtle — a green left accent + faint tint, not a full green box */
   .mlr-field-card.checked{ background:#f6fbf7; }
-  .mlr-field-card.checked::before{ content:""; position:absolute; left:0; top:6px; bottom:6px; width:2px; border-radius:2px; background:#2E844A; }
+  .mlr-field-card.checked::before{ content:""; position:absolute; left:0; top:9px; bottom:9px; width:2px; border-radius:2px; background:#2E844A; }
   .mlr-field-card.invalid{ background:#fef6f6; }
-  .mlr-field-card.invalid::before{ content:""; position:absolute; left:0; top:6px; bottom:6px; width:2px; border-radius:2px; background:#ef4444; }
+  .mlr-field-card.invalid::before{ content:""; position:absolute; left:0; top:9px; bottom:9px; width:2px; border-radius:2px; background:#ef4444; }
 
   .mlr-field-label{ font-family:var(--font, "Salesforce Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif); font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#9aa3af; line-height:1.2; }
-  .mlr-field-value{ font-size:14px; font-weight:500; color:#1f2937; margin-top:3px; line-height:1.3; word-break:break-word; }
+  .mlr-field-value{ font-size:14px; font-weight:500; color:#1f2937; margin-top:6px; line-height:1.3; word-break:break-word; }
   .mlr-field-value.muted{ color:#b91c1c; font-style:italic; }
-  /* Empty fields show a subtle 'Add' hint instead of an em-dash */
+  /* Empty optional field (e.g. Relationship): quiet grey 'Add' hint */
   .mlr-field-value.is-empty{ color:#c2c8d0; font-weight:400; font-style:italic; }
   .mlr-field-value.is-empty::before{ content:"Add"; }
-  .mlr-field-edit{ margin-top:4px; width:100%; border:1px solid #dddbda; border-radius:7px; padding:6px 9px; font-family:inherit; font-size:13.5px; color:#1f2937; outline:none; box-sizing:border-box; }
+  /* Empty REQUIRED field: red 'Required' flag so it's obvious what's blocking */
+  .mlr-field-card.invalid .mlr-field-value.is-empty{ color:#dc2626; font-style:italic; }
+  .mlr-field-card.invalid .mlr-field-value.is-empty::before{ content:"Required"; }
+  .mlr-field-edit{ margin-top:5px; width:100%; border:1px solid #dddbda; border-radius:7px; padding:6px 9px; font-family:inherit; font-size:13.5px; color:#1f2937; outline:none; box-sizing:border-box; }
   .mlr-field-edit:focus{ border-color:#0176d3; box-shadow:0 0 0 1px #0176d3; }
 
   /* Letter-context fields: same flat treatment, pencil affordance on the left */
@@ -8524,25 +8506,76 @@
     'fort worth':'Tarrant','arlington':'Tarrant','grapevine':'Tarrant','euless':'Tarrant',
     'bedford':'Tarrant','hurst':'Tarrant','mansfield':'Tarrant','north richland hills':'Tarrant'
   };
-  function inferCounty(city, existing){
+  // Common 5-digit zip → county for the operating area. Used as a fallback
+  // when the city is blank but a zip is present on the record.
+  var ZIP_TO_COUNTY = {
+    // Harris (Houston metro core)
+    '770':'Harris','771':'Harris','772':'Harris',
+    // Montgomery / Conroe area
+    '773':'Montgomery',
+    // Galveston / Brazoria coastal (broad — refined by exact zips below)
+    '775':'Galveston',
+    // Dallas metro
+    '752':'Dallas','753':'Dallas',
+    // Tarrant / Fort Worth
+    '760':'Tarrant','761':'Tarrant'
+  };
+  // A few exact-zip overrides where a 3-digit prefix isn't precise enough.
+  var ZIP5_TO_COUNTY = {
+    '77441':'Fort Bend','77450':'Harris','77478':'Fort Bend','77479':'Fort Bend',
+    '77489':'Fort Bend','77545':'Fort Bend','77459':'Fort Bend','77469':'Fort Bend',
+    '77584':'Brazoria','77581':'Brazoria','77511':'Brazoria','77566':'Brazoria',
+    '77573':'Galveston','77546':'Galveston','77550':'Galveston','77591':'Galveston'
+  };
+  function countyFromZip(zip){
+    var z = String(zip || '').trim().match(/\d{5}/);
+    if(!z) return '';
+    var z5 = z[0];
+    if(ZIP5_TO_COUNTY[z5]) return ZIP5_TO_COUNTY[z5];
+    var pre = z5.slice(0,3);
+    if(ZIP_TO_COUNTY[pre]) return ZIP_TO_COUNTY[pre];
+    return '';
+  }
+  function inferCounty(city, existing, zip){
     var ex = (existing == null) ? '' : String(existing).trim();
     if(ex && ex !== '—') return ex; // respect any real value already on file
     var key = String(city || '').trim().toLowerCase();
-    if(!key) return '';
-    if(CITY_TO_COUNTY[key]) return CITY_TO_COUNTY[key];
-    return '';
+    if(key && CITY_TO_COUNTY[key]) return CITY_TO_COUNTY[key];
+    // Fallback: derive from zip when city is missing/unknown.
+    return countyFromZip(zip);
   }
 
   // ── Build the one-line subject address: "street, city ST zip" ──
+  // Treat dash/unknown placeholders as empty so they never leak into the line.
+  function sanitizePart(v){
+    if(v == null) return '';
+    var s = String(v).trim();
+    if(!s || s === '—' || s === '-' || s === '--' || s.toLowerCase() === 'unknown' || s.toLowerCase() === 'n/a') return '';
+    return s;
+  }
+  // Remove any standalone dash/placeholder tokens that may be embedded mid-string
+  // (e.g. a street/address that arrives as "1403 E 31ST St — 77022" or "..., —, 77022").
+  function stripDashTokens(s){
+    if(!s) return '';
+    return String(s)
+      // collapse ", —," or " — " style orphan placeholders
+      .replace(/(^|[,\s])[—–-]{1,2}(?=[,\s]|$)/g, '$1')
+      .replace(/\s*,\s*,\s*/g, ', ')   // double commas → single
+      .replace(/\s{2,}/g, ' ')
+      .replace(/^[,\s]+|[,\s]+$/g, '')
+      .trim();
+  }
   function buildSubjectAddress(rec){
-    var street = properAddr(cleanAddress(rec.subject_street || '')) ||
-                 (rec.subject_address && rec.subject_address !== '—' ? properAddr(cleanAddress(rec.subject_address)) : '');
-    var city  = rec.subject_city ? properAddr(String(rec.subject_city).trim()) : '';
-    var st    = rec.subject_state ? String(rec.subject_state).trim().toUpperCase() : '';
-    var zip   = rec.subject_zip ? String(rec.subject_zip).trim() : '';
+    var street = properAddr(cleanAddress(sanitizePart(rec.subject_street))) ||
+                 (sanitizePart(rec.subject_address) ? properAddr(cleanAddress(rec.subject_address)) : '');
+    street = stripDashTokens(street);
+    var city  = sanitizePart(rec.subject_city) ? properAddr(sanitizePart(rec.subject_city)) : '';
+    var st    = sanitizePart(rec.subject_state) ? sanitizePart(rec.subject_state).toUpperCase() : '';
+    var zip   = sanitizePart(rec.subject_zip);
     var line2 = [city, st].filter(Boolean).join(', ');
     line2 = [line2, zip].filter(Boolean).join(' ');
-    return [street, line2].filter(Boolean).join(', ').trim();
+    var full = [street, line2].filter(Boolean).join(', ').trim();
+    return stripDashTokens(full);
   }
 
   window.openMailer = function(contact){
@@ -8560,24 +8593,32 @@
 
     // A letter field that already holds real data starts pre-confirmed.
     function filled(v){ return !!(v && String(v).trim() && String(v).trim() !== '—'); }
-    var relVal = properName(contact.relation || contact.relationship || '—');
+    var relRaw = contact.relation || contact.relationship || '';
+    var relVal = filled(relRaw) ? properName(relRaw) : '';
     var decVal = cleanDeceasedOwner(rec.deceased_owner) || '';
     var taxVal = formatTaxBalance(rec.taxes_owed) || '';
     var subVal = buildSubjectAddress(rec) || '';
-    var couVal = inferCounty(rec.subject_city || p.city, rec.county) || '';
+    var couVal = inferCounty(
+      rec.subject_city || p.city,
+      rec.county,
+      rec.subject_zip || p.zip
+    ) || '';
 
-    // zone: 'recipient' = deliverability-critical (gated). 'letter' = merge context.
+    // gate:true  → must be valid (non-empty) AND confirmed before proceeding.
+    // gate:false → optional (Relationship); never blocks the Next button.
+    // 'valid' reflects whether the field is actually filled, so empty required
+    //  fields render flagged and keep Next disabled until corrected.
     state.fields = {
-      name:    { label:'Recipient name', value:name, valid:!!(name && name!=='—'), zone:'recipient', gate:true, checked: filled(name) },
+      name:    { label:'Recipient name', value:name, valid:filled(name), zone:'recipient', gate:true, checked: filled(name) },
       street:  { label:'Street address', value:p.street || '', valid:!!p.street, zone:'recipient', gate:true, checked: filled(p.street) },
       city:    { label:'City', value:p.city || '', valid:!!p.city, zone:'recipient', gate:true, checked: filled(p.city) },
       state:   { label:'State', value:p.state || '', valid:!!p.state, zone:'recipient', gate:true, checked: filled(p.state) },
       zip:     { label:'Zip code', value:p.zip || '', valid:!!p.zip, zone:'recipient', gate:true, checked: filled(p.zip) },
-      relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:true, checked: filled(relVal) },
-      deceased:{ label:'Deceased owner', value: decVal, valid:true, zone:'letter', gate:true, checked: filled(decVal) },
-      taxes:   { label:'Tax balance', value: taxVal, valid:true, zone:'letter', gate:true, checked: filled(taxVal) },
-      subject: { label:'Subject address', value: subVal, valid:true, zone:'letter', gate:true, checked: filled(subVal) },
-      county:  { label:'County', value: couVal, valid:true, zone:'letter', gate:true, checked: filled(couVal) }
+      relation:{ label:'Relationship', value: relVal, valid:true, zone:'letter', gate:false, checked: filled(relVal) },
+      deceased:{ label:'Deceased owner', value: decVal, valid:filled(decVal), zone:'letter', gate:true, checked: filled(decVal) },
+      taxes:   { label:'Tax balance', value: taxVal, valid:filled(taxVal), zone:'letter', gate:true, checked: filled(taxVal) },
+      subject: { label:'Subject address', value: subVal, valid:filled(subVal), zone:'letter', gate:true, checked: filled(subVal) },
+      county:  { label:'County', value: couVal, valid:filled(couVal), zone:'letter', gate:true, checked: filled(couVal) }
     };
 
     document.getElementById('mlrAvatar').textContent = initials(name);
@@ -8611,9 +8652,8 @@
     var card = document.createElement('div');
     card.className = 'mlr-field-card' + (f.valid ? '' : ' invalid') + (f.zone==='letter' ? ' context' : '');
     card.dataset.key = key;
-    var canCheck = f.gate && f.valid;
     var control = f.gate
-      ? '<div class="mlr-check' + (canCheck?'':' disabled') + '" data-key="'+key+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
+      ? '<div class="mlr-check' + ((f.gate && f.valid)?'':' disabled') + '" data-key="'+key+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'
       : '<div class="mlr-pencil" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>';
     card.innerHTML = control +
       '<div style="flex:1 1 auto; min-width:0;"><div class="mlr-field-label">'+ f.label +'</div>'+
@@ -8621,15 +8661,20 @@
       '<input class="mlr-field-edit" data-edit="'+key+'" value="'+ (f.value||'').replace(/"/g,'&quot;') +'" style="display:none;"></div>';
 
     var checkEl = card.querySelector('.mlr-check');
-    if(canCheck && checkEl){
-      if(f.checked){ checkEl.classList.add('on'); card.classList.add('checked'); }
-      checkEl.addEventListener('click', function(){
-        f.checked = !f.checked;
-        checkEl.classList.toggle('on', f.checked);
-        card.classList.toggle('checked', f.checked);
-        updateNextEnabled();
-      });
+
+    // Toggle the confirm checkbox (only when the field is valid).
+    function onCheckClick(){
+      if(!f.valid) return;
+      f.checked = !f.checked;
+      checkEl.classList.toggle('on', f.checked);
+      card.classList.toggle('checked', f.checked);
+      updateNextEnabled();
     }
+    if(checkEl){
+      if(f.gate && f.valid && f.checked){ checkEl.classList.add('on'); card.classList.add('checked'); }
+      checkEl.addEventListener('click', onCheckClick);
+    }
+
     var disp = card.querySelector('[data-display="'+key+'"]');
     var edit = card.querySelector('[data-edit="'+key+'"]');
     disp.style.cursor='pointer'; disp.title='Click to edit (this mailing only)';
@@ -8639,10 +8684,15 @@
       f.valid = (f.value !== '');
       disp.textContent = f.value || '';
       disp.classList.toggle('is-empty', !f.value);
+      disp.classList.toggle('muted', false); // not used for empties anymore; flag comes from .invalid
       disp.style.display=''; edit.style.display='none';
       if(f.gate){
-        f.checked=false;
-        if(checkEl) checkEl.classList.remove('on');
+        // Editing a gated field clears its confirmation; user must re-check.
+        f.checked = false;
+        if(checkEl){
+          checkEl.classList.remove('on');
+          checkEl.classList.toggle('disabled', !f.valid); // re-enable once it has a value
+        }
         card.classList.remove('checked');
         card.classList.toggle('invalid', !f.valid);
       }
