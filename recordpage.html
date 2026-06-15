@@ -227,7 +227,7 @@
     }
     /* ── Related Contacts section wrapper ── */
     #rcSectionWrapper {
-      padding: 12px 16px 22px 30px;
+      padding: 12px 16px 80px 30px;
     }
 
     /* ── Smooth entry: section head gets bottom padding not a border ── */
@@ -4648,7 +4648,7 @@
     const RC_FIELD_EDIT_CFG = {
       sellerMotivation: { type:'select', opts:["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'], columnId:'dropdown_mkzspsm2' },
       ownerStatus:      { type:'select', opts:['Yes','Possibly','No'], columnId:'color_mktsdfhd' },
-      contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To– Not productive','Text Conversation','Texted – Awaiting Reply'], columnId:'dropdown_mkzwr0f3' },
+      contactOutcome:   { type:'select', opts:['Spoke To - Has No Info','Spoke To – Productive','Spoke To– Not productive','Text Conversation','Texted – Awaiting Reply','Mailer Sent'], columnId:'dropdown_mkzwr0f3' },
       phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzfhq2' },
       phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzdvd2' },
       phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzw44e' },
@@ -4681,7 +4681,7 @@
       const optsAttr = cfg.opts ? `data-opts="${cfg.opts.join('|')}"` : '';
       const isEmpty = !displayVal || displayVal === '—';
       const cls = (flagged && isEmpty) ? 'rc-missing-flag' : (extraClass || '');
-      const label = isEmpty ? '—' : displayVal;
+      const label = isEmpty ? '' : displayVal;
       return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
         <span class="rc-value ${cls}">${escapeHtml(label)}</span><svg class="rc-edit-icon" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>`;
@@ -4709,7 +4709,7 @@
       const cfg = RC_FIELD_EDIT_CFG[field] || {type:'text'};
       const optsAttr = cfg.opts ? `data-opts="${cfg.opts.join('|')}"` : '';
       return `<div class="rc-editable" data-edit-field="${field}" data-edit-type="${cfg.type}" ${optsAttr}>
-        <span class="rc-missing-text">—</span><svg class="rc-edit-icon" viewBox="0 0 24 24" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="rc-missing-text"></span><svg class="rc-edit-icon" viewBox="0 0 24 24" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>`;
     }
 
@@ -4755,12 +4755,13 @@
 
     function rcStyledDropdown(value, opts, field, placeholder, alwaysUp, flagged){
       const current = rcHasVal(value) ? value : null;
+      const ph = (placeholder === '—') ? '' : placeholder;
       const optHtml = opts.map(o =>
         `<button class="rc-status-opt${o===current?' current':''}" data-action="setfield" data-field="${field}" data-val="${escapeHtml(o)}">${escapeHtml(o)}</button>`
       ).join('');
       const emptyLabel = (flagged && !current)
-        ? `<span style="color:#bf8b8b;font-weight:400">${placeholder}</span>`
-        : `<span style="color:#b0b8c4;font-weight:400">${placeholder}</span>`;
+        ? `<span style="color:#bf8b8b;font-weight:400">${ph}</span>`
+        : `<span style="color:#b0b8c4;font-weight:400">${ph}</span>`;
       return `<div class="rc-status-wrapper">
         <button class="rc-status-btn rc-status-btn--nodot" data-action="openstatus">
           <span class="rc-status-row">${current ? escapeHtml(current) : emptyLabel}</span>${RC_CHEV_SVG}
@@ -5214,13 +5215,13 @@
                 const correct = phones.filter(p => p.num && String(p.status||'').toLowerCase().includes('correct'));
                 const toShow = correct.length > 0 ? correct : phones.filter(p => p.num);
                 const addrHtml = '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">Address</span><div class="rc-value">' + rcEditableEl('address', (c.address&&c.address!=='Unknown'&&c.address!=='—')?c.address:'—','multiline') + '</div></div></div>';
+                const outcomeHtml = '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">Contact Outcome</span><div class="rc-value">' + rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To– Not productive','Text Conversation','Texted – Awaiting Reply','Mailer Sent'],'contactOutcome','') + '</div></div></div>';
                 const phoneFieldHtml = (p) => '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">' + p.label + '</span><div class="rc-value">' + rcPhoneRowHtml(p.num,p.status,p.field) + '</div></div></div>';
                 const rows = [];
-                // Row 1: Address | Phone 1 (or empty if no phones)
-                const first = toShow[0];
-                rows.push('<div class="rc-row">' + addrHtml + (first ? phoneFieldHtml(first) : '<div class="rc-field"></div>') + '</div>');
-                // Remaining phones, two per row
-                for(let i=1;i<toShow.length;i+=2){
+                // Row 1: Address | Contact Outcome
+                rows.push('<div class="rc-row">' + addrHtml + outcomeHtml + '</div>');
+                // Phones, two per row
+                for(let i=0;i<toShow.length;i+=2){
                   const left = toShow[i];
                   const right = toShow[i+1];
                   const rightHtml = right ? phoneFieldHtml(right) : '<div class="rc-field"></div>';
@@ -5361,7 +5362,7 @@
                 <div class="rc-field rc-field--key">
                   <div class="rc-field-inner">
                   <span class="rc-label">Contact Outcome</span>
-                  <div class="rc-value">${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To– Not productive','Text Conversation','Texted – Awaiting Reply'],'contactOutcome','—')}</div>
+                  <div class="rc-value">${rcStyledDropdown(c.contactOutcome,['Spoke To - Has No Info','Spoke To – Productive','Spoke To– Not productive','Text Conversation','Texted – Awaiting Reply','Mailer Sent'],'contactOutcome','—')}</div>
                   </div>
                 </div>
               </div>
