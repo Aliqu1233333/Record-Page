@@ -4819,13 +4819,17 @@
       const optHtml = opts.map(o =>
         `<button class="rc-status-opt${o===status?' current':''}" data-action="setfield" data-field="${statusField}" data-val="${o}">${o}</button>`
       ).join('');
-      const dispLabel = (status && status !== "—") ? status : '<span class="rc-ph-disp-empty">Set disposition</span>';
+      const hasStatus = status && status !== "—";
+      const clearHtml = hasStatus
+        ? `<button class="rc-status-opt rc-status-opt-clear" data-action="setfield" data-field="${statusField}" data-val="—" style="color:#e57373;border-top:1px solid #f3f4f6;margin-top:2px;">Clear</button>`
+        : '';
+      const dispLabel = hasStatus ? status : '<span class="rc-ph-disp-empty">Set disposition</span>';
       return `<div class="rc-phone-row">
         <span class="rc-ph-num">${escapeHtml(phone)}</span>
         <span class="rc-ph-dot">·</span>
         <div class="rc-status-wrapper rc-ph-disp-wrapper">
           <button class="rc-ph-disp-btn" data-action="openstatus">${dispLabel}${RC_CHEV_SVG}</button>
-          <div class="rc-status-dropdown always-up">${optHtml}</div>
+          <div class="rc-status-dropdown always-up">${optHtml}${clearHtml}</div>
         </div>
       </div>`;
     }
