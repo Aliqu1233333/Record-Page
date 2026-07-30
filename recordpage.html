@@ -2322,39 +2322,37 @@
     /* Name row — separated from the field values by a hairline rule rather
        than a filled band. The rule matches .rctgt-person's own border colour
        so the card reads as one surface with a divider, not two stacked
-       blocks. */
+       blocks. No icon here: the widget header above already carries one, and
+       repeating it made the card read as a header inside a header. */
     .rctgt-top {
       display: flex;
-      align-items: center;
-      gap: 11px;
+      flex-direction: column;
+      align-items: flex-start;
       margin-bottom: 16px;
-      /* Horizontal padding must match .rctgt-fields (18px) so the crown badge
-         and the field labels below it share one left edge. Vertical padding is
-         symmetric. */
+      /* Horizontal padding matches .rctgt-fields (18px) so the name and the
+         field labels below it share one left edge. */
       padding: 13px 18px;
       background: transparent;
       border-bottom: 1px solid #e5e7eb;
     }
-    /* Same crown badge used beside a confirmed owner's name in their record
-       header (.rc-det-icon.owner), scaled down to suit the card. */
-    .rctgt-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #F4A623;
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-      line-height: 0;
+    /* Small subheader beneath the name, mirroring .rcrel-sub in the widget
+       header above so the two read as the same kind of label. */
+    .rctgt-sub {
+      display: block;
+      margin-top: 2px;
+      font-size: 11px;
+      font-weight: 400;
+      color: #9aa3af;
+      line-height: 1.3;
+      letter-spacing: .01em;
     }
-    .rctgt-badge svg { width: 15px; height: 15px; display: block; }
     .rctgt-name {
       font-size: 17px;
       font-weight: 500;
       color: #032D60;
       letter-spacing: -0.005em;
       line-height: 1.25;
-      flex: 1;
+      max-width: 100%;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
@@ -5029,9 +5027,6 @@
     window.scheduleSilentRefresh = scheduleSilentRefresh;
 
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
-
-
-
     /* Update marker → floating popup (rendered at body level so it's never
        clipped by the table's scroll container). Hover + focus + tap all open
        it; it flips above/below the marker based on available viewport space. */
@@ -6078,9 +6073,6 @@
         ? `onclick="rcOpenById('${escapeHtml(String(t.pulseId))}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcOpenById('${escapeHtml(String(t.pulseId))}');}"`
         : '';
 
-      // Same crown mark shown beside a confirmed owner's name in their header.
-      const OWNER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>';
-
       // Expanded by default — matches the Related Contacts list card.
       return `<div class="rcrel-card rctgt-card rcrel-open">
         <div class="rcrel-header" role="button" tabindex="0" aria-expanded="true"
@@ -6096,8 +6088,8 @@
         <div class="rcrel-body">
           <div class="rctgt-person" ${openAttr}>
             <div class="rctgt-top">
-              <span class="rctgt-badge" aria-hidden="true">${OWNER_SVG}</span>
               <div class="rctgt-name">${escapeHtml(t.name)}</div>
+              <span class="rctgt-sub">Lead</span>
             </div>
             <div class="rctgt-fields">
               <div class="rctgt-field">
