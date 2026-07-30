@@ -1941,22 +1941,36 @@
       line-height: 1.3;
     }
 
-    /* Rounded "New" button — mirrors the Cosmos related-list action */
-    .rcrel-new {
-      flex-shrink: 0;
-      font-family: var(--font);
-      font-size: 12.5px;
-      font-weight: 500;
-      color: #0176d3;
+    /* Bottom-centered "Add Contact +" button — mirrors the Lead Milestones
+       .ms-past-toggle pattern so both widgets end the same way. */
+    .rcrel-add-bar {
+      display: flex;
+      justify-content: center;
+      border-top: 1px solid #e5e7eb;
+      padding: 2px 12px 4px;
+    }
+    .rcrel-add-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 10px auto 4px;
+      padding: 7px 16px;
       background: #ffffff;
       border: 1px solid #dbe0e6;
       border-radius: 999px;
-      padding: 5px 12px;
+      color: #0176d3;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       transition: background 0.12s ease, border-color 0.12s ease;
     }
-    .rcrel-new:hover { background: #f3f8fd; border-color: #0176d3; }
-    .rcrel-new:active { transform: translateY(1px); }
+    .rcrel-add-btn:hover { background: #f3f8fd; border-color: #0176d3; }
+    .rcrel-add-btn:active { transform: translateY(1px); }
+    .rcrel-add-plus { width: 14px; height: 14px; flex-shrink: 0; }
+    /* While the add form is open there is nothing left to open — hide the bar. */
+    .rcrel-card:has(.rcrel-form.rcrel-form-open) .rcrel-add-bar { display: none; }
 
     /* Circular chevron button */
     .rcrel-toggle {
@@ -1995,7 +2009,7 @@
     @media (prefers-reduced-motion: reduce) {
       .rcrel-card.rcrel-open .rcrel-body { animation: none; }
       .rcrel-toggle svg { transition: none; }
-      .rcrel-new:active { transform: none; }
+      .rcrel-add-btn:active { transform: none; }
     }
 
     /* ── Table — fixed layout so it always fits the panel ── */
@@ -2036,8 +2050,8 @@
     .rcrel-table tbody td {
       font-size: 12.5px;
       color: #181818;
-      padding: 6px 9px;
-      height: 44px;
+      padding: 8px 9px;
+      height: 50px;
       border-bottom: 1px solid #e5e5e5;
       vertical-align: middle;
       background: #fff;
@@ -2047,14 +2061,24 @@
     .rcrel-table tbody tr:last-child td { border-bottom: none; }
     .rcrel-table tbody tr:hover td { background: #f3f3f3; }
 
-    /* Column widths — sum to 100% so nothing overflows */
-    .rcrel-c-name   { width: 40%; }
-    .rcrel-c-status { width: 35%; }
-    .rcrel-c-phone  { width: 25%; }
+    /* Column widths — sum to 100% so nothing overflows. Phone gets a little
+       more room now that it renders a point larger. */
+    .rcrel-c-name   { width: 38%; }
+    .rcrel-c-status { width: 33%; }
+    .rcrel-c-phone  { width: 29%; }
+
+    /* Name column sat hard against the panel edge — pull it inward, and give
+       the phone column matching room on the right so nothing reads cramped. */
+    .rcrel-table thead th.rcrel-c-name,
+    .rcrel-table tbody td.rcrel-c-name { padding-left: 16px; }
+    .rcrel-table thead th.rcrel-c-phone,
+    .rcrel-table tbody td.rcrel-c-phone { padding-right: 14px; }
+    .rcrel-table thead th.rcrel-c-status,
+    .rcrel-table tbody td.rcrel-c-status { padding-left: 11px; padding-right: 11px; }
 
     /* Name cell — name on top, relationship underneath */
     .rcrel-name {
-      font-size: 13px;
+      font-size: 13.7px;
       color: #0176d3;
       font-weight: 400;
       line-height: 1.3;
@@ -2075,7 +2099,7 @@
 
     .rcrel-phone {
       display: block;
-      font-size: 12px;
+      font-size: 13.3px;
       color: #181818;
       text-decoration: none;
       white-space: nowrap;
@@ -2087,9 +2111,12 @@
     /* Slightly tighter pill so longer statuses fit the narrow column */
     .rcrel-status { display: block; overflow: hidden; }
     .rcrel-table .rc-status-pill {
-      font-size: 9.5px;
-      padding: 2px 6px;
+      font-size: 10.8px;
+      padding: 3px 8px;
       max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ── Add-contact form — rounded inline panel ── */
@@ -2249,21 +2276,35 @@
     /* ══════════════════════════════════════════════════════
        TARGETED CONTACT — single-person card (not a table)
        ══════════════════════════════════════════════════════ */
-    .rctgt-icon { background: #5867e8; }
-    .rctgt-icon svg { width: 18px; height: 18px; }
+    /* The bullseye artwork is already centred on its viewBox, so the visible
+       offset came from the icon being laid out inline (baseline alignment +
+       line-height). Grid placement removes both variables. */
+    .rctgt-icon {
+      background: #5867e8;
+      display: grid;
+      place-items: center;
+      line-height: 0;
+    }
+    .rctgt-icon svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+      margin: 0;
+    }
 
     .rctgt-person {
       margin: 12px;
-      padding: 16px 16px 20px;
+      padding: 0 0 20px;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       background: #ffffff;
+      /* Clips the header band to the card's rounded corners */
+      overflow: hidden;
       transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
     }
     .rctgt-person[role="button"] { cursor: pointer; }
     .rctgt-person[role="button"]:hover {
       border-color: #5867e8;
-      background: #fbfbff;
       box-shadow: 0 1px 4px rgba(88,103,232,.12);
     }
     .rctgt-person[role="button"]:focus-visible {
@@ -2271,49 +2312,61 @@
       outline-offset: 1px;
     }
 
+    /* Name band — sections the identity off from the field values and gives
+       the card the hierarchy it was missing. */
     .rctgt-top {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      padding: 20px 18px 15px;
+      background: #f3f3f3;
+      border-bottom: 1px solid #dcdfe3;
     }
     .rctgt-name {
-      font-size: 18.5px;
-      font-weight: 400;
-      color: #0176d3;
-      line-height: 1.25;
+      font-size: 20px;
+      font-weight: 600;
+      color: #032D60;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      transition: color 0.12s ease;
     }
-    .rctgt-person[role="button"]:hover .rctgt-name { text-decoration: underline; }
+    /* Still clearly clickable, without spending link-blue on the resting state */
+    .rctgt-person[role="button"]:hover .rctgt-name {
+      color: #0176d3;
+      text-decoration: underline;
+    }
 
     .rctgt-fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px 14px;
+      gap: 16px 14px;
+      padding: 0 18px;
     }
     .rctgt-field { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
     .rctgt-field-full { grid-column: 1 / -1; }
-    /* Column-header grey, matching the other section tables */
+    /* Field names sit quietly under the name — the values carry the weight */
     .rctgt-label {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 11.5px;
+      font-weight: 500;
       letter-spacing: 0.01em;
       text-transform: none;
-      color: #444;
+      color: #6b7280;
       line-height: 1.2;
     }
     .rctgt-value {
-      font-size: 13px;
+      font-size: 13.5px;
       color: #181818;
       line-height: 1.4;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .rctgt-value .rcrel-phone { font-size: 13px; }
+    .rctgt-value .rcrel-phone { font-size: 13.5px; }
     .rctgt-value .rc-status-pill { font-size: 10.5px; padding: 2px 8px; }
     /* ── Activity Widget ── */
     .rc-aw-pill-row {
@@ -4902,10 +4955,17 @@
       // An inline field/textarea is open, or a modal/note dialog is active.
       if (document.querySelector('.inline-input, .inline-textarea, .rc-inline-edit')) return true;
       if (document.querySelector('.rc-update-module.active')) return true;
+      /* The table-view cell editor, the inline "Add a contact" row and the
+         Related Contacts add form were invisible to this check, so a refresh
+         could land mid-entry and wipe a half-filled row. */
+      if (document.querySelector('.rct-cell-editable.rct-editing')) return true;
+      if (document.querySelector('.rct-add-row.rct-add-active, .rct-add-active')) return true;
+      if (document.querySelector('.rcrel-form.rcrel-form-open')) return true;
+      if (document.querySelector('.rc-status-dropdown.open')) return true;
       const noteOverlay = document.getElementById('noteModalOverlay');
       if (noteOverlay && noteOverlay.classList.contains('active')) return true;
       const ae = document.activeElement;
-      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return true;
+      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT' || ae.isContentEditable)) return true;
       return false;
     }
 
@@ -5120,6 +5180,46 @@
     let rcContactsById = {};  // pulseId → mapped contact, for Related To lookups
 
     const _rcWebhookLastFired = {};
+
+    /* ── PENDING-WRITE GUARD ───────────────────────────────────────────────
+       Every edit writes optimistically to the local contact object and then
+       fires a webhook. A silent refresh follows. If Make/monday hasn't
+       committed the write yet, that refresh returns the OLD value and
+       rcPopulateFromPayload rebuilds the contact objects from it — silently
+       wiping what the user just typed. Nothing is re-sent, so the page shows
+       a cleared field while monday still holds the previous value.
+
+       This map remembers, per contact + field, what we last wrote locally.
+       rcPopulateFromPayload re-applies anything the server payload hasn't
+       caught up to yet. Entries expire after RC_PENDING_TTL_MS or as soon as
+       the server echoes the value back, whichever comes first. */
+    const RC_PENDING_TTL_MS = 60000;
+    const _rcPendingWrites = {};   // `${pulseId}::${field}` → { value, ts }
+
+    function rcMarkPending(pulseId, field, value){
+      if(pulseId == null || !field) return;
+      _rcPendingWrites[`${pulseId}::${field}`] = { value: value, ts: Date.now() };
+    }
+
+    // Re-applies still-pending local edits on top of a freshly mapped contact.
+    function rcApplyPendingWrites(mapped){
+      if(!mapped || mapped.pulseId == null) return mapped;
+      const now = Date.now();
+      const prefix = `${mapped.pulseId}::`;
+      Object.keys(_rcPendingWrites).forEach(key => {
+        if(key.indexOf(prefix) !== 0) return;
+        const entry = _rcPendingWrites[key];
+        const field = key.slice(prefix.length);
+        // Expired, or the server has caught up — drop the guard.
+        if(now - entry.ts > RC_PENDING_TTL_MS){ delete _rcPendingWrites[key]; return; }
+        if(String(mapped[field] ?? '') === String(entry.value ?? '')){ delete _rcPendingWrites[key]; return; }
+        mapped[field] = entry.value;
+      });
+      // Keep derived flags consistent with any re-applied status.
+      mapped.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(mapped.status);
+      return mapped;
+    }
+
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
       const key = `${pulseId}::${columnId}`;
       const now = Date.now();
@@ -5132,8 +5232,10 @@
           body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue })
         });
         // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
-        // without a manual refresh.
-        if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
+        // without a manual refresh. 2.5s was shorter than a Make → monday
+        // round trip, so the re-read routinely came back with the pre-edit
+        // value; 7s plus the pending-write guard above stops the flicker.
+        if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh(7000);
       } catch(err) { console.warn("RC webhook error:", err); }
     }
 
@@ -5210,6 +5312,12 @@
       status:           { type:'select', columnId:'status_Mjj2xjsq' },
     };
 
+    /* Optional dedicated "Offer Made" checkbox column in monday. Left null
+       because no such column ID exists in this config — see the offer toggle
+       handler for how Offer Made is persisted instead. Paste a real column ID
+       here (e.g. 'checkbox_xxxxxxx') to have it written directly as well. */
+    const RC_OFFER_MADE_COLUMN_ID = null;
+
     // Returns the correct monday.com column ID for a given field key,
     // taking into account which board the contact (subitem) belongs to.
     function rcGetColumnId(field, contactBoardId) {
@@ -5260,7 +5368,7 @@
       </div>`;
     }
 
-    const RC_QUALIFYING_STATUSES = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer'];
+    const RC_QUALIFYING_STATUSES = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'];
     const RC_READINESS_OWNER = [
       { field:'sellerMotivation', label:'Seller motivation', sub:'Identify what the Seller Motivation is', actionLabel:'Add' },
       { field:'ownerStatus',      label:'Owner status',      sub:"Identify the Lead's Ownership Status",  actionLabel:'Set' },
@@ -5426,7 +5534,13 @@
 
       // "Most Recent Update" now surfaces in the Upcoming & Overdue section
       // (see rcMostRecentUpdateRow); it is intentionally not added here.
-      if (c.lastContact && c.lastContact !== '—') {
+      /* "First Contact Made" is gated on the LEAD STATUS reaching Contacted
+         or better — not merely on a contacted date existing. Setting Contact
+         Outcome causes a contacted date to be stamped, which was firing this
+         milestone for contacts that had never actually been reached. */
+      const RC_CONTACTED_OR_BETTER = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'];
+      const hasBeenContacted = RC_CONTACTED_OR_BETTER.includes(String(c.status || '').trim());
+      if (hasBeenContacted && c.lastContact && c.lastContact !== '—') {
         entries.push({ id:'ms-row-contact', expandable:false, iconColor:'#4aad52', iconSvg:PHONE_SVG,  title:'First Contact Made',  subHtml:'You made contact with ' + nameHtml,  dateStr:c.lastContact });
       }
       if (c.offerDate && c.offerDate !== '—') {
@@ -5739,9 +5853,11 @@
 
     // Relationship suggestions for the Add form — free-typing still allowed.
     const RCREL_RELATION_OPTS = [
-      'Brother','Sister','Son','Daughter','Mother','Father','Spouse',
-      'Cousin','Nephew','Niece','Aunt','Uncle','Grandchild','Grandparent',
-      'Friend','Neighbor','Attorney / POA','Executor','Business Partner','Other'
+      'Brother','Sister','Son','Daughter','Spouse',
+      'Cousin','Nephew','Niece','Aunt','Uncle',
+      'Relative','Distant Relative',
+      'Friend','Neighbor','Administrator',
+      'Occupant of Property','Tennant'
     ];
 
     // ── Related To / Targeted Contact resolution ──────────────────────────
@@ -5933,9 +6049,9 @@
         ? `onclick="rcOpenById('${escapeHtml(String(t.pulseId))}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcOpenById('${escapeHtml(String(t.pulseId))}');}"`
         : '';
 
-      // Collapsed by default.
-      return `<div class="rcrel-card rctgt-card">
-        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="false"
+      // Expanded by default — matches the Related Contacts list card.
+      return `<div class="rcrel-card rctgt-card rcrel-open">
+        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="true"
              onclick="rcRelToggle(this)"
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcRelToggle(this);}">
           <span class="rcrel-icon rctgt-icon">${TARGET_SVG}</span>
@@ -5989,9 +6105,10 @@
       const relationOpts = RCREL_RELATION_OPTS
         .map(o => `<div class="rcrel-combo-opt" onmousedown="rcRelComboPick(event,this)">${escapeHtml(o)}</div>`).join('');
 
-      // Collapsed by default — `rcrel-open` is added on click.
-      return `<div class="rcrel-card" data-rcrel="${token}">
-        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="false"
+      // Expanded by default — the list should be readable the moment a
+      // subitem loads. `rcrel-open` is toggled off only by an explicit click.
+      return `<div class="rcrel-card rcrel-open" data-rcrel="${token}">
+        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="true"
              onclick="rcRelToggle(this)"
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcRelToggle(this);}">
           <span class="rcrel-icon">${GROUP_SVG}</span>
@@ -5999,7 +6116,6 @@
             <span class="rcrel-title">Related Contacts <span class="rcrel-count">(${list.length})</span></span>
             <span class="rcrel-sub">${list.length} item${list.length === 1 ? '' : 's'}</span>
           </span>
-          <button type="button" class="rcrel-new" onclick="event.stopPropagation();rcRelOpenForm(this);">New</button>
           <span class="rcrel-toggle">${CHEV_SVG}</span>
         </div>
         <div class="rcrel-body">
@@ -6043,6 +6159,12 @@
             </div>
           </div>
           <div class="rcrel-table-wrap">${rcRelTableHtml(list)}</div>
+          <div class="rcrel-add-bar">
+            <button type="button" class="rcrel-add-btn" onclick="rcRelOpenForm(this)">
+              <span class="rcrel-add-label">Add Contact</span>
+              <svg class="rcrel-add-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
         </div>
       </div>`;
     }
@@ -7156,11 +7278,16 @@
       }
 
       c[field] = newVal;
+      if(field === 'offer') c.offerMade = !!(newVal && newVal !== '—');
 
       const cPulseId = c.pulseId || globalPulseId;
       const cBoardId = c.boardId || boardId;
       const colId = rcGetColumnId(field, cBoardId);
-      if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
+      if(cPulseId && cBoardId){
+        rcMarkPending(cPulseId, field, newVal);
+        if(field === 'offer') rcMarkPending(cPulseId, 'offerMade', c.offerMade);
+        fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
+      }
 
       rctOpenEditor = null;   // editor will be removed by the rebuild
 
@@ -7196,13 +7323,35 @@
     // active contact" now that there is no persistent .rc-list-item.active.
     const rcActiveIndex = { owners: null, other: null };
 
+    /* The open contact is identified by pulse ID, not by position. rcOwners /
+       rcOthers are rebuilt from scratch on every refresh and are re-filtered
+       by owner status, so a stored index can silently come to point at a
+       different person (or past the end of the array) — which is why edits
+       sometimes landed on the wrong record or appeared to do nothing. */
+    const rcActiveId = { owners: null, other: null };
+
+    // The live contact object currently open in a pane, resolved fresh.
+    function rcResolveActive(suffix){
+      const arr = suffix === 'owners' ? rcOwners : rcOthers;
+      const id  = rcActiveId[suffix];
+      if(id != null){
+        const byId = arr.findIndex(c => c && String(c.pulseId) === String(id));
+        if(byId !== -1){ rcActiveIndex[suffix] = byId; return arr[byId]; }
+      }
+      // Fall back to the legacy index for contacts with no pulse ID yet
+      // (e.g. an optimistic row still being created).
+      const idx = rcActiveIndex[suffix];
+      return (idx != null && arr[idx]) ? arr[idx] : null;
+    }
+
     // Returns an object shaped like the old active list item ({dataset:{i}})
     // so legacy handlers continue to work unchanged.
     function rcGetActiveItem(paneId){
       const suffix = paneId.replace('pane-', '');
-      const idx = rcActiveIndex[suffix];
-      if(idx == null) return null;
-      return { dataset: { i: String(idx) }, classList: { add(){}, remove(){} } };
+      const live = rcResolveActive(suffix);
+      if(!live) return null;
+      const arr = suffix === 'owners' ? rcOwners : rcOthers;
+      return { dataset: { i: String(arr.indexOf(live)) }, classList: { add(){}, remove(){} } };
     }
     window.rcGetActiveItem = rcGetActiveItem;
 
@@ -7213,9 +7362,11 @@
       const recordView = document.getElementById('recordview-' + suffix);
       if(!recordView) return;
 
-      // Remember the open contact for legacy active-item lookups
+      // Remember the open contact — by pulse ID first (stable across
+      // refreshes), with the index kept only as a fallback.
       const dataArr = suffix === 'owners' ? rcOwners : rcOthers;
       rcActiveIndex[suffix] = dataArr.indexOf(c);
+      rcActiveId[suffix]    = (c && c.pulseId != null) ? String(c.pulseId) : null;
 
       // Inject / refresh the back-bar at the top of the record view
       let backBar = recordView.querySelector('.rc-back-bar');
@@ -7272,8 +7423,8 @@
          ['other',  rcOthers, 'inner-other',  'detail-other',  rcRenderDetailOther]].forEach(([suffix, arr, innerId, detailId, fn]) => {
           const recordView = document.getElementById('recordview-' + suffix);
           if(recordView && recordView.style.display === 'block'){
-            const idx = rcActiveIndex[suffix];
-            if(idx != null && arr[idx]) fn(arr[idx], innerId, detailId);
+            const live = rcResolveActive(suffix);
+            if(live) fn(live, innerId, detailId);
           }
         });
       } catch(e){ console.warn('rcRefreshAfterTaskChange error:', e); }
@@ -7369,7 +7520,18 @@
         overdue,
         sellerMotivation: c.seller_motivation ?? c.sellerMotivation ?? "—",
         offer:            c.offer_amount ?? c.offerAmount ?? (c.offer_made ? "Presented" : "—"),
-        offerMade:        typeof c.offer_made === 'boolean' ? c.offer_made : (String(c.offer_made ?? '').trim().toLowerCase() === 'true'),
+        /* An offer amount on the record IS an offer having been made. Reading
+           the flag from the amount as well as the (often unwritten) offer_made
+           field keeps the checkbox checked after a refresh. */
+        offerMade:        (typeof c.offer_made === 'boolean'
+                            ? c.offer_made
+                            : String(c.offer_made ?? '').trim().toLowerCase() === 'true')
+                          || (() => {
+                               const a = c.offer_amount ?? c.offerAmount ?? '';
+                               if(a === '' || a == null || a === '—') return false;
+                               const n = parseFloat(String(a).replace(/[^0-9.]/g,''));
+                               return !isNaN(n) && n > 0;
+                             })(),
         phone:            formatPhone(c.phone_1 ?? c.phone1 ?? c.phone ?? "—"),
         phoneStatus:      c.phone_1_status ?? c.phone1Status ?? c.phoneStatus ?? "—",
         phone2:           formatPhone(c.phone_2 ?? c.phone2 ?? "—"),
@@ -7439,7 +7601,9 @@
 
     function rcPopulateFromPayload(payload){
       const allContacts = Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : [];
-      const allMapped = allContacts.map(rcMapContact);
+      // Re-apply any edit the user made that the server hasn't echoed back yet,
+      // so a refresh landing mid-write can't blank the field on screen.
+      const allMapped = allContacts.map(rcMapContact).map(rcApplyPendingWrites);
       rcOwners = allMapped.filter(c => c.ownerStatusNorm === "yes");
       rcOthers = allMapped.filter(c => c.ownerStatusNorm !== "yes");
 
@@ -7452,6 +7616,18 @@
       rcUpdateMeta();
       rcBuildList(rcOwners, "list-owners", "inner-owners", "detail-owners", rcRenderDetailOwner, true);
       rcBuildList(rcOthers, "list-other",  "inner-other",  "detail-other",  rcRenderDetailOther, false);
+
+      // The contact objects were just replaced. Any record left open on screen
+      // is now bound to a stale object, so re-render it against the new one —
+      // otherwise the next edit reads from an orphaned copy and appears to
+      // "not save".
+      [['owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner],
+       ['other',  'inner-other',  'detail-other',  rcRenderDetailOther]].forEach(([suffix, innerId, detailId, fn]) => {
+        const recordView = document.getElementById('recordview-' + suffix);
+        if(!recordView || recordView.style.display !== 'block') return;
+        const live = rcResolveActive(suffix);
+        if(live) { try { fn(live, innerId, detailId); } catch(e){ console.warn('RC re-render error:', e); } }
+      });
     }
 
     document.querySelectorAll(".rc-tab").forEach(btn=>{
@@ -7472,9 +7648,7 @@
       if (!note) return;
       const panel = btn.closest('.rc-pane');
       const paneId = panel ? panel.id : '';
-      const dataArr = paneId === 'pane-owners' ? rcOwners : rcOthers;
-      const activeItem = paneId ? rcGetActiveItem(paneId) : null;
-      const contact = activeItem ? dataArr[+activeItem.dataset.i] : null;
+      const contact = paneId ? rcResolveActive(paneId.replace('pane-','')) : null;
       const { boardId, pulseId: globalPulseId } = getRcIds();
       const contactPulseId = contact ? (contact.pulseId || null) : null;
       const contactBoardId = contact ? (contact.boardId || boardId) : boardId;
@@ -7522,11 +7696,15 @@
           const field = wrap.dataset.editField;
           const pane = wrap.closest(".rc-pane");
           if(!pane) return;
-          const dataArr = pane.id === 'pane-owners' ? rcOwners : rcOthers;
-          const activeItem = rcGetActiveItem(pane.id);
-          const c = activeItem ? dataArr[+activeItem.dataset.i] : null;
+          const c = rcResolveActive(pane.id.replace('pane-',''));
           if(!c) return;
-          const rawVal = c[field];
+          let rawVal = c[field];
+          /* Offer amounts are stored raw but displayed as currency. Reverting
+             with the raw value made a saved offer look like it had changed. */
+          if(field === 'offer' && rawVal && rawVal !== '—'){
+            const n = parseFloat(String(rawVal).replace(/[^0-9.]/g,''));
+            if(!isNaN(n)) rawVal = '$' + n.toLocaleString('en-US');
+          }
           const displayVal = (rawVal && rawVal !== '—') ? rawVal : '—';
           const extraCls = field==='offer'?'offer':field==='phone'?'link':'';
           wrap.innerHTML = `<span class="rc-value ${extraCls}">${escapeHtml(displayVal)}</span>${RC_PENCIL_SVG}`;
@@ -7546,14 +7724,39 @@
         // ── "Offer Made" checkbox toggle ──
         if(el.closest("[data-offer-toggle]")){
           e.stopPropagation();
-          const activeItem = rcGetActiveItem(paneId);
-          const c = activeItem ? dataArr[+activeItem.dataset.i] : null;
+          const c = rcResolveActive(paneId.replace('pane-',''));
           if(!c) return;
-          c.offerMade = !c.offerMade;
+          const nowMade = !c.offerMade;
+          c.offerMade = nowMade;
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
-          const colId = rcGetColumnId('offerMade', cBoardId);
-          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, c.offerMade ? 'true' : 'false');
+
+          /* There is no "Offer Made" column ID configured for any board, so
+             rcGetColumnId('offerMade') used to fall through to the literal
+             string "offerMade" and post that as a column ID. monday has no
+             such column, the write silently failed, and the next refresh
+             brought back offer_made:false — which is why the box kept
+             un-checking itself. Offer Made is now persisted through the real
+             Offer Amount column: an amount means an offer was made, clearing
+             the box clears the amount. If you later add a genuine checkbox
+             column in monday, put its ID in RC_OFFER_MADE_COLUMN_ID and it
+             will be written as well. */
+          if(cPulseId && cBoardId){
+            if(RC_OFFER_MADE_COLUMN_ID){
+              rcMarkPending(cPulseId, 'offerMade', nowMade);
+              fireRcWebhook(cPulseId, cBoardId, RC_OFFER_MADE_COLUMN_ID, nowMade ? 'true' : 'false');
+            }
+            if(!nowMade){
+              // Unchecking retracts the offer — clear the stored amount too,
+              // otherwise the box re-checks itself on the next refresh.
+              c.offer = '—';
+              rcMarkPending(cPulseId, 'offer', '—');
+              rcMarkPending(cPulseId, 'offerMade', false);
+              fireRcWebhook(cPulseId, cBoardId, rcGetColumnId('offer', cBoardId), '');
+            } else {
+              rcMarkPending(cPulseId, 'offerMade', true);
+            }
+          }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
           return;
@@ -7639,9 +7842,8 @@
           const field = el.closest("[data-action='inline-save']").dataset.field;
           const wrap  = el.closest(".rc-editable");
           const input = wrap.querySelector(`[data-field="${field}"]`);
-          const activeItem = rcGetActiveItem(paneId);
-          if(!activeItem || !input) return;
-          const c = dataArr[+activeItem.dataset.i];
+          const c = rcResolveActive(paneId.replace('pane-',''));
+          if(!c || !input) return;
           if(input.value && input.value !== "Select…"){
             let newVal = input.value;
             let webhookVal = newVal;
@@ -7675,10 +7877,17 @@
               }
             }
             c[field] = newVal;
+            // Entering an amount means an offer was made — keep the checkbox
+            // and the amount in step so neither can undo the other.
+            if(field === 'offer' && newVal && newVal !== '—') c.offerMade = true;
             const cPulseId = c.pulseId || globalPulseId;
             const cBoardId = c.boardId || boardId;
             const colId = rcGetColumnId(field, cBoardId);
-            if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
+            if(cPulseId && cBoardId){
+              rcMarkPending(cPulseId, field, newVal);
+              if(field === 'offer' && newVal && newVal !== '—') rcMarkPending(cPulseId, 'offerMade', true);
+              fireRcWebhook(cPulseId, cBoardId, colId, webhookVal);
+            }
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
@@ -7688,14 +7897,18 @@
         if(el.closest("[data-action='inline-clear']")){
           e.stopPropagation();
           const field = el.closest("[data-action='inline-clear']").dataset.field;
-          const activeItem = rcGetActiveItem(paneId);
-          if(!activeItem) return;
-          const c = dataArr[+activeItem.dataset.i];
+          const c = rcResolveActive(paneId.replace('pane-',''));
+          if(!c) return;
           c[field] = "—";
+          if(field === 'offer') c.offerMade = false;
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
           const colId = rcGetColumnId(field, cBoardId);
-          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, "");
+          if(cPulseId && cBoardId){
+            rcMarkPending(cPulseId, field, "—");
+            if(field === 'offer') rcMarkPending(cPulseId, 'offerMade', false);
+            fireRcWebhook(cPulseId, cBoardId, colId, "");
+          }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
           return;
@@ -7703,8 +7916,8 @@
 
         if(el.closest("[data-action='inline-cancel']")){
           e.stopPropagation();
-          const activeItem = rcGetActiveItem(paneId);
-          if(activeItem) renderFn(dataArr[+activeItem.dataset.i], innerId, detailId);
+          const c = rcResolveActive(paneId.replace('pane-',''));
+          if(c) renderFn(c, innerId, detailId);
           return;
         }
 
@@ -7712,8 +7925,8 @@
           e.stopPropagation();
           const btn = el.closest("[data-action='setstatus']");
           const newStatus = btn.dataset.val;
-          const activeItem = rcGetActiveItem(paneId);
-          if(!activeItem) return;
+          const suffix = paneId.replace('pane-','');
+          if(!rcResolveActive(suffix)) return;
           /* Visual press feedback on the clicked chevron */
           btn.style.filter = 'brightness(0.82)';
           btn.style.transform = 'scale(0.97)';
@@ -7721,14 +7934,23 @@
           setTimeout(() => {
             btn.style.filter = '';
             btn.style.transform = '';
-            const c = dataArr[+activeItem.dataset.i];
+            /* Resolved again inside the timeout: a refresh can land during
+               the 300ms press animation and swap the contact arrays out from
+               under us. Reading a captured index here was what cleared other
+               fields on the record when a stage was clicked. */
+            const c = rcResolveActive(suffix);
+            if(!c) return;
+            const liveArr = suffix === 'owners' ? rcOwners : rcOthers;
             c.status = newStatus;
             c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(newStatus);
             document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
             const cPulseId = c.pulseId || globalPulseId;
             const cBoardId = c.boardId || boardId;
-            if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, rcGetColumnId('status', cBoardId), newStatus);
-            rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
+            if(cPulseId && cBoardId){
+              rcMarkPending(cPulseId, 'status', newStatus);
+              fireRcWebhook(cPulseId, cBoardId, rcGetColumnId('status', cBoardId), newStatus);
+            }
+            rcBuildList(liveArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
             renderFn(c, innerId, detailId);
           }, 300);
           return;
@@ -7739,16 +7961,20 @@
           const btn = el.closest("[data-action='setfield']");
           const field = btn.dataset.field;
           const val = btn.dataset.val;
-          const activeItem = rcGetActiveItem(paneId);
-          if(!activeItem) return;
-          const c = dataArr[+activeItem.dataset.i];
+          const c = rcResolveActive(paneId.replace('pane-',''));
+          if(!c) return;
           c[field] = val;
+          if(field === 'status'){
+            c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(val);
+          }
           document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
-          const cfg = RC_FIELD_EDIT_CFG[field]||{};
           const cPulseId = c.pulseId || globalPulseId;
           const cBoardId = c.boardId || boardId;
           const colId = rcGetColumnId(field, cBoardId);
-          if(cPulseId && cBoardId) fireRcWebhook(cPulseId, cBoardId, colId, val === '—' ? '' : val);
+          if(cPulseId && cBoardId){
+            rcMarkPending(cPulseId, field, val);
+            fireRcWebhook(cPulseId, cBoardId, colId, val === '—' ? '' : val);
+          }
           renderFn(c, innerId, detailId);
           return;
         }
