@@ -1842,7 +1842,7 @@
       min-width: 0;
       background: #ffffff;
       border-radius: 12px;
-      border: 1px solid #e5e5e5;
+      border: none;
       padding: 16px 16px 6px 16px;
     }
     .rc-record-right-panel {
@@ -1850,11 +1850,471 @@
       min-width: 280px;
       background: #ffffff;
       border-radius: 12px;
-      border: 1px solid #e5e5e5;
+      border: none;
       padding: 0 0 24px 0;
       overflow: hidden;
     }
 
+    /* ══════════════════════════════════════════════════════
+       RIGHT COLUMN — stacks the Lead Milestones panel and any
+       cards that sit beneath it (e.g. Related Contacts).
+       ══════════════════════════════════════════════════════ */
+    .rc-right-col {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    /* Inside the column the panel is a block, not a flex child competing for width */
+    .rc-right-col > .rc-record-right-panel {
+      flex: 0 0 auto;
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       RELATED CONTACTS — collapsible related list.
+       Sits ABOVE the Lead Milestones panel in the right column.
+       Fitted to the panel width: no horizontal scrolling.
+       ══════════════════════════════════════════════════════ */
+    .rcrel-card {
+      background: #ffffff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+      overflow: hidden;
+      font-family: var(--font);
+    }
+
+    /* ── Header (click target) ── */
+    .rcrel-header {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 14px;
+      min-height: 58px;
+      cursor: pointer;
+      user-select: none;
+      background: #ffffff;
+      transition: background 0.12s ease;
+    }
+    .rcrel-header:hover { background: #fafafa; }
+    .rcrel-header:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
+    }
+
+    /* Circular icon badge */
+    .rcrel-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #5867e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rcrel-icon svg { width: 17px; height: 17px; display: block; }
+
+    .rcrel-headtext { flex: 1; min-width: 0; display: block; }
+
+    /* Title — regular weight, never bold */
+    .rcrel-title {
+      display: block;
+      font-size: 18px;
+      font-weight: 400;
+      color: #032D60;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rcrel-count { font-weight: 400; color: #032D60; }
+    .rcrel-sub {
+      display: block;
+      margin-top: 1px;
+      font-size: 11px;
+      font-weight: 400;
+      color: #9aa3af;
+      line-height: 1.3;
+    }
+
+    /* Rounded "New" button — mirrors the Cosmos related-list action */
+    .rcrel-new {
+      flex-shrink: 0;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #0176d3;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 999px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .rcrel-new:hover { background: #f3f8fd; border-color: #0176d3; }
+    .rcrel-new:active { transform: translateY(1px); }
+
+    /* Circular chevron button */
+    .rcrel-toggle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #dbe0e6;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .rcrel-header:hover .rcrel-toggle { background: #f3f4f6; border-color: #c9d0d8; }
+    .rcrel-toggle svg {
+      width: 13px;
+      height: 13px;
+      color: #0176d3;
+      /* Collapsed by default — chevron points down */
+      transform: rotate(0deg);
+      transition: transform 0.18s ease;
+    }
+    .rcrel-card.rcrel-open .rcrel-toggle svg { transform: rotate(180deg); }
+
+    /* ── Body ── */
+    .rcrel-body { display: none; }
+    .rcrel-card.rcrel-open .rcrel-body {
+      display: block;
+      animation: rcrelIn 0.18s ease;
+    }
+    @keyframes rcrelIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rcrel-card.rcrel-open .rcrel-body { animation: none; }
+      .rcrel-toggle svg { transition: none; }
+      .rcrel-new:active { transform: none; }
+    }
+
+    /* ── Table — fixed layout so it always fits the panel ── */
+    .rcrel-table {
+      width: 100%;
+      max-width: 100%;
+      /* The page sets a global `table { min-width: 1100px }`; override it or
+         the table blows past this narrow panel. */
+      min-width: 0;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-family: "Salesforce Sans", var(--font), system-ui, sans-serif;
+      font-size: 13px;
+      color: #181818;
+      border-top: 1px solid #e5e5e5;
+    }
+    .rcrel-table thead th {
+      background: #f3f3f3;
+      color: #444;
+      font-weight: 700;
+      font-size: 11px;
+      text-align: left;
+      padding: 7px 9px;
+      height: 32px;
+      border-bottom: 1px solid #c9c9c9;
+      border-right: 1px solid #e5e5e5;
+      vertical-align: middle;
+      user-select: none;
+      letter-spacing: .01em;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .rcrel-table thead th:last-child { border-right: none; }
+    /* The page sets a global `tbody td { font-size:16.5px; padding:14px 16px }`.
+       A direct rule on the cell beats what the table passes down, so these
+       must be declared explicitly or the rows render oversized. */
+    .rcrel-table tbody td {
+      font-size: 12.5px;
+      color: #181818;
+      padding: 6px 9px;
+      height: 44px;
+      border-bottom: 1px solid #e5e5e5;
+      vertical-align: middle;
+      background: #fff;
+      overflow: hidden;
+      transition: background .08s;
+    }
+    .rcrel-table tbody tr:last-child td { border-bottom: none; }
+    .rcrel-table tbody tr:hover td { background: #f3f3f3; }
+
+    /* Column widths — sum to 100% so nothing overflows */
+    .rcrel-c-name   { width: 40%; }
+    .rcrel-c-status { width: 35%; }
+    .rcrel-c-phone  { width: 25%; }
+
+    /* Name cell — name on top, relationship underneath */
+    .rcrel-name {
+      font-size: 13px;
+      color: #0176d3;
+      font-weight: 400;
+      line-height: 1.3;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .rcrel-table tbody tr:hover .rcrel-name { text-decoration: underline; }
+    .rcrel-relation {
+      margin-top: 1px;
+      font-size: 10.5px;
+      color: #706e6b;
+      line-height: 1.3;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .rcrel-phone {
+      display: block;
+      font-size: 12px;
+      color: #181818;
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rcrel-phone:hover { color: #0176d3; text-decoration: underline; }
+    .rcrel-muted { color: #939393; }
+    /* Slightly tighter pill so longer statuses fit the narrow column */
+    .rcrel-status { display: block; overflow: hidden; }
+    .rcrel-table .rc-status-pill {
+      font-size: 9.5px;
+      padding: 2px 6px;
+      max-width: 100%;
+    }
+
+    /* ── Add-contact form — rounded inline panel ── */
+    .rcrel-form {
+      display: none;
+      margin: 12px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+    }
+    .rcrel-form.rcrel-form-open { display: block; }
+    .rcrel-form-title {
+      font-size: 15.5px;
+      font-weight: 600;
+      color: #032D60;
+      margin-bottom: 14px;
+    }
+    .rcrel-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 12px;
+    }
+    .rcrel-field { min-width: 0; position: relative; }
+    .rcrel-field.rcrel-field-full { grid-column: 1 / -1; }
+    /* Field labels — unbolded, proper case, matching the record's field style */
+    .rcrel-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: #444;
+      margin-bottom: 5px;
+    }
+    .rcrel-input, .rcrel-select {
+      width: 100%;
+      font-family: var(--font);
+      font-size: 13px;
+      color: #181818;
+      background: #ffffff;
+      border: 1px solid #b7bcc4;
+      border-radius: 8px;
+      padding: 9px 11px;
+      box-sizing: border-box;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+    .rcrel-input::placeholder { color: #9aa3af; }
+    .rcrel-input:hover, .rcrel-select:hover { border-color: #8f959e; }
+    .rcrel-input:focus, .rcrel-select:focus {
+      outline: none;
+      border-color: #0176d3;
+      box-shadow: 0 0 0 2px rgba(1,118,211,.2);
+    }
+    .rcrel-input.rcrel-invalid { border-color: #dc2626; }
+    .rcrel-input.rcrel-invalid:focus { box-shadow: 0 0 0 2px rgba(220,38,38,.18); }
+
+    /* Combobox (Relationship): input + chevron + suggestion menu */
+    .rcrel-combo { position: relative; }
+    .rcrel-combo .rcrel-input { padding-right: 30px; }
+    .rcrel-combo-chev {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #706e6b;
+      pointer-events: none;
+    }
+    .rcrel-combo-menu {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 40;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      padding: 4px;
+    }
+    .rcrel-combo.rcrel-combo-open .rcrel-combo-menu { display: block; }
+    .rcrel-combo-opt {
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #181818;
+      border-radius: 7px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rcrel-combo-opt:hover, .rcrel-combo-opt.rcrel-combo-active { background: #eaf5ff; }
+
+    .rcrel-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .rcrel-btn-cancel {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      color: #0176d3;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 999px;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .rcrel-btn-cancel:hover { background: #f3f8fd; border-color: #0176d3; }
+    .rcrel-btn-save {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      color: #ffffff;
+      background: #0176d3;
+      border: 1px solid #0176d3;
+      border-radius: 999px;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .rcrel-btn-save:hover { background: #0165b8; border-color: #0165b8; }
+
+    /* Empty state */
+    .rcrel-empty {
+      padding: 20px 14px;
+      font-size: 13px;
+      font-style: italic;
+      color: #9ca3af;
+      text-align: center;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    /* Clickable related-contact rows open that person's profile */
+    .rcrel-row-link { cursor: pointer; }
+    .rcrel-row-pending td { opacity: 0.6; }
+    .rcrel-pending-badge {
+      display: inline-block;
+      margin-left: 7px;
+      padding: 1px 7px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #6b7280;
+      background: #f0f1f3;
+      border-radius: 999px;
+      vertical-align: middle;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       TARGETED CONTACT — single-person card (not a table)
+       ══════════════════════════════════════════════════════ */
+    .rctgt-icon { background: #5867e8; }
+    .rctgt-icon svg { width: 18px; height: 18px; }
+
+    .rctgt-person {
+      margin: 12px;
+      padding: 16px 16px 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #ffffff;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .rctgt-person[role="button"] { cursor: pointer; }
+    .rctgt-person[role="button"]:hover {
+      border-color: #5867e8;
+      background: #fbfbff;
+      box-shadow: 0 1px 4px rgba(88,103,232,.12);
+    }
+    .rctgt-person[role="button"]:focus-visible {
+      outline: 2px solid #5867e8;
+      outline-offset: 1px;
+    }
+
+    .rctgt-top {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .rctgt-name {
+      font-size: 18.5px;
+      font-weight: 400;
+      color: #0176d3;
+      line-height: 1.25;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .rctgt-person[role="button"]:hover .rctgt-name { text-decoration: underline; }
+
+    .rctgt-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 14px;
+    }
+    .rctgt-field { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .rctgt-field-full { grid-column: 1 / -1; }
+    /* Column-header grey, matching the other section tables */
+    .rctgt-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: #444;
+      line-height: 1.2;
+    }
+    .rctgt-value {
+      font-size: 13px;
+      color: #181818;
+      line-height: 1.4;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rctgt-value .rcrel-phone { font-size: 13px; }
+    .rctgt-value .rc-status-pill { font-size: 10.5px; padding: 2px 8px; }
     /* ── Activity Widget ── */
     .rc-aw-pill-row {
       display: flex;
@@ -2381,27 +2841,111 @@
        MILESTONE PANEL — blueprint exact
        ══════════════════════════════════════════════════════ */
     .ms-card-header {
-      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px 6px;
       border-bottom: 1px solid #e5e7eb;
     }
+    .ms-card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #cb65ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ms-card-icon svg { width: 15px; height: 15px; display: block; }
+
+    /* ── Brief record-switch loading overlay ── */
+    #rc-switch-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(243, 243, 243, 0.55);
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.14s ease;
+    }
+    #rc-switch-loader.rc-switch-visible { opacity: 1; pointer-events: all; }
+    .rc-switch-spinner {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 3px solid rgba(1, 118, 211, 0.2);
+      border-top-color: #0176d3;
+      animation: rcSwitchSpin 0.7s linear infinite;
+    }
+    @keyframes rcSwitchSpin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .rc-switch-spinner { animation-duration: 1.4s; }
+      #rc-switch-loader { transition: none; }
+    }
     .ms-card-title {
-      font-family: 'Inter', sans-serif;
-      font-size: 18.5px;
-      font-weight: 700;
+      font-family: var(--font);
+      font-size: 19px;
+      font-weight: 400;
       letter-spacing: 0;
       text-transform: none;
-      color: #122349;
+      color: #032D60;
     }
     .ms-section-label {
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 10px 20px 6px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      color: #9aa3af;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      color: #5e6470;
+    }
+
+    /* Collapsible Past Activities */
+    .ms-past-block { border-top: 1px solid #e5e7eb; margin-top: 4px; }
+    /* Label + timeline are hidden until expanded */
+    .ms-past-block .ms-section-label,
+    .ms-past-block .ms-past-body { display: none; }
+    .ms-past-block.ms-past-open .ms-section-label,
+    .ms-past-block.ms-past-open .ms-past-body { display: block; }
+
+    /* Centered expand/collapse button at the bottom of the widget */
+    .ms-past-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 10px auto 4px;
+      padding: 7px 16px;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 999px;
+      color: #0176d3;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .ms-past-toggle:hover { background: #f3f8fd; border-color: #0176d3; }
+    .ms-past-toggle:active { transform: translateY(1px); }
+    .ms-past-chev {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      transition: transform 0.18s ease;
+    }
+    .ms-past-block.ms-past-open .ms-past-chev { transform: rotate(180deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .ms-past-chev { transition: none; }
+      .ms-past-toggle:active { transform: none; }
     }
     .ms-toggle-btn {
       background: none; border: none; cursor: pointer; padding: 0;
@@ -4330,6 +4874,7 @@
       return{ boardId:params.get('boardId')||params.get('board_id'), pulseId:params.get('pulseId')||params.get('pulse_id')||params.get('itemId')||params.get('item_id') };
     }
 
+
     async function fetchDataFromMake(){
       const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
       showLoading();
@@ -4571,6 +5116,8 @@
 
     let rcOwners = [];
     let rcOthers = [];
+    let rcAllContacts = [];   // all mapped contacts (owners + others)
+    let rcContactsById = {};  // pulseId → mapped contact, for Related To lookups
 
     const _rcWebhookLastFired = {};
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
@@ -4877,10 +5424,8 @@
 
       const entries = [];
 
-      const noteStr = sanitizeMostRecentUpdate(c.lastRecentUpdate);
-      if (noteStr && noteStr.trim() && noteStr !== '—') {
-        entries.push({ id:'ms-row-update', expandable:true,  iconColor:'#4aad52', iconSvg:NOTE_SVG,   title:'Most Recent Update', subHtml:'You logged a note for ' + nameHtml, dateStr:'',            note:noteStr });
-      }
+      // "Most Recent Update" now surfaces in the Upcoming & Overdue section
+      // (see rcMostRecentUpdateRow); it is intentionally not added here.
       if (c.lastContact && c.lastContact !== '—') {
         entries.push({ id:'ms-row-contact', expandable:false, iconColor:'#4aad52', iconSvg:PHONE_SVG,  title:'First Contact Made',  subHtml:'You made contact with ' + nameHtml,  dateStr:c.lastContact });
       }
@@ -4950,6 +5495,107 @@
         function rcBuildTimelineRowsSafe(c) {
       try { return rcBuildTimelineRows(c); } catch(e) { console.warn('Timeline render error:', e); return ''; }
     }
+
+    // Most Recent Update, rendered inside the Upcoming & Overdue section so the
+    // latest note is always visible without opening Past Activities.
+    function rcMostRecentUpdateRow(c){
+      const noteStr = (typeof sanitizeMostRecentUpdate === 'function')
+        ? sanitizeMostRecentUpdate(c.lastRecentUpdate) : (c.lastRecentUpdate || '');
+      if(!noteStr || !String(noteStr).trim() || noteStr === '—') return '';
+      const NOTE_SVG = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>';
+      const nameHtml = (c.name && c.name !== '—') ? `<span class="ms-sub-contact">${escapeHtml(c.name)}</span>` : 'this lead';
+      const uid = 'ms-upd-' + Math.random().toString(36).slice(2,6);
+      return `<div class="ms-activity" id="ms-row-update">
+        <button class="ms-toggle-btn-row" onclick="(function(btn){var d=btn.closest('.ms-activity').querySelector('.ms-detail-card');var h=d.classList.toggle('ms-hidden');btn.querySelector('svg').style.transform=h?'':'rotate(90deg)';})(this)" aria-label="Expand"><svg viewBox="0 0 16 16"><path d="M5.5 3.5l5 4.5-5 4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="ms-icon-circle" style="background:#4aad52;">${NOTE_SVG}</div>
+        <div class="ms-activity-content">
+          <div class="ms-activity-header">
+            <div class="ms-activity-title-row">
+              <span class="ms-activity-title" style="cursor:pointer">Most Recent Update</span>
+            </div>
+            <div class="ms-activity-meta"><span class="ms-activity-timestamp"></span></div>
+          </div>
+          <div class="ms-activity-subtitle">You logged a note for ${nameHtml}</div>
+          <div id="${uid}" class="ms-detail-card ms-hidden"><div class="ms-detail-label">Note</div><div class="ms-detail-value ms-note-body"></div></div>
+        </div>
+      </div>`;
+    }
+
+    // Shared body for the Lead Milestones card, used by both the owner and
+    // other-contact detail views. Upcoming & Overdue is always visible; Past
+    // Activities is collapsed into a click-to-open section.
+    function rcMilestonesBody(c){
+      const MILESTONE_ICON = '<svg viewBox="0 0 520 520" fill="#fff"><path d="M68 20c-26 0-48 22-48 48 0 14 6 27 16 36v364c0 18 14 32 32 32s32-14 32-32V104c10-9 16-22 16-36 0-26-22-48-48-48zm420 86c-126 66-211-47-330-4-6 2-10 8-10 15v206c0 10 10 18 21 15 114-34 199 73 323 5 5-2 8-8 8-14V114c0-7-6-11-12-8z"/></svg>';
+
+      const followUpRow = rcHasVal(c.followUp) ? (() => {
+        const fpDate = parseFlexibleDate(c.followUp);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const isOverdue = fpDate && fpDate < today;
+        const iconColor = isOverdue ? '#dc2626' : '#5ebcb3';
+        const titleColor = isOverdue ? '#dc2626' : '#0176d3';
+        const label = isOverdue ? 'Follow-Up Overdue' : 'Follow-Up Upcoming';
+        const sub = isOverdue ? 'Past due — follow up now' : 'Scheduled follow-up';
+        return `<div class="ms-activity" id="ms-row-followup">
+          <div style="width:20px;margin-right:4px;flex-shrink:0;"></div>
+          <div class="ms-icon-circle" style="background:${iconColor};">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+          </div>
+          <div class="ms-activity-content">
+            <div class="ms-activity-header">
+              <div class="ms-activity-title-row">
+                <span class="ms-activity-title" style="cursor:default;color:${titleColor};">${label}</span>
+              </div>
+              <div class="ms-activity-meta">
+                <span class="ms-activity-timestamp" style="color:${titleColor};">${escapeHtml(c.followUp)}</span>
+              </div>
+            </div>
+            <div class="ms-activity-subtitle">${sub}</div>
+          </div>
+        </div>`;
+      })() : '';
+
+      const hasUpcoming = rcHasVal(c.followUp) || rcTasksForContact(c).length ||
+        (rcMostRecentUpdateRow(c) !== '');
+
+      return `
+        <div class="ms-card-header">
+          <span class="ms-card-icon">${MILESTONE_ICON}</span>
+          <h2 class="ms-card-title">Lead Milestones</h2>
+        </div>
+
+        <div class="ms-section-label">Upcoming &amp; Overdue</div>
+        <div class="ms-upcoming-section">
+          ${rcMostRecentUpdateRow(c)}
+          ${followUpRow}
+          ${rcBuildTaskRows(c)}
+          ${!hasUpcoming ? '<div class="ms-empty-state">No upcoming follow-ups or tasks.</div>' : ''}
+        </div>
+
+        <div class="ms-past-block">
+          <div class="ms-section-label">Past Activities</div>
+          <div class="ms-past-body">
+            <div class="ms-timeline">
+              ${rcBuildTimelineRowsSafe(c)}
+            </div>
+          </div>
+          <button type="button" class="ms-past-toggle" aria-expanded="false"
+                  onclick="rcMsTogglePast(this)">
+            <svg class="ms-past-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <span class="ms-past-toggle-label">Show past activities</span>
+          </button>
+        </div>`;
+    }
+
+    function rcMsTogglePast(btn){
+      const block = btn.closest('.ms-past-block');
+      if(!block) return;
+      const open = block.classList.toggle('ms-past-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      const lbl = btn.querySelector('.ms-past-toggle-label');
+      if(lbl) lbl.textContent = open ? 'Hide past activities' : 'Show past activities';
+    }
+    window.rcMsTogglePast = rcMsTogglePast;
+
 
     /**
      * After rcBuildTimelineRows HTML is injected into `container`,
@@ -5067,6 +5713,574 @@
       return '';
     }
     // ─────────────────────────────────────────────────────────────────────
+
+    /* ══════════════════════════════════════════════════════════════
+       RELATED CONTACTS — collapsible card shown beneath Lead Milestones
+       on an opened subitem (a confirmed owner or an other contact).
+
+       Presentation only. It reads an optional `relatedContacts` array off
+       the subitem; nothing is written back and no existing data flow is
+       touched. Each entry may supply: name, relation, status, phone.
+       ══════════════════════════════════════════════════════════════ */
+
+    // Placeholder list intentionally empty for production — real related
+    // contacts are derived from each contact's "Related To" field.
+    const RCREL_PLACEHOLDERS = [];
+
+    // Registry so the add-form handlers can resolve which subitem a card
+    // belongs to without inlining data into onclick attributes.
+    let __rcRelSeq = 0;
+    const __rcRelReg = {};
+
+    const RCREL_STATUS_OPTS = [
+      'Contacted','Interested In Selling','Negotiations/Review','Accepted Offer',
+      'Closed','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Re-Skiptrace'
+    ];
+
+    // Relationship suggestions for the Add form — free-typing still allowed.
+    const RCREL_RELATION_OPTS = [
+      'Brother','Sister','Son','Daughter','Mother','Father','Spouse',
+      'Cousin','Nephew','Niece','Aunt','Uncle','Grandchild','Grandparent',
+      'Friend','Neighbor','Attorney / POA','Executor','Business Partner','Other'
+    ];
+
+    // ── Related To / Targeted Contact resolution ──────────────────────────
+    // The whole model runs off one field, `relatedTo` (a pulse ID):
+    //   • A contact WITH relatedTo set is a bridge → their profile shows the
+    //     single Targeted Contact they lead to.
+    //   • A contact WITHOUT relatedTo who is pointed at by others is the target
+    //     → their profile shows those pointers as Related Contacts.
+
+    // The person this contact's "Related To" points at, or null.
+    function rcTargetOf(c){
+      if(!c || c.relatedTo == null) return null;
+      return rcContactsById[String(c.relatedTo)] || null;
+    }
+
+    // Everyone whose "Related To" points at this contact.
+    function rcPointersTo(c){
+      if(!c || c.pulseId == null) return [];
+      const id = String(c.pulseId);
+      return rcAllContacts.filter(o => o && o.relatedTo != null && String(o.relatedTo) === id);
+    }
+
+    // Shapes a mapped contact into the row format the table expects.
+    function rcRelRow(c){
+      const phone = (c.phone && c.phone !== '—') ? c.phone : '';
+      return {
+        pulseId:     c.pulseId,
+        name:        (c.name && c.name !== '—') ? c.name : '—',
+        relation:    (c.relation && c.relation !== '—') ? c.relation : '',
+        status:      (c.status && c.status !== 'New') ? c.status : '',
+        ownerStatus: (c.ownerStatus && c.ownerStatus !== '—') ? c.ownerStatus : '',
+        address:     (c.address && c.address !== '—') ? c.address : '',
+        phone:       phone
+      };
+    }
+
+    // The Related Contacts list for a target: everyone whose "Related To"
+    // points here. Any manually-added rows (session-only) are appended.
+    function rcRelList(c){
+      const pointers = rcPointersTo(c).map(rcRelRow);
+      const added = Array.isArray(c && c.relatedContacts) ? c.relatedContacts : [];
+      return pointers.concat(added);
+    }
+
+    // Open a person's profile by pulse ID, switching tabs if they live in the
+    // other list. Used by both widgets' click-through.
+    function rcOpenById(pulseId){
+      if(pulseId == null) return;
+      const id = String(pulseId);
+      // Brief loading flash so the record→record switch reads as a real
+      // navigation rather than an instant swap. Purely visual (~500ms).
+      rcShowSwitchLoader();
+      setTimeout(() => {
+        try {
+          let idx = rcOwners.findIndex(c => c && String(c.pulseId) === id);
+          if(idx !== -1){
+            rcActivateTab('pane-owners');
+            rcOpenRecord(rcOwners[idx], 'owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner);
+            return;
+          }
+          idx = rcOthers.findIndex(c => c && String(c.pulseId) === id);
+          if(idx !== -1){
+            rcActivateTab('pane-other');
+            rcOpenRecord(rcOthers[idx], 'other', 'inner-other', 'detail-other', rcRenderDetailOther);
+          }
+        } finally {
+          rcHideSwitchLoader();
+        }
+      }, 500);
+    }
+    window.rcOpenById = rcOpenById;
+
+    // ── Brief record-switch loading overlay ───────────────────────────────
+    function rcShowSwitchLoader(){
+      let ov = document.getElementById('rc-switch-loader');
+      if(!ov){
+        ov = document.createElement('div');
+        ov.id = 'rc-switch-loader';
+        ov.innerHTML = '<div class="rc-switch-spinner"></div>';
+        document.body.appendChild(ov);
+      }
+      // force reflow so the fade-in transition runs
+      void ov.offsetWidth;
+      ov.classList.add('rc-switch-visible');
+    }
+    function rcHideSwitchLoader(){
+      const ov = document.getElementById('rc-switch-loader');
+      if(!ov) return;
+      ov.classList.remove('rc-switch-visible');
+    }
+
+    // Programmatically select a tab (mirrors the tab click handler).
+    function rcActivateTab(paneId){
+      const btn = document.querySelector(`.rc-tab[aria-controls="${paneId}"]`);
+      if(!btn) return;
+      document.querySelectorAll('.rc-tab').forEach(b => b.setAttribute('aria-selected','false'));
+      document.querySelectorAll('.rc-pane').forEach(p => p.classList.remove('active'));
+      btn.setAttribute('aria-selected','true');
+      const pane = document.getElementById(paneId);
+      if(pane) pane.classList.add('active');
+    }
+
+    // Builds just the table (or empty state) — re-rendered on its own after an add.
+    function rcRelTableHtml(list){
+      if(!list.length) return '<div class="rcrel-empty">No related contacts yet.</div>';
+
+      const dash = '<span class="rcrel-muted">—</span>';
+
+      const rows = list.map(r => {
+        const name     = String(r && r.name ? r.name : '—');
+        const relation = (r && r.relation && r.relation !== '—') ? String(r.relation) : '';
+        const phone    = (r && r.phone && r.phone !== '—') ? String(r.phone) : '';
+        const status   = (r && r.status && r.status !== '—') ? String(r.status) : '';
+        const pid      = (r && r.pulseId != null) ? String(r.pulseId) : '';
+        const pending  = !!(r && r._pending);
+
+        const phoneCell = phone
+          ? `<a class="rcrel-phone" href="tel:${escapeHtml((typeof formatPhoneForTel === 'function') ? formatPhoneForTel(phone) : String(phone).replace(/\D/g,''))}" title="${escapeHtml(phone)}" onclick="event.stopPropagation();">${escapeHtml(phone)}</a>`
+          : dash;
+
+        const statusCell = status
+          ? ((typeof rctStatusPill === 'function')
+              ? rctStatusPill(status)
+              : `<span class="rc-status-pill pill-noattempt"><span class="rc-pill-dot"></span>${escapeHtml(status)}</span>`)
+          : dash;
+
+        // Rows resolved from real contacts carry a pulse ID and open that
+        // person's profile. Placeholder rows have none and stay static.
+        const clickAttr = (pid && !pending)
+          ? `class="rcrel-row-link" onclick="rcOpenById('${escapeHtml(pid)}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'){rcOpenById('${escapeHtml(pid)}');}"`
+          : (pending ? 'class="rcrel-row-pending"' : '');
+
+        const pendingBadge = pending
+          ? '<span class="rcrel-pending-badge">Creating…</span>'
+          : '';
+
+        return `<tr ${clickAttr}>
+          <td class="rcrel-c-name">
+            <div class="rcrel-name" title="${escapeHtml(name)}">${escapeHtml(name)}${pendingBadge}</div>
+            ${relation ? `<div class="rcrel-relation" title="${escapeHtml(relation)}">${escapeHtml(relation)}</div>` : ''}
+          </td>
+          <td class="rcrel-c-status" title="${escapeHtml(status)}"><span class="rcrel-status">${statusCell}</span></td>
+          <td class="rcrel-c-phone">${phoneCell}</td>
+        </tr>`;
+      }).join('');
+
+      return `<table class="rcrel-table">
+        <thead>
+          <tr>
+            <th class="rcrel-c-name">Name</th>
+            <th class="rcrel-c-status">Lead Status</th>
+            <th class="rcrel-c-phone">Phone</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    // Router: a contact with "Related To" set shows the single Targeted
+    // Contact they lead to; otherwise the Related Contacts list.
+    function rcRelatedContactsCard(c){
+      const target = rcTargetOf(c);
+      if(target) return rcTargetedContactCard(c, target);
+      return rcRelatedListCard(c);
+    }
+
+    // ── Targeted Contact — single rich card for the person this contact
+    //    leads to. Not a table: one person, more fields, click to open. ──
+    function rcTargetedContactCard(c, target){
+      const t = rcRelRow(target);
+
+      const TARGET_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1.4" fill="#fff" stroke="none"></circle></svg>';
+      const CHEV_SVG   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+      const dash = '<span class="rcrel-muted">—</span>';
+      const val  = v => (v && v !== '—') ? escapeHtml(String(v)) : dash;
+
+      const statusHtml = t.status
+        ? ((typeof rctStatusPill === 'function')
+            ? rctStatusPill(t.status)
+            : `<span class="rc-status-pill pill-noattempt"><span class="rc-pill-dot"></span>${escapeHtml(t.status)}</span>`)
+        : dash;
+
+      const phoneHtml = t.phone
+        ? `<a class="rcrel-phone" href="tel:${escapeHtml((typeof formatPhoneForTel === 'function') ? formatPhoneForTel(t.phone) : String(t.phone).replace(/\D/g,''))}" onclick="event.stopPropagation();">${escapeHtml(t.phone)}</a>`
+        : dash;
+
+      const openAttr = t.pulseId != null
+        ? `onclick="rcOpenById('${escapeHtml(String(t.pulseId))}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcOpenById('${escapeHtml(String(t.pulseId))}');}"`
+        : '';
+
+      // Collapsed by default.
+      return `<div class="rcrel-card rctgt-card">
+        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="false"
+             onclick="rcRelToggle(this)"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcRelToggle(this);}">
+          <span class="rcrel-icon rctgt-icon">${TARGET_SVG}</span>
+          <span class="rcrel-headtext">
+            <span class="rcrel-title">Targeted Contact</span>
+            <span class="rcrel-sub">The person this lead helps you reach</span>
+          </span>
+          <span class="rcrel-toggle">${CHEV_SVG}</span>
+        </div>
+        <div class="rcrel-body">
+          <div class="rctgt-person" ${openAttr}>
+            <div class="rctgt-top">
+              <div class="rctgt-name">${escapeHtml(t.name)}</div>
+            </div>
+            <div class="rctgt-fields">
+              <div class="rctgt-field">
+                <span class="rctgt-label">Lead Status</span>
+                <span class="rctgt-value">${statusHtml}</span>
+              </div>
+              <div class="rctgt-field">
+                <span class="rctgt-label">Owner Status</span>
+                <span class="rctgt-value">${val(t.ownerStatus)}</span>
+              </div>
+              <div class="rctgt-field">
+                <span class="rctgt-label">Relationship</span>
+                <span class="rctgt-value">${val(t.relation)}</span>
+              </div>
+              <div class="rctgt-field">
+                <span class="rctgt-label">Phone</span>
+                <span class="rctgt-value">${phoneHtml}</span>
+              </div>
+              <div class="rctgt-field rctgt-field-full">
+                <span class="rctgt-label">Address</span>
+                <span class="rctgt-value">${val(t.address)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function rcRelatedListCard(c){
+      const token = 'rcrel' + (++__rcRelSeq);
+      __rcRelReg[token] = c;
+      const list = rcRelList(c);
+
+      // Group icon supplied by the user — circular badge, #5867e8 background.
+      const GROUP_SVG = '<svg viewBox="0 0 520 520" fill="#fff"><path d="M158 280c-14-21-21-45-21-72 0-46 19-84 49-107a62 62 0 0 0-56-31c-44 0-69 36-69 77 0 22 7 41 22 54 8 8 15 18 15 28s-4 20-29 31c-36 16-69 38-70 71 1 22 15 39 36 39h33c5 0 10-3 13-8 16-29 46-47 71-60 9-4 11-15 6-22zm292-20c-25-11-29-20-29-31s7-21 15-28c15-14 22-32 22-54 0-41-24-77-69-77-26 0-46 13-57 31 30 23 49 61 49 107 0 27-7 51-21 72-5 8-2 18 6 22 25 12 55 31 71 60 3 5 8 8 13 8h33c21 0 35-17 35-39 1-33-32-55-68-71zm-124 73c-27-12-32-23-32-34 0-12 8-23 17-31 16-15 25-36 25-60 0-45-27-84-76-84s-76 39-76 84c0 24 9 45 25 60 9 9 17 20 17 31 0 12-4 22-32 34-40 17-78 36-79 72 0 24 18 44 41 44h208c23 0 41-20 41-44-1-36-39-54-79-72z"/></svg>';
+      const CHEV_SVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+      const relationOpts = RCREL_RELATION_OPTS
+        .map(o => `<div class="rcrel-combo-opt" onmousedown="rcRelComboPick(event,this)">${escapeHtml(o)}</div>`).join('');
+
+      // Collapsed by default — `rcrel-open` is added on click.
+      return `<div class="rcrel-card" data-rcrel="${token}">
+        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="false"
+             onclick="rcRelToggle(this)"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcRelToggle(this);}">
+          <span class="rcrel-icon">${GROUP_SVG}</span>
+          <span class="rcrel-headtext">
+            <span class="rcrel-title">Related Contacts <span class="rcrel-count">(${list.length})</span></span>
+            <span class="rcrel-sub">${list.length} item${list.length === 1 ? '' : 's'}</span>
+          </span>
+          <button type="button" class="rcrel-new" onclick="event.stopPropagation();rcRelOpenForm(this);">New</button>
+          <span class="rcrel-toggle">${CHEV_SVG}</span>
+        </div>
+        <div class="rcrel-body">
+          <div class="rcrel-form">
+            <div class="rcrel-form-title">Add a Related Contact</div>
+            <div class="rcrel-form-grid">
+              <div class="rcrel-field rcrel-field-full">
+                <label>Name</label>
+                <input type="text" class="rcrel-input" data-f="name" placeholder="Full name" autocomplete="off">
+              </div>
+              <div class="rcrel-field rcrel-field-full">
+                <label>Relationship</label>
+                <div class="rcrel-combo">
+                  <input type="text" class="rcrel-input" data-f="relation" placeholder="Select or type…" autocomplete="off"
+                         onfocus="rcRelComboOpen(this)" oninput="rcRelComboFilter(this)"
+                         onkeydown="rcRelComboKey(event,this)">
+                  <svg class="rcrel-combo-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  <div class="rcrel-combo-menu">${relationOpts}</div>
+                </div>
+              </div>
+              <div class="rcrel-field rcrel-field-full">
+                <label>Address</label>
+                <input type="text" class="rcrel-input" data-f="address" placeholder="Street, City, ST ZIP" autocomplete="off">
+              </div>
+              <div class="rcrel-field">
+                <label>Phone 1</label>
+                <input type="text" class="rcrel-input" data-f="phone" placeholder="(000) 000-0000" autocomplete="off">
+              </div>
+              <div class="rcrel-field">
+                <label>Phone 2</label>
+                <input type="text" class="rcrel-input" data-f="phone2" placeholder="(000) 000-0000" autocomplete="off">
+              </div>
+              <div class="rcrel-field rcrel-field-full">
+                <label>Phone 3</label>
+                <input type="text" class="rcrel-input" data-f="phone3" placeholder="(000) 000-0000" autocomplete="off">
+              </div>
+            </div>
+            <div class="rcrel-form-actions">
+              <button type="button" class="rcrel-btn-cancel" onclick="rcRelCloseForm(this)">Cancel</button>
+              <button type="button" class="rcrel-btn-save" onclick="rcRelSaveForm(this)">Add Contact</button>
+            </div>
+          </div>
+          <div class="rcrel-table-wrap">${rcRelTableHtml(list)}</div>
+        </div>
+      </div>`;
+    }
+
+    function rcRelToggle(headerEl){
+      const card = headerEl.closest('.rcrel-card');
+      if(!card) return;
+      const open = card.classList.toggle('rcrel-open');
+      headerEl.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if(!open) rcRelResetForm(card);
+    }
+
+    // "New" → expand the card and reveal the rounded add form.
+    function rcRelOpenForm(btn){
+      const card = btn.closest('.rcrel-card');
+      if(!card) return;
+      card.classList.add('rcrel-open');
+      const header = card.querySelector('.rcrel-header');
+      if(header) header.setAttribute('aria-expanded', 'true');
+      const form = card.querySelector('.rcrel-form');
+      if(form){
+        form.classList.add('rcrel-form-open');
+        const first = form.querySelector('.rcrel-input');
+        if(first) setTimeout(() => first.focus(), 60);
+      }
+    }
+
+    function rcRelResetForm(card){
+      const form = card.querySelector('.rcrel-form');
+      if(!form) return;
+      form.classList.remove('rcrel-form-open');
+      form.querySelectorAll('.rcrel-input').forEach(i => { i.value = ''; i.classList.remove('rcrel-invalid'); });
+      form.querySelectorAll('.rcrel-combo').forEach(rcRelComboClose);
+    }
+
+    function rcRelCloseForm(btn){
+      const card = btn.closest('.rcrel-card');
+      if(card) rcRelResetForm(card);
+    }
+
+    // Adds the row in memory only. No webhook, no write-back — the new entry
+    // lives on the subitem for this session so the layout can be reviewed.
+    // ── Relationship combobox — suggestions with free typing ──────────────
+    function rcRelComboOpen(input){
+      const combo = input.closest('.rcrel-combo');
+      if(combo){ combo.classList.add('rcrel-combo-open'); rcRelComboFilter(input); }
+    }
+    function rcRelComboClose(combo){
+      if(!combo) return;
+      combo.classList.remove('rcrel-combo-open');
+      combo.querySelectorAll('.rcrel-combo-active').forEach(o => o.classList.remove('rcrel-combo-active'));
+    }
+    function rcRelComboFilter(input){
+      const combo = input.closest('.rcrel-combo');
+      if(!combo) return;
+      const q = String(input.value || '').trim().toLowerCase();
+      let anyVisible = false;
+      combo.querySelectorAll('.rcrel-combo-opt').forEach(opt => {
+        const match = !q || opt.textContent.toLowerCase().includes(q);
+        opt.style.display = match ? '' : 'none';
+        if(match) anyVisible = true;
+        opt.classList.remove('rcrel-combo-active');
+      });
+      combo.classList.toggle('rcrel-combo-open', anyVisible);
+    }
+    function rcRelComboPick(e, opt){
+      e.preventDefault(); // fire before blur so the value lands
+      const combo = opt.closest('.rcrel-combo');
+      const input = combo ? combo.querySelector('.rcrel-input') : null;
+      if(input) input.value = opt.textContent;
+      rcRelComboClose(combo);
+    }
+    function rcRelComboKey(e, input){
+      const combo = input.closest('.rcrel-combo');
+      if(!combo) return;
+      const opts = [...combo.querySelectorAll('.rcrel-combo-opt')].filter(o => o.style.display !== 'none');
+      let idx = opts.findIndex(o => o.classList.contains('rcrel-combo-active'));
+      if(e.key === 'ArrowDown'){
+        e.preventDefault(); combo.classList.add('rcrel-combo-open');
+        idx = Math.min(idx + 1, opts.length - 1);
+      } else if(e.key === 'ArrowUp'){
+        e.preventDefault(); idx = Math.max(idx - 1, 0);
+      } else if(e.key === 'Enter'){
+        if(idx >= 0 && opts[idx]){ e.preventDefault(); input.value = opts[idx].textContent; rcRelComboClose(combo); }
+        return;
+      } else if(e.key === 'Escape'){ rcRelComboClose(combo); return; }
+      else return;
+      opts.forEach(o => o.classList.remove('rcrel-combo-active'));
+      if(opts[idx]){ opts[idx].classList.add('rcrel-combo-active'); opts[idx].scrollIntoView({block:'nearest'}); }
+    }
+    // Close any open combo when clicking elsewhere.
+    document.addEventListener('click', e => {
+      if(!e.target.closest('.rcrel-combo')){
+        document.querySelectorAll('.rcrel-combo-open').forEach(rcRelComboClose);
+      }
+    });
+
+    async function rcRelSaveForm(btn){
+      const card = btn.closest('.rcrel-card');
+      if(!card) return;
+      const form = card.querySelector('.rcrel-form');
+      const c    = __rcRelReg[card.dataset.rcrel];
+      if(!form || !c) return;
+      if(btn.dataset.saving === '1') return;   // guard against double-submit
+
+      const get = f => {
+        const el = form.querySelector(`[data-f="${f}"]`);
+        return el ? String(el.value || '').trim() : '';
+      };
+      const nameEl = form.querySelector('[data-f="name"]');
+      const name   = get('name');
+      if(!name){
+        if(nameEl){ nameEl.classList.add('rcrel-invalid'); nameEl.focus(); }
+        return;
+      }
+      if(nameEl) nameEl.classList.remove('rcrel-invalid');
+
+      const relation = get('relation');
+      const address  = get('address');
+      const phone    = get('phone');
+      const phone2   = get('phone2');
+      const phone3   = get('phone3');
+
+      // ── Optimistic row ────────────────────────────────────────────────
+      // Show the new contact immediately (pending) and confirm on success.
+      // Derived pointers always render; manual additions live here.
+      if(!Array.isArray(c.relatedContacts)) c.relatedContacts = [];
+      const optimistic = { name, relation, address, phone, phone2, phone3, _pending: true };
+      c.relatedContacts.push(optimistic);
+
+      const rerender = () => {
+        const list = rcRelList(c);
+        const wrap = card.querySelector('.rcrel-table-wrap');
+        if(wrap) wrap.innerHTML = rcRelTableHtml(list);
+        const cnt = card.querySelector('.rcrel-count');
+        if(cnt) cnt.textContent = `(${list.length})`;
+        const sub = card.querySelector('.rcrel-sub');
+        if(sub) sub.textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+      };
+      rerender();
+      rcRelResetForm(card);
+
+      // ── Create the subitem in Monday via the standard create webhook ──
+      // related_to is the pulse ID of the subitem whose Related Contacts we're
+      // adding to (the record currently open), so Monday maps the new person
+      // straight back to this individual.
+      btn.dataset.saving = '1';
+      const { boardId, pulseId } = getRcIds();
+      const relatedToId = (c.pulseId != null) ? String(c.pulseId) : null;
+
+      const payload = {
+        type:            'create_contact',
+        parent_board_id: boardId || '',
+        parent_pulse_id: pulseId || '',
+        name:            name,
+        related_to:      relatedToId,   // ← new field mapped onto the subitem
+        timestamp:       new Date().toISOString()
+      };
+      if(relation) payload.relationship = relation;
+      if(address)  payload.address      = address;
+      const p1 = phone.replace(/[^0-9+]/g,'');  if(p1) payload.phone_1 = p1;
+      const p2 = phone2.replace(/[^0-9+]/g,''); if(p2) payload.phone_2 = p2;
+      const p3 = phone3.replace(/[^0-9+]/g,''); if(p3) payload.phone_3 = p3;
+
+      let ok = true, newPulseId = null, newBoardId = null;
+      try {
+        const res = await fetch(RC_CREATE_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        // Best-effort read of returned IDs; a CORS-blocked body must not flip
+        // the create to a failure (the send itself already succeeded).
+        try {
+          const data = await res.json();
+          if(data && typeof data === 'object'){
+            newPulseId = data.pulse_id ?? data.pulseId ?? data.item_id ?? data.itemId ?? data.id ?? null;
+            newBoardId = data.board_id ?? data.boardId ?? data.subitem_board_id ?? data.subitemBoardId ?? null;
+            if(newPulseId != null) newPulseId = String(newPulseId);
+            if(newBoardId != null) newBoardId = String(newBoardId);
+          }
+        } catch(parseErr){ console.warn('Could not read create response (likely CORS):', parseErr); }
+      } catch(err){
+        // Make.com frequently omits CORS headers on the *response*, so the
+        // browser reports a network error even though the POST was delivered
+        // and the subitem was created. Matching the existing create flow, we
+        // treat a delivered-but-unreadable send as success rather than
+        // discarding the user's contact. A silent background refresh below
+        // will reconcile with Monday's real state shortly.
+        console.warn('Related-contact create webhook (treating as delivered):', err);
+        ok = true;
+      }
+      btn.dataset.saving = '';
+
+      if(ok){
+        // Confirm the row: clear pending, attach real IDs so it becomes a
+        // clickable, resolvable contact.
+        optimistic._pending = false;
+        if(newPulseId != null){
+          optimistic.pulseId = newPulseId;
+          if(newBoardId != null) optimistic.boardId = newBoardId;
+          // Register so the new person is resolvable/openable like any other.
+          rcContactsById[newPulseId] = optimistic;
+          if(Array.isArray(rcAllContacts)) rcAllContacts.push(optimistic);
+        }
+        rerender();
+        rcRelToastMsg(card, 'Contact added', true);
+        if(typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh(3500);
+      } else {
+        // Roll back the optimistic row on hard failure.
+        const i = c.relatedContacts.indexOf(optimistic);
+        if(i !== -1) c.relatedContacts.splice(i, 1);
+        rerender();
+        rcRelToastMsg(card, 'Could not add contact', false);
+      }
+    }
+
+    // Lightweight inline toast under a widget header.
+    function rcRelToastMsg(card, msg, success){
+      try {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'margin:0 12px 8px;padding:7px 12px;border-radius:8px;font-family:var(--font);font-size:12px;'
+          + (success ? 'background:#e7f5ef;color:#0e7a5a;' : 'background:#fdeaea;color:#b42318;');
+        const body = card.querySelector('.rcrel-body');
+        if(body) body.insertBefore(t, body.firstChild);
+        setTimeout(() => t.remove(), 2600);
+      } catch(e){}
+    }
+
+    window.rcRelToggle    = rcRelToggle;
+    window.rcRelOpenForm  = rcRelOpenForm;
+    window.rcRelCloseForm = rcRelCloseForm;
+    window.rcRelSaveForm  = rcRelSaveForm;
+    window.rcRelComboOpen   = rcRelComboOpen;
+    window.rcRelComboFilter = rcRelComboFilter;
+    window.rcRelComboPick   = rcRelComboPick;
+    window.rcRelComboKey    = rcRelComboKey;
 
     function rcRenderDetailOwner(c, innerId, detailId){
       const det = document.getElementById(detailId);
@@ -5233,57 +6447,12 @@
           </div>
           </div>
           
+          <div class="rc-right-col">
+          <!-- Related Contacts — collapsible related list above Lead Milestones -->
+          ${rcRelatedContactsCard(c)}
           <div class="rc-record-right-panel">
-            <!-- Card header -->
-            <div class="ms-card-header">
-              <h2 class="ms-card-title">Lead Milestones</h2>
-            </div>
-
-            <!-- Upcoming & Overdue label -->
-            <div class="ms-section-label">Upcoming &amp; Overdue</div>
-
-            <!-- Upcoming section -->
-            <div class="ms-upcoming-section">
-              ${rcHasVal(c.followUp) ? (() => {
-                const fpDate = parseFlexibleDate(c.followUp);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const isOverdue = fpDate && fpDate < today;
-                const iconColor = isOverdue ? '#dc2626' : '#5ebcb3';
-                const titleColor = isOverdue ? '#dc2626' : '#0176d3';
-                const label = isOverdue ? 'Follow-Up Overdue' : 'Follow-Up Upcoming';
-                const sub = isOverdue ? 'Past due — follow up now' : 'Scheduled follow-up';
-                return `<div class="ms-activity" id="ms-row-followup">
-                  <div style="width:20px;margin-right:4px;flex-shrink:0;"></div>
-                  <div class="ms-icon-circle" style="background:${iconColor};">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-                  </div>
-                  <div class="ms-activity-content">
-                    <div class="ms-activity-header">
-                      <div class="ms-activity-title-row">
-                        <span class="ms-activity-title" style="cursor:default;color:${titleColor};">${label}</span>
-                      </div>
-                      <div class="ms-activity-meta">
-                        <span class="ms-activity-timestamp" style="color:${titleColor};">${escapeHtml(c.followUp)}</span>
-                      </div>
-                    </div>
-                    <div class="ms-activity-subtitle">${sub}</div>
-                  </div>
-                </div>`;
-              })() : ''}
-              ${rcBuildTaskRows(c)}
-              ${(!rcHasVal(c.followUp) && !rcTasksForContact(c).length) ? '<div class="ms-empty-state">No upcoming follow-ups or tasks.</div>' : ''}
-            </div>
-
-            <!-- Divider -->
-            <div class="ms-section-divider"></div>
-
-            <!-- Past Activities label -->
-            <div class="ms-section-label">Past Activities</div>
-
-            <!-- Timeline rows -->
-            <div class="ms-timeline">
-              ${rcBuildTimelineRowsSafe(c)}
-            </div>
+            ${rcMilestonesBody(c)}
+          </div>
           </div>
 
         </div>`;
@@ -5432,57 +6601,12 @@
           </div>
           </div>
           
+          <div class="rc-right-col">
+          <!-- Related Contacts — collapsible related list above Lead Milestones -->
+          ${rcRelatedContactsCard(c)}
           <div class="rc-record-right-panel">
-            <!-- Card header -->
-            <div class="ms-card-header">
-              <h2 class="ms-card-title">Lead Milestones</h2>
-            </div>
-
-            <!-- Upcoming & Overdue label -->
-            <div class="ms-section-label">Upcoming &amp; Overdue</div>
-
-            <!-- Upcoming section -->
-            <div class="ms-upcoming-section">
-              ${rcHasVal(c.followUp) ? (() => {
-                const fpDate = parseFlexibleDate(c.followUp);
-                const today = new Date(); today.setHours(0,0,0,0);
-                const isOverdue = fpDate && fpDate < today;
-                const iconColor = isOverdue ? '#dc2626' : '#5ebcb3';
-                const titleColor = isOverdue ? '#dc2626' : '#0176d3';
-                const label = isOverdue ? 'Follow-Up Overdue' : 'Follow-Up Upcoming';
-                const sub = isOverdue ? 'Past due — follow up now' : 'Scheduled follow-up';
-                return `<div class="ms-activity" id="ms-row-followup">
-                  <div style="width:20px;margin-right:4px;flex-shrink:0;"></div>
-                  <div class="ms-icon-circle" style="background:${iconColor};">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-                  </div>
-                  <div class="ms-activity-content">
-                    <div class="ms-activity-header">
-                      <div class="ms-activity-title-row">
-                        <span class="ms-activity-title" style="cursor:default;color:${titleColor};">${label}</span>
-                      </div>
-                      <div class="ms-activity-meta">
-                        <span class="ms-activity-timestamp" style="color:${titleColor};">${escapeHtml(c.followUp)}</span>
-                      </div>
-                    </div>
-                    <div class="ms-activity-subtitle">${sub}</div>
-                  </div>
-                </div>`;
-              })() : ''}
-              ${rcBuildTaskRows(c)}
-              ${(!rcHasVal(c.followUp) && !rcTasksForContact(c).length) ? '<div class="ms-empty-state">No upcoming follow-ups or tasks.</div>' : ''}
-            </div>
-
-            <!-- Divider -->
-            <div class="ms-section-divider"></div>
-
-            <!-- Past Activities label -->
-            <div class="ms-section-label">Past Activities</div>
-
-            <!-- Timeline rows -->
-            <div class="ms-timeline">
-              ${rcBuildTimelineRowsSafe(c)}
-            </div>
+            ${rcMilestonesBody(c)}
+          </div>
           </div>
 
         </div>`;
@@ -6267,6 +7391,11 @@
         mailDate:         c.Mailed_Date ?? c.mailed_date ?? c.mailDate ?? c.date_mm48ztkf ?? null,
         postgridId:       c.postgrid_id ?? c.postgridId ?? c.text_mm48kbwa ?? null,
         mailTemplate:     c.Mailer_Template ?? c.mailer_template ?? c.mailTemplate ?? c.text_mm48v7hj ?? null,
+        // The "Related To" column: the pulse ID of the person THIS contact is
+        // a way to reach. When set, this contact is a bridge and their profile
+        // shows a single Targeted Contact card. When empty but others point
+        // here, this contact is the target and shows the Related Contacts list.
+        relatedTo:        c.related_to ?? c.relatedTo ?? c.related_to_id ?? null,
       };
     }
 
@@ -6313,6 +7442,12 @@
       const allMapped = allContacts.map(rcMapContact);
       rcOwners = allMapped.filter(c => c.ownerStatusNorm === "yes");
       rcOthers = allMapped.filter(c => c.ownerStatusNorm !== "yes");
+
+      // Directory for the Related To / Targeted Contact widgets: every mapped
+      // contact keyed by pulse ID, so a card can resolve who points where.
+      rcAllContacts = allMapped;
+      rcContactsById = {};
+      allMapped.forEach(c => { if(c.pulseId != null) rcContactsById[String(c.pulseId)] = c; });
 
       rcUpdateMeta();
       rcBuildList(rcOwners, "list-owners", "inner-owners", "detail-owners", rcRenderDetailOwner, true);
