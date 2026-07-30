@@ -1947,28 +1947,28 @@
       display: flex;
       justify-content: center;
       border-top: 1px solid #e5e7eb;
-      padding: 2px 12px 4px;
+      padding: 0 12px 2px;
     }
     .rcrel-add-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      margin: 10px auto 4px;
-      padding: 7px 16px;
+      gap: 6px;
+      margin: 8px auto 4px;
+      padding: 5px 13px;
       background: #ffffff;
       border: 1px solid #dbe0e6;
       border-radius: 999px;
       color: #0176d3;
       font-family: var(--font);
-      font-size: 12.5px;
+      font-size: 11.8px;
       font-weight: 500;
       cursor: pointer;
       transition: background 0.12s ease, border-color 0.12s ease;
     }
     .rcrel-add-btn:hover { background: #f3f8fd; border-color: #0176d3; }
     .rcrel-add-btn:active { transform: translateY(1px); }
-    .rcrel-add-plus { width: 14px; height: 14px; flex-shrink: 0; }
+    .rcrel-add-plus { width: 12px; height: 12px; flex-shrink: 0; }
     /* While the add form is open there is nothing left to open — hide the bar. */
     .rcrel-card:has(.rcrel-form.rcrel-form-open) .rcrel-add-bar { display: none; }
 
@@ -2111,7 +2111,7 @@
     /* Slightly tighter pill so longer statuses fit the narrow column */
     .rcrel-status { display: block; overflow: hidden; }
     .rcrel-table .rc-status-pill {
-      font-size: 10.8px;
+      font-size: 10.1px;
       padding: 3px 8px;
       max-width: 100%;
       white-space: nowrap;
@@ -2293,8 +2293,12 @@
     }
 
     .rctgt-person {
-      margin: 12px;
-      padding: 0 0 20px;
+      /* Left/right margin matches .rcrel-header's 14px padding so the card
+         edge lines up with the bullseye icon above it (was 12px — another
+         2px offset). Bottom padding matches the band's bottom margin so the
+         field grid sits in an evenly spaced well. */
+      margin: 12px 14px 14px;
+      padding: 0 0 16px;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       background: #ffffff;
@@ -2312,34 +2316,55 @@
       outline-offset: 1px;
     }
 
-    /* Name band — sections the identity off from the field values and gives
-       the card the hierarchy it was missing. */
+    /* Name band — sections the identity off from the field values. The name
+       sits between an initials avatar and the status pill so it reads as a
+       record header rather than a lone string in empty space. */
+    /* Name row — separated from the field values by a hairline rule rather
+       than a filled band. The rule matches .rctgt-person's own border colour
+       so the card reads as one surface with a divider, not two stacked
+       blocks. */
     .rctgt-top {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-      padding: 20px 18px 15px;
-      background: #f3f3f3;
-      border-bottom: 1px solid #dcdfe3;
+      gap: 11px;
+      margin-bottom: 16px;
+      /* Horizontal padding must match .rctgt-fields (18px) so the crown badge
+         and the field labels below it share one left edge. Vertical padding is
+         symmetric. */
+      padding: 13px 18px;
+      background: transparent;
+      border-bottom: 1px solid #e5e7eb;
     }
+    /* Same crown badge used beside a confirmed owner's name in their record
+       header (.rc-det-icon.owner), scaled down to suit the card. */
+    .rctgt-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #F4A623;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+    .rctgt-badge svg { width: 15px; height: 15px; display: block; }
     .rctgt-name {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 500;
       color: #032D60;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
+      letter-spacing: -0.005em;
+      line-height: 1.25;
+      flex: 1;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       transition: color 0.12s ease;
     }
-    /* Still clearly clickable, without spending link-blue on the resting state */
-    .rctgt-person[role="button"]:hover .rctgt-name {
-      color: #0176d3;
-      text-decoration: underline;
-    }
+    .rctgt-top .rc-status-pill { flex-shrink: 0; }
+    /* Colour shift only — the card border and cursor already signal that the
+       whole tile is clickable, and an underlined 17px name read as a raw link. */
+    .rctgt-person[role="button"]:hover .rctgt-name { color: #0176d3; }
 
     .rctgt-fields {
       display: grid;
@@ -2367,7 +2392,10 @@
       text-overflow: ellipsis;
     }
     .rctgt-value .rcrel-phone { font-size: 13.5px; }
-    .rctgt-value .rc-status-pill { font-size: 10.5px; padding: 2px 8px; }
+    /* Lead Status sits beside Owner Status in the same row, so its pill needs
+       comparable weight — at 10.5px against a 13.5px value it read as a
+       lesser, faded field rather than an equal one. */
+    .rctgt-value .rc-status-pill { font-size: 12px; padding: 3px 9px; }
     /* ── Activity Widget ── */
     .rc-aw-pill-row {
       display: flex;
@@ -5003,6 +5031,7 @@
     window.addEventListener('DOMContentLoaded', () => { fetchDataFromMake(); });
 
 
+
     /* Update marker → floating popup (rendered at body level so it's never
        clipped by the table's scroll container). Hover + focus + tap all open
        it; it flips above/below the marker based on available viewport space. */
@@ -6049,6 +6078,9 @@
         ? `onclick="rcOpenById('${escapeHtml(String(t.pulseId))}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcOpenById('${escapeHtml(String(t.pulseId))}');}"`
         : '';
 
+      // Same crown mark shown beside a confirmed owner's name in their header.
+      const OWNER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="#fff"><path d="M418 410H102c-8 0-14 7-14 14v1c0 25 20 45 45 45h255c25 0 45-20 45-45v-1c-1-7-7-14-15-14zm37-308a45 45 0 0 0-29 79 80 80 0 0 1-76 48c-40-2-72-34-74-74l1-19c17-7 29-22 29-42-1-24-21-44-46-44s-45 20-45 45c0 19 12 35 28 42 2 6 2 12 2 19-2 40-34 72-74 74-34 2-64-19-77-48a45 45 0 0 0-29-79c-25 0-45 20-45 45s20 45 45 45l21 160c1 7 7 12 14 12h320c7 0 13-5 14-12l21-160c25 0 45-20 45-45s-20-46-45-46z"/></svg>';
+
       // Expanded by default — matches the Related Contacts list card.
       return `<div class="rcrel-card rctgt-card rcrel-open">
         <div class="rcrel-header" role="button" tabindex="0" aria-expanded="true"
@@ -6064,6 +6096,7 @@
         <div class="rcrel-body">
           <div class="rctgt-person" ${openAttr}>
             <div class="rctgt-top">
+              <span class="rctgt-badge" aria-hidden="true">${OWNER_SVG}</span>
               <div class="rctgt-name">${escapeHtml(t.name)}</div>
             </div>
             <div class="rctgt-fields">
@@ -6105,10 +6138,10 @@
       const relationOpts = RCREL_RELATION_OPTS
         .map(o => `<div class="rcrel-combo-opt" onmousedown="rcRelComboPick(event,this)">${escapeHtml(o)}</div>`).join('');
 
-      // Expanded by default — the list should be readable the moment a
-      // subitem loads. `rcrel-open` is toggled off only by an explicit click.
-      return `<div class="rcrel-card rcrel-open" data-rcrel="${token}">
-        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="true"
+      // Collapsed by default — `rcrel-open` is added on click. (The Targeted
+      // Contact card is the one that opens automatically; this list does not.)
+      return `<div class="rcrel-card" data-rcrel="${token}">
+        <div class="rcrel-header" role="button" tabindex="0" aria-expanded="false"
              onclick="rcRelToggle(this)"
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcRelToggle(this);}">
           <span class="rcrel-icon">${GROUP_SVG}</span>
