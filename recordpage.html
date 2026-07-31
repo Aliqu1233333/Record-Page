@@ -2326,25 +2326,13 @@
        repeating it made the card read as a header inside a header. */
     .rctgt-top {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 16px;
       /* Horizontal padding matches .rctgt-fields (18px) so the name and the
          field labels below it share one left edge. */
-      padding: 13px 18px;
+      padding: 14px 18px;
       background: transparent;
       border-bottom: 1px solid #e5e7eb;
-    }
-    /* Small subheader beneath the name, mirroring .rcrel-sub in the widget
-       header above so the two read as the same kind of label. */
-    .rctgt-sub {
-      display: block;
-      margin-top: 2px;
-      font-size: 11px;
-      font-weight: 400;
-      color: #9aa3af;
-      line-height: 1.3;
-      letter-spacing: .01em;
     }
     .rctgt-name {
       font-size: 17px;
@@ -6089,7 +6077,6 @@
           <div class="rctgt-person" ${openAttr}>
             <div class="rctgt-top">
               <div class="rctgt-name">${escapeHtml(t.name)}</div>
-              <span class="rctgt-sub">Lead</span>
             </div>
             <div class="rctgt-fields">
               <div class="rctgt-field">
