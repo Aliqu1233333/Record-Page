@@ -2293,23 +2293,21 @@
     }
 
     .rctgt-person {
-      /* Left/right margin matches .rcrel-header's 14px padding so the card
-         edge lines up with the bullseye icon above it (was 12px — another
-         2px offset). Bottom padding matches the band's bottom margin so the
-         field grid sits in an evenly spaced well. */
-      margin: 12px 14px 14px;
-      padding: 0 0 16px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
+      /* Elevated surface: no border, soft double shadow, larger radius. The
+         margin matches .rcrel-header's 14px padding so the card lines up with
+         the bullseye icon above it. */
+      margin: 14px;
+      padding: 0 0 20px;
+      border: none;
+      border-radius: 16px;
       background: #ffffff;
-      /* Clips the header band to the card's rounded corners */
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
       overflow: hidden;
-      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      transition: box-shadow 0.12s ease, background 0.12s ease;
     }
     .rctgt-person[role="button"] { cursor: pointer; }
     .rctgt-person[role="button"]:hover {
-      border-color: #5867e8;
-      box-shadow: 0 1px 4px rgba(88,103,232,.12);
+      box-shadow: 0 2px 6px rgba(16,24,40,.10), 0 8px 20px rgba(16,24,40,.07);
     }
     .rctgt-person[role="button"]:focus-visible {
       outline: 2px solid #5867e8;
@@ -2327,12 +2325,12 @@
     .rctgt-top {
       display: flex;
       align-items: center;
-      margin-bottom: 16px;
-      /* Horizontal padding matches .rctgt-fields (18px) so the name and the
-         field labels below it share one left edge. */
-      padding: 14px 18px;
+      justify-content: space-between;
+      gap: 12px;
+      /* Padding matches .rctgt-fields (20px) so the name and the field labels
+         below it share one left edge. Separation is handled by .rctgt-rule. */
+      padding: 18px 20px 15px;
       background: transparent;
-      border-bottom: 1px solid #e5e7eb;
     }
     .rctgt-name {
       font-size: 17px;
@@ -2340,7 +2338,8 @@
       color: #032D60;
       letter-spacing: -0.005em;
       line-height: 1.25;
-      max-width: 100%;
+      /* Shrinks (with ellipsis) before the status pill does */
+      flex: 0 1 auto;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
@@ -2352,11 +2351,19 @@
        whole tile is clickable, and an underlined 17px name read as a raw link. */
     .rctgt-person[role="button"]:hover .rctgt-name { color: #0176d3; }
 
+    /* Hairline between the name row and the field values — structure without
+       adding a filled band. */
+    .rctgt-rule {
+      height: 1px;
+      background: #eef0f3;
+      margin: 0 20px 16px;
+    }
+
     .rctgt-fields {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px 14px;
-      padding: 0 18px;
+      gap: 18px 16px;
+      padding: 0 20px;
     }
     .rctgt-field { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
     .rctgt-field-full { grid-column: 1 / -1; }
@@ -2370,7 +2377,7 @@
       line-height: 1.2;
     }
     .rctgt-value {
-      font-size: 13.5px;
+      font-size: 14px;
       color: #181818;
       line-height: 1.4;
       min-width: 0;
@@ -6077,12 +6084,10 @@
           <div class="rctgt-person" ${openAttr}>
             <div class="rctgt-top">
               <div class="rctgt-name">${escapeHtml(t.name)}</div>
+              ${statusHtml}
             </div>
+            <div class="rctgt-rule"></div>
             <div class="rctgt-fields">
-              <div class="rctgt-field">
-                <span class="rctgt-label">Lead Status</span>
-                <span class="rctgt-value">${statusHtml}</span>
-              </div>
               <div class="rctgt-field">
                 <span class="rctgt-label">Owner Status</span>
                 <span class="rctgt-value">${val(t.ownerStatus)}</span>
