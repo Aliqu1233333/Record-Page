@@ -2904,6 +2904,84 @@
       border: 1px solid #fecaca;
     }
 
+    /* ── Suggestion Toast (in-record, nudges reps to update fields) ──
+       Lighter teal than a standard success toast; sits at the bottom of the
+       open lead detail card and gently suggests the next field to fill. */
+    .rc-suggest-toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 16px 16px 16px;
+      padding: 12px 14px 12px 16px;
+      border-radius: 12px;
+      background: #eafaf5;                 /* light teal — softer than image 1 */
+      border: 1px solid #c3ecdf;
+      box-shadow: 0 1px 3px rgba(11,130,124,0.08);
+      font-family: var(--font);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .rc-suggest-toast.rc-suggest-visible { opacity: 1; transform: translateY(0); }
+    .rc-suggest-toast.rc-suggest-leaving { opacity: 0; transform: translateY(6px); }
+
+    .rc-suggest-icon {
+      flex: 0 0 auto;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #0b827c;                 /* teal circle, like image 1's check */
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rc-suggest-icon svg { width: 15px; height: 15px; display: block; fill: none; stroke: #fff; }
+
+    .rc-suggest-body { flex: 1; min-width: 0; }
+    .rc-suggest-text {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #024d4c;
+      line-height: 1.4;
+    }
+    .rc-suggest-text b { font-weight: 700; }
+    .rc-suggest-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .rc-suggest-btn {
+      appearance: none;
+      border: 1px solid #b7e6d8;
+      background: #ffffff;
+      color: #0b6e69;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .1s ease, border-color .1s ease, transform .06s ease;
+      white-space: nowrap;
+    }
+    .rc-suggest-btn:hover { background: #f2fbf8; border-color: #0b827c; }
+    .rc-suggest-btn:active { transform: translateY(1px); }
+
+    .rc-suggest-close {
+      flex: 0 0 auto;
+      align-self: flex-start;
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #5a8f88;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s ease, color .1s ease;
+    }
+    .rc-suggest-close:hover { background: rgba(11,130,124,0.10); color: #0b827c; }
+    .rc-suggest-close svg { width: 15px; height: 15px; display: block; }
+
     .rc-det-sub .rc-owner-badge {
       display:inline-block; font-size:10.5px; font-weight:600;
       color:#5f6b7a; background:#f3f3f3; border:1px solid #e2e5ea;
@@ -3121,9 +3199,13 @@
     }
 
     /* ══ Lead Status Chevron Track ══ */
+    /* Pull the chevron "tree branch" out of the white card so it sits directly
+       on the grey record body — removes the white-box-on-white-box layering. */
     .ls-chevron-inner {
-      padding: 10px 10px 10px 10px;
-      margin-bottom: 4px;
+      padding: 4px 0 14px 0;
+      margin: -16px -16px 8px -16px;   /* escape the white panel's 16px padding */
+      background: #f3f3f3;             /* match .rc-record-body grey */
+      border-radius: 12px 12px 0 0;
     }
     .ls-chevron-wrap { padding: 0; }
     .ls-chevron-track {
@@ -3133,7 +3215,7 @@
       overflow: hidden;
       border-radius: 20px;
       gap: 0;
-      background: #ffffff;
+      background: #f3f3f3;             /* grey base so pending segments blend in */
     }
     .ls-chev-wrap {
       display: flex;
@@ -3148,13 +3230,14 @@
     .ls-chev-wrap:hover { z-index: 5; }
     .ls-chev-wrap.ls-active-wrap { z-index: 4; }
 
-    /* White outline creates visible 2px gap between segments */
+    /* Grey outline creates a visible 2px gap between segments (matches the
+       grey record body so the track reads as one flush branch, not a box). */
     .ls-chev-wrap::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       clip-path: polygon(0% 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 0% 100%, 10px 50%);
-      background: white;
+      background: #f3f3f3;
       z-index: -1;
       transform: scaleX(1.04) scaleY(1.0);
       transform-origin: right center;
@@ -3242,7 +3325,7 @@
     /* ── Chevron stages — darker done ── */
     .ls-chev.ls-done    { background: #62c97e; color: #0C2912; }
     .ls-chev.ls-active  { background: #1f5eae; color: #ffffff; font-weight: 600; }
-    .ls-chev.ls-pending { background: #f3f3f3; color: #6b7280; }
+    .ls-chev.ls-pending { background: #e4e7ea; color: #6b7280; }
     .ls-chev.ls-mail-alert { background: #fee2e2; color: #991b1b; font-weight: 600; }
     /* Visually separate the read-only Mailer Sent milestone from the clickable stages */
     .ls-chev-wrap.ls-mail-milestone { margin-left: 10px; }
@@ -7957,6 +8040,7 @@
             const c = rcResolveActive(suffix);
             if(!c) return;
             const liveArr = suffix === 'owners' ? rcOwners : rcOthers;
+            const prevStatus = c.status;   // capture before we overwrite it
             c.status = newStatus;
             c.statusOn = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(newStatus);
             document.querySelectorAll(".rc-status-dropdown.open").forEach(d=>d.classList.remove("open"));
@@ -7968,6 +8052,16 @@
             }
             rcBuildList(liveArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
             renderFn(c, innerId, detailId);
+
+            /* Only nudge on a genuine FORWARD move to a new stage — never when
+               re-clicking the current stage or stepping backward. Runs after
+               renderFn so the toast lands in the freshly-rendered card. */
+            const STAGE_ORDER = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'];
+            const wasIdx = STAGE_ORDER.indexOf(prevStatus);
+            const nowIdx = STAGE_ORDER.indexOf(newStatus);
+            if(nowIdx > -1 && nowIdx > wasIdx){
+              setTimeout(() => rcShowSuggestToast(suffix, newStatus), 120);
+            }
           }, 300);
           return;
         }
@@ -7999,6 +8093,185 @@
 
     rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
     rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
+
+    /* ══════════════════════════════════════════════════════════════════
+       SUGGESTION TOAST — gently nudges reps to update the right fields
+       right after a stage change, inside the open lead detail card.
+       Non-blocking: it's a suggestion, always dismissable, never modal.
+       ══════════════════════════════════════════════════════════════════ */
+
+    const RC_SUGGEST_CHECK = '<svg viewBox="0 0 24 24" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    // What to suggest when the lead reaches a given stage. Each action either
+    // opens a field editor ({field:'...'}) or the Write Update box ({update:true}).
+    function rcSuggestFor(newStatus, suffix){
+      const isOwner = suffix === 'owners';
+      switch(newStatus){
+        case 'Contacted':
+          return {
+            text: 'Nice — this lead is now <b>Contacted</b>. Want to log how it went?',
+            actions: [
+              { label: 'Set Contact Outcome', field: 'contactOutcome' },
+              { label: 'Write Update', update: true }
+            ]
+          };
+        case 'Interested In Selling':
+          return {
+            text: 'They\u2019re <b>Interested in Selling</b>. Capture the details while they\u2019re fresh.',
+            actions: [
+              // Seller Motivation only lives on the Confirmed Owners card;
+              // for Other Contacts, nudge Owner Status instead.
+              isOwner
+                ? { label: 'Add Seller Motivation', field: 'sellerMotivation' }
+                : { label: 'Confirm Owner Status', field: 'ownerStatus' },
+              { label: 'Set Follow-Up Date', field: 'followUp' }
+            ]
+          };
+        case 'Negotiations/Review':
+          return {
+            text: 'Moving into <b>Negotiations</b>. Keep the offer details up to date.',
+            actions: [
+              { label: 'Update Offer', field: 'offerStatus' },
+              { label: 'Write Update', update: true }
+            ]
+          };
+        case 'Accepted Offer':
+          return {
+            text: 'Offer <b>Accepted</b> \u2014 log the terms and confirm ownership share.',
+            actions: [
+              { label: 'Set Ownership %', field: 'ownership' },
+              { label: 'Write Update', update: true }
+            ]
+          };
+        default:
+          return null;
+      }
+    }
+
+    // Find the open detail card element for a pane suffix ('owners' | 'other').
+    function rcActiveDetailEl(suffix){
+      const inner = document.getElementById('inner-' + suffix);
+      if(!inner || inner.style.display === 'none') return null;
+      return inner;
+    }
+
+    // Scroll a field into view and open its editor inside the detail card.
+    function rcOpenFieldEditor(detailEl, fieldKey){
+      if(!detailEl) return;
+      let target = null;
+
+      // Styled dropdowns (contactOutcome, sellerMotivation, ownerStatus, offerStatus…)
+      // expose the field on their option buttons; walk up to the wrapper.
+      const opt = detailEl.querySelector('[data-action="setfield"][data-field="' + fieldKey + '"]');
+      if(opt){
+        const wrap = opt.closest('.rc-status-wrapper');
+        if(wrap){
+          const openBtn = wrap.querySelector('[data-action="openstatus"]');
+          target = wrap;
+          rcScrollToField(target);
+          if(openBtn) setTimeout(() => openBtn.click(), 260);
+          rcFlashField(target);
+          return;
+        }
+      }
+
+      // Inline-editable fields (followUp, ownership…) carry data-edit-field.
+      const editable = detailEl.querySelector('.rc-editable[data-edit-field="' + fieldKey + '"]');
+      if(editable){
+        target = editable;
+        rcScrollToField(target);
+        setTimeout(() => editable.click(), 260);
+        rcFlashField(target);
+        return;
+      }
+
+      // Offer combo has no standard hook — just scroll to the Lead Details block.
+      const label = Array.from(detailEl.querySelectorAll('.rc-label'))
+        .find(l => /offer/i.test(l.textContent) && /offerStatus/i.test(fieldKey));
+      if(label){ rcScrollToField(label.closest('.rc-field') || label); rcFlashField(label.closest('.rc-field') || label); }
+    }
+
+    // Open the Write Update composer within the detail card.
+    function rcOpenWriteUpdate(detailEl){
+      if(!detailEl) return;
+      const mod = detailEl.querySelector('.rc-update-module');
+      if(mod){
+        mod.classList.add('active');
+        rcScrollToField(mod);
+        const ta = mod.querySelector('.rc-update-input');
+        if(ta) setTimeout(() => ta.focus(), 220);
+      }
+    }
+
+    function rcScrollToField(el){
+      try { el.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){ try{ el.scrollIntoView(); }catch(_){} }
+    }
+
+    // Brief teal ring to draw the eye to the field the rep should fill.
+    function rcFlashField(el){
+      if(!el) return;
+      const prev = el.style.boxShadow;
+      const prevRadius = el.style.borderRadius;
+      el.style.transition = 'box-shadow .25s ease';
+      el.style.borderRadius = el.style.borderRadius || '8px';
+      el.style.boxShadow = '0 0 0 2px rgba(11,130,124,0.45)';
+      setTimeout(() => { el.style.boxShadow = prev || ''; el.style.borderRadius = prevRadius; }, 1400);
+    }
+
+    // Render (or replace) the suggestion toast at the bottom of the detail card.
+    function rcShowSuggestToast(suffix, newStatus){
+      const cfg = rcSuggestFor(newStatus, suffix);
+      const detailEl = rcActiveDetailEl(suffix);
+      if(!cfg || !detailEl) return;
+
+      // Only one suggestion toast at a time per card.
+      const old = detailEl.querySelector('.rc-suggest-toast');
+      if(old) old.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'rc-suggest-toast';
+
+      const actionsHtml = cfg.actions.map((a, i) =>
+        '<button class="rc-suggest-btn" data-sg-idx="' + i + '">' + a.label + '</button>'
+      ).join('');
+
+      toast.innerHTML =
+        '<div class="rc-suggest-icon">' + RC_SUGGEST_CHECK + '</div>' +
+        '<div class="rc-suggest-body">' +
+          '<div class="rc-suggest-text">' + cfg.text + '</div>' +
+          '<div class="rc-suggest-actions">' + actionsHtml + '</div>' +
+        '</div>' +
+        '<button class="rc-suggest-close" aria-label="Dismiss suggestion">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>';
+
+      // Place it at the very bottom of the record body (below both columns).
+      const body = detailEl.querySelector('.rc-record-body') || detailEl;
+      body.appendChild(toast);
+
+      const dismiss = () => {
+        toast.classList.add('rc-suggest-leaving');
+        setTimeout(() => toast.remove(), 240);
+      };
+
+      toast.querySelector('.rc-suggest-close').addEventListener('click', dismiss);
+      toast.querySelectorAll('.rc-suggest-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const a = cfg.actions[+btn.dataset.sgIdx];
+          if(!a) return;
+          const liveDetail = rcActiveDetailEl(suffix) || detailEl;
+          if(a.update) rcOpenWriteUpdate(liveDetail);
+          else if(a.field) rcOpenFieldEditor(liveDetail, a.field);
+          dismiss();
+        });
+      });
+
+      requestAnimationFrame(() => toast.classList.add('rc-suggest-visible'));
+
+      // Auto-dismiss after a while so it never lingers or nags.
+      setTimeout(() => { if(toast.isConnected) dismiss(); }, 14000);
+    }
+    window.rcShowSuggestToast = rcShowSuggestToast;
 
   </script>
 
