@@ -1340,6 +1340,7 @@
       padding: 10px 16px;
       border-bottom: 1px solid #e5e5e5;
       background: #fafaf9;
+      position: relative;   /* anchor for the floating suggestion popup */
     }
     .rc-back-btn {
       display: inline-flex;
@@ -1844,6 +1845,7 @@
       border-radius: 12px;
       border: none;
       padding: 16px 16px 6px 16px;
+      position: relative;   /* anchor for the floating suggestion popup */
     }
     .rc-record-right-panel {
       flex: 1;
@@ -2905,28 +2907,48 @@
     }
 
     /* ── Suggestion Toast (in-record, nudges reps to update fields) ──
-       Lighter teal than a standard success toast; sits at the TOP of the
-       open lead detail card, directly above the deal path, and gently
-       suggests the next field to fill. */
+       Lighter teal than a standard success toast. Pops up as a floating
+       OVERLAY centered horizontally on the breadcrumb back-bar, dropping down
+       over the strip — it never pushes any content up or down. The message is
+       warm and encouraging; where an action helps, a single word in the copy
+       is an inline underlined link the rep can click. */
     .rc-suggest-toast {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      width: min(520px, calc(100% - 360px));
+      max-width: 520px;
+      z-index: 60;
       display: flex;
       align-items: center;
       gap: 12px;
-      margin: 0 0 12px 0;
       padding: 12px 14px 12px 16px;
       border-radius: 12px;
       background: #eafaf5;                 /* light teal — softer than image 1 */
       border: 1px solid #c3ecdf;
-      box-shadow: 0 1px 3px rgba(11,130,124,0.08);
+      box-shadow: 0 6px 20px rgba(11,130,124,0.16); /* lifted, like a popup */
       font-family: var(--font);
       opacity: 0;
-      transform: translateY(-6px);
       transition: opacity .22s ease, transform .22s ease;
+      pointer-events: none;               /* enabled once visible (below) */
     }
-    .rc-suggest-toast.rc-suggest-visible { opacity: 1; transform: translateY(0); }
-    .rc-suggest-toast.rc-suggest-leaving { opacity: 0; transform: translateY(-6px); }
-    /* When the toast is present, the deal path shouldn't pull up over it. */
-    .rc-suggest-toast + .ls-chevron-inner { margin-top: 0; }
+    /* Narrower widths: keep it centered but give it a bit more room. */
+    @media (max-width: 1100px){
+      .rc-suggest-toast { width: min(480px, calc(100% - 220px)); }
+    }
+    @media (max-width: 720px){
+      .rc-suggest-toast { width: calc(100% - 32px); }  /* near full-width on mobile */
+    }
+    .rc-suggest-toast.rc-suggest-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .rc-suggest-toast.rc-suggest-leaving {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px);
+    }
 
     .rc-suggest-icon {
       flex: 0 0 auto;
@@ -2942,32 +2964,20 @@
       font-size: 13.5px;
       font-weight: 500;
       color: #024d4c;
-      line-height: 1.4;
+      line-height: 1.45;
     }
     .rc-suggest-text b { font-weight: 700; }
-    .rc-suggest-actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
-    }
-    .rc-suggest-btn {
-      appearance: none;
-      border: 1px solid #b7e6d8;
-      background: #ffffff;
+    /* Inline actionable word — reads as part of the sentence, click to act. */
+    .rc-suggest-link {
       color: #0b6e69;
-      font-family: var(--font);
-      font-size: 12.5px;
-      font-weight: 600;
-      padding: 5px 11px;
-      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-thickness: 1.5px;
       cursor: pointer;
-      transition: background .1s ease, border-color .1s ease, transform .06s ease;
-      white-space: nowrap;
+      transition: color .1s ease;
     }
-    .rc-suggest-btn:hover { background: #f2fbf8; border-color: #0b827c; }
-    .rc-suggest-btn:active { transform: translateY(1px); }
+    .rc-suggest-link:hover { color: #075a56; }
 
     .rc-suggest-close {
       flex: 0 0 auto;
@@ -3205,10 +3215,8 @@
     /* Pull the chevron "tree branch" out of the white card so it sits directly
        on the grey record body — removes the white-box-on-white-box layering. */
     .ls-chevron-inner {
-      padding: 4px 0 14px 0;
-      margin: -16px -16px 8px -16px;   /* escape the white panel's 16px padding */
-      background: #f3f3f3;             /* match .rc-record-body grey */
-      border-radius: 12px 12px 0 0;
+      padding: 10px 10px 10px 10px;
+      margin-bottom: 4px;
     }
     .ls-chevron-wrap { padding: 0; }
     .ls-chevron-track {
@@ -3218,7 +3226,7 @@
       overflow: hidden;
       border-radius: 20px;
       gap: 0;
-      background: #f3f3f3;             /* grey base so pending segments blend in */
+      background: #ffffff;
     }
     .ls-chev-wrap {
       display: flex;
@@ -3233,14 +3241,13 @@
     .ls-chev-wrap:hover { z-index: 5; }
     .ls-chev-wrap.ls-active-wrap { z-index: 4; }
 
-    /* Grey outline creates a visible 2px gap between segments (matches the
-       grey record body so the track reads as one flush branch, not a box). */
+    /* White outline creates visible 2px gap between segments */
     .ls-chev-wrap::after {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       clip-path: polygon(0% 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 0% 100%, 10px 50%);
-      background: #f3f3f3;
+      background: white;
       z-index: -1;
       transform: scaleX(1.04) scaleY(1.0);
       transform-origin: right center;
@@ -3328,7 +3335,7 @@
     /* ── Chevron stages — darker done ── */
     .ls-chev.ls-done    { background: #62c97e; color: #0C2912; }
     .ls-chev.ls-active  { background: #1f5eae; color: #ffffff; font-weight: 600; }
-    .ls-chev.ls-pending { background: #e4e7ea; color: #6b7280; }
+    .ls-chev.ls-pending { background: #f3f3f3; color: #6b7280; }
     .ls-chev.ls-mail-alert { background: #fee2e2; color: #991b1b; font-weight: 600; }
     /* Visually separate the read-only Mailer Sent milestone from the clickable stages */
     .ls-chev-wrap.ls-mail-milestone { margin-left: 10px; }
@@ -7861,6 +7868,8 @@
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
+          const _sfxOffer = paneId.replace('pane-','');
+          setTimeout(() => rcShowFieldSavedToast(_sfxOffer, 'offerMade', nowMade ? 'made' : ''), 60);
           return;
         }
 
@@ -7993,6 +8002,8 @@
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
+          const _sfxSave = paneId.replace('pane-','');
+          setTimeout(() => rcShowFieldSavedToast(_sfxSave, field, c[field]), 60);
           return;
         }
 
@@ -8013,6 +8024,8 @@
           }
           rcBuildList(dataArr, paneId.replace("pane-","list-"), innerId, detailId, renderFn, isOwner);
           renderFn(c, innerId, detailId);
+          const _sfxClr = paneId.replace('pane-','');
+          setTimeout(() => rcShowFieldSavedToast(_sfxClr, field, '—'), 60);
           return;
         }
 
@@ -8089,6 +8102,10 @@
             fireRcWebhook(cPulseId, cBoardId, colId, val === '—' ? '' : val);
           }
           renderFn(c, innerId, detailId);
+          const _sfxSet = paneId.replace('pane-','');
+          if(field !== 'status'){
+            setTimeout(() => rcShowFieldSavedToast(_sfxSet, field, val), 60);
+          }
           return;
         }
       });
@@ -8107,45 +8124,52 @@
 
     // What to suggest when the lead reaches a given stage. Each action either
     // opens a field editor ({field:'...'}) or the Write Update box ({update:true}).
+    /* Each entry has warm, encouraging copy. A {token} in the text marks a
+       single clickable word that triggers an action ('field' opens an editor,
+       'update' opens the Write Update box). Entries with no action (e.g.
+       Closed) are pure encouragement — icon + message, nothing to click. */
+    /* Build the stage-change suggestion. It checks the ACTIVE contact's target
+       field first: if that field is already filled, the toast becomes a pure
+       "you're all set" cheer with no clickable word — so it never tells a rep
+       to fill something that's already done. If the field is empty, it nudges
+       with a single inline clickable word. */
     function rcSuggestFor(newStatus, suffix){
-      const isOwner = suffix === 'owners';
+      const c = rcResolveActive(suffix) || {};
+      // Offer counts as "filled" if an amount is present OR the box is checked.
+      const offerFilled = rcHasVal(c.offer) || c.offerMade === true;
+
       switch(newStatus){
         case 'Contacted':
-          return {
-            text: 'Nice — this lead is now <b>Contacted</b>. Want to log how it went?',
-            actions: [
-              { label: 'Set Contact Outcome', field: 'contactOutcome' },
-              { label: 'Write Update', update: true }
-            ]
-          };
+          return rcHasVal(c.contactOutcome)
+            ? { text: 'Great work making contact — and the outcome\u2019s already logged. Nicely done! \u2713', token: null, action: null }
+            : { text: 'Great start — you\u2019ve made contact! Jot down how the {outcome} went while it\u2019s fresh.',
+                token: 'outcome', action: { field: 'contactOutcome' } };
+
         case 'Interested In Selling':
-          return {
-            text: 'They\u2019re <b>Interested in Selling</b>. Capture the details while they\u2019re fresh.',
-            actions: [
-              // Seller Motivation only lives on the Confirmed Owners card;
-              // for Other Contacts, nudge Owner Status instead.
-              isOwner
-                ? { label: 'Add Seller Motivation', field: 'sellerMotivation' }
-                : { label: 'Confirm Owner Status', field: 'ownerStatus' },
-              { label: 'Set Follow-Up Date', field: 'followUp' }
-            ]
-          };
+          return rcHasVal(c.followUp)
+            ? { text: 'Exciting — they\u2019re interested! Your follow-up\u2019s already on the books. Keep it rolling! \u2713', token: null, action: null }
+            : { text: 'Exciting — they\u2019re interested! Lock in a {follow-up} so the momentum keeps going.',
+                token: 'follow-up', action: { field: 'followUp' } };
+
         case 'Negotiations/Review':
-          return {
-            text: 'Moving into <b>Negotiations</b>. Keep the offer details up to date.',
-            actions: [
-              { label: 'Update Offer', field: 'offerStatus' },
-              { label: 'Write Update', update: true }
-            ]
-          };
+          return offerFilled
+            ? { text: 'You\u2019re in negotiations — nice work. Your offer details are looking sharp! \u2713', token: null, action: null }
+            : { text: 'You\u2019re in negotiations — nice work. Add the {offer} details to keep things sharp.',
+                token: 'offer', action: { field: 'offer' } };
+
         case 'Accepted Offer':
+          return rcHasVal(c.ownership)
+            ? { text: 'Huge — the offer\u2019s accepted! Ownership share is already confirmed. Fantastic! \u2713', token: null, action: null }
+            : { text: 'Huge — the offer\u2019s accepted! Confirm the {ownership} share to seal the details.',
+                token: 'ownership', action: { field: 'ownership' } };
+
+        case 'Closed':
           return {
-            text: 'Offer <b>Accepted</b> \u2014 log the terms and confirm ownership share.',
-            actions: [
-              { label: 'Set Ownership %', field: 'ownership' },
-              { label: 'Write Update', update: true }
-            ]
+            // Deal's done — pure encouragement, no clickable action.
+            text: 'Deal closed — outstanding work! \uD83C\uDF89 That\u2019s one for the win column.',
+            token: null, action: null
           };
+
         default:
           return null;
       }
@@ -8163,7 +8187,27 @@
       if(!detailEl) return;
       let target = null;
 
-      // Styled dropdowns (contactOutcome, sellerMotivation, ownerStatus, offerStatus…)
+      // Offer is a combo (checkbox + amount). If no offer's been made yet,
+      // clicking the word checks "Offer Made" to unlock the amount; if it's
+      // already made, open the amount field for editing.
+      if(fieldKey === 'offer'){
+        const amountEditable = detailEl.querySelector('.rc-offer-amount:not(.locked) .rc-editable[data-edit-field="offer"]');
+        if(amountEditable){
+          rcScrollToField(amountEditable);
+          setTimeout(() => amountEditable.click(), 260);
+          rcFlashField(amountEditable.closest('.rc-offer-combo') || amountEditable);
+          return;
+        }
+        const toggle = detailEl.querySelector('[data-offer-toggle]');
+        if(toggle){
+          rcScrollToField(toggle);
+          setTimeout(() => toggle.click(), 260);
+          rcFlashField(toggle.closest('.rc-offer-combo') || toggle);
+          return;
+        }
+      }
+
+      // Styled dropdowns (contactOutcome, sellerMotivation, ownerStatus…)
       // expose the field on their option buttons; walk up to the wrapper.
       const opt = detailEl.querySelector('[data-action="setfield"][data-field="' + fieldKey + '"]');
       if(opt){
@@ -8187,11 +8231,6 @@
         rcFlashField(target);
         return;
       }
-
-      // Offer combo has no standard hook — just scroll to the Lead Details block.
-      const label = Array.from(detailEl.querySelectorAll('.rc-label'))
-        .find(l => /offer/i.test(l.textContent) && /offerStatus/i.test(fieldKey));
-      if(label){ rcScrollToField(label.closest('.rc-field') || label); rcFlashField(label.closest('.rc-field') || label); }
     }
 
     // Open the Write Update composer within the detail card.
@@ -8227,61 +8266,164 @@
       const detailEl = rcActiveDetailEl(suffix);
       if(!cfg || !detailEl) return;
 
-      // Only one suggestion toast at a time per card.
-      const old = detailEl.querySelector('.rc-suggest-toast');
-      if(old) old.remove();
+      // Only one suggestion toast at a time — clear any lingering one.
+      const recordView = document.getElementById('recordview-' + suffix);
+      const host = (recordView && recordView.querySelector('.rc-back-bar')) || null;
+      const scope = host || detailEl;
+      const existing = scope.querySelector('.rc-suggest-toast');
+      if(existing) existing.remove();
 
       const toast = document.createElement('div');
       toast.className = 'rc-suggest-toast';
 
-      const actionsHtml = cfg.actions.map((a, i) =>
-        '<button class="rc-suggest-btn" data-sg-idx="' + i + '">' + a.label + '</button>'
-      ).join('');
+      // Build the message. If there's a {token}, split the text around it and
+      // wrap that word in an inline clickable link; otherwise it's plain text.
+      let textHtml;
+      if(cfg.token && cfg.action){
+        const marker = '{' + cfg.token + '}';
+        const parts = cfg.text.split(marker);
+        const before = escapeHtml(parts[0] || '');
+        const after  = escapeHtml(parts[1] || '');
+        textHtml = before
+          + '<span class="rc-suggest-link" role="button" tabindex="0">' + escapeHtml(cfg.token) + '</span>'
+          + after;
+      } else {
+        // Strip any stray token braces, just in case.
+        textHtml = escapeHtml(cfg.text.replace(/\{|\}/g, ''));
+      }
 
       toast.innerHTML =
         '<div class="rc-suggest-icon">' + RC_SUGGEST_CHECK + '</div>' +
         '<div class="rc-suggest-body">' +
-          '<div class="rc-suggest-text">' + cfg.text + '</div>' +
-          '<div class="rc-suggest-actions">' + actionsHtml + '</div>' +
+          '<div class="rc-suggest-text">' + textHtml + '</div>' +
         '</div>' +
         '<button class="rc-suggest-close" aria-label="Dismiss suggestion">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button>';
 
-      // Place it at the TOP of the left panel, directly above the deal path.
-      const leftPanel = detailEl.querySelector('.rc-record-left-panel');
-      const dealPath  = leftPanel ? leftPanel.querySelector('.ls-chevron-inner') : null;
-      if(leftPanel && dealPath){
-        leftPanel.insertBefore(toast, dealPath);
-      } else if(leftPanel){
-        leftPanel.insertBefore(toast, leftPanel.firstChild);
-      } else {
-        (detailEl.querySelector('.rc-record-body') || detailEl).appendChild(toast);
-      }
+      // Mount as a floating overlay in the breadcrumb back-bar (centered). The
+      // back-bar is position:relative and the toast is position:absolute, so it
+      // drops down over the strip without pushing any content up or down.
+      scope.appendChild(toast);
 
+      // ── Auto-dismiss with pause-on-hover ──────────────────────────────
+      // Vanishes 2.5s after appearing, but the countdown freezes while the
+      // pointer is over the toast so the rep has time to click the inline word.
+      const HIDE_MS = 2500;
+      let hideTimer = null;
       const dismiss = () => {
+        if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
         toast.classList.add('rc-suggest-leaving');
         setTimeout(() => toast.remove(), 240);
       };
+      const startTimer = () => {
+        if(hideTimer) clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => { if(toast.isConnected) dismiss(); }, HIDE_MS);
+      };
+      const pauseTimer = () => { if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; } };
+      toast.addEventListener('mouseenter', pauseTimer);
+      toast.addEventListener('mouseleave', startTimer);
 
+      // Close button.
       toast.querySelector('.rc-suggest-close').addEventListener('click', dismiss);
-      toast.querySelectorAll('.rc-suggest-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const a = cfg.actions[+btn.dataset.sgIdx];
-          if(!a) return;
+
+      // Inline clickable word → run the action, then dismiss.
+      const link = toast.querySelector('.rc-suggest-link');
+      if(link && cfg.action){
+        const run = () => {
           const liveDetail = rcActiveDetailEl(suffix) || detailEl;
-          if(a.update) rcOpenWriteUpdate(liveDetail);
-          else if(a.field) rcOpenFieldEditor(liveDetail, a.field);
+          if(cfg.action.update) rcOpenWriteUpdate(liveDetail);
+          else if(cfg.action.field) rcOpenFieldEditor(liveDetail, cfg.action.field);
           dismiss();
+        };
+        link.addEventListener('click', run);
+        link.addEventListener('keydown', e => {
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); run(); }
         });
-      });
+      }
 
-      requestAnimationFrame(() => toast.classList.add('rc-suggest-visible'));
-
-      // Auto-dismiss after a while so it never lingers or nags.
-      setTimeout(() => { if(toast.isConnected) dismiss(); }, 14000);
+      requestAnimationFrame(() => { toast.classList.add('rc-suggest-visible'); startTimer(); });
     }
     window.rcShowSuggestToast = rcShowSuggestToast;
+
+    /* ── Field-saved confirmation toast ─────────────────────────────────
+       A lightweight companion to the stage-change suggestion toast. It fires
+       for ANY ordinary field edit in the Confirmed Owners / Other Contacts
+       sections (address, phone status, contact outcome, seller motivation,
+       owner status, follow-up, ownership, offer, etc.) so a rep always gets a
+       little confirmation their change landed. Same centered popup, same 2.5s
+       + pause-on-hover behavior, but a plain encouraging message — no
+       clickable word (the edit is already done). */
+
+    // Friendly labels + messages, keyed by the internal field name.
+    const RC_FIELD_SAVED = {
+      address:         'Address updated — nice and current. \u2713',
+      phoneStatus:     'Phone 1 status saved — good tracking! \u2713',
+      phone2Status:    'Phone 2 status saved — good tracking! \u2713',
+      phone3Status:    'Phone 3 status saved — good tracking! \u2713',
+      phone:           'Phone number saved — nice work. \u2713',
+      phone2:          'Phone number saved — nice work. \u2713',
+      phone3:          'Phone number saved — nice work. \u2713',
+      contactOutcome:  'Contact outcome logged — great detail! \u2713',
+      sellerMotivation:'Seller motivation captured — that\u2019s gold. \u2713',
+      ownerStatus:     'Owner status confirmed — keep it up! \u2713',
+      relation:        'Relationship updated — nicely done. \u2713',
+      followUp:        'Follow-up date set — momentum locked in! \u2713',
+      ownership:       'Ownership % saved — sharp record-keeping. \u2713',
+      offer:           'Offer details saved — looking good! \u2713',
+      offerMade:       'Offer status updated — nice progress! \u2713',
+      keyContact:      'Key contact updated — good call. \u2713'
+    };
+
+    function rcFieldSavedMessage(field, value){
+      // Cleared values get a gentler note.
+      const cleared = (value === '' || value == null || value === '\u2014');
+      if(cleared){
+        return 'Field cleared \u2014 all set. \u2713';
+      }
+      return RC_FIELD_SAVED[field] || 'Change saved \u2014 nice work! \u2713';
+    }
+
+    function rcShowFieldSavedToast(suffix, field, value){
+      const recordView = document.getElementById('recordview-' + suffix);
+      const host = (recordView && recordView.querySelector('.rc-back-bar')) || null;
+      const detailEl = rcActiveDetailEl(suffix);
+      const scope = host || detailEl;
+      if(!scope) return;
+
+      // Replace any existing toast (suggestion or confirmation) so we never
+      // stack two popups in the same strip.
+      const existing = scope.querySelector('.rc-suggest-toast');
+      if(existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'rc-suggest-toast';
+      toast.innerHTML =
+        '<div class="rc-suggest-icon">' + RC_SUGGEST_CHECK + '</div>' +
+        '<div class="rc-suggest-body">' +
+          '<div class="rc-suggest-text">' + escapeHtml(rcFieldSavedMessage(field, value)) + '</div>' +
+        '</div>' +
+        '<button class="rc-suggest-close" aria-label="Dismiss">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>';
+      scope.appendChild(toast);
+
+      const HIDE_MS = 2500;
+      let hideTimer = null;
+      const dismiss = () => {
+        if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; }
+        toast.classList.add('rc-suggest-leaving');
+        setTimeout(() => toast.remove(), 240);
+      };
+      const startTimer = () => { if(hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(() => { if(toast.isConnected) dismiss(); }, HIDE_MS); };
+      const pauseTimer = () => { if(hideTimer){ clearTimeout(hideTimer); hideTimer = null; } };
+      toast.addEventListener('mouseenter', pauseTimer);
+      toast.addEventListener('mouseleave', startTimer);
+      toast.querySelector('.rc-suggest-close').addEventListener('click', dismiss);
+
+      requestAnimationFrame(() => { toast.classList.add('rc-suggest-visible'); startTimer(); });
+    }
+    window.rcShowFieldSavedToast = rcShowFieldSavedToast;
 
   </script>
 
