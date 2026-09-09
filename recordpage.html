@@ -3861,7 +3861,7 @@
         <div class="topSnapshot" aria-label="Top Snapshot">
           <div class="topSnapshotGrid">
             <div class="snapshotBlock">
-              <div class="snapshotTitle">PROPERTY DETAILS</div>
+              <div class="snapshotTitle">Property Details</div>
               <div class="snapshotDivider"></div>
               <div class="snapshotFields">
                 <div class="sfield">
@@ -3870,13 +3870,12 @@
                 </div>
                 <div class="sfield">
                   <div class="slabel">Last Contact</div>
-                  <div class="svalue" style="display: flex; flex-direction: column; gap: 2px;">
+                  <div class="svalue">
                     <span style="font-weight: 700; font-size: 17px; color: #f59e0b;" data-snapshot="true" data-field="last_contact_days_ago">—</span>
-                    <span style="font-size: 12.5px; color: #6b7280; font-weight: 500;" data-snapshot="true" data-field="last_contact_date">—</span>
                   </div>
                 </div>
                 <div class="sfield">
-                  <div class="slabel">✦ Deal Score</div>
+                  <div class="slabel"><svg class="sf-spark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="sparkDeal" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9BDCFF"/><stop offset="0.55" stop-color="#5CC8FF"/><stop offset="1" stop-color="#1B96FF"/></linearGradient></defs><path d="M10.4 2.9l1.5 4.1a2.6 2.6 0 0 0 1.6 1.6l4.1 1.5-4.1 1.5a2.6 2.6 0 0 0-1.6 1.6l-1.5 4.1-1.5-4.1a2.6 2.6 0 0 0-1.6-1.6L3.3 10.1l4.1-1.5a2.6 2.6 0 0 0 1.6-1.6l1.4-4.1z" fill="url(#sparkDeal)"/><path d="M18.4 14.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z" fill="url(#sparkDeal)" opacity=".85"/></svg>Deal Score</div>
                   <div class="svalue" data-snapshot="true" data-field="deal_score">—</div>
                 </div>
                 <div class="sfield">
@@ -3887,7 +3886,7 @@
             </div>
             <div class="snapshotBlock">
               <div style="display:flex; align-items:flex-start; justify-content:space-between; margin: 0 0 10px 0; min-height: 0;">
-                <div class="snapshotTitle" style="margin:0;">DEAL INSIGHTS</div>
+                <div class="snapshotTitle" style="margin:0;">Deal Insights</div>
                 <button id="ownershipTreeBtn" type="button" style="display:none; font-size:11px; padding: 3px 8px; gap: 4px; margin-top: -2px;" aria-label="Mark Ownership Complete">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3M5.636 5.636l2.122 2.122M3 12h3m-.364 6.364 2.122-2.122M12 21v-3m6.364.364-2.122-2.122M21 12h-3m.364-6.364-2.122 2.122" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
                   Mark Ownership Complete
@@ -5011,13 +5010,14 @@
         const d=parseFlexibleDate(c?.follow_up_date??c?.followupDate); if(!d) return;
         const due=startOfDay(d); const diffDays=Math.floor((today-due)/(1000*60*60*24));
         if(diffDays>0){
-          const rawNext=String(c?.next_action??c?.nextAction??"").trim(); const candidate={name:String(c?.name??"—").trim()||"—",daysOverdue:diffDays,nextAction:(rawNext&&rawNext!=="—")?rawNext:""};
+          const rawNext=String(c?.next_action??c?.nextAction??"").trim(); const candidate={name:String(c?.name??"—").trim()||"—",daysOverdue:diffDays,nextAction:(rawNext&&rawNext!=="—")?rawNext:"",pulseId:(c?.pulse_id ?? c?.pulseId ?? c?.id ?? null)};
           if(!best||candidate.daysOverdue>best.daysOverdue) best=candidate;
         }
       });
       if(!best){banner.classList.remove("show");textNode.textContent="—";return;}
       const plural=best.daysOverdue===1?"":"s";
-      const base=`<strong>Action Required:</strong> Follow-up with ${best.name} is ${best.daysOverdue} day${plural} overdue.`;
+      const nameHtml = `<button type="button" class="banner-contact-link" data-pulse="${best.pulseId==null?"":escapeHtml(String(best.pulseId))}" data-name="${escapeHtml(best.name)}">${escapeHtml(best.name)}</button>`;
+      const base=`<strong>Action Required:</strong> Follow-up with ${nameHtml} is ${best.daysOverdue} day${plural} overdue.`;
       textNode.innerHTML=base;
       banner.classList.add("show");
     }
@@ -6015,28 +6015,33 @@
 
     // Open a person's profile by pulse ID, switching tabs if they live in the
     // other list. Used by both widgets' click-through.
-    function rcOpenById(pulseId){
+    function rcOpenById(pulseId, opts){
       if(pulseId == null) return;
       const id = String(pulseId);
-      // Brief loading flash so the record→record switch reads as a real
-      // navigation rather than an instant swap. Purely visual (~500ms).
+
+      function openIt(){
+        let idx = rcOwners.findIndex(c => c && String(c.pulseId) === id);
+        if(idx !== -1){
+          rcActivateTab('pane-owners');
+          rcOpenRecord(rcOwners[idx], 'owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner);
+          return;
+        }
+        idx = rcOthers.findIndex(c => c && String(c.pulseId) === id);
+        if(idx !== -1){
+          rcActivateTab('pane-other');
+          rcOpenRecord(rcOthers[idx], 'other', 'inner-other', 'detail-other', rcRenderDetailOther);
+        }
+      }
+
+      // Record → record switches show a brief flash so the swap reads as a
+      // real navigation. Opening from the list or the action banner is
+      // instant, so there's nothing to cover and no loader is shown.
+      if(opts && opts.instant){ openIt(); return; }
+
       rcShowSwitchLoader();
       setTimeout(() => {
-        try {
-          let idx = rcOwners.findIndex(c => c && String(c.pulseId) === id);
-          if(idx !== -1){
-            rcActivateTab('pane-owners');
-            rcOpenRecord(rcOwners[idx], 'owners', 'inner-owners', 'detail-owners', rcRenderDetailOwner);
-            return;
-          }
-          idx = rcOthers.findIndex(c => c && String(c.pulseId) === id);
-          if(idx !== -1){
-            rcActivateTab('pane-other');
-            rcOpenRecord(rcOthers[idx], 'other', 'inner-other', 'detail-other', rcRenderDetailOther);
-          }
-        } finally {
-          rcHideSwitchLoader();
-        }
+        try { openIt(); }
+        finally { rcHideSwitchLoader(); }
       }, 500);
     }
     window.rcOpenById = rcOpenById;
@@ -10989,5 +10994,235 @@
 })();
 </script>
 
+
+<!-- ═══════════════════════════════════════════════════════════
+     UI REFINEMENT LAYER
+     Additive only. Loads last so it wins without touching the
+     rules above. Delete this block to revert to the prior look.
+     ═══════════════════════════════════════════════════════════ -->
+<style>
+  /* ── 1. Snapshot header: light falls from the upper right ── */
+  .topSnapshot{
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(158deg, #06396f 0%, #032d60 54%, #02264f 100%);
+  }
+  .topSnapshot::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(88% 130% at 92% -18%, rgba(90,168,255,.26) 0%, rgba(90,168,255,0) 58%),
+      radial-gradient(70% 110% at 4% 108%, rgba(0,0,0,.20) 0%, rgba(0,0,0,0) 62%);
+    pointer-events:none;
+  }
+  .topSnapshot::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:2px;
+    background: linear-gradient(90deg, #1b96ff 0%, #0176d3 28%, rgba(1,118,211,.15) 72%, rgba(1,118,211,0) 100%);
+  }
+  .topSnapshot > *{ position:relative; z-index:1; }
+
+  /* Divider fades out instead of stopping dead */
+  .snapshotDivider{
+    background: linear-gradient(90deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.10) 55%, rgba(255,255,255,0) 100%) !important;
+  }
+
+  /* Values pick up a touch of weight against the deeper navy */
+  .svalue{ text-shadow: 0 1px 1px rgba(0,0,0,.16); }
+
+  /* Deal Score sparkle */
+  .slabel .sf-spark{
+    width:14px; height:14px; flex-shrink:0;
+    filter: drop-shadow(0 1px 2px rgba(27,150,255,.45));
+  }
+
+
+  /* ── 7. Tab bar sits under the header with a soft seam ── */
+  .tabsbar{
+    background: linear-gradient(180deg, #fdfefe 0%, #ffffff 100%);
+  }
+
+  /* ── 2. The panel floats on the grey page ── */
+  .panel{
+    border-color:#e3e8ef;
+    box-shadow:
+      0 1px 2px rgba(16,32,56,.05),
+      0 6px 16px -10px rgba(3,45,96,.20),
+      0 24px 44px -28px rgba(3,45,96,.30);
+  }
+
+  /* ── 3. Next Action Step gets dimension ── */
+  .nas-section{
+    background: linear-gradient(180deg, #f2f8fe 0%, #e6f1fc 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 2px rgba(3,45,96,.07),
+      0 6px 14px -8px rgba(1,118,211,.22),
+      0 18px 32px -24px rgba(3,45,96,.32);
+  }
+
+  /* ── 4. Table header reads as a raised rail ── */
+  .rct-table thead th{
+    background: linear-gradient(180deg, #fbfbfc 0%, #f1f3f5 100%) !important;
+    border-bottom: 1px solid #c9d2dd !important;
+    box-shadow: inset 0 1px 0 #fff;
+    color:#3f4b5b !important;
+  }
+
+  /* ── 5. Buttons get a subtle face ── */
+  .btn{
+    background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+    box-shadow: 0 1px 1.5px rgba(16,32,56,.07), inset 0 1px 0 #fff;
+  }
+  .btn:hover{ background: linear-gradient(180deg, #ffffff 0%, #eef2f7 100%); }
+
+  /* ── 6. Section headings sit on a clearer baseline ── */
+  .section-head h3{ letter-spacing: -0.012em; }
+
+
+  /* ── 8. Action banner: the contact name is a way in ── */
+  .banner-contact-link{
+    appearance:none; border:0; background:none; padding:0;
+    font:inherit; color:#0176d3; font-weight:700;
+    cursor:pointer; border-radius:3px;
+    text-decoration:underline; text-underline-offset:2px;
+    text-decoration-color: rgba(1,118,211,.35);
+    transition: color .12s ease, text-decoration-color .12s ease;
+  }
+  .banner-contact-link:hover{
+    color:#032d60;
+    text-decoration-color:#032d60;
+  }
+  .banner-contact-link:focus-visible{
+    outline:2px solid rgba(1,118,211,.45); outline-offset:2px;
+  }
+
+  /* Brief highlight so the profile you landed on is obvious */
+  @keyframes rcLandingGlow{
+    0%   { box-shadow: 0 0 0 3px rgba(1,118,211,.30); }
+    100% { box-shadow: 0 0 0 3px rgba(1,118,211,0); }
+  }
+  .rc-record-view.rc-landed{
+    border-radius:10px;
+    animation: rcLandingGlow 1.5s ease-out 1;
+  }
+
+
+
+
+  /* ── 9. Section headers follow SLDS structure: title case, no tracking ── */
+  .snapshotTitle{
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: -0.005em;
+    color: #ffffff;
+    margin-bottom: 9px;
+  }
+
+  /* ── 10. Existing round icon chips pick up a molded face ── */
+  .ms-card-icon,
+  .rc-rel-card-icon,
+  .rcrel-card-icon{
+    background-image: linear-gradient(158deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 52%, rgba(0,0,0,.14) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.45),
+      0 1px 3px rgba(16,24,40,.24);
+  }
+
+  /* ── 11. Primary actions get a light source ── */
+  .nas-complete-btn,
+  .nas-next-save,
+  .note-btn-save,
+  .rc-det-action-primary{
+    background-image: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 48%, rgba(0,0,0,.07) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.28),
+      0 1px 2px rgba(16,32,56,.18),
+      0 4px 10px -6px rgba(16,32,56,.40);
+  }
+  .nas-complete-btn:hover,
+  .nas-next-save:hover,
+  .note-btn-save:hover,
+  .rc-det-action-primary:hover{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.34),
+      0 2px 4px rgba(16,32,56,.20),
+      0 8px 16px -8px rgba(16,32,56,.46);
+  }
+
+  /* The ownership pill sits on navy, so it needs its own lift */
+  #ownershipTreeBtn{
+    background-image: linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+    box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(0,0,0,.22);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration:.01ms !important;
+      transition-duration:.01ms !important;
+    }
+  }
+</style>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   Action banner → contact profile
+   Clicking the name in the Action Required banner switches to
+   Deal Information, opens that person's record in the contacts
+   panel, and scrolls it into view.
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  function findByName(name){
+    var target = String(name || '').trim().toLowerCase();
+    if(!target) return null;
+    var lists = [];
+    try { if (Array.isArray(rcOwners)) lists.push(rcOwners); } catch(e){}
+    try { if (Array.isArray(rcOthers)) lists.push(rcOthers); } catch(e){}
+    for (var i = 0; i < lists.length; i++){
+      var hit = lists[i].find(function(c){
+        return c && String(c.name || '').trim().toLowerCase() === target;
+      });
+      if (hit && hit.pulseId != null) return String(hit.pulseId);
+    }
+    return null;
+  }
+
+  function flagLanding(){
+    ['recordview-owners','recordview-other'].forEach(function(id){
+      var v = document.getElementById(id);
+      if (v && v.style.display !== 'none'){
+        v.classList.remove('rc-landed');
+        void v.offsetWidth;               // restart the animation
+        v.classList.add('rc-landed');
+        setTimeout(function(){ v.classList.remove('rc-landed'); }, 1700);
+      }
+    });
+  }
+
+  document.addEventListener('click', function(e){
+    var link = e.target.closest && e.target.closest('.banner-contact-link');
+    if (!link) return;
+    e.preventDefault();
+
+    var pulse = (link.getAttribute('data-pulse') || '').trim();
+    if (!pulse) pulse = findByName(link.getAttribute('data-name'));
+    if (!pulse) return;                   // nothing to open — leave the banner alone
+
+    // The contacts panel lives in Deal Information, so make sure we're there.
+    var dealTab = document.getElementById('tab-deal');
+    if (dealTab && dealTab.getAttribute('aria-selected') !== 'true') dealTab.click();
+
+    try { window.rcOpenById(pulse, { instant: true }); } catch(err){ return; }
+
+    // Opens instantly, so scroll on the next frame — no loader, no delay.
+    requestAnimationFrame(function(){
+      var wrap = document.getElementById('rcSectionWrapper');
+      if (wrap && wrap.scrollIntoView) wrap.scrollIntoView({ behavior:'smooth', block:'start' });
+      flagLanding();
+    });
+  });
+})();
+</script>
 </body>
 </html>
