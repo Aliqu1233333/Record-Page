@@ -3838,10 +3838,584 @@
       background: #fcdde3;
       color: #b90d5a;
     }
+    .rc-status-badge--optout {
+      background: #fde4e2;
+      color: #c23934;
+    }
   </style>
+
+  <style>
+    /* ══════════════════════════════════════════════════════
+       MESSAGES — text thread + composer on an opened subitem
+       (Confirmed Owners / Other Contacts). Mock-up only: the
+       thread lives in memory for the session.
+       Follows the SLDS chat blueprint: inbound in neutral gray,
+       outbound in brand blue, thin rules, pill controls.
+       ══════════════════════════════════════════════════════ */
+    .rcmsg-card .rcrel-icon { background: #0176d3; }
+    .rcmsg-card .rcrel-icon svg { width: 16px; height: 16px; }
+
+    .rcmsg-body { display: none; border-top: 1px solid #e5e7eb; }
+    .rcmsg-card.rcmsg-open .rcmsg-body { display: block; animation: rcrelIn 0.18s ease; }
+    .rcmsg-card.rcmsg-open .rcrel-toggle svg { transform: rotate(180deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .rcmsg-card.rcmsg-open .rcmsg-body { animation: none; }
+    }
+
+    /* ── Recipient bar ── */
+    .rcmsg-to {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      font-size: 12px;
+      color: #706e6b;
+      background: #ffffff;
+    }
+    .rcmsg-to-label { flex-shrink: 0; }
+    .rcmsg-to-select-wrap { position: relative; min-width: 0; flex: 1; }
+    .rcmsg-to-select {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      max-width: 260px;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #181818;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 999px;
+      padding: 5px 28px 5px 12px;
+      cursor: pointer;
+      transition: border-color .12s ease, box-shadow .12s ease;
+      text-overflow: ellipsis;
+    }
+    .rcmsg-to-select:hover { border-color: #c9d0d8; }
+    .rcmsg-to-select:focus-visible { outline: none; border-color: #0176d3; box-shadow: 0 0 0 3px rgba(1,118,211,.12); }
+    .rcmsg-to-chev {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      width: 11px;
+      height: 11px;
+      transform: translateY(-50%);
+      color: #0176d3;
+      pointer-events: none;
+    }
+    /* keep the chevron inside the capped select width */
+    .rcmsg-to-select-wrap { max-width: 260px; }
+    .rcmsg-to-none { color: #939393; font-size: 12.5px; }
+
+    /* ── Thread ── */
+    .rcmsg-thread {
+      max-height: 360px;
+      min-height: 140px;
+      overflow-y: auto;
+      padding: 6px 14px 14px;
+      background: #fafbfc;
+      border-top: 1px solid #eef0f3;
+      border-bottom: 1px solid #eef0f3;
+      scrollbar-width: thin;
+      scrollbar-color: #d6dbe1 transparent;
+    }
+    .rcmsg-thread::-webkit-scrollbar { width: 8px; }
+    .rcmsg-thread::-webkit-scrollbar-thumb { background: #d6dbe1; border-radius: 8px; border: 2px solid #fafbfc; }
+
+    .rcmsg-day {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 10px;
+      font-size: 11px;
+      color: #8a94a6;
+      font-weight: 400;
+    }
+    .rcmsg-day::before,
+    .rcmsg-day::after { content: ""; flex: 1; height: 1px; background: #e5e7eb; }
+
+    .rcmsg-row { display: flex; align-items: flex-end; gap: 8px; margin-top: 3px; }
+    .rcmsg-row.is-grouped-start { margin-top: 10px; }
+    .rcmsg-row.out { justify-content: flex-end; }
+
+    .rcmsg-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #d8e6fe;
+      color: #014486;
+      font-size: 10.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      letter-spacing: .02em;
+    }
+    .rcmsg-avatar.is-spacer { visibility: hidden; }
+
+    .rcmsg-stack { display: flex; flex-direction: column; max-width: 82%; min-width: 0; }
+    .rcmsg-row.out .rcmsg-stack { align-items: flex-end; }
+
+    .rcmsg-bubble {
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 400;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      border-radius: 16px;
+    }
+    .rcmsg-row.in .rcmsg-bubble {
+      background: #f0f2f5;
+      color: #181818;
+      border: 1px solid #e8ebef;
+      border-bottom-left-radius: 5px;
+    }
+    .rcmsg-row.out .rcmsg-bubble {
+      background: #0176d3;
+      color: #ffffff;
+      border: 1px solid #0176d3;
+      border-bottom-right-radius: 5px;
+    }
+    .rcmsg-row.out.is-sending .rcmsg-bubble { opacity: .72; }
+    .rcmsg-row.out.is-failed .rcmsg-bubble { background: #ffffff; color: #181818; border-color: #f0b6b3; }
+
+    .rcmsg-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+      padding: 0 4px;
+      font-size: 10.5px;
+      color: #8a94a6;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .rcmsg-meta svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .rcmsg-meta .is-delivered { color: #2e844a; }
+    .rcmsg-meta .is-failed { color: #ba0517; }
+    .rcmsg-retry {
+      appearance: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      margin-left: 2px;
+      font-family: var(--font);
+      font-size: 10.5px;
+      color: #0176d3;
+      cursor: pointer;
+    }
+    .rcmsg-retry:hover { text-decoration: underline; }
+
+    .rcmsg-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 6px;
+      min-height: 150px;
+      padding: 16px;
+      color: #706e6b;
+      font-size: 12.5px;
+    }
+    .rcmsg-empty-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #eaf4fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+    .rcmsg-empty-icon svg { width: 17px; height: 17px; color: #0176d3; }
+    .rcmsg-empty-title { font-size: 13.5px; color: #181818; }
+
+    /* ── Composer ── */
+    .rcmsg-composer { padding: 12px 14px 12px; background: #ffffff; }
+    .rcmsg-input-wrap {
+      border: 1px solid #dbe0e6;
+      border-radius: 14px;
+      background: #ffffff;
+      transition: border-color .12s ease, box-shadow .12s ease;
+    }
+    .rcmsg-input-wrap:focus-within { border-color: #0176d3; box-shadow: 0 0 0 3px rgba(1,118,211,.12); }
+    .rcmsg-input {
+      display: block;
+      width: 100%;
+      min-height: 42px;
+      max-height: 132px;
+      resize: none;
+      border: 0;
+      outline: none;
+      background: transparent;
+      padding: 11px 13px 4px;
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 400;
+      color: #181818;
+    }
+    .rcmsg-input::placeholder { color: #9aa3af; }
+    .rcmsg-input:disabled { cursor: not-allowed; }
+
+    .rcmsg-input-foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px 6px 8px;
+    }
+    .rcmsg-count { font-size: 10.5px; color: #9aa3af; margin-right: auto; padding-left: 4px; }
+    .rcmsg-count.is-over { color: #a86403; }
+
+    .rcmsg-tpl-wrap { position: relative; }
+    .rcmsg-tpl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      appearance: none;
+      background: #ffffff;
+      border: 1px solid #dbe0e6;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-family: var(--font);
+      font-size: 11.5px;
+      font-weight: 400;
+      color: #0176d3;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .rcmsg-tpl-btn:hover { background: #f3f8fd; border-color: #0176d3; }
+    .rcmsg-tpl-btn svg { width: 12px; height: 12px; }
+    .rcmsg-tpl-btn:disabled { color: #9aa3af; background: #f7f8fa; border-color: #e5e7eb; cursor: not-allowed; }
+
+    .rcmsg-tpl-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 6px);
+      width: 272px;
+      max-width: 80vw;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(3,45,96,.10), 0 1px 3px rgba(3,45,96,.06);
+      padding: 6px;
+      z-index: 30;
+    }
+    .rcmsg-tpl-menu.is-open { display: block; }
+    .rcmsg-tpl-head { font-size: 11px; color: #8a94a6; padding: 6px 8px 4px; }
+    .rcmsg-tpl-opt {
+      display: block;
+      width: 100%;
+      text-align: left;
+      appearance: none;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 8px;
+      font-family: var(--font);
+      cursor: pointer;
+    }
+    .rcmsg-tpl-opt:hover,
+    .rcmsg-tpl-opt:focus-visible { background: #f3f8fd; outline: none; }
+    .rcmsg-tpl-name { display: block; font-size: 12.5px; color: #181818; }
+    .rcmsg-tpl-prev {
+      display: block;
+      margin-top: 1px;
+      font-size: 11px;
+      color: #8a94a6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rcmsg-send {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      appearance: none;
+      background: #0176d3;
+      color: #ffffff;
+      border: 1px solid #0176d3;
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+    }
+    .rcmsg-send svg { width: 13px; height: 13px; }
+    .rcmsg-send:hover { background: #015ba7; border-color: #015ba7; }
+    .rcmsg-send:active { transform: translateY(1px); }
+    .rcmsg-send:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.2); }
+    .rcmsg-send:disabled { background: #c9ddf0; border-color: #c9ddf0; cursor: not-allowed; transform: none; }
+
+    .rcmsg-hint { margin-top: 6px; font-size: 10.5px; color: #9aa3af; padding-left: 2px; }
+    .rcmsg-hint kbd {
+      font-family: var(--font);
+      font-size: 10px;
+      color: #706e6b;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 0 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rcmsg-send:active { transform: none; }
+    }
+  </style>
+
+
+  <style>
+    /* ══════════════════════════════════════════════════════
+       MESSAGES — record widget + docked pop-up (utility tray)
+       ══════════════════════════════════════════════════════ */
+
+    /* ── Record widget: single row that opens the pop-up ── */
+    .rcmsg-widget .rcrel-header { min-height: 58px; }
+    .rcmsg-widget .rcrel-icon { background: #2e844a; }
+    .rcmsg-widget .rcrel-icon svg { width: 16px; height: 16px; }
+    .rcmsg-widget .rcmsg-dot { margin-right: 2px; }
+    .rcmsg-widget .rcmsg-w-pop svg { width: 12px; height: 12px; transform: none !important; }
+    .rcmsg-widget .rcrel-header:hover .rcmsg-w-pop { background: #f3f8fd; border-color: #0176d3; }
+
+    /* Unread / awaiting-reply marker */
+    .rcmsg-dot { width: 7px; height: 7px; border-radius: 50%; background: #ea001e; flex-shrink: 0; display: inline-block; }
+
+    /* Neutral avatars (keeps blue for actions only) */
+    .rcmsg-avatar { background: #eef1f5; color: #3e4c63; }
+
+    /* Pop-up header: dark title instead of brand blue */
+    #rcmsgTray .tray-top-title { color: #181818; font-weight: 500; }
+    #rcmsgTray .tray-top-icon svg { stroke: #181818; }
+
+    /* "View record" sits at the end of the To row */
+    .rcmsg-panel .rcmsg-to .rcmsg-ctx-link { margin-left: auto; }
+
+    /* ── Utility bar button (mirrors To Do List) ── */
+    .rcmsg-util-btn {
+      display: flex; align-items: center; gap: 7px; padding: 0 18px;
+      border: none; border-top: 2px solid transparent; background: transparent;
+      font-family: var(--font); font-size: 15px; font-weight: 500; color: #0250d9;
+      cursor: pointer; height: 100%; white-space: nowrap; transition: background .12s ease;
+    }
+    .rcmsg-util-btn:hover { background: #f3f4f6; }
+    .rcmsg-util-btn.is-active { background: #eff6ff; border-top-color: #0176d3; }
+    .rcmsg-util-badge {
+      display: none; align-items: center; justify-content: center;
+      min-width: 16px; height: 16px; padding: 0 4px; background: #ea001e; color: #fff;
+      border-radius: 999px; font-size: 9px; font-weight: 500; line-height: 1;
+    }
+
+    /* ── Tray ── */
+    .rcmsg-tray {
+      position: fixed; bottom: 40px; right: 16px; left: auto;
+      width: 440px; height: 600px; max-height: calc(100vh - 56px);
+      background: #fff; border: 1px solid #c9d0d8; border-bottom: none;
+      border-radius: 11px 11px 0 0;
+      box-shadow: 0 0 0 1px rgba(3,45,96,.04), 0 2px 8px rgba(3,45,96,.12), 0 12px 40px rgba(3,45,96,.24);
+      display: none; flex-direction: column; z-index: 8999; overflow: hidden;
+      font-family: var(--font);
+    }
+    .rcmsg-tray.is-open { display: flex; }
+        .rcmsg-open-count { font-size: 11px; font-weight: 400; color: #706e6b; margin-left: 2px; }
+    .rcmsg-head-actions { display: flex; align-items: center; gap: 2px; }
+    .rcmsg-head-icon svg { width: 13px; height: 13px; }
+
+    /* Tabs (console-style subtabs) */
+    .rcmsg-tabs {
+      display: flex; align-items: stretch; gap: 2px; padding: 0 8px;
+      border-bottom: 1px solid #e5e7eb; background: #fafbfc;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .rcmsg-tabs::-webkit-scrollbar { display: none; }
+    .rcmsg-tab {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+      height: 38px; padding: 0 6px 0 10px; margin-bottom: -1px;
+      border-bottom: 2px solid transparent; color: #54698d;
+      font-size: 12.5px; font-weight: 400; cursor: pointer;
+      transition: color .12s ease, background .12s ease;
+    }
+    .rcmsg-tab:hover { color: #0176d3; }
+    .rcmsg-tab.is-active { color: #0176d3; border-bottom-color: #0176d3; background: #ffffff; }
+    .rcmsg-tab:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(1,118,211,.25); border-radius: 6px 6px 0 0; }
+    .rcmsg-tab-name { max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rcmsg-tab-x {
+      display: flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border: 0; border-radius: 50%; background: transparent;
+      color: #8a94a6; cursor: pointer; padding: 0; opacity: 0; transition: opacity .12s ease, background .12s ease;
+    }
+    .rcmsg-tab-x svg { width: 10px; height: 10px; }
+    .rcmsg-tab:hover .rcmsg-tab-x, .rcmsg-tab.is-active .rcmsg-tab-x, .rcmsg-tab-x:focus-visible { opacity: 1; }
+    .rcmsg-tab-x:hover { background: #eef1f5; color: #3e3e3c; }
+    .rcmsg-tab-add {
+      align-self: center; flex-shrink: 0; margin-left: 4px;
+      display: flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%; border: 1px solid #dbe0e6; background: #fff;
+      color: #0176d3; cursor: pointer; padding: 0; transition: background .12s ease, border-color .12s ease;
+    }
+    .rcmsg-tab-add svg { width: 12px; height: 12px; }
+    .rcmsg-tab-add:hover, .rcmsg-tab-add.is-active { background: #f3f8fd; border-color: #0176d3; }
+
+    .rcmsg-tab-inbox { gap: 5px; padding-right: 10px; }
+    .rcmsg-tab-inbox svg { width: 14px; height: 14px; }
+    .rcmsg-tab-count, .rcmsg-picker-n {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 16px; height: 16px; padding: 0 5px; border-radius: 999px;
+      background: #0176d3; color: #fff; font-size: 10px; font-weight: 500; line-height: 1;
+    }
+    .rcmsg-picker-n { margin-left: 4px; background: #eaf4fe; color: #0176d3; }
+    .rcmsg-caughtup {
+      display: flex; align-items: center; gap: 8px; margin: 8px 6px 4px; padding: 10px 12px;
+      border: 1px solid #e5e7eb; border-radius: 10px; font-size: 12px; color: #54698d; background: #fafbfc;
+    }
+    .rcmsg-caughtup svg { width: 16px; height: 16px; color: #2e844a; flex-shrink: 0; }
+    .rcmsg-pick.is-waiting .rcmsg-pick-name { color: #032d60; }
+    .rcmsg-pick.is-waiting .rcmsg-pick-prev { color: #181818; }
+
+    .rcmsg-dock-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+    /* Conversation panel inside the tray */
+    .rcmsg-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .rcmsg-panel .rcmsg-thread { flex: 1; max-height: none; min-height: 0; }
+    .rcmsg-panel .rcmsg-to { padding-top: 4px; }
+    .rcmsg-ctx { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 14px 2px; }
+    .rcmsg-ctx-text { font-size: 11.5px; color: #706e6b; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rcmsg-ctx-link {
+      display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0;
+      appearance: none; background: none; border: 0; padding: 2px 0; cursor: pointer;
+      font-family: var(--font); font-size: 11.5px; font-weight: 400; color: #0176d3;
+    }
+    .rcmsg-ctx-link svg { width: 12px; height: 12px; }
+    .rcmsg-ctx-link:hover { text-decoration: underline; }
+
+    /* Conversation picker (the "+" tab) */
+    .rcmsg-picker { flex: 1; overflow-y: auto; padding: 6px 6px 10px; scrollbar-width: thin; }
+    .rcmsg-picker-head { display: flex; align-items: center; font-size: 11px; color: #8a94a6; padding: 10px 10px 6px; }
+    .rcmsg-pick {
+      display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      appearance: none; background: transparent; border: 0; border-radius: 10px;
+      padding: 9px 10px; font-family: var(--font); cursor: pointer; transition: background .12s ease;
+    }
+    .rcmsg-pick:hover, .rcmsg-pick:focus-visible { background: #f3f8fd; outline: none; }
+    .rcmsg-pick { gap: 8px; padding-left: 4px; }
+    .rcmsg-pick-flag { width: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .rcmsg-pick .rcmsg-avatar { width: 32px; height: 32px; font-size: 11.5px; }
+    .rcmsg-pick-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .rcmsg-pick-top, .rcmsg-pick-bot { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .rcmsg-pick-name { flex: 1; min-width: 0; font-size: 13px; color: #181818; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rcmsg-pick-time { font-size: 11px; color: #8a94a6; flex-shrink: 0; }
+    .rcmsg-pick-prev { flex: 1; min-width: 0; font-size: 12px; color: #54698d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rcmsg-pick-prev.is-muted { color: #9aa3af; }
+
+    /* AI draft button (neutral; sits beside Templates) */
+    .rcmsg-ai-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; padding: 0; flex-shrink: 0;
+      appearance: none; background: #ffffff; border: 1px solid #dbe0e6; border-radius: 50%;
+      color: #3e3e3c; cursor: pointer; transition: background .12s ease, border-color .12s ease, color .12s ease;
+    }
+    .rcmsg-ai-btn svg { width: 14px; height: 14px; }
+    .rcmsg-ai-btn:hover { background: #f3f4f6; border-color: #c9d0d8; color: #181818; }
+    .rcmsg-ai-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.15); }
+    .rcmsg-ai-btn:disabled { color: #b0b8c4; background: #f7f8fa; border-color: #e5e7eb; cursor: not-allowed; }
+    .rcmsg-ai-btn.is-busy { color: #3e3e3c; background: #f3f4f6; cursor: progress; }
+    .rcmsg-ai-btn.is-busy svg { animation: rcmsgAiPulse 1s ease-in-out infinite; }
+    @keyframes rcmsgAiPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.88); } }
+    @media (prefers-reduced-motion: reduce) { .rcmsg-ai-btn.is-busy svg { animation: none; } }
+
+    @media (max-width: 640px) {
+      .rcmsg-tray { width: calc(100vw - 24px); right: 12px; }
+    }
+  </style>
+
+  <style>
+    /* ── Messages pop-up: cleaner header + To/From route bar ── */
+    #rcmsgTray .rcmsg-head {
+      display: flex; align-items: stretch; gap: 10px;
+      height: 46px; padding: 0 8px 0 14px; flex-shrink: 0;
+      background: #ffffff; border-bottom: 1px solid #e5e7eb;
+    }
+    #rcmsgTray .rcmsg-head-mark {
+      align-self: center; flex-shrink: 0;
+      width: 24px; height: 24px; border-radius: 50%; background: #0176d3;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #rcmsgTray .rcmsg-head-mark svg { width: 13px; height: 13px; }
+    #rcmsgTray .rcmsg-head-title { align-self: center; font-size: 14px; font-weight: 500; color: #032d60; flex: 1; }
+    #rcmsgTray .rcmsg-tabs {
+      flex: 1; min-width: 0; padding: 0; gap: 4px;
+      border-bottom: 0; background: transparent; align-items: stretch;
+    }
+    #rcmsgTray .rcmsg-tab {
+      height: 46px; margin-bottom: -1px; padding: 0 4px 0 8px;
+      font-size: 13px; color: #54698d; background: transparent;
+      border-bottom: 2px solid transparent;
+    }
+    #rcmsgTray .rcmsg-tab.is-active { color: #032d60; background: transparent; border-bottom-color: #0176d3; }
+    #rcmsgTray .rcmsg-tab-add { width: 22px; height: 22px; margin-left: 2px; }
+    #rcmsgTray .rcmsg-head-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+    #rcmsgTray .rcmsg-head-btn {
+      width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+      color: #54698d; cursor: pointer; transition: background .12s ease, color .12s ease;
+    }
+    #rcmsgTray .rcmsg-head-btn svg { width: 14px; height: 14px; }
+    #rcmsgTray .rcmsg-head-btn:hover { background: #f3f4f6; color: #0176d3; }
+    #rcmsgTray .rcmsg-head-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.15); }
+
+    .rcmsg-route {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 16px; background: #ffffff; flex-shrink: 0;
+    }
+    .rcmsg-route-f { display: flex; align-items: center; gap: 7px; min-width: 0; flex: 0 1 auto; }
+    .rcmsg-route-lbl { font-size: 11px; color: #8a94a6; flex-shrink: 0; }
+    .rcmsg-route-div { width: 1px; height: 18px; background: #e5e7eb; flex-shrink: 0; }
+    .rcmsg-route-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: #c3cad4; }
+    .rcmsg-route-dot.is-ok  { background: #2e844a; }
+    .rcmsg-route-dot.is-bad { background: #ea001e; }
+    .rcmsg-route-sel {
+      position: relative; display: flex; align-items: center; min-width: 0;
+      padding: 3px 20px 3px 6px; margin-left: -6px; border-radius: 6px;
+      border: 1px solid transparent; cursor: pointer; transition: background .12s ease;
+    }
+    .rcmsg-route-sel:hover { background: #f3f4f6; }
+    .rcmsg-route-sel:focus-within { border-color: #0176d3; box-shadow: 0 0 0 3px rgba(1,118,211,.12); }
+    .rcmsg-route-val {
+      font-size: 12.5px; font-weight: 400; color: #181818;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .rcmsg-route-num { color: #706e6b; margin-left: 3px; }
+    .rcmsg-route-sel select {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer; font-family: var(--font); font-size: 12.5px;
+      appearance: none; -webkit-appearance: none; border: 0;
+    }
+    .rcmsg-route-chev {
+      position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 10px; color: #8a94a6; pointer-events: none;
+    }
+  </style>
+
+  <style>
+    /* Contact names read black and a touch heavier in the pop-up */
+    #rcmsgTray .rcmsg-tab, #rcmsgTray .rcmsg-tab.is-active { color: #181818; }
+    #rcmsgTray .rcmsg-tab .rcmsg-tab-name { font-weight: 400; }
+    #rcmsgTray .rcmsg-tab.is-active .rcmsg-tab-name { font-weight: 500; }
+    #rcmsgTray .rcmsg-tab:hover { color: #000000; }
+    .rcmsg-pick-name, .rcmsg-pick.is-waiting .rcmsg-pick-name { color: #181818; font-weight: 500; }
+  </style>
+
 </head>
 
 <body>
+
+
   <div id="loadingOverlay" aria-hidden="true">
     <div class="loadingCard" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
@@ -4377,6 +4951,7 @@
           renderOtherContacts(payload.confirmed_owners);
           updateActionBannerFromContacts(payload.confirmed_owners);
           rcPopulateFromPayload(payload);
+          if (typeof window.rcMsgAfterData === 'function') { try { window.rcMsgAfterData(); } catch(e){} }
         } else {
           updateActionBannerFromContacts([]);
         }
@@ -5412,6 +5987,8 @@
       phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzfhq2' },
       phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzdvd2' },
       phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzw44e' },
+      // TODO: replace with the real SMS Opt Status column ID once it exists on the subitem boards.
+      smsOptStatus:     { type:'select', opts:['Opted In','Opted Out'], columnId:'status_sms_opt' },
       followUp:         { type:'date',   columnId:'date_mkzt8vfa' },
       phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_mkkz9bay' },
       phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3_mkkz1y89' },
@@ -5537,6 +6114,21 @@
           ${current ? `<button class="rc-status-opt rc-status-opt-clear" data-action="setfield" data-field="${field}" data-val="—" style="color:#e57373;border-top:1px solid #f3f4f6;margin-top:2px;">Clear</button>` : ''}
         </div>
       </div>`;
+    }
+
+    // SMS Opt Status: green check when Opted In, small red x when Opted Out.
+    function rcSmsOptFieldHtml(c){
+      const v = rcHasVal(c.smsOptStatus) ? String(c.smsOptStatus) : '';
+      let badge = '';
+      if(/^opted in$/i.test(v)){
+        badge = '<span class="rc-status-badge rc-status-badge--success"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+      } else if(/^opted out$/i.test(v)){
+        badge = '<span class="rc-status-badge rc-status-badge--optout"><svg viewBox="0 0 12 12" fill="none"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>';
+      }
+      return '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">SMS Opt Status</span>'
+        + '<div style="display:flex;align-items:center;gap:6px;">' + badge
+        + '<div class="rc-value">' + rcStyledDropdown(c.smsOptStatus, ['Opted In','Opted Out'], 'smsOptStatus', '—', true, false) + '</div>'
+        + '</div></div></div>';
     }
 
     const RC_STATUS_OPTS = ['Re-Skiptrace','Attempt 1 - No Answer','Attempt 2 - No Answer','Attempt 3 - No Answer','Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed','Not Interested in selling'];
@@ -6518,6 +7110,897 @@
     window.rcRelComboPick   = rcRelComboPick;
     window.rcRelComboKey    = rcRelComboKey;
 
+    /* ══════════════════════════════════════════════════════════════
+       MESSAGES — text thread + composer on an opened subitem.
+
+       MOCK-UP ONLY. Threads are held in memory for the session; nothing
+       is sent or written back. When the messaging backend is ready,
+       swap rcMsgSeed() for the real thread fetch and the setTimeout in
+       rcMsgDeliver() for the real send call — the rendering is already
+       driven off each message's { dir, text, at, status } shape.
+       ══════════════════════════════════════════════════════════════ */
+
+    const __rcMsgStore = {};          // key → { messages, draft, phoneIdx, open }
+    const RCMSG_SEGMENT = 160;
+
+    const RCMSG_TEMPLATES = [
+      { name: 'Introduction',
+        text: 'Hi {first}, I\'m reaching out about a property connected to your family. Do you have a few minutes this week to talk?' },
+      { name: 'Follow-up',
+        text: 'Hi {first}, just following up on my last message. Is there a good time to give you a quick call?' },
+      { name: 'Schedule a call',
+        text: 'Thanks {first}. Would tomorrow morning or afternoon work better for a 10-minute call?' },
+      { name: 'Missed call',
+        text: 'Hi {first}, sorry I missed you. Feel free to call or text me back whenever is convenient.' }
+    ];
+
+    const RCMSG_ICON_CHAT = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3C6.9 3 3 6.5 3 10.8c0 2.4 1.2 4.5 3.1 5.9-.1 1.2-.6 2.4-1.5 3.4-.2.2 0 .6.3.6 1.9-.1 3.6-.8 4.8-1.8.7.1 1.5.2 2.3.2 5.1 0 9-3.5 9-7.8S17.1 3 12 3z"/></svg>';
+    const RCMSG_ICON_CHAT_LINE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.3c-.9 0-1.8-.1-2.6-.4L4 21l1.4-4A8 8 0 0 1 3 11.5 8.6 8.6 0 0 1 12 3a8.6 8.6 0 0 1 9 8.5z"/></svg>';
+    const RCMSG_ICON_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+    const RCMSG_ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>';
+    const RCMSG_ICON_TPL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>';
+    const RCMSG_ICON_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3 3 7-7"/></svg>';
+    const RCMSG_ICON_WARN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6.3"/><line x1="8" y1="4.8" x2="8" y2="8.6"/><circle cx="8" cy="11" r=".4" fill="currentColor"/></svg>';
+
+    // Numbers texts go out from. Swap in the real Twilio / carrier numbers here.
+    const RCMSG_SENDERS = [
+      { name: 'Christian', num: '281-555-0110' },
+      { name: 'Damian',    num: '281-555-0124' }
+    ];
+
+    function rcMsgHas(v){ return v != null && String(v).trim() !== '' && v !== '—'; }
+
+    function rcMsgKey(c){
+      return (c && c.pulseId != null) ? String(c.pulseId) : ('anon-' + String((c && c.name) || '').replace(/\W+/g,'-'));
+    }
+
+    function rcMsgFirst(c){
+      const n = String((c && c.name) || '').trim();
+      return n && n !== '—' ? n.split(/\s+/)[0] : 'there';
+    }
+
+    function rcMsgInitials(c){
+      const parts = String((c && c.name) || '').trim().split(/\s+/).filter(Boolean);
+      if(!parts.length || parts[0] === '—') return '?';
+      return ((parts[0][0] || '') + (parts.length > 1 ? parts[parts.length-1][0] : '')).toUpperCase();
+    }
+
+    // Numbers on file, best-status first (a "Correct" number leads).
+    function rcMsgPhones(c){
+      const list = [
+        { label: 'Phone 1', num: c.phone,  status: c.phoneStatus },
+        { label: 'Phone 2', num: c.phone2, status: c.phone2Status },
+        { label: 'Phone 3', num: c.phone3, status: c.phone3Status }
+      ].filter(p => rcMsgHas(p.num));
+      const rank = s => {
+        const v = String(s || '').toLowerCase();
+        if(v.includes('correct') && !v.includes('in')) return 0;
+        if(!rcMsgHas(s)) return 1;
+        return 2;
+      };
+      return list.sort((a,b) => rank(a.status) - rank(b.status));
+    }
+
+    // Threads start empty; texts sent this session are kept in memory.
+    // To show real history, return the contact's messages here as
+    // [{ dir: 'in'|'out', text, at: Date, status }].
+    function rcMsgSeed(c){
+      return [];
+    }
+
+    function rcMsgState(c){
+      const key = rcMsgKey(c);
+      if(!__rcMsgStore[key]){
+        __rcMsgStore[key] = {
+          messages: rcMsgPhones(c).length ? rcMsgSeed(c) : [],
+          draft: '',
+          phoneIdx: 0,
+          open: true,
+          contact: c
+        };
+      }
+      __rcMsgStore[key].contact = c;   // keep the freshest copy after refreshes
+      return __rcMsgStore[key];
+    }
+
+    function rcMsgTime(d){ return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+
+    function rcMsgDayLabel(d){
+      const today = new Date(); today.setHours(0,0,0,0);
+      const day = new Date(d); day.setHours(0,0,0,0);
+      const diff = Math.round((today - day) / 86400000);
+      if(diff === 0) return 'Today';
+      if(diff === 1) return 'Yesterday';
+      return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    function rcMsgAgo(d){
+      const mins = Math.max(0, Math.round((Date.now() - d.getTime()) / 60000));
+      if(mins < 1) return 'just now';
+      if(mins < 60) return mins + 'm ago';
+      const hrs = Math.round(mins / 60);
+      if(hrs < 24) return hrs + 'h ago';
+      const days = Math.round(hrs / 24);
+      return days + 'd ago';
+    }
+
+    function rcMsgSubline(st){
+      const n = st.messages.length;
+      if(!n) return 'No messages yet';
+      const lastIn = [...st.messages].reverse().find(m => m.dir === 'in');
+      const tail = lastIn ? ('Last reply ' + rcMsgAgo(lastIn.at)) : ('Last sent ' + rcMsgAgo(st.messages[n-1].at));
+      return n + ' message' + (n === 1 ? '' : 's') + ' · ' + tail;
+    }
+
+    function rcMsgThreadHtml(st){
+      const c = st.contact;
+      if(!rcMsgPhones(c).length){
+        return `<div class="rcmsg-empty">
+          <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
+          <span class="rcmsg-empty-title">No phone number on file</span>
+          <span>Add a number under Contact Info to start texting ${escapeHtml(rcMsgFirst(c))}.</span>
+        </div>`;
+      }
+      if(!st.messages.length){
+        return `<div class="rcmsg-empty">
+          <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
+          <span class="rcmsg-empty-title">No messages yet</span>
+          <span>Write a message below or start from a template.</span>
+        </div>`;
+      }
+      const initials = escapeHtml(rcMsgInitials(c));
+      let html = '';
+      let lastDay = '';
+      st.messages.forEach((m, i) => {
+        const dayKey = m.at.toDateString();
+        const prev = st.messages[i-1];
+        const next = st.messages[i+1];
+        if(dayKey !== lastDay){ html += `<div class="rcmsg-day">${escapeHtml(rcMsgDayLabel(m.at))}</div>`; lastDay = dayKey; }
+        const startsGroup = !prev || prev.dir !== m.dir || prev.at.toDateString() !== dayKey;
+        const endsGroup   = !next || next.dir !== m.dir || next.at.toDateString() !== dayKey
+                            || (next.at - m.at) > 10 * 60000;
+        const cls = ['rcmsg-row', m.dir];
+        if(startsGroup) cls.push('is-grouped-start');
+        if(m.status === 'sending') cls.push('is-sending');
+        if(m.status === 'failed')  cls.push('is-failed');
+
+        let meta = '';
+        if(endsGroup || m.status === 'sending' || m.status === 'failed'){
+          let status = '';
+          if(m.dir === 'out'){
+            if(m.status === 'sending')   status = '<span>Sending…</span>';
+            else if(m.status === 'failed') status = `<span class="is-failed" style="display:inline-flex;align-items:center;gap:3px;">${RCMSG_ICON_WARN}Not delivered</span><button type="button" class="rcmsg-retry" onclick="rcMsgRetry(this, ${i})">Retry</button>`;
+            else status = `<span class="is-delivered" style="display:inline-flex;align-items:center;">${RCMSG_ICON_CHECK}</span><span>${m.status === 'sent' ? 'Sent' : 'Delivered'}</span>`;
+          }
+          meta = `<div class="rcmsg-meta"><span>${escapeHtml(rcMsgTime(m.at))}</span>${status}</div>`;
+        }
+
+        const avatar = m.dir === 'in'
+          ? `<span class="rcmsg-avatar${endsGroup ? '' : ' is-spacer'}" aria-hidden="true">${initials}</span>`
+          : '';
+
+        html += `<div class="${cls.join(' ')}">
+          ${avatar}
+          <div class="rcmsg-stack">
+            <div class="rcmsg-bubble">${escapeHtml(m.text)}</div>
+            ${meta}
+          </div>
+        </div>`;
+      });
+      return html;
+    }
+
+    // ── Shared bits ────────────────────────────────────────────────────
+    const RCMSG_ICON_POPOUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M19 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4"/></svg>';
+    const RCMSG_ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    const RCMSG_ICON_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    const RCMSG_ICON_EXPAND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+    const RCMSG_ICON_SHRINK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
+
+    function rcMsgAwaiting(st){
+      const n = st.messages.length;
+      return n > 0 && st.messages[n-1].dir === 'in';
+    }
+
+    function rcMsgGroupOf(c){
+      try {
+        if(typeof rcOwners !== 'undefined' && rcOwners.some(o => o && String(o.pulseId) === String(c.pulseId))) return 'Confirmed Owner';
+        if(typeof rcOthers !== 'undefined' && rcOthers.some(o => o && String(o.pulseId) === String(c.pulseId))) return 'Other Contact';
+      } catch(e){}
+      return '';
+    }
+
+    function rcMsgAllContacts(){
+      let list = [];
+      try { list = [].concat(typeof rcOwners !== 'undefined' ? rcOwners : [], typeof rcOthers !== 'undefined' ? rcOthers : []); } catch(e){}
+      return list.filter(c => c && rcMsgHas(c.name));
+    }
+
+    function rcMsgShortTime(d){
+      const today = new Date(); today.setHours(0,0,0,0);
+      return d >= today ? rcMsgTime(d) : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // RECORD WIDGET — compact card on the subitem record. Shows the last
+    // two messages and opens the conversation in the Messages pop-up.
+    // ══════════════════════════════════════════════════════════════════
+    // Record widget: one clickable row, "Messages (N)". Opens the pop-up directly.
+    function rcMessagesCard(c){
+      const st = rcMsgState(c);
+      const k = escapeHtml(rcMsgKey(c));
+      const n = st.messages.length;
+      return `<div class="rcrel-card rcmsg-widget" data-rcmsg-w="${k}">
+        <div class="rcrel-header" role="button" tabindex="0" title="Open in Messages"
+             onclick="rcMsgOpenDock('${k}')"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcMsgOpenDock('${k}');}">
+          <span class="rcrel-icon">${RCMSG_ICON_CHAT}</span>
+          <span class="rcrel-headtext">
+            <span class="rcrel-title">Messages</span>
+          </span>
+          <span class="rcrel-toggle rcmsg-w-pop">${RCMSG_ICON_POPOUT}</span>
+        </div>
+      </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // DOCK PANEL — the conversation inside the Messages pop-up.
+    // Keeps the .rcmsg-card class so the composer handlers work unchanged.
+    // ══════════════════════════════════════════════════════════════════
+    function rcMsgPanelHtml(key){
+      const st = __rcMsgStore[key];
+      if(!st) return '';
+      const c = st.contact;
+      const phones = rcMsgPhones(c);
+      if(st.phoneIdx >= phones.length) st.phoneIdx = 0;
+      const canText = phones.length > 0;
+      const k = escapeHtml(key);
+      const placeholder = phones.length ? 'Text ' + escapeHtml(rcMsgFirst(c)) + '…' : 'Add a phone number to send texts';
+
+
+      if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = 0;
+      const chev = '<svg class="rcmsg-route-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+      const cur = phones[st.phoneIdx];
+      const toHtml = canText
+        ? `<span class="rcmsg-route-dot is-${rcMsgPhoneTone(cur && cur.status)}" title="${escapeHtml(cur && rcMsgHas(cur.status) ? cur.status : 'Unverified')}"></span>
+           <span class="rcmsg-route-sel">
+             <span class="rcmsg-route-val">${escapeHtml(cur ? cur.num : '')}</span>
+             <select aria-label="Send to" onchange="rcMsgPickPhone(this)">
+               ${phones.map((p, i) => `<option value="${i}"${i === st.phoneIdx ? ' selected' : ''}>${escapeHtml(p.num)} · ${escapeHtml(p.label)}${rcMsgHas(p.status) ? ' (' + escapeHtml(p.status) + ')' : ''}</option>`).join('')}
+             </select>${chev}
+           </span>`
+        : `<span class="rcmsg-to-none">No number on file</span>`;
+      const snd = RCMSG_SENDERS[st.fromIdx];
+      const fromHtml = `<span class="rcmsg-route-sel">
+             <span class="rcmsg-route-val">${escapeHtml(snd.name)}</span>
+             <select aria-label="Send from" onchange="rcMsgPickFrom(this)">
+               ${RCMSG_SENDERS.map((p, i) => `<option value="${i}"${i === st.fromIdx ? ' selected' : ''}>${escapeHtml(p.name)}</option>`).join('')}
+             </select>${chev}
+           </span>`;
+
+      const tplOpts = RCMSG_TEMPLATES.map((t, i) => {
+        const preview = t.text.replace('{first}', rcMsgFirst(c));
+        return `<button type="button" class="rcmsg-tpl-opt" onclick="rcMsgPickTemplate(this, ${i})">
+          <span class="rcmsg-tpl-name">${escapeHtml(t.name)}</span>
+          <span class="rcmsg-tpl-prev">${escapeHtml(preview)}</span>
+        </button>`;
+      }).join('');
+
+      return `<div class="rcmsg-card rcmsg-panel" data-rcmsg="${k}">
+        <div class="rcmsg-route">
+          <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">To</span>${toHtml}</div>
+          <span class="rcmsg-route-div" aria-hidden="true"></span>
+          <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">From</span>${fromHtml}</div>
+        </div>
+        <div class="rcmsg-thread" role="log" aria-live="polite" aria-label="Message thread">${rcMsgThreadHtml(st)}</div>
+        <div class="rcmsg-composer">
+          <div class="rcmsg-input-wrap">
+            <textarea class="rcmsg-input" rows="1"
+              placeholder="${placeholder}"
+              aria-label="Message"
+              ${canText ? '' : 'disabled'}
+              oninput="rcMsgOnInput(this)"
+              onkeydown="rcMsgOnKey(event, this)"></textarea>
+            <div class="rcmsg-input-foot">
+              <span class="rcmsg-count">0 / ${RCMSG_SEGMENT}</span>
+              <button type="button" class="rcmsg-ai-btn" onclick="rcMsgAiDraft(this)" title="Draft a reply with AI" aria-label="Draft a reply with AI" ${canText ? '' : 'disabled'}>
+                ${RCMSG_ICON_AI}
+              </button>
+              <div class="rcmsg-tpl-wrap">
+                <button type="button" class="rcmsg-tpl-btn" onclick="rcMsgToggleTemplates(this)" aria-haspopup="true" aria-expanded="false" ${canText ? '' : 'disabled'}>
+                  ${RCMSG_ICON_TPL}Templates
+                </button>
+                <div class="rcmsg-tpl-menu" role="menu">
+                  <div class="rcmsg-tpl-head">Insert a template</div>
+                  ${tplOpts}
+                </div>
+              </div>
+              <button type="button" class="rcmsg-send" onclick="rcMsgSend(this)" disabled>
+                ${RCMSG_ICON_SEND}Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // AI DRAFT — mock-up. Reads the conversation and drafts a reply into
+    // the composer for review. Nothing sends until the rep hits Send.
+    // To make it real, replace rcMsgAiSuggest() with a call to your AI
+    // endpoint, passing the thread + contact context, and keep the rest.
+    // ══════════════════════════════════════════════════════════════════
+    const RCMSG_ICON_AI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9L12 16.5l-1.9-4.6L5.5 10l4.6-1.9z"/><path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"/></svg>';
+
+    function rcMsgAiSuggest(st, typed){
+      const c = st.contact;
+      const first = rcMsgFirst(c);
+      const msgs = st.messages;
+      const last = msgs[msgs.length - 1];
+
+      // Rep already typed something: tidy it into a finished message.
+      if(typed && typed.trim()){
+        let body = typed.trim().replace(/\s+/g, ' ');
+        body = body.charAt(0).toUpperCase() + body.slice(1);
+        if(!/[.!?]$/.test(body)) body += '.';
+        return /^(hi|hey|hello|thanks|thank)/i.test(body) ? body : 'Hi ' + first + ', ' + body.charAt(0).toLowerCase() + body.slice(1);
+      }
+      if(!last){
+        return 'Hi ' + first + ', I\'m reaching out about a property connected to your family. Do you have a few minutes this week for a quick call?';
+      }
+      if(last.dir === 'out'){
+        return 'Hi ' + first + ', just checking in on my last message. Is there a good time this week for a quick call?';
+      }
+      const t = String(last.text || '').toLowerCase();
+      if(/\b(stop|unsubscribe|not interested|no thanks|leave me alone)\b/.test(t))
+        return 'Understood, ' + first + '. Thank you for letting me know. I won\'t reach out again unless you\'d like me to.';
+      if(/\b(sign|married|husband|wife|spouse)\b/.test(t))
+        return 'Good question, ' + first + '. I\'ll confirm with our title company exactly who needs to sign and get back to you today.';
+      if(/@|\bemail\b/.test(t))
+        return 'Thank you, ' + first + '. I\'ll send the paperwork to that email this afternoon. Let me know if any questions come up once you\'ve had a look.';
+      if(/\b(number|offer|how much|price|worth|pay)\b/.test(t))
+        return 'Great question, ' + first + '. I\'m finalizing the numbers for your share now and would like to walk you through them so I can answer any questions. Does a call at 4:15 today work?';
+      if(/\b(which|what) (property|house|land)\b|\bwho is this\b|\bwho\'s this\b/.test(t))
+        return 'It\'s land that was titled to a relative of yours. We help families work through inherited property, and I\'d be happy to explain how it works. Do you have a few minutes for a call?';
+      if(/\b(sorry|missed)\b/.test(t))
+        return 'No problem at all, ' + first + '. What time works best for you tomorrow?';
+      if(/\b(call|tomorrow|morning|afternoon|tonight|after \d|works)\b/.test(t))
+        return 'That works for me. I\'ll give you a call then. Talk soon, ' + first + '.';
+      if(/\bthank/.test(t))
+        return 'You\'re welcome, ' + first + '. I\'ll be in touch soon with next steps.';
+      return 'Thanks for getting back to me, ' + first + '. Would you have a few minutes this week to go over everything on a quick call?';
+    }
+
+    function rcMsgAiDraft(btn){
+      const { card, st } = rcMsgCardState(btn);
+      if(!card || !st || btn.classList.contains('is-busy')) return;
+      const ta = card.querySelector('.rcmsg-input');
+      if(!ta || ta.disabled) return;
+      const text = rcMsgAiSuggest(st, ta.value);
+      const ph = ta.placeholder;
+      btn.classList.add('is-busy');
+      btn.disabled = true;
+      ta.value = '';
+      ta.placeholder = 'Drafting a reply…';
+      rcMsgSyncComposer(card, st);
+
+      const finish = () => {
+        btn.classList.remove('is-busy');
+        btn.disabled = false;
+        ta.placeholder = ph;
+        st.draft = text;
+        if(card.isConnected){
+          ta.value = text;
+          rcMsgSyncComposer(card, st);
+          ta.focus();
+          ta.setSelectionRange(text.length, text.length);
+        }
+      };
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setTimeout(() => {
+        if(reduce || !card.isConnected){ finish(); return; }
+        let i = 0;
+        const step = () => {
+          if(!card.isConnected){ finish(); return; }
+          i = Math.min(text.length, i + 3);
+          ta.value = text.slice(0, i);
+          rcMsgAutosize(ta);
+          if(i < text.length) setTimeout(step, 14); else finish();
+        };
+        step();
+      }, 650);
+    }
+
+    // ── Composer behaviour (shared) ────────────────────────────────────
+    function rcMsgCardState(el){
+      const card = el.closest('.rcmsg-card');
+      if(!card) return {};
+      return { card, st: __rcMsgStore[card.getAttribute('data-rcmsg')] };
+    }
+
+    function rcMsgScrollBottom(card){
+      const t = card && card.querySelector('.rcmsg-thread');
+      if(t) t.scrollTop = t.scrollHeight;
+    }
+
+    function rcMsgAutosize(ta){
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 132) + 'px';
+    }
+
+    function rcMsgSyncComposer(card, st){
+      const ta = card.querySelector('.rcmsg-input');
+      const send = card.querySelector('.rcmsg-send');
+      const count = card.querySelector('.rcmsg-count');
+      if(!ta) return;
+      const len = ta.value.length;
+      const segs = Math.max(1, Math.ceil(len / RCMSG_SEGMENT));
+      if(count){
+        count.textContent = len <= RCMSG_SEGMENT ? (len + ' / ' + RCMSG_SEGMENT) : (len + ' characters · ' + segs + ' texts');
+        count.classList.toggle('is-over', len > RCMSG_SEGMENT);
+      }
+      if(send) send.disabled = ta.disabled || !ta.value.trim();
+      rcMsgAutosize(ta);
+    }
+
+    // Kept for the record renderers' post-render hook; the record widget needs no hydration.
+    function rcMsgHydrate(root){ rcMsgUpdateBadge(); }
+
+    // Re-draw everything showing this conversation: record widgets, the open tab, tab dots, badge.
+    function rcMsgRefresh(key){
+      const st = __rcMsgStore[key];
+      if(!st) return;
+      document.querySelectorAll('.rcmsg-widget').forEach(w => {
+        if(w.getAttribute('data-rcmsg-w') !== key) return;
+        const tmp = document.createElement('div');
+        tmp.innerHTML = rcMessagesCard(st.contact).trim();
+        w.replaceWith(tmp.firstElementChild);
+      });
+      const panel = document.querySelector('#rcmsgTray .rcmsg-panel');
+      if(panel && panel.getAttribute('data-rcmsg') === key){
+        const thread = panel.querySelector('.rcmsg-thread');
+        if(thread) thread.innerHTML = rcMsgThreadHtml(st);
+        rcMsgScrollBottom(panel);
+      }
+      rcMsgRenderTabs();
+      rcMsgUpdateBadge();
+    }
+
+    function rcMsgOnInput(ta){
+      const { card, st } = rcMsgCardState(ta);
+      if(!card || !st) return;
+      st.draft = ta.value;
+      rcMsgSyncComposer(card, st);
+    }
+
+    function rcMsgOnKey(e, ta){
+      if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){
+        e.preventDefault();
+        const btn = ta.closest('.rcmsg-composer').querySelector('.rcmsg-send');
+        if(btn && !btn.disabled) rcMsgSend(btn);
+      }
+    }
+
+    function rcMsgPickPhone(sel){
+      const { st } = rcMsgCardState(sel);
+      if(st) st.phoneIdx = parseInt(sel.value, 10) || 0;
+      rcMsgSyncRouteDots(sel.closest('.rcmsg-route'), st);
+    }
+
+    function rcMsgPickFrom(sel){
+      const { st } = rcMsgCardState(sel);
+      if(st) st.fromIdx = parseInt(sel.value, 10) || 0;
+      const snd = RCMSG_SENDERS[st ? st.fromIdx : 0];
+      const val = sel.parentElement.querySelector('.rcmsg-route-val');
+      if(val && snd) val.textContent = snd.name;
+    }
+
+    // Colour of the small dot beside the To number: green = Correct, red = wrong, gray = unverified.
+    function rcMsgPhoneTone(status){
+      const v = String(status || '').toLowerCase();
+      if(v.includes('wrong') || v.includes('disconnect') || v.includes('incorrect')) return 'bad';
+      if(v.includes('correct')) return 'ok';
+      return 'unk';
+    }
+    function rcMsgSyncRouteDots(route, st){
+      if(!route || !st) return;
+      const p = rcMsgPhones(st.contact)[st.phoneIdx];
+      const dot = route.querySelector('.rcmsg-route-dot');
+      const val = route.querySelector('.rcmsg-route-f .rcmsg-route-val');
+      if(val && p) val.textContent = p.num;
+      if(dot && p){
+        dot.className = 'rcmsg-route-dot is-' + rcMsgPhoneTone(p.status);
+        dot.title = rcMsgHas(p.status) ? p.status : 'Unverified';
+      }
+    }
+
+    // ── SEND WEBHOOK ─────────────────────────────────────────────────
+    // Every Send (and Retry) posts one text to Make:
+    //   lead_id    → Sales Pipeline item ID (the record this page is open on)
+    //   contact_id → the person's subitem ID
+    //   phone      → number picked in the To dropdown, E.164 (+15125550143)
+    //   message    → what was typed
+    //   line       → "Christian" or "Damian" (the From picker)
+    //   source     → "CRM"
+    // A 2xx response marks the bubble "Sent"; anything else marks it
+    // "Not delivered" with a Retry link. In test mode the page's fetch
+    // interceptor answers instead, so nothing reaches Make.
+    const RCMSG_SEND_WEBHOOK = 'https://hook.us1.make.com/wjrf12w1awfi6tep3y5ky9w3p2710i3i';
+
+    function rcMsgLeadId(){
+      try {
+        const ids = (typeof extractIdsFromUrl === 'function') ? extractIdsFromUrl() : null;
+        if(ids && ids.pulseId) return String(ids.pulseId);
+      } catch(e){}
+      return null;
+    }
+
+    function rcMsgE164(num){
+      const d = String(num || '').replace(/\D/g, '');
+      if(d.length === 10) return '+1' + d;
+      if(d.length === 11 && d[0] === '1') return '+' + d;
+      return d ? '+' + d : '';
+    }
+
+    async function rcMsgDeliver(key, msg){
+      const st = __rcMsgStore[key];
+      const c = st ? st.contact : null;
+      const payload = {
+        lead_id:    rcMsgLeadId(),
+        contact_id: c && c.pulseId != null ? String(c.pulseId) : null,
+        phone:      rcMsgE164(msg.to),
+        message:    msg.text,
+        line:       msg.fromName || (RCMSG_SENDERS[0] && RCMSG_SENDERS[0].name),
+        source:     'CRM'
+      };
+      try {
+        if(!payload.contact_id || !payload.phone) throw new Error('Missing contact or phone');
+        const res = await fetch(RCMSG_SEND_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        msg.status = 'sent';
+      } catch(err){
+        console.error('Text send failed:', err, payload);
+        msg.status = 'failed';
+      }
+      rcMsgRefresh(key);
+    }
+
+    function rcMsgSend(btn){
+      const { card, st } = rcMsgCardState(btn);
+      if(!card || !st) return;
+      const ta = card.querySelector('.rcmsg-input');
+      const text = (ta.value || '').trim();
+      if(!text) return;
+      const phones = rcMsgPhones(st.contact);
+      const to = phones[st.phoneIdx] ? phones[st.phoneIdx].num : null;
+      const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
+      const msg = { dir: 'out', text, at: new Date(), status: 'sending', to, from: sender.num, fromName: sender.name };
+      st.messages.push(msg);
+      st.draft = '';
+      ta.value = '';
+      rcMsgSyncComposer(card, st);
+      const key = card.getAttribute('data-rcmsg');
+      rcMsgRefresh(key);
+      rcMsgDeliver(key, msg);
+      ta.focus();
+    }
+
+    function rcMsgRetry(btn, idx){
+      const { card, st } = rcMsgCardState(btn);
+      if(!card || !st || !st.messages[idx]) return;
+      const msg = st.messages[idx];
+      msg.status = 'sending';
+      const key = card.getAttribute('data-rcmsg');
+      rcMsgRefresh(key);
+      rcMsgDeliver(key, msg);
+    }
+
+    function rcMsgCloseMenus(except){
+      document.querySelectorAll('.rcmsg-tpl-menu.is-open').forEach(m => {
+        if(m === except) return;
+        m.classList.remove('is-open');
+        const b = m.previousElementSibling;
+        if(b) b.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    function rcMsgToggleTemplates(btn){
+      const menu = btn.nextElementSibling;
+      if(!menu) return;
+      rcMsgCloseMenus(menu);
+      const open = menu.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if(open){ const first = menu.querySelector('.rcmsg-tpl-opt'); if(first) first.focus(); }
+    }
+
+    function rcMsgPickTemplate(opt, i){
+      const { card, st } = rcMsgCardState(opt);
+      if(!card || !st) return;
+      const ta = card.querySelector('.rcmsg-input');
+      const text = RCMSG_TEMPLATES[i].text.replace('{first}', rcMsgFirst(st.contact));
+      ta.value = ta.value.trim() ? (ta.value.replace(/\s+$/,'') + ' ' + text) : text;
+      st.draft = ta.value;
+      rcMsgCloseMenus();
+      rcMsgSyncComposer(card, st);
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // MESSAGES POP-UP — docked utility tray, bottom-left, above its own
+    // button in the utility bar (same pattern as the To Do List).
+    // One tab per conversation; tabs survive going back to the list.
+    // ══════════════════════════════════════════════════════════════════
+    const __rcMsgDock = { open: false, expanded: false, tabs: [], active: null };
+
+    function rcMsgKeyFromContactKey(key){
+      // Make sure the store has the freshest contact object for this key.
+      const c = rcMsgAllContacts().find(x => rcMsgKey(x) === key);
+      if(c) rcMsgState(c);
+      return __rcMsgStore[key] ? key : null;
+    }
+
+    function rcMsgOpenDock(key){
+      key = rcMsgKeyFromContactKey(key) || (__rcMsgStore[key] ? key : null);
+      if(!key) return;
+      if(!__rcMsgDock.tabs.includes(key)) __rcMsgDock.tabs.push(key);
+      __rcMsgDock.active = key;
+      rcMsgShowTray(true);
+      rcMsgRenderDock();
+      const ta = document.querySelector('#rcmsgTray .rcmsg-input');
+      if(ta && !ta.disabled) setTimeout(() => ta.focus({ preventScroll: true }), 120);
+    }
+
+    function rcMsgShowTray(open, quiet){
+      const tray = document.getElementById('rcmsgTray');
+      const btn  = document.getElementById('rcmsgUtilBtn');
+      if(!tray || !btn) return;
+      if(open && typeof utilityTasksOpen !== 'undefined' && utilityTasksOpen && window.__rcTasksToggleOrig){
+        window.__rcTasksToggleOrig();   // one utility panel at a time
+      }
+      __rcMsgDock.open = open;
+      if(open){
+        const wasOpen = tray.classList.contains('is-open');
+        tray.classList.add('is-open');
+        if(!quiet && !wasOpen){ tray.classList.remove('tray-bounce'); void tray.offsetWidth; tray.classList.add('tray-bounce'); }
+      } else {
+        tray.classList.remove('is-open', 'tray-bounce');
+        rcMsgCloseMenus();
+      }
+      btn.classList.toggle('is-active', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function rcMsgToggleTray(){
+      const opening = !__rcMsgDock.open;
+      rcMsgShowTray(opening);
+      if(opening) rcMsgRenderDock();
+    }
+
+    function rcMsgAwaitingList(){
+      return rcMsgAllContacts().filter(c => rcMsgPhones(c).length && rcMsgAwaiting(rcMsgState(c)));
+    }
+
+    function rcMsgToggleExpand(){
+      __rcMsgDock.expanded = !__rcMsgDock.expanded;
+      const tray = document.getElementById('rcmsgTray');
+      tray.classList.toggle('is-expanded', __rcMsgDock.expanded);
+      const b = document.getElementById('rcmsgExpandBtn');
+      if(b){ b.innerHTML = __rcMsgDock.expanded ? RCMSG_ICON_SHRINK : RCMSG_ICON_EXPAND; b.title = __rcMsgDock.expanded ? 'Shrink' : 'Expand'; }
+      if(__rcMsgDock.open) rcMsgShowTray(true, true);   // re-clamp position
+      rcMsgScrollBottom(document.querySelector('#rcmsgTray .rcmsg-panel'));
+    }
+
+    function rcMsgSelectTab(key){
+      __rcMsgDock.active = key;
+      rcMsgRenderDock();
+    }
+
+    function rcMsgCloseTab(e, key){
+      if(e) e.stopPropagation();
+      const i = __rcMsgDock.tabs.indexOf(key);
+      if(i === -1) return;
+      __rcMsgDock.tabs.splice(i, 1);
+      if(__rcMsgDock.active === key){
+        __rcMsgDock.active = __rcMsgDock.tabs[i] || __rcMsgDock.tabs[i-1] || null;
+      }
+      rcMsgRenderDock();
+    }
+
+    function rcMsgShowPicker(){
+      __rcMsgDock.active = '__picker';
+      rcMsgRenderDock();
+    }
+
+    function rcMsgOpenRecord(key){
+      const st = __rcMsgStore[key];
+      if(st && st.contact && st.contact.pulseId != null && typeof rcOpenById === 'function'){
+        rcOpenById(st.contact.pulseId, { instant: true });
+      }
+    }
+
+    function rcMsgRenderTabs(){
+      const strip = document.getElementById('rcmsgTabs');
+      if(!strip) return;
+      const tabs = __rcMsgDock.tabs.map(key => {
+        const st = __rcMsgStore[key];
+        if(!st) return '';
+        const c = st.contact;
+        const on = key === __rcMsgDock.active;
+        const k = escapeHtml(key);
+        return `<div class="rcmsg-tab${on ? ' is-active' : ''}" role="tab" tabindex="0" aria-selected="${on}"
+                     title="${escapeHtml(c.name)}"
+                     onclick="rcMsgSelectTab('${k}')"
+                     onkeydown="if(event.key==='Enter'){rcMsgSelectTab('${k}');}">
+          <span class="rcmsg-tab-name">${escapeHtml(c.name)}</span>
+          ${rcMsgAwaiting(st) ? '<span class="rcmsg-dot" aria-label="Awaiting reply"></span>' : ''}
+          <button type="button" class="rcmsg-tab-x" title="Close tab" aria-label="Close ${escapeHtml(c.name)}" onclick="rcMsgCloseTab(event, '${k}')">${RCMSG_ICON_X}</button>
+        </div>`;
+      }).join('');
+      // "+" only matters inside a conversation; hide it while the inbox is showing.
+      const onInbox = __rcMsgDock.active === '__picker' || !__rcMsgDock.active;
+      const add = onInbox ? '' : `<button type="button" class="rcmsg-tab-add" title="Open another conversation" onclick="rcMsgShowPicker()">${RCMSG_ICON_PLUS}</button>`;
+      strip.innerHTML = tabs + add;
+      const hasTabs = !!tabs.trim();
+      strip.style.display = (hasTabs || add) ? '' : 'none';
+      const title = document.getElementById('rcmsgTitle');
+      if(title) title.style.display = hasTabs ? 'none' : '';
+      const view = document.getElementById('rcmsgViewBtn');
+      if(view) view.style.display = onInbox ? 'none' : '';
+      const act = strip.querySelector('.rcmsg-tab.is-active');
+      if(act && act.scrollIntoView) act.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
+    function rcMsgPickerRow(c){
+      const st = rcMsgState(c);
+      const last = st.messages[st.messages.length - 1];
+      const phones = rcMsgPhones(c);
+      const waiting = rcMsgAwaiting(st);
+      const prev = last ? ((last.dir === 'out' ? 'You: ' : '') + last.text)
+                        : (phones.length ? 'No messages yet' : 'No phone on file');
+      return `<button type="button" class="rcmsg-pick${waiting ? ' is-waiting' : ''}" onclick="rcMsgOpenDock('${escapeHtml(rcMsgKey(c))}')">
+        <span class="rcmsg-pick-flag">${waiting ? '<span class="rcmsg-dot" aria-label="Unread"></span>' : ''}</span>
+        <span class="rcmsg-avatar">${escapeHtml(rcMsgInitials(c))}</span>
+        <span class="rcmsg-pick-main">
+          <span class="rcmsg-pick-top">
+            <span class="rcmsg-pick-name">${escapeHtml(c.name)}</span>
+            <span class="rcmsg-pick-time">${last ? escapeHtml(rcMsgShortTime(last.at)) : ''}</span>
+          </span>
+          <span class="rcmsg-pick-bot">
+            <span class="rcmsg-pick-prev${last ? '' : ' is-muted'}">${escapeHtml(prev)}</span>
+          </span>
+        </span>
+      </button>`;
+    }
+
+    function rcMsgPickerHtml(){
+      const contacts = rcMsgAllContacts();
+      if(!contacts.length){
+        return `<div class="rcmsg-empty" style="flex:1;"><span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
+          <span class="rcmsg-empty-title">No contacts yet</span><span>Contacts from Confirmed Owners and Other Contacts show up here.</span></div>`;
+      }
+      const lastAt = c => { const st = rcMsgState(c); const m = st.messages[st.messages.length-1]; return m ? m.at.getTime() : 0; };
+      const rows = contacts.slice().sort((a, b) => lastAt(b) - lastAt(a));
+      return `<div class="rcmsg-picker">
+        <div class="rcmsg-picker-head">Conversations</div>
+        ${rows.map(rcMsgPickerRow).join('')}
+      </div>`;
+    }
+
+    function rcMsgRenderDock(){
+      const body = document.getElementById('rcmsgBody');
+      if(!body) return;
+      if(__rcMsgDock.active && __rcMsgDock.active !== '__picker' && !__rcMsgStore[__rcMsgDock.active]) __rcMsgDock.active = null;
+      rcMsgRenderTabs();
+      const key = __rcMsgDock.active;
+      if(!key || key === '__picker'){
+        body.innerHTML = rcMsgPickerHtml();
+      } else {
+        body.innerHTML = rcMsgPanelHtml(key);
+        const panel = body.querySelector('.rcmsg-panel');
+        const st = __rcMsgStore[key];
+        const ta = panel.querySelector('.rcmsg-input');
+        if(ta && !ta.disabled) ta.value = st.draft || '';
+        rcMsgSyncComposer(panel, st);
+        requestAnimationFrame(() => rcMsgScrollBottom(panel));
+      }
+      const count = document.getElementById('rcmsgOpenCount');
+      if(count) count.textContent = __rcMsgDock.tabs.length ? '(' + __rcMsgDock.tabs.length + ' open)' : '';
+      rcMsgUpdateBadge();
+    }
+
+    // Utility-bar badge = conversations whose latest message is from the contact.
+    function rcMsgUpdateBadge(){
+      const badge = document.getElementById('rcmsgUtilBadge');
+      if(!badge) return;
+      const n = rcMsgAwaitingList().length;
+      badge.textContent = n;
+      badge.style.display = n ? 'inline-flex' : 'none';
+    }
+
+    // Called after fresh record data lands (initial load + silent refreshes).
+    function rcMsgAfterData(){
+      rcMsgUpdateBadge();
+      if(__rcMsgDock.open && (!__rcMsgDock.active || __rcMsgDock.active === '__picker')) rcMsgRenderDock();
+      else rcMsgRenderTabs();
+    }
+    window.rcMsgAfterData = rcMsgAfterData;
+
+    // Record header "Message" button → opens this contact's tab.
+    function rcMessageButton(c){
+      return `<button type="button" class="rc-det-action-ghost" onclick="rcMsgOpenDock('${escapeHtml(rcMsgKey(c))}')" title="Text this contact">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.3c-.9 0-1.8-.1-2.6-.4L4 21l1.4-4A8 8 0 0 1 3 11.5 8.6 8.6 0 0 1 12 3a8.6 8.6 0 0 1 9 8.5z"/></svg>
+        Message
+      </button>`;
+    }
+
+    // Build the utility-bar button + tray once the page is ready.
+    function rcMsgMountDock(){
+      if(document.getElementById('rcmsgTray')) return;
+      const bar = document.getElementById('utilityBar');
+      if(bar){
+        const btn = document.createElement('button');
+        btn.id = 'rcmsgUtilBtn';
+        btn.type = 'button';
+        btn.className = 'rcmsg-util-btn';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.3c-.9 0-1.8-.1-2.6-.4L4 21l1.4-4A8 8 0 0 1 3 11.5 8.6 8.6 0 0 1 12 3a8.6 8.6 0 0 1 9 8.5z"/></svg>
+          Messages<span id="rcmsgUtilBadge" class="rcmsg-util-badge">0</span>`;
+        btn.addEventListener('click', rcMsgToggleTray);
+        bar.appendChild(btn);
+      }
+      const tray = document.createElement('div');
+      tray.id = 'rcmsgTray';
+      tray.className = 'rcmsg-tray';
+      tray.setAttribute('role', 'dialog');
+      tray.setAttribute('aria-label', 'Messages');
+      tray.innerHTML = `
+        <div class="rcmsg-head">
+          <span class="rcmsg-head-mark">${RCMSG_ICON_CHAT}</span>
+          <span id="rcmsgTitle" class="rcmsg-head-title">Messages</span>
+          <div id="rcmsgTabs" class="rcmsg-tabs" role="tablist"></div>
+          <div class="rcmsg-head-actions">
+            <button type="button" id="rcmsgViewBtn" class="rcmsg-head-btn" title="View record" aria-label="View record" onclick="rcMsgOpenRecord(__rcMsgDock.active)">${RCMSG_ICON_POPOUT}</button>
+            <button type="button" class="rcmsg-head-btn" title="Minimize" aria-label="Minimize" onclick="rcMsgShowTray(false)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="12" x2="18" y2="12"/></svg></button>
+          </div>
+        </div>
+        <div id="rcmsgBody" class="rcmsg-dock-body"></div>`;
+      document.body.appendChild(tray);
+
+      // Opening the To Do List closes Messages (one utility panel at a time).
+      if(typeof window.toggleTasksTray === 'function' && !window.__rcTasksToggleOrig){
+        window.__rcTasksToggleOrig = window.toggleTasksTray;
+        window.toggleTasksTray = function(){
+          if(typeof utilityTasksOpen !== 'undefined' && !utilityTasksOpen && __rcMsgDock.open) rcMsgShowTray(false);
+          return window.__rcTasksToggleOrig.apply(this, arguments);
+        };
+      }
+      rcMsgRenderDock();
+    }
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', rcMsgMountDock);
+    else setTimeout(rcMsgMountDock, 0);
+    window.addEventListener('resize', () => { if(__rcMsgDock.open) rcMsgShowTray(true, true); });
+
+    document.addEventListener('click', e => {
+      if(!e.target.closest('.rcmsg-tpl-wrap')) rcMsgCloseMenus();
+    });
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape') rcMsgCloseMenus();
+    });
+
+    Object.assign(window, {
+      rcMsgOnInput, rcMsgOnKey, rcMsgPickPhone, rcMsgSend, rcMsgRetry,
+      rcMsgToggleTemplates, rcMsgPickTemplate, rcMsgHydrate,
+      rcMsgOpenDock, rcMsgShowTray, rcMsgToggleTray, rcMsgToggleExpand,
+      rcMsgSelectTab, rcMsgCloseTab, rcMsgShowPicker, rcMsgOpenRecord, rcMsgUpdateBadge,
+      rcMsgAiDraft, rcMsgRenderDock
+    });
+
+
     function rcRenderDetailOwner(c, innerId, detailId){
       const det = document.getElementById(detailId);
       det.querySelector(".rc-detail-empty").style.display = "none";
@@ -6535,8 +8018,7 @@
       const isOverdue = c.overdue;
       
       let intelBadge = '';
-      if (isOverdue) intelBadge = `<div class="rc-det-badge">Overdue</div>`;
-      else if (allFilled) intelBadge = `<div class="rc-det-badge success"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-right:2px;"><path d="M2 6.5l2.5 2.5 5.5-5.5" stroke="#0e7a0e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Signals Identified</div>`;
+      if (false) intelBadge = '';
 
       const relBadge = c.relation ? `<div class="rc-det-badge">${escapeHtml(c.relation)}</div>` : '';
 
@@ -6551,7 +8033,6 @@
                 <div class="rc-det-name">${escapeHtml(c.name)}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;">
                   ${c.status && c.status !== 'New' ? `<div class="rc-det-badge">${escapeHtml(c.status)}</div>` : ''}
-                  ${intelBadge}
                   ${rcMailBadge(c)}
                 </div>
               </div>
@@ -6607,10 +8088,6 @@
                   <div class="rc-field-inner">
                   <span class="rc-label">Seller Motivation</span>
                   <div style="display:flex;align-items:center;gap:6px;">
-                    ${rcHasVal(c.sellerMotivation)
-                      ? '<span class="rc-status-badge rc-status-badge--success"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
-                      : '<span class="rc-status-badge rc-status-badge--warning"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L11 10H1L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r="0.5" fill="currentColor"/></svg></span>'
-                    }
                     <div class="rc-value">${rcStyledDropdown(c.sellerMotivation,["Doesn't want involvement",'Financial Hardship','Fractured relationship w/ owners','Gave up on solving the problem','Unaware of their ownership & ties'],'sellerMotivation','—',true,false)}</div>
                   </div>
                   </div>
@@ -6670,12 +8147,10 @@
                 const rows = [];
                 // Row 1: Address | Contact Outcome
                 rows.push('<div class="rc-row">' + addrHtml + outcomeHtml + '</div>');
-                // Phones, two per row
-                for(let i=0;i<toShow.length;i+=2){
-                  const left = toShow[i];
-                  const right = toShow[i+1];
-                  const rightHtml = right ? phoneFieldHtml(right) : '<div class="rc-field"></div>';
-                  rows.push('<div class="rc-row">' + phoneFieldHtml(left) + rightHtml + '</div>');
+                // Phones, then SMS Opt Status, two per row
+                const cells = toShow.map(phoneFieldHtml).concat([rcSmsOptFieldHtml(c)]);
+                for(let i=0;i<cells.length;i+=2){
+                  rows.push('<div class="rc-row">' + cells[i] + (cells[i+1] || '<div class="rc-field"></div>') + '</div>');
                 }
                 return rows.join('');
               })()}
@@ -6686,6 +8161,7 @@
           <div class="rc-right-col">
           <!-- Related Contacts — collapsible related list above Lead Milestones -->
           ${rcRelatedContactsCard(c)}
+          ${rcMessagesCard(c)}
           <div class="rc-record-right-panel">
             ${rcMilestonesBody(c)}
           </div>
@@ -6695,6 +8171,7 @@
       // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
       rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
       rcFillTaskNoteBodies(inner, c);
+      rcMsgHydrate(inner);
       } catch(e) { console.error('rcRenderDetailOwner error:', e, c); }
     }
 
@@ -6833,6 +8310,11 @@
                   </div>
                 </div>
               </div>
+              <!-- Row 3: SMS Opt Status -->
+              <div class="rc-row">
+                ${rcSmsOptFieldHtml(c)}
+                <div class="rc-field"></div>
+              </div>
             </div>
           </div>
           </div>
@@ -6840,6 +8322,7 @@
           <div class="rc-right-col">
           <!-- Related Contacts — collapsible related list above Lead Milestones -->
           ${rcRelatedContactsCard(c)}
+          ${rcMessagesCard(c)}
           <div class="rc-record-right-panel">
             ${rcMilestonesBody(c)}
           </div>
@@ -6849,6 +8332,7 @@
       // Fill timeline note bodies via textContent to prevent any special characters from breaking the DOM
       rcFillTimelineNoteBodies(inner, c.lastRecentUpdate || '');
       rcFillTaskNoteBodies(inner, c);
+      rcMsgHydrate(inner);
       } catch(e) { console.error('rcRenderDetailOther error:', e, c); }
     }
 
@@ -7653,6 +9137,7 @@
         phone3:           formatPhone(c.phone_3 ?? c.phone3 ?? "—"),
         phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
         contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
+        smsOptStatus:     c.sms_opt_status ?? c.smsOptStatus ?? "—",
         address:          toProperAddress(c.Address ?? c.address ?? c.text5__1 ?? "—"),
         keyContact:       !!(c.key_contact ?? c.keyContact ?? false),
         notes:            c.notes ?? "",
@@ -8370,6 +9855,7 @@
       phone2:          'Phone number saved — nice work. \u2713',
       phone3:          'Phone number saved — nice work. \u2713',
       contactOutcome:  'Contact outcome logged — great detail! \u2713',
+      smsOptStatus:    'SMS opt status saved \u2713',
       sellerMotivation:'Seller motivation captured — that\u2019s gold. \u2713',
       ownerStatus:     'Owner status confirmed — keep it up! \u2713',
       relation:        'Relationship updated — nicely done. \u2713',
