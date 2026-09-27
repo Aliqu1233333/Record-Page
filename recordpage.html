@@ -4419,6 +4419,128 @@
     .rcmsg-route-sel select option:disabled { color: #b0b8c4; }
   </style>
 
+  <style>
+    /* ══════════════════════════════════════════════════════
+       MESSAGES — Cosmos polish (route dropdowns, empty state,
+       composer tools). Declared last so it wins.
+       ══════════════════════════════════════════════════════ */
+
+    /* Route bar */
+    #rcmsgTray .rcmsg-route {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 8px; height: 44px;
+      background: #ffffff; border-bottom: 1px solid #e5e7eb;
+    }
+    #rcmsgTray .rcmsg-route-f { display: flex; align-items: center; gap: 4px; min-width: 0; flex: 1 1 auto; padding: 0 8px; }
+    #rcmsgTray .rcmsg-route-f.is-from { flex: 0 0 auto; border-left: 1px solid #e5e7eb; }
+    #rcmsgTray .rcmsg-route-lbl { font-size: 12px; font-weight: 400; color: #5c5c5c; flex-shrink: 0; }
+    .rcmsg-dd-none { font-size: 13px; color: #5c5c5c; padding-left: 6px; }
+
+    /* Dropdown trigger: borderless, matches record-page dropdowns */
+    .rcmsg-dd { position: relative; min-width: 0; }
+    .rcmsg-dd-btn {
+      display: inline-flex; align-items: center; gap: 7px; max-width: 100%;
+      height: 30px; padding: 0 8px; border: 1px solid transparent; border-radius: 8px;
+      background: transparent; cursor: pointer; font-family: var(--font);
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .rcmsg-dd-btn:hover { background: #f3f3f3; }
+    .rcmsg-dd.is-open .rcmsg-dd-btn { background: #eef4ff; border-color: #cfe0f7; }
+    .rcmsg-dd-btn:focus-visible { outline: none; border-color: #0176d3; box-shadow: 0 0 0 2px rgba(1,118,211,.18); }
+    .rcmsg-dd-val { font-size: 13.5px; font-weight: 500; color: #181818; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -.005em; }
+    .rcmsg-dd-chev { width: 12px; height: 12px; color: #747474; flex-shrink: 0; transition: transform .15s ease; }
+    .rcmsg-dd.is-open .rcmsg-dd-chev { transform: rotate(180deg); color: #0176d3; }
+
+    /* Status tag (SLDS badge style) */
+    .rcmsg-tag {
+      display: inline-flex; align-items: center; flex-shrink: 0;
+      height: 18px; padding: 0 7px; border-radius: 4px;
+      font-size: 11px; font-weight: 500; line-height: 1; white-space: nowrap; letter-spacing: .01em;
+    }
+    .rcmsg-tag.is-ok  { background: #ebf7e6; color: #2e844a; }
+    .rcmsg-tag.is-bad { background: #feded8; color: #ba0517; }
+    .rcmsg-tag.is-unk { background: #f3f3f3; color: #5c5c5c; }
+
+    /* Menu */
+    .rcmsg-dd-menu {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+      min-width: 260px; padding: 4px;
+      background: #ffffff; border: 1px solid #e5e5e5; border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(24,24,24,.06), 0 8px 24px rgba(24,24,24,.12);
+    }
+    .rcmsg-dd-menu.is-right { left: auto; right: 0; min-width: 200px; }
+    .rcmsg-dd.is-open .rcmsg-dd-menu { display: block; animation: rcmsgDdIn .12s ease; }
+    @keyframes rcmsgDdIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+    .rcmsg-dd-head { padding: 8px 10px 6px; font-size: 11px; font-weight: 500; color: #5c5c5c; letter-spacing: .02em; }
+    .rcmsg-dd-opt {
+      display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      padding: 8px 10px; border: 0; border-radius: 6px; background: transparent;
+      font-family: var(--font); cursor: pointer; transition: background .1s ease;
+    }
+    .rcmsg-dd-opt:hover:not([disabled]), .rcmsg-dd-opt:focus-visible { background: #f3f3f3; outline: none; }
+    .rcmsg-dd-opt.is-current { background: #eef4ff; }
+    .rcmsg-dd-opt[disabled] { cursor: not-allowed; }
+    .rcmsg-dd-opt[disabled] .rcmsg-dd-title { color: #939393; text-decoration: line-through; text-decoration-color: #c9c9c9; }
+    .rcmsg-dd-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+    .rcmsg-dd-title { font-size: 13.5px; font-weight: 500; color: #181818; white-space: nowrap; }
+    .rcmsg-dd-sub { font-size: 11.5px; color: #5c5c5c; white-space: nowrap; }
+    .rcmsg-dd-tickwrap { width: 14px; flex-shrink: 0; display: flex; justify-content: center; }
+    .rcmsg-dd-tick { width: 14px; height: 14px; color: #0176d3; }
+
+    /* Thread + empty state (no illustration) */
+    #rcmsgTray .rcmsg-thread { background: #fafafa; border-top: 0; border-bottom: 1px solid #e5e7eb; }
+    .rcmsg-empty { gap: 4px; min-height: 180px; padding: 24px 32px; }
+    .rcmsg-empty .rcmsg-empty-title { font-size: 14px; font-weight: 500; color: #181818; letter-spacing: -.005em; }
+    .rcmsg-empty > span:not(.rcmsg-empty-title) { font-size: 12.5px; color: #5c5c5c; line-height: 1.45; max-width: 280px; }
+    #rcmsgTray .rcmsg-panel .rcmsg-empty { flex: 1; min-height: 100%; }
+
+    /* Composer */
+    #rcmsgTray .rcmsg-composer { padding: 12px 14px 14px; background: #ffffff; }
+    #rcmsgTray .rcmsg-input-wrap { border: 1px solid #c9c9c9; border-radius: 12px; background: #ffffff; }
+    #rcmsgTray .rcmsg-input-wrap:focus-within { border-color: #0176d3; box-shadow: 0 0 0 2px rgba(1,118,211,.15); }
+    #rcmsgTray .rcmsg-input-wrap.is-disabled { background: #f3f3f3; border-color: #e5e5e5; }
+    #rcmsgTray .rcmsg-input { font-size: 13.5px; padding: 11px 14px 6px; }
+    #rcmsgTray .rcmsg-input::placeholder { color: #747474; }
+    #rcmsgTray .rcmsg-input:disabled::placeholder { color: #939393; }
+    #rcmsgTray .rcmsg-input-foot { gap: 6px; padding: 4px 8px 8px 8px; }
+    #rcmsgTray .rcmsg-send { margin-left: auto; height: 30px; padding: 0 16px; font-size: 13px; }
+    #rcmsgTray .rcmsg-send:disabled { background: #e5e5e5; border-color: #e5e5e5; color: #939393; }
+
+    /* Secondary tools: Draft with AI + Templates (SLDS neutral buttons) */
+    #rcmsgTray .rcmsg-tpl-btn,
+    #rcmsgTray .rcmsg-ai-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      width: auto; height: 30px; padding: 0 12px;
+      border-radius: 999px; font-family: var(--font); font-size: 12.5px; font-weight: 500;
+      cursor: pointer; transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    #rcmsgTray .rcmsg-tpl-btn { background: #ffffff; border: 1px solid #c9c9c9; color: #0b5cab; }
+    #rcmsgTray .rcmsg-tpl-btn svg { width: 13px; height: 13px; }
+    #rcmsgTray .rcmsg-tpl-btn:hover:not(:disabled) { background: #f3f3f3; border-color: #aeaeae; }
+
+    /* AI: gradient hairline border, gradient mark, dark label */
+    #rcmsgTray .rcmsg-ai-btn {
+      border: 1px solid transparent; color: #032d60;
+      background: linear-gradient(#ffffff, #ffffff) padding-box,
+                  linear-gradient(120deg, #0176d3, #9050e9) border-box;
+    }
+    #rcmsgTray .rcmsg-ai-btn svg { width: 15px; height: 15px; }
+    #rcmsgTray .rcmsg-ai-btn:hover:not(:disabled) {
+      background: linear-gradient(#f5f2fe, #f5f2fe) padding-box,
+                  linear-gradient(120deg, #0176d3, #9050e9) border-box;
+      box-shadow: 0 1px 6px rgba(144,80,233,.18);
+    }
+    #rcmsgTray .rcmsg-ai-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(144,80,233,.25); }
+    #rcmsgTray .rcmsg-ai-btn.is-busy { cursor: progress; }
+    #rcmsgTray .rcmsg-ai-btn.is-busy .rcmsg-ai-lbl { color: #5c5c5c; }
+
+    #rcmsgTray .rcmsg-tpl-btn:disabled,
+    #rcmsgTray .rcmsg-ai-btn:disabled:not(.is-busy) {
+      background: #ffffff; border: 1px solid #e5e5e5; color: #aeaeae; cursor: not-allowed; box-shadow: none;
+    }
+    #rcmsgTray .rcmsg-ai-btn:disabled:not(.is-busy) svg path { fill: #c9c9c9; }
+  </style>
+
 </head>
 
 <body>
@@ -7269,14 +7391,12 @@
       const c = st.contact;
       if(!st.messages.length && !rcMsgPhones(c).length){
         return `<div class="rcmsg-empty">
-          <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
           <span class="rcmsg-empty-title">No phone number on file</span>
           <span>Add a number under Contact Info to start texting ${escapeHtml(rcMsgFirst(c))}.</span>
         </div>`;
       }
       if(!st.messages.length){
         return `<div class="rcmsg-empty">
-          <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
           <span class="rcmsg-empty-title">No messages yet</span>
           <span>${rcMsgOptedOut(c) ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts.'
                  : (rcMsgFirstGoodIdx(rcMsgPhones(c)) === -1 ? 'Every number on file is marked Wrong or Disconnected.'
@@ -7400,29 +7520,10 @@
       const k = escapeHtml(key);
       const placeholder = optedOut ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts'
         : !phones.length ? 'Add a phone number to send texts'
-        : allBad ? 'No textable number (all marked Wrong/Disconnected)'
+        : allBad ? 'No textable number on file'
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
 
       if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = rcMsgSavedFrom();
-      const chev = '<svg class="rcmsg-route-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
-      const cur = phones[st.phoneIdx];
-      const toHtml = phones.length
-        ? `<span class="rcmsg-route-dot is-${rcMsgPhoneTone(cur && cur.status)}" title="${escapeHtml(cur && rcMsgHas(cur.status) ? cur.status : 'Unverified')}"></span>
-           <span class="rcmsg-route-sel">
-             <span class="rcmsg-route-val">${escapeHtml(cur ? cur.num : '')}</span>
-             <select aria-label="Send to" onchange="rcMsgPickPhone(this)">
-               ${phones.map((p, i) => `<option value="${i}"${i === st.phoneIdx ? ' selected' : ''}${rcMsgPhoneTone(p.status) === 'bad' ? ' disabled' : ''}>${escapeHtml(p.num)} · ${escapeHtml(p.label)}${rcMsgHas(p.status) ? ' (' + escapeHtml(p.status) + ')' : ''}</option>`).join('')}
-             </select>${chev}
-           </span>`
-        : `<span class="rcmsg-to-none">No number on file</span>`;
-      const snd = RCMSG_SENDERS[st.fromIdx];
-      const fromHtml = `<span class="rcmsg-route-sel">
-             <span class="rcmsg-route-val">${escapeHtml(snd.name)}</span>
-             <select aria-label="Send from" onchange="rcMsgPickFrom(this)">
-               ${RCMSG_SENDERS.map((p, i) => `<option value="${i}"${i === st.fromIdx ? ' selected' : ''}>${escapeHtml(p.name)}</option>`).join('')}
-             </select>${chev}
-           </span>`;
-
       const tplOpts = RCMSG_TEMPLATES.map((t, i) => {
         const preview = t.text.replace('{first}', rcMsgFirst(c));
         return `<button type="button" class="rcmsg-tpl-opt" onclick="rcMsgPickTemplate(this, ${i})">
@@ -7432,14 +7533,10 @@
       }).join('');
 
       return `<div class="rcmsg-card rcmsg-panel" data-rcmsg="${k}">
-        <div class="rcmsg-route">
-          <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">To</span>${toHtml}</div>
-          <span class="rcmsg-route-div" aria-hidden="true"></span>
-          <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">From</span>${fromHtml}</div>
-        </div>
+        ${rcMsgRouteHtml(st)}
         <div class="rcmsg-thread" role="log" aria-live="polite" aria-label="Message thread">${rcMsgThreadHtml(st)}</div>
         <div class="rcmsg-composer">
-          <div class="rcmsg-input-wrap">
+          <div class="rcmsg-input-wrap${canText ? '' : ' is-disabled'}">
             <textarea class="rcmsg-input" rows="1"
               placeholder="${placeholder}"
               aria-label="Message"
@@ -7447,9 +7544,8 @@
               oninput="rcMsgOnInput(this)"
               onkeydown="rcMsgOnKey(event, this)"></textarea>
             <div class="rcmsg-input-foot">
-              <span class="rcmsg-count">0 / ${RCMSG_SEGMENT}</span>
-              <button type="button" class="rcmsg-ai-btn" onclick="rcMsgAiDraft(this)" title="Draft a reply with AI" aria-label="Draft a reply with AI" ${canText ? '' : 'disabled'}>
-                ${RCMSG_ICON_AI}
+              <button type="button" class="rcmsg-ai-btn" onclick="rcMsgAiDraft(this)" title="Draft a reply from the conversation" ${canText ? '' : 'disabled'}>
+                ${RCMSG_ICON_AI}<span class="rcmsg-ai-lbl">Draft with AI</span>
               </button>
               <div class="rcmsg-tpl-wrap">
                 <button type="button" class="rcmsg-tpl-btn" onclick="rcMsgToggleTemplates(this)" aria-haspopup="true" aria-expanded="false" ${canText ? '' : 'disabled'}>
@@ -7475,7 +7571,7 @@
     // To make it real, replace rcMsgAiSuggest() with a call to your AI
     // endpoint, passing the thread + contact context, and keep the rest.
     // ══════════════════════════════════════════════════════════════════
-    const RCMSG_ICON_AI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l1.9 4.6 4.6 1.9-4.6 1.9L12 16.5l-1.9-4.6L5.5 10l4.6-1.9z"/><path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"/></svg>';
+    const RCMSG_ICON_AI = '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="rcmsgAiGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0176d3"/><stop offset="1" stop-color="#9050e9"/></linearGradient></defs><path fill="url(#rcmsgAiGrad)" d="M10 2.5l1.9 5.1 5.1 1.9-5.1 1.9L10 16.5l-1.9-5.1L3 9.5l5.1-1.9z"/><path fill="url(#rcmsgAiGrad)" d="M18 13.5l.95 2.55 2.55.95-2.55.95L18 20.5l-.95-2.55L14.5 17l2.55-.95z"/></svg>';
 
     function rcMsgAiSuggest(st, typed){
       const c = st.contact;
@@ -7626,19 +7722,106 @@
       }
     }
 
-    function rcMsgPickPhone(sel){
-      const { st } = rcMsgCardState(sel);
-      if(st) st.phoneIdx = parseInt(sel.value, 10) || 0;
-      rcMsgSyncRouteDots(sel.closest('.rcmsg-route'), st);
+    // ── To / From dropdowns (Cosmos-style listbox, replaces native selects) ──
+    const RCMSG_ICON_DDCHEV = '<svg class="rcmsg-dd-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+    const RCMSG_ICON_TICK = '<svg class="rcmsg-dd-tick" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+
+    // Short, readable status label + tone for a phone status.
+    function rcMsgPhoneTag(status){
+      const v = String(status || '').toLowerCase();
+      if(v.includes('disconnect') || v.includes('no longer')) return { label: 'Disconnected', tone: 'bad' };
+      if(v.includes('wrong') || v.includes('incorrect'))      return { label: 'Wrong number', tone: 'bad' };
+      if(v.includes('correct'))                               return { label: 'Correct',      tone: 'ok' };
+      if(rcMsgHas(status))                                    return { label: String(status).trim(), tone: 'unk' };
+      return { label: 'Unverified', tone: 'unk' };
+    }
+    function rcMsgTagHtml(t){ return `<span class="rcmsg-tag is-${t.tone}">${escapeHtml(t.label)}</span>`; }
+
+    function rcMsgRouteHtml(st){
+      const c = st.contact;
+      const phones = rcMsgPhones(c);
+      const cur = phones[st.phoneIdx];
+      let toHtml;
+      if(!phones.length){
+        toHtml = `<span class="rcmsg-dd-none">No number on file</span>`;
+      } else {
+        const curTag = rcMsgPhoneTag(cur && cur.status);
+        const opts = phones.map((p, i) => {
+          const t = rcMsgPhoneTag(p.status);
+          const bad = t.tone === 'bad';
+          return `<button type="button" class="rcmsg-dd-opt${i === st.phoneIdx ? ' is-current' : ''}" role="option"
+                    aria-selected="${i === st.phoneIdx}" ${bad ? 'disabled aria-disabled="true"' : `onclick="rcMsgChoosePhone(this, ${i})"`}>
+            <span class="rcmsg-dd-main"><span class="rcmsg-dd-title">${escapeHtml(p.num)}</span><span class="rcmsg-dd-sub">${escapeHtml(p.label)}</span></span>
+            ${rcMsgTagHtml(t)}
+            <span class="rcmsg-dd-tickwrap">${i === st.phoneIdx ? RCMSG_ICON_TICK : ''}</span>
+          </button>`;
+        }).join('');
+        toHtml = `<div class="rcmsg-dd">
+          <button type="button" class="rcmsg-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Send to" onclick="rcMsgDdToggle(this)">
+            <span class="rcmsg-dd-val">${escapeHtml(cur ? cur.num : '')}</span>
+            ${curTag.tone !== 'ok' ? rcMsgTagHtml(curTag) : ''}
+            ${RCMSG_ICON_DDCHEV}
+          </button>
+          <div class="rcmsg-dd-menu" role="listbox">
+            <div class="rcmsg-dd-head">Send to</div>
+            ${opts}
+          </div>
+        </div>`;
+      }
+      const snd = RCMSG_SENDERS[st.fromIdx] || RCMSG_SENDERS[0];
+      const fromOpts = RCMSG_SENDERS.map((p, i) => `<button type="button" class="rcmsg-dd-opt${i === st.fromIdx ? ' is-current' : ''}" role="option" aria-selected="${i === st.fromIdx}" onclick="rcMsgChooseFrom(this, ${i})">
+            <span class="rcmsg-dd-main"><span class="rcmsg-dd-title">${escapeHtml(p.name)}</span>${p.num ? `<span class="rcmsg-dd-sub">${escapeHtml(p.num)}</span>` : ''}</span>
+            <span class="rcmsg-dd-tickwrap">${i === st.fromIdx ? RCMSG_ICON_TICK : ''}</span>
+          </button>`).join('');
+      const fromHtml = `<div class="rcmsg-dd">
+          <button type="button" class="rcmsg-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Send from" onclick="rcMsgDdToggle(this)">
+            <span class="rcmsg-dd-val">${escapeHtml(snd.name)}</span>${RCMSG_ICON_DDCHEV}
+          </button>
+          <div class="rcmsg-dd-menu is-right" role="listbox">
+            <div class="rcmsg-dd-head">Send from</div>
+            ${fromOpts}
+          </div>
+        </div>`;
+      return `<div class="rcmsg-route">
+          <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">To</span>${toHtml}</div>
+          <div class="rcmsg-route-f is-from"><span class="rcmsg-route-lbl">From</span>${fromHtml}</div>
+        </div>`;
     }
 
-    function rcMsgPickFrom(sel){
-      const { st } = rcMsgCardState(sel);
-      if(st) st.fromIdx = parseInt(sel.value, 10) || 0;
-      try { localStorage.setItem('rcmsg_from_idx', String(st ? st.fromIdx : 0)); } catch(e){}
-      const snd = RCMSG_SENDERS[st ? st.fromIdx : 0];
-      const val = sel.parentElement.querySelector('.rcmsg-route-val');
-      if(val && snd) val.textContent = snd.name;
+    function rcMsgDdClose(except){
+      document.querySelectorAll('.rcmsg-dd.is-open').forEach(dd => {
+        if(dd === except) return;
+        dd.classList.remove('is-open');
+        const b = dd.querySelector('.rcmsg-dd-btn'); if(b) b.setAttribute('aria-expanded', 'false');
+      });
+    }
+    function rcMsgDdToggle(btn){
+      const dd = btn.closest('.rcmsg-dd');
+      rcMsgDdClose(dd);
+      rcMsgCloseMenus();
+      const open = dd.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if(open){ const f = dd.querySelector('.rcmsg-dd-opt.is-current:not([disabled])') || dd.querySelector('.rcmsg-dd-opt:not([disabled])'); if(f) f.focus({ preventScroll: true }); }
+    }
+    function rcMsgRedrawRoute(card, st){
+      const route = card.querySelector('.rcmsg-route');
+      if(!route) return;
+      const tmp = document.createElement('div');
+      tmp.innerHTML = rcMsgRouteHtml(st).trim();
+      route.replaceWith(tmp.firstElementChild);
+    }
+    function rcMsgChoosePhone(opt, i){
+      const { card, st } = rcMsgCardState(opt);
+      if(!card || !st) return;
+      st.phoneIdx = i;
+      rcMsgRedrawRoute(card, st);
+    }
+    function rcMsgChooseFrom(opt, i){
+      const { card, st } = rcMsgCardState(opt);
+      if(!card || !st) return;
+      st.fromIdx = i;
+      try { localStorage.setItem('rcmsg_from_idx', String(i)); } catch(e){}
+      rcMsgRedrawRoute(card, st);
     }
 
     // Colour of the small dot beside the To number: green = Correct, red = wrong, gray = unverified.
@@ -7648,18 +7831,6 @@
       if(v.includes('correct')) return 'ok';
       return 'unk';
     }
-    function rcMsgSyncRouteDots(route, st){
-      if(!route || !st) return;
-      const p = rcMsgPhones(st.contact)[st.phoneIdx];
-      const dot = route.querySelector('.rcmsg-route-dot');
-      const val = route.querySelector('.rcmsg-route-f .rcmsg-route-val');
-      if(val && p) val.textContent = p.num;
-      if(dot && p){
-        dot.className = 'rcmsg-route-dot is-' + rcMsgPhoneTone(p.status);
-        dot.title = rcMsgHas(p.status) ? p.status : 'Unverified';
-      }
-    }
-
     // ── SEND WEBHOOK ─────────────────────────────────────────────────
     // Every Send (and Retry) posts one text to Make:
     //   lead_id    → Sales Pipeline item ID (the record this page is open on)
@@ -7943,7 +8114,7 @@
     function rcMsgPickerHtml(){
       const contacts = rcMsgAllContacts();
       if(!contacts.length){
-        return `<div class="rcmsg-empty" style="flex:1;"><span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
+        return `<div class="rcmsg-empty" style="flex:1;">
           <span class="rcmsg-empty-title">No contacts yet</span><span>Contacts from Confirmed Owners and Other Contacts show up here.</span></div>`;
       }
       const lastAt = c => { const st = rcMsgState(c); const m = st.messages[st.messages.length-1]; return m ? m.at.getTime() : 0; };
@@ -7955,6 +8126,7 @@
     }
 
     function rcMsgRenderDock(){
+      rcMsgDdClose();
       const body = document.getElementById('rcmsgBody');
       if(!body) return;
       if(__rcMsgDock.active && __rcMsgDock.active !== '__picker' && !__rcMsgStore[__rcMsgDock.active]) __rcMsgDock.active = null;
@@ -8205,13 +8377,14 @@
 
     document.addEventListener('click', e => {
       if(!e.target.closest('.rcmsg-tpl-wrap')) rcMsgCloseMenus();
+      if(!e.target.closest('.rcmsg-dd')) rcMsgDdClose();
     });
     document.addEventListener('keydown', e => {
-      if(e.key === 'Escape') rcMsgCloseMenus();
+      if(e.key === 'Escape'){ rcMsgCloseMenus(); rcMsgDdClose(); }
     });
 
     Object.assign(window, {
-      rcMsgOnInput, rcMsgOnKey, rcMsgPickPhone, rcMsgSend, rcMsgRetry,
+      rcMsgOnInput, rcMsgOnKey, rcMsgDdToggle, rcMsgChoosePhone, rcMsgChooseFrom, rcMsgSend, rcMsgRetry,
       rcMsgToggleTemplates, rcMsgPickTemplate, rcMsgHydrate,
       rcMsgOpenDock, rcMsgShowTray, rcMsgToggleTray, rcMsgToggleExpand,
       rcMsgSelectTab, rcMsgCloseTab, rcMsgShowPicker, rcMsgOpenRecord, rcMsgUpdateBadge,
