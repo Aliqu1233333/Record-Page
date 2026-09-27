@@ -5320,7 +5320,7 @@
           // Your board: dropdown_mm1aybze · Logan's board (18334683949): dropdown_mm1jj215
           const OWNERSHIP_MAP_COLS = { '18334683949': 'dropdown_mm1jj215' };
           const ownershipMapCol = OWNERSHIP_MAP_COLS[String(boardId)] || 'dropdown_mm1aybze';
-          const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: ownershipMapCol, value: "Complete" }) });
+          const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId: ownershipMapCol, value: "Complete", who: rcWho() }) });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
         } catch (err) { console.error("Failed to update Ownership Map:", err); }
@@ -5663,7 +5663,7 @@
       const { boardId, pulseId } = extractIdsFromUrl();
       if (!boardId || !pulseId) { console.error("Cannot save — missing boardId or pulseId in URL"); return; }
       try {
-        const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId, value: newValue }) });
+        const res = await fetch(SAVE_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ boardId, pulseId, columnId, value: newValue, who: rcWho() }) });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         console.log(`✓ Saved "${fieldKey}" (${columnId}) → "${newValue}"`);
         if (typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh();
@@ -5873,10 +5873,13 @@
           scr = w + 'x' + h;
         }
       } catch (e) {}
-      window.rcViewer = { who, deviceId, screen: scr };
+      // page_version shows up in the Make logs, so you can tell which copy of this page ran.
+      window.rcViewer = { who, deviceId, screen: scr, rule: 'height>1080', page_version: '2026-09-27b' };
       return window.rcViewer;
     }
     window.rcGetViewer = rcGetViewer;
+    // `who` for every webhook this page sends ('Christian' / 'Damian' / '').
+    window.rcWho = function(){ try { return rcGetViewer().who || ''; } catch(e){ return ''; } };
 
     async function fetchDataFromMake(){
       const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
@@ -6177,7 +6180,7 @@
         await fetch(RC_CHANGE_WEBHOOK, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue })
+          body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue, who: rcWho() })
         });
         // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
         // without a manual refresh. 2.5s was shorter than a Make → monday
@@ -7302,7 +7305,7 @@
         const res = await fetch(RC_CREATE_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(Object.assign({}, payload, { who: rcWho() }))
         });
         // Best-effort read of returned IDs; a CORS-blocked body must not flip
         // the create to a failure (the send itself already succeeded).
@@ -7873,7 +7876,7 @@
         const res = await fetch(RCMSG_AI_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(rcMsgAiPayload(st, typed)),
+          body: JSON.stringify(Object.assign(rcMsgAiPayload(st, typed), { who: rcWho() })),
           signal: ctrl ? ctrl.signal : undefined
         });
         if(timer) clearTimeout(timer);
@@ -8156,7 +8159,7 @@
         const res = await fetch(RCMSG_SEND_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(Object.assign({}, payload, { who: rcWho() }))
         });
         if(!res.ok) throw new Error('HTTP ' + res.status);
         let data = null;
@@ -8600,7 +8603,7 @@
         const res = await fetch(RCMSG_THREAD_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lead_id: leadId })
+          body: JSON.stringify({ lead_id: leadId, who: rcWho() })
         });
         if(!res.ok) throw new Error('HTTP ' + res.status);
         let data = null;
@@ -9454,7 +9457,7 @@
         const res = await fetch(RC_CREATE_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(Object.assign({}, payload, { who: rcWho() }))
         });
         // Try to read the returned IDs. Wrapped separately so a CORS-blocked
         // or non-JSON body never flips the create to a failure.
@@ -9984,6 +9987,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            who: rcWho(),
             type: 'write_update',
             board_id: contactBoardId,
             pulse_id: contactPulseId || globalPulseId,
@@ -11002,7 +11006,7 @@
         const res = await fetch(TASK_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action, boardId, pulseId, task })
+          body: JSON.stringify({ action, boardId, pulseId, task, who: rcWho() })
         });
         if(res.ok) return await res.json().catch(() => null);
       } catch(err) { console.warn('Task webhook error:', err); }
@@ -11334,6 +11338,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            who: rcWho(),
             boardId,
             pulseId,
             columnId: 'long_text_mm2bk7p6',
@@ -11559,6 +11564,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              who:              (window.rcWho ? window.rcWho() : ''),
               boardId:          ids.boardId  || '',
               pulseId:          ids.pulseId  || '',
               next_action_step: step || '',
@@ -13160,7 +13166,7 @@
       var res = await fetch(MAILER_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(Object.assign({}, payload, { who: (window.rcWho ? window.rcWho() : '') }))
       });
       var bodyText = '';
       try { bodyText = await res.text(); } catch(e){ bodyText = ''; }
