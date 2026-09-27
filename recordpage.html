@@ -4632,6 +4632,15 @@
     .rcmsg-inbox-none { padding: 32px 16px; text-align: center; font-size: 12.5px; color: #5c5c5c; }
   </style>
 
+  <style>
+    /* From: no sender identified yet */
+    .rcmsg-dd-btn.is-empty .rcmsg-dd-val { color: #0176d3; font-weight: 500; }
+    .rcmsg-dd-btn.is-empty { border-color: #cfe0f7; background: #f4f8fd; }
+    .rcmsg-dd-btn.is-empty .rcmsg-dd-chev { color: #0176d3; }
+    .rcmsg-dd-btn.is-nudge { animation: rcmsgNudge .4s ease; }
+    @keyframes rcmsgNudge { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+  </style>
+
 </head>
 
 <body>
@@ -5839,13 +5848,40 @@
     }
 
 
+    // ── Who is viewing? ────────────────────────────────────────────────
+    // Worked out before the record-load webhook so the Make router can send
+    // the request down the right route by comparing a simple name.
+    // Ultrawide screen (ratio > 2) = Christian, anything else = Damian.
+    // If the screen can't be read, `who` is '' (unidentified).
+    // Also sets the default From line in Messages.
+    function rcGetViewer(){
+      if(window.rcViewer) return window.rcViewer;
+      let deviceId;
+      try {
+        deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) { deviceId = crypto.randomUUID(); localStorage.setItem('deviceId', deviceId); }
+      } catch (e) { deviceId = 'no-storage'; }
+      let who = '', scr = '';
+      try {
+        const w = screen.width, h = screen.height;
+        if (w > 0 && h > 0) {
+          const ratio = w / h;
+          who = ratio > 2 ? 'Christian' : 'Damian';   // swap names if needed
+          scr = w + 'x' + h;
+        }
+      } catch (e) {}
+      window.rcViewer = { who, deviceId, screen: scr };
+      return window.rcViewer;
+    }
+    window.rcGetViewer = rcGetViewer;
+
     async function fetchDataFromMake(){
       const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
       showLoading();
       const{boardId,pulseId}=extractIdsFromUrl();
       if(!boardId||!pulseId){ console.error('Missing board ID or pulse ID'); hideLoading(); return; }
       try{
-        const response=await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
+        const response=await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({boardId,pulseId}, rcGetViewer()))});
         if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data=await response.json();
         window.RecordPage.applyData(data);
@@ -5892,7 +5928,7 @@
       if(!boardId || !pulseId) return;
       _silentRefreshInFlight = true;
       try{
-        const response = await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boardId,pulseId})});
+        const response = await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({boardId,pulseId}, rcGetViewer()))});
         if(!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         // One more guard: user may have started editing during the fetch.
@@ -7389,6 +7425,17 @@
       for(let i = 0; i < phones.length; i++) if(rcMsgPhoneTone(phones[i].status) !== 'bad') return i;
       return -1;
     }
+    // One From choice for the whole page view (every conversation uses it).
+    // Starts as the identified viewer; null = unidentified, rep must pick.
+    let __rcMsgFromIdx;
+    function rcMsgFromIdx(){
+      if(__rcMsgFromIdx === undefined){
+        const who = (typeof window.rcGetViewer === 'function' ? window.rcGetViewer().who : '') || '';
+        const i = RCMSG_SENDERS.findIndex(x => x.name.toLowerCase() === who.toLowerCase());
+        __rcMsgFromIdx = i >= 0 ? i : null;
+      }
+      return __rcMsgFromIdx;
+    }
     function rcMsgSavedFrom(){
       try {
         const v = parseInt(localStorage.getItem('rcmsg_from_idx'), 10);
@@ -7641,7 +7688,7 @@
         : curBad ? 'This number is marked ' + escapeHtml(rcMsgPhoneTag(phones[st.phoneIdx].status).label.toLowerCase()) + '. View only.'
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
 
-      if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = rcMsgSavedFrom();
+      st.fromIdx = rcMsgFromIdx();
       const tplOpts = RCMSG_TEMPLATES.map((t, i) => {
         const preview = t.text.replace('{first}', rcMsgFirst(c));
         return `<button type="button" class="rcmsg-tpl-opt" onclick="rcMsgPickTemplate(this, ${i})">
@@ -7749,7 +7796,8 @@
       const dec = rcMsgDeceased();
       const phones = rcMsgPhones(c);
       const cur = phones[st.phoneIdx];
-      const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
+      const fi = rcMsgFromIdx();
+      const sender = fi != null ? RCMSG_SENDERS[fi] : { name: '' };
       const thread = rcMsgVisible(st).map(x => x.m).filter(m => m.status !== 'failed').slice(-20);
       return {
         lead_id:      rcMsgLeadId(),
@@ -7983,14 +8031,14 @@
           </div>
         </div>`;
       }
-      const snd = RCMSG_SENDERS[st.fromIdx] || RCMSG_SENDERS[0];
+      const snd = st.fromIdx != null ? RCMSG_SENDERS[st.fromIdx] : null;
       const fromOpts = RCMSG_SENDERS.map((p, i) => `<button type="button" class="rcmsg-dd-opt${i === st.fromIdx ? ' is-current' : ''}" role="option" aria-selected="${i === st.fromIdx}" onclick="rcMsgChooseFrom(this, ${i})">
             <span class="rcmsg-dd-main"><span class="rcmsg-dd-title">${escapeHtml(p.name)}</span>${p.num ? `<span class="rcmsg-dd-sub">${escapeHtml(p.num)}</span>` : ''}</span>
             <span class="rcmsg-dd-tickwrap">${i === st.fromIdx ? RCMSG_ICON_TICK : ''}</span>
           </button>`).join('');
       const fromHtml = `<div class="rcmsg-dd">
-          <button type="button" class="rcmsg-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Send from" onclick="rcMsgDdToggle(this)">
-            <span class="rcmsg-dd-val">${escapeHtml(snd.name)}</span>${RCMSG_ICON_DDCHEV}
+          <button type="button" class="rcmsg-dd-btn${snd ? '' : ' is-empty'}" aria-haspopup="listbox" aria-expanded="false" aria-label="Send from" onclick="rcMsgDdToggle(this)">
+            <span class="rcmsg-dd-val">${snd ? escapeHtml(snd.name) : 'Select sender'}</span>${RCMSG_ICON_DDCHEV}
           </button>
           <div class="rcmsg-dd-menu is-right" role="listbox">
             <div class="rcmsg-dd-head">Send from</div>
@@ -8001,6 +8049,18 @@
           <div class="rcmsg-route-f"><span class="rcmsg-route-lbl">To</span>${toHtml}</div>
           <div class="rcmsg-route-f is-from"><span class="rcmsg-route-lbl">From</span>${fromHtml}</div>
         </div>`;
+    }
+
+    // No sender picked yet: open the From menu so the rep chooses one.
+    function rcMsgPromptFrom(card){
+      const btn = card && card.querySelector('.rcmsg-dd-btn[aria-label="Send from"]');
+      if(!btn) return;
+      const dd = btn.closest('.rcmsg-dd');
+      // Deferred so the document click that triggered Send doesn't close it again.
+      setTimeout(() => {
+        if(!dd.classList.contains('is-open')) rcMsgDdToggle(btn);
+        btn.classList.remove('is-nudge'); void btn.offsetWidth; btn.classList.add('is-nudge');
+      }, 0);
     }
 
     function rcMsgDdClose(except){
@@ -8036,9 +8096,10 @@
     function rcMsgChooseFrom(opt, i){
       const { card, st } = rcMsgCardState(opt);
       if(!card || !st) return;
-      st.fromIdx = i;
-      try { localStorage.setItem('rcmsg_from_idx', String(i)); } catch(e){}
+      __rcMsgFromIdx = i;
+      Object.keys(__rcMsgStore).forEach(k => { __rcMsgStore[k].fromIdx = i; });
       rcMsgRedrawRoute(card, st);
+      rcMsgSyncComposer(card, st);
     }
 
     // Colour of the small dot beside the To number: green = Correct, red = wrong, gray = unverified.
@@ -8123,7 +8184,9 @@
       const pick = phones[st.phoneIdx];
       if(!pick || rcMsgPhoneTone(pick.status) === 'bad') return;
       const to = pick.num;
-      const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
+      if(rcMsgFromIdx() == null){ rcMsgPromptFrom(card); return; }
+      st.fromIdx = rcMsgFromIdx();
+      const sender = RCMSG_SENDERS[st.fromIdx];
       const msg = { dir: 'out', text, at: new Date(), status: 'sending', to, from: sender.num, fromName: sender.name };
       st.messages.push(msg);
       st.draft = '';
