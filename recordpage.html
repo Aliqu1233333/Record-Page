@@ -5193,7 +5193,9 @@
           subject_state:  __mlrState,
           subject_zip:    __mlrZip,
           subject_address: payload.subject_address ?? payload.property_address ?? payload.situs_address ?? '—',
-          county:         payload.county ?? payload.County ?? '—'
+          county:         payload.county ?? payload.County ?? '—',
+          // Sales Pipeline item name exactly as stored (Messages → AI draft owner_name).
+          owner_name:     payload.name ?? ''
         };
         computeContactsSummary(payload);
 
@@ -7694,31 +7696,78 @@
     //
     // Request:
     //   { lead_id, contact_id, contact_name, first_name, relationship,
+    //     deceased_owner, deceased_owner_raw, owner_name, property, facts,
     //     phone, line, draft, source: "CRM",
-    //     messages: [{ direction: "in"|"out", text, at (ISO), line }] }   // up to the last 30, oldest first
+    //     messages: [{ direction: "in"|"out", text, at (ISO), line }] }   // up to the last 20, oldest first
     // Response (any of these work):
     //   plain text  |  { "draft": "..." }  |  { "reply" | "message" | "text" | "response" | "output" | "result": "..." }
     const RCMSG_AI_WEBHOOK = 'https://hook.us1.make.com/661rehaylaqmd0c90qmn5jryh14ymj4f';
     const RCMSG_AI_TIMEOUT_MS = 45000;
 
+    // Deceased owner for the file: raw value from the record load, plus the
+    // cleaned "First Last" the mailer uses ("MARSH KENNETH R ESTATE OF" → "Kenneth Marsh").
+    function rcMsgDeceased(){
+      const rec = window.__mlrRecord || {};
+      const raw = rcMsgHas(rec.deceased_owner) ? String(rec.deceased_owner).trim() : '';
+      let clean = '';
+      try { clean = (typeof window.rcDeceasedName === 'function') ? window.rcDeceasedName(raw) : raw; } catch(e){ clean = raw; }
+      return { clean: clean || raw, raw };
+    }
+
+    // Record-level facts for the AI draft, all from fields the record load already sent.
+    function rcMsgRecVal(v){ return (v == null || String(v).trim() === '' || String(v).trim() === '—') ? '' : String(v).trim(); }
+    function rcMsgOwnerName(){
+      const rec = window.__mlrRecord || {};
+      return rcMsgRecVal(rec.owner_name);           // exactly as stored, no reformatting
+    }
+    function rcMsgProperty(){
+      const rec = window.__mlrRecord || {};
+      const street = rcMsgRecVal(rec.subject_street);
+      const city   = rcMsgRecVal(rec.subject_city);
+      const zip    = rcMsgRecVal(rec.subject_zip);
+      if(!street) return rcMsgRecVal(rec.subject_address);
+      const parts = [street];
+      if(city && !street.toLowerCase().includes(city.toLowerCase())) parts.push(city);
+      if(zip && !street.includes(zip)) parts.push(zip);
+      return parts.join(', ');
+    }
+    function rcMsgFacts(){
+      const rec = window.__mlrRecord || {};
+      const out = [];
+      const taxes = rcMsgRecVal(rec.taxes_owed);
+      const amt = parseFloat(taxes.replace(/[^0-9.]/g, ''));
+      if(taxes && !isNaN(amt) && amt > 0){
+        out.push('Delinquent property taxes owed: $' + amt.toLocaleString('en-US', { maximumFractionDigits: 0 }));
+      }
+      const county = rcMsgRecVal(rec.county);
+      if(county) out.push('County: ' + (/county$/i.test(county) ? county : county + ' County'));
+      return out.join('. ');
+    }
+
     function rcMsgAiPayload(st, typed){
       const c = st.contact;
+      const dec = rcMsgDeceased();
       const phones = rcMsgPhones(c);
       const cur = phones[st.phoneIdx];
       const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
-      const thread = rcMsgVisible(st).map(x => x.m).filter(m => m.status !== 'failed').slice(-30);
+      const thread = rcMsgVisible(st).map(x => x.m).filter(m => m.status !== 'failed').slice(-20);
       return {
         lead_id:      rcMsgLeadId(),
         contact_id:   c && c.pulseId != null ? String(c.pulseId) : null,
         contact_name: rcMsgHas(c.name) ? c.name : '',
         first_name:   rcMsgFirst(c),
         relationship: rcMsgHas(c.relation) ? c.relation : '',
+        deceased_owner:     dec.clean,
+        deceased_owner_raw: dec.raw,
+        owner_name:   rcMsgOwnerName(),
+        property:     rcMsgProperty(),
+        facts:        rcMsgFacts(),
         phone:        cur ? rcMsgE164(cur.num) : '',
         line:         sender.name,
         draft:        (typed || '').trim(),
         source:       'CRM',
         messages:     thread.map(m => ({
-          direction: m.dir,
+          direction: m.dir === 'in' ? 'in' : 'out',
           text:      m.text,
           at:        m.at instanceof Date ? m.at.toISOString() : String(m.at || ''),
           line:      m.fromName || ''
@@ -12508,6 +12557,9 @@
 
     return titled.replace(/\s+/g,' ').trim();
   }
+
+  // Shared with Messages (AI draft): same clean name the mailer uses.
+  window.rcDeceasedName = function(raw){ return stripNameChars(cleanDeceasedOwner(raw)) || ''; };
 
   // ── County inference from city ──
   // Maps common cities in the operating area to their county.
