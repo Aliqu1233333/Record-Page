@@ -5851,7 +5851,11 @@
     // ── Who is viewing? ────────────────────────────────────────────────
     // Worked out before the record-load webhook so the Make router can send
     // the request down the right route by comparing a simple name.
-    // Ultrawide screen (ratio > 2) = Christian, anything else = Damian.
+    // Screen taller than 1080 = Christian (his screens are 1440p+),
+    // 1080 or less = Damian (his screens are all 1080p).
+    // screen.height is the display's resolution after Windows scaling and is
+    // not affected by browser zoom; scaling only lowers it, so a 1080p screen
+    // can never read above 1080.
     // If the screen can't be read, `who` is '' (unidentified).
     // Also sets the default From line in Messages.
     function rcGetViewer(){
@@ -5865,8 +5869,7 @@
       try {
         const w = screen.width, h = screen.height;
         if (w > 0 && h > 0) {
-          const ratio = w / h;
-          who = ratio > 2 ? 'Christian' : 'Damian';   // swap names if needed
+          who = h > 1080 ? 'Christian' : 'Damian';
           scr = w + 'x' + h;
         }
       } catch (e) {}
