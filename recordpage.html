@@ -4178,7 +4178,7 @@
 
     /* ── Record widget: single row that opens the pop-up ── */
     .rcmsg-widget .rcrel-header { min-height: 58px; }
-    .rcmsg-widget .rcrel-icon { background: #2e844a; }
+    .rcmsg-widget .rcrel-icon { background: #3ba755; }
     .rcmsg-widget .rcrel-icon svg { width: 16px; height: 16px; }
     .rcmsg-widget .rcmsg-dot { margin-right: 2px; }
     .rcmsg-widget .rcmsg-w-pop svg { width: 12px; height: 12px; transform: none !important; }
@@ -4215,7 +4215,7 @@
     /* ── Tray ── */
     .rcmsg-tray {
       position: fixed; bottom: 40px; right: 16px; left: auto;
-      width: 440px; height: 600px; max-height: calc(100vh - 56px);
+      width: 484px; height: 660px; max-height: calc(100vh - 56px);
       background: #fff; border: 1px solid #c9d0d8; border-bottom: none;
       border-radius: 11px 11px 0 0;
       box-shadow: 0 0 0 1px rgba(3,45,96,.04), 0 2px 8px rgba(3,45,96,.12), 0 12px 40px rgba(3,45,96,.24);
@@ -7608,7 +7608,7 @@
              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcMsgOpenDock('${k}');}">
           <span class="rcrel-icon">${RCMSG_ICON_CHAT}</span>
           <span class="rcrel-headtext">
-            <span class="rcrel-title">Messages</span>
+            <span class="rcrel-title">Message History</span>
           </span>
           <span class="rcrel-toggle rcmsg-w-pop">${RCMSG_ICON_POPOUT}</span>
         </div>
@@ -7682,69 +7682,119 @@
     }
 
     // ══════════════════════════════════════════════════════════════════
-    // AI DRAFT — mock-up. Reads the conversation and drafts a reply into
-    // the composer for review. Nothing sends until the rep hits Send.
-    // To make it real, replace rcMsgAiSuggest() with a call to your AI
-    // endpoint, passing the thread + contact context, and keep the rest.
+    // AI DRAFT — "Draft with AI" posts the thread to RCMSG_AI_WEBHOOK (Make
+    // runs the prompt) and types the returned draft into the composer.
     // ══════════════════════════════════════════════════════════════════
     const RCMSG_ICON_AI = '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="rcmsgAiGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0176d3"/><stop offset="1" stop-color="#9050e9"/></linearGradient></defs><path fill="url(#rcmsgAiGrad)" d="M10 2.5l1.9 5.1 5.1 1.9-5.1 1.9L10 16.5l-1.9-5.1L3 9.5l5.1-1.9z"/><path fill="url(#rcmsgAiGrad)" d="M18 13.5l.95 2.55 2.55.95-2.55.95L18 20.5l-.95-2.55L14.5 17l2.55-.95z"/></svg>';
 
-    function rcMsgAiSuggest(st, typed){
-      const c = st.contact;
-      const first = rcMsgFirst(c);
-      const msgs = st.messages;
-      const last = msgs[msgs.length - 1];
+    // ── AI DRAFT WEBHOOK ────────────────────────────────────────────
+    // Posts the conversation to Make, which runs the AI prompt and replies
+    // with the draft. The draft is typed into the composer for review;
+    // nothing is sent until the rep hits Send.
+    //
+    // Request:
+    //   { lead_id, contact_id, contact_name, first_name, relationship,
+    //     phone, line, draft, source: "CRM",
+    //     messages: [{ direction: "in"|"out", text, at (ISO), line }] }   // up to the last 30, oldest first
+    // Response (any of these work):
+    //   plain text  |  { "draft": "..." }  |  { "reply" | "message" | "text" | "response" | "output" | "result": "..." }
+    const RCMSG_AI_WEBHOOK = 'https://hook.us1.make.com/661rehaylaqmd0c90qmn5jryh14ymj4f';
+    const RCMSG_AI_TIMEOUT_MS = 45000;
 
-      // Rep already typed something: tidy it into a finished message.
-      if(typed && typed.trim()){
-        let body = typed.trim().replace(/\s+/g, ' ');
-        body = body.charAt(0).toUpperCase() + body.slice(1);
-        if(!/[.!?]$/.test(body)) body += '.';
-        return /^(hi|hey|hello|thanks|thank)/i.test(body) ? body : 'Hi ' + first + ', ' + body.charAt(0).toLowerCase() + body.slice(1);
-      }
-      if(!last){
-        return 'Hi ' + first + ', I\'m reaching out about a property connected to your family. Do you have a few minutes this week for a quick call?';
-      }
-      if(last.dir === 'out'){
-        return 'Hi ' + first + ', just checking in on my last message. Is there a good time this week for a quick call?';
-      }
-      const t = String(last.text || '').toLowerCase();
-      if(/\b(stop|unsubscribe|not interested|no thanks|leave me alone)\b/.test(t))
-        return 'Understood, ' + first + '. Thank you for letting me know. I won\'t reach out again unless you\'d like me to.';
-      if(/\b(sign|married|husband|wife|spouse)\b/.test(t))
-        return 'Good question, ' + first + '. I\'ll confirm with our title company exactly who needs to sign and get back to you today.';
-      if(/@|\bemail\b/.test(t))
-        return 'Thank you, ' + first + '. I\'ll send the paperwork to that email this afternoon. Let me know if any questions come up once you\'ve had a look.';
-      if(/\b(number|offer|how much|price|worth|pay)\b/.test(t))
-        return 'Great question, ' + first + '. I\'m finalizing the numbers for your share now and would like to walk you through them so I can answer any questions. Does a call at 4:15 today work?';
-      if(/\b(which|what) (property|house|land)\b|\bwho is this\b|\bwho\'s this\b/.test(t))
-        return 'It\'s land that was titled to a relative of yours. We help families work through inherited property, and I\'d be happy to explain how it works. Do you have a few minutes for a call?';
-      if(/\b(sorry|missed)\b/.test(t))
-        return 'No problem at all, ' + first + '. What time works best for you tomorrow?';
-      if(/\b(call|tomorrow|morning|afternoon|tonight|after \d|works)\b/.test(t))
-        return 'That works for me. I\'ll give you a call then. Talk soon, ' + first + '.';
-      if(/\bthank/.test(t))
-        return 'You\'re welcome, ' + first + '. I\'ll be in touch soon with next steps.';
-      return 'Thanks for getting back to me, ' + first + '. Would you have a few minutes this week to go over everything on a quick call?';
+    function rcMsgAiPayload(st, typed){
+      const c = st.contact;
+      const phones = rcMsgPhones(c);
+      const cur = phones[st.phoneIdx];
+      const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
+      const thread = rcMsgVisible(st).map(x => x.m).filter(m => m.status !== 'failed').slice(-30);
+      return {
+        lead_id:      rcMsgLeadId(),
+        contact_id:   c && c.pulseId != null ? String(c.pulseId) : null,
+        contact_name: rcMsgHas(c.name) ? c.name : '',
+        first_name:   rcMsgFirst(c),
+        relationship: rcMsgHas(c.relation) ? c.relation : '',
+        phone:        cur ? rcMsgE164(cur.num) : '',
+        line:         sender.name,
+        draft:        (typed || '').trim(),
+        source:       'CRM',
+        messages:     thread.map(m => ({
+          direction: m.dir,
+          text:      m.text,
+          at:        m.at instanceof Date ? m.at.toISOString() : String(m.at || ''),
+          line:      m.fromName || ''
+        }))
+      };
     }
 
-    function rcMsgAiDraft(btn){
+    // Pull the draft text out of whatever shape Make returns.
+    function rcMsgAiExtract(raw){
+      let body = String(raw || '').trim();
+      if(!body) return '';
+      let data = null;
+      try { data = JSON.parse(body); } catch(e){}
+      if(typeof data === 'string') body = data;
+      else if(data && typeof data === 'object'){
+        const pick = data.draft ?? data.reply ?? data.message ?? data.text ?? data.response ?? data.output ?? data.result
+          ?? (data.choices && data.choices[0] && ((data.choices[0].message && data.choices[0].message.content) || data.choices[0].text))
+          ?? (Array.isArray(data.content) && data.content[0] && data.content[0].text);
+        body = pick != null ? String(pick) : '';
+      }
+      return body.trim().replace(/^"(.*)"$/s, '$1').trim();
+    }
+
+    async function rcMsgAiDraft(btn){
       const { card, st } = rcMsgCardState(btn);
       if(!card || !st || btn.classList.contains('is-busy')) return;
       const ta = card.querySelector('.rcmsg-input');
       if(!ta || ta.disabled) return;
-      const text = rcMsgAiSuggest(st, ta.value);
+      const typed = ta.value;
       const ph = ta.placeholder;
+      const lbl = btn.querySelector('.rcmsg-ai-lbl');
       btn.classList.add('is-busy');
       btn.disabled = true;
+      if(lbl) lbl.textContent = 'Drafting…';
       ta.value = '';
       ta.placeholder = 'Drafting a reply…';
+      ta.readOnly = true;
       rcMsgSyncComposer(card, st);
 
-      const finish = () => {
+      const reset = () => {
         btn.classList.remove('is-busy');
         btn.disabled = false;
+        if(lbl) lbl.textContent = 'Draft with AI';
+        ta.readOnly = false;
         ta.placeholder = ph;
+      };
+
+      let text = '';
+      try {
+        const ctrl = ('AbortController' in window) ? new AbortController() : null;
+        const timer = ctrl ? setTimeout(() => ctrl.abort(), RCMSG_AI_TIMEOUT_MS) : null;
+        const res = await fetch(RCMSG_AI_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rcMsgAiPayload(st, typed)),
+          signal: ctrl ? ctrl.signal : undefined
+        });
+        if(timer) clearTimeout(timer);
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        text = rcMsgAiExtract(await res.text());
+        if(!text) throw new Error('Empty AI response');
+      } catch(err){
+        console.error('AI draft failed:', err);
+        reset();
+        st.draft = typed;
+        if(card.isConnected){
+          ta.value = typed;
+          ta.placeholder = 'Couldn\u2019t draft a reply. Try again.';
+          rcMsgSyncComposer(card, st);
+          setTimeout(() => { if(ta.placeholder.startsWith('Couldn')) ta.placeholder = ph; }, 3500);
+        }
+        return;
+      }
+
+      const finish = () => {
+        reset();
         st.draft = text;
         if(card.isConnected){
           ta.value = text;
@@ -7754,18 +7804,16 @@
         }
       };
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      setTimeout(() => {
-        if(reduce || !card.isConnected){ finish(); return; }
-        let i = 0;
-        const step = () => {
-          if(!card.isConnected){ finish(); return; }
-          i = Math.min(text.length, i + 3);
-          ta.value = text.slice(0, i);
-          rcMsgAutosize(ta);
-          if(i < text.length) setTimeout(step, 14); else finish();
-        };
-        step();
-      }, 650);
+      if(reduce || !card.isConnected){ finish(); return; }
+      let i = 0;
+      const step = () => {
+        if(!card.isConnected){ finish(); return; }
+        i = Math.min(text.length, i + 3);
+        ta.value = text.slice(0, i);
+        rcMsgAutosize(ta);
+        if(i < text.length) setTimeout(step, 14); else finish();
+      };
+      step();
     }
 
     // ── Composer behaviour (shared) ────────────────────────────────────
@@ -8217,9 +8265,6 @@
       const optedOut = rcMsgOptedOut(c);
       const prev = last ? ((last.dir === 'out' ? 'You: ' : '') + last.text)
                         : (phones.length ? 'No messages yet' : 'No phone on file');
-      const rel = rcMsgHas(c.relation) ? c.relation : '';
-      const group = rcMsgGroupOf(c);
-      const sub = [rel, group].filter(Boolean).join(' \u00b7 ');
       let tag = '';
       if(waiting) tag = '<span class="rcmsg-inbox-tag is-reply">Needs reply</span>';
       else if(optedOut) tag = '<span class="rcmsg-inbox-tag is-muted">Opted out</span>';
@@ -8230,7 +8275,6 @@
         <span class="rcmsg-inbox-main">
           <span class="rcmsg-inbox-top">
             <span class="rcmsg-inbox-name">${name}</span>
-            ${sub ? `<span class="rcmsg-inbox-sub">${escapeHtml(sub)}</span>` : ''}
             <span class="rcmsg-inbox-time">${last ? escapeHtml(rcMsgShortTime(last.at)) : ''}</span>
           </span>
           <span class="rcmsg-inbox-bot">
@@ -8248,7 +8292,9 @@
           <span class="rcmsg-empty-title">No contacts yet</span><span>Contacts from Confirmed Owners and Other Contacts show up here.</span></div>`;
       }
       const lastAt = c => { const st = rcMsgState(c); const m = st.messages[st.messages.length-1]; return m ? m.at.getTime() : 0; };
-      const sorted = contacts.slice().sort((a, b) => lastAt(b) - lastAt(a));
+      // Confirmed Owners always first, then Other Contacts; newest message first within each.
+      const rank = c => rcMsgGroupOf(c) === 'Confirmed Owner' ? 0 : 1;
+      const sorted = contacts.slice().sort((a, b) => (rank(a) - rank(b)) || (lastAt(b) - lastAt(a)));
       const needs  = sorted.filter(c => rcMsgAwaiting(rcMsgState(c)));
       const active = sorted.filter(c => !rcMsgAwaiting(rcMsgState(c)) && rcMsgState(c).messages.length);
       const quiet  = sorted.filter(c => !rcMsgState(c).messages.length);
