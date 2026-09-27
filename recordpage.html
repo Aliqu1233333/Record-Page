@@ -4541,6 +4541,97 @@
     #rcmsgTray .rcmsg-ai-btn:disabled:not(.is-busy) svg path { fill: #c9c9c9; }
   </style>
 
+  <style>
+    /* ── Messages: tab names, templates menu, inbox ── */
+    #rcmsgTray .rcmsg-tab { font-size: 14px; }
+    #rcmsgTray .rcmsg-tab-name { max-width: 170px; letter-spacing: -.005em; }
+
+    /* Templates: quiet text button; menu spans the composer so it never clips */
+    #rcmsgTray .rcmsg-input-wrap { position: relative; }
+    #rcmsgTray .rcmsg-tpl-wrap.is-static { position: static; }
+    #rcmsgTray .rcmsg-tpl-btn {
+      background: transparent; border: 1px solid transparent; color: #181818;
+      font-family: "Inter", var(--font); font-weight: 500; padding: 0 10px;
+    }
+    #rcmsgTray .rcmsg-tpl-btn svg { color: #5c5c5c; width: 14px; height: 14px; }
+    #rcmsgTray .rcmsg-tpl-btn:hover:not(:disabled),
+    #rcmsgTray .rcmsg-tpl-btn[aria-expanded="true"] { background: #f3f3f3; border-color: transparent; }
+    #rcmsgTray .rcmsg-tpl-btn:disabled { background: transparent; border-color: transparent; color: #aeaeae; }
+    #rcmsgTray .rcmsg-tpl-btn:disabled svg { color: #c9c9c9; }
+    #rcmsgTray .rcmsg-tpl-menu {
+      left: 0; right: 0; width: auto; max-width: none; bottom: calc(100% + 8px);
+      padding: 4px; border: 1px solid #e5e5e5; border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(24,24,24,.06), 0 10px 28px rgba(24,24,24,.14);
+      font-family: "Inter", var(--font);
+    }
+    #rcmsgTray .rcmsg-tpl-head { padding: 8px 10px 6px; font-size: 11px; font-weight: 500; color: #5c5c5c; letter-spacing: .02em; }
+    #rcmsgTray .rcmsg-tpl-opt { padding: 8px 10px; border-radius: 8px; font-family: "Inter", var(--font); }
+    #rcmsgTray .rcmsg-tpl-opt:hover, #rcmsgTray .rcmsg-tpl-opt:focus-visible { background: #f3f3f3; }
+    #rcmsgTray .rcmsg-tpl-name { font-size: 13px; font-weight: 500; color: #181818; }
+    #rcmsgTray .rcmsg-tpl-prev { margin-top: 2px; font-size: 12px; color: #5c5c5c; }
+
+    /* Bad numbers stay struck through but are selectable (view-only thread) */
+    .rcmsg-dd-opt[data-bad] .rcmsg-dd-title { color: #939393; text-decoration: line-through; text-decoration-color: #c9c9c9; }
+
+    /* Inbox */
+    .rcmsg-inbox { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #f3f3f3; }
+    .rcmsg-inbox-bar { padding: 14px 14px 12px; background: #ffffff; border-bottom: 1px solid #e5e5e5; display: flex; flex-direction: column; gap: 10px; }
+    .rcmsg-inbox-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .rcmsg-inbox-title { font-size: 15px; font-weight: 600; color: #032d60; letter-spacing: -.01em; }
+    .rcmsg-inbox-meta { font-size: 12px; color: #5c5c5c; white-space: nowrap; }
+    .rcmsg-inbox-meta b { font-weight: 500; color: #ba0517; }
+    .rcmsg-inbox-search {
+      display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px;
+      border: 1px solid #c9c9c9; border-radius: 8px; background: #ffffff; cursor: text;
+      transition: border-color .12s ease, box-shadow .12s ease;
+    }
+    .rcmsg-inbox-search:focus-within { border-color: #0176d3; box-shadow: 0 0 0 2px rgba(1,118,211,.15); }
+    .rcmsg-inbox-search svg { width: 14px; height: 14px; color: #747474; flex-shrink: 0; }
+    .rcmsg-inbox-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-family: "Inter", var(--font); font-size: 13px; color: #181818; }
+    .rcmsg-inbox-search input::placeholder { color: #747474; }
+    .rcmsg-inbox-search input::-webkit-search-cancel-button { cursor: pointer; }
+
+    .rcmsg-inbox-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 12px 14px; scrollbar-width: thin; }
+    .rcmsg-inbox-sec { margin-top: 12px; }
+    .rcmsg-inbox-sec-head { display: flex; align-items: center; gap: 6px; padding: 0 4px 6px; font-size: 11.5px; font-weight: 600; color: #444; letter-spacing: .01em; }
+    .rcmsg-inbox-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 16px; padding: 0 5px; border-radius: 999px; background: #e5e5e5; color: #444; font-size: 10.5px; font-weight: 500; }
+    .rcmsg-inbox-card {
+      background: #ffffff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(24,24,24,.05);
+    }
+    .rcmsg-inbox-row {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      padding: 11px 14px; border: 0; border-top: 1px solid #f0f0f0; background: #ffffff;
+      font-family: "Inter", var(--font); cursor: pointer; position: relative;
+      transition: background .1s ease;
+    }
+    .rcmsg-inbox-row:first-child { border-top: 0; }
+    .rcmsg-inbox-row:hover, .rcmsg-inbox-row:focus-visible { background: #f7f9fc; outline: none; }
+    .rcmsg-inbox-row.is-waiting::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: #0176d3; }
+    .rcmsg-inbox-av {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #eef1f5; color: #3e4c63; font-size: 12px; font-weight: 600; letter-spacing: .02em;
+      box-shadow: inset 0 0 0 1px rgba(3,45,96,.06);
+    }
+    .rcmsg-inbox-av.is-waiting { background: #e8f1fc; color: #0b5cab; }
+    .rcmsg-inbox-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .rcmsg-inbox-top, .rcmsg-inbox-bot { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .rcmsg-inbox-name { font-size: 13.5px; font-weight: 500; color: #181818; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; }
+    .rcmsg-inbox-row.is-waiting .rcmsg-inbox-name { font-weight: 600; }
+    .rcmsg-inbox-sub { font-size: 11.5px; color: #747474; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+    .rcmsg-inbox-time { margin-left: auto; font-size: 11.5px; color: #747474; flex-shrink: 0; }
+    .rcmsg-inbox-row.is-waiting .rcmsg-inbox-time { color: #0b5cab; font-weight: 500; }
+    .rcmsg-inbox-prev { flex: 1; min-width: 0; font-size: 12.5px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rcmsg-inbox-row.is-waiting .rcmsg-inbox-prev { color: #181818; }
+    .rcmsg-inbox-prev.is-muted { color: #939393; }
+    .rcmsg-inbox-tag { flex-shrink: 0; height: 18px; padding: 0 7px; border-radius: 4px; display: inline-flex; align-items: center; font-size: 10.5px; font-weight: 500; }
+    .rcmsg-inbox-tag.is-reply { background: #e8f1fc; color: #0b5cab; }
+    .rcmsg-inbox-tag.is-muted { background: #f3f3f3; color: #5c5c5c; }
+    .rcmsg-inbox-row[hidden], .rcmsg-inbox-sec[hidden], .rcmsg-inbox-none[hidden] { display: none; }
+    .rcmsg-inbox-none { padding: 32px 16px; text-align: center; font-size: 12.5px; color: #5c5c5c; }
+  </style>
+
 </head>
 
 <body>
@@ -7387,12 +7478,34 @@
       return n + ' message' + (n === 1 ? '' : 's') + ' · ' + tail;
     }
 
+    // Last 10 digits, for matching numbers across formats.
+    function rcMsgDigits(n){ return String(n || '').replace(/\D/g, '').slice(-10); }
+    // The other party's number on a message (outbound → to, inbound → from).
+    function rcMsgNumOf(m){ return rcMsgDigits(m.dir === 'out' ? m.to : m.from); }
+    // Messages for the number picked in To. Messages with no number show everywhere.
+    function rcMsgVisible(st){
+      const phones = rcMsgPhones(st.contact);
+      const cur = phones[st.phoneIdx];
+      const all = st.messages.map((m, i) => ({ m, i }));
+      if(!cur || phones.length < 2) return all;
+      const want = rcMsgDigits(cur.num);
+      return all.filter(x => { const d = rcMsgNumOf(x.m); return !d || d === want; });
+    }
+
     function rcMsgThreadHtml(st){
       const c = st.contact;
       if(!st.messages.length && !rcMsgPhones(c).length){
         return `<div class="rcmsg-empty">
           <span class="rcmsg-empty-title">No phone number on file</span>
           <span>Add a number under Contact Info to start texting ${escapeHtml(rcMsgFirst(c))}.</span>
+        </div>`;
+      }
+      const vis = rcMsgVisible(st);
+      if(st.messages.length && !vis.length){
+        const cur = rcMsgPhones(c)[st.phoneIdx];
+        return `<div class="rcmsg-empty">
+          <span class="rcmsg-empty-title">No messages with this number</span>
+          <span>${escapeHtml(cur ? cur.num : '')} has no texts yet. Other numbers for ${escapeHtml(rcMsgFirst(c))} are in the To menu.</span>
         </div>`;
       }
       if(!st.messages.length){
@@ -7406,10 +7519,11 @@
       const initials = escapeHtml(rcMsgInitials(c));
       let html = '';
       let lastDay = '';
-      st.messages.forEach((m, i) => {
+      vis.forEach((x, vi) => {
+        const m = x.m, i = x.i;
         const dayKey = m.at.toDateString();
-        const prev = st.messages[i-1];
-        const next = st.messages[i+1];
+        const prev = vis[vi-1] && vis[vi-1].m;
+        const next = vis[vi+1] && vis[vi+1].m;
         if(dayKey !== lastDay){ html += `<div class="rcmsg-day">${escapeHtml(rcMsgDayLabel(m.at))}</div>`; lastDay = dayKey; }
         const startsGroup = !prev || prev.dir !== m.dir || prev.at.toDateString() !== dayKey;
         const endsGroup   = !next || next.dir !== m.dir || next.at.toDateString() !== dayKey
@@ -7420,7 +7534,7 @@
         if(m.status === 'failed')  cls.push('is-failed');
 
         let meta = '';
-        const isLastOut = m.dir === 'out' && !st.messages.slice(i + 1).some(x => x.dir === 'out');
+        const isLastOut = m.dir === 'out' && !vis.slice(vi + 1).some(y => y.m.dir === 'out');
         if(endsGroup || m.status === 'sending' || m.status === 'failed' || (m.status === 'queued' && isLastOut)){
           let status = '';
           if(m.dir === 'out'){
@@ -7511,16 +7625,18 @@
       const c = st.contact;
       const phones = rcMsgPhones(c);
       const goodIdx = rcMsgFirstGoodIdx(phones);
-      if(st.phoneIdx >= phones.length || (phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad' && goodIdx !== -1)){
+      if(st.phoneIdx >= phones.length || (!st.phoneManual && phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad' && goodIdx !== -1)){
         st.phoneIdx = Math.max(0, goodIdx);
       }
       const optedOut = rcMsgOptedOut(c);
       const allBad = phones.length > 0 && goodIdx === -1;
-      const canText = phones.length > 0 && !allBad && !optedOut;
+      const curBad = !!(phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad');
+      const canText = phones.length > 0 && !curBad && !optedOut;
       const k = escapeHtml(key);
       const placeholder = optedOut ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts'
         : !phones.length ? 'Add a phone number to send texts'
         : allBad ? 'No textable number on file'
+        : curBad ? 'This number is marked ' + escapeHtml(rcMsgPhoneTag(phones[st.phoneIdx].status).label.toLowerCase()) + '. View only.'
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
 
       if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = rcMsgSavedFrom();
@@ -7547,12 +7663,12 @@
               <button type="button" class="rcmsg-ai-btn" onclick="rcMsgAiDraft(this)" title="Draft a reply from the conversation" ${canText ? '' : 'disabled'}>
                 ${RCMSG_ICON_AI}<span class="rcmsg-ai-lbl">Draft with AI</span>
               </button>
-              <div class="rcmsg-tpl-wrap">
+              <div class="rcmsg-tpl-wrap is-static">
                 <button type="button" class="rcmsg-tpl-btn" onclick="rcMsgToggleTemplates(this)" aria-haspopup="true" aria-expanded="false" ${canText ? '' : 'disabled'}>
                   ${RCMSG_ICON_TPL}Templates
                 </button>
                 <div class="rcmsg-tpl-menu" role="menu">
-                  <div class="rcmsg-tpl-head">Insert a template</div>
+                  <div class="rcmsg-tpl-head">Templates</div>
                   ${tplOpts}
                 </div>
               </div>
@@ -7746,12 +7862,14 @@
         toHtml = `<span class="rcmsg-dd-none">No number on file</span>`;
       } else {
         const curTag = rcMsgPhoneTag(cur && cur.status);
+        const multi = phones.length > 1;
         const opts = phones.map((p, i) => {
           const t = rcMsgPhoneTag(p.status);
+          const nMsg = multi ? st.messages.filter(m => rcMsgNumOf(m) === rcMsgDigits(p.num)).length : 0;
           const bad = t.tone === 'bad';
           return `<button type="button" class="rcmsg-dd-opt${i === st.phoneIdx ? ' is-current' : ''}" role="option"
-                    aria-selected="${i === st.phoneIdx}" ${bad ? 'disabled aria-disabled="true"' : `onclick="rcMsgChoosePhone(this, ${i})"`}>
-            <span class="rcmsg-dd-main"><span class="rcmsg-dd-title">${escapeHtml(p.num)}</span><span class="rcmsg-dd-sub">${escapeHtml(p.label)}</span></span>
+                    aria-selected="${i === st.phoneIdx}" onclick="rcMsgChoosePhone(this, ${i})"${bad ? ' data-bad="1" title="View this number\u2019s messages (texting is off)"' : ''}>
+            <span class="rcmsg-dd-main"><span class="rcmsg-dd-title">${escapeHtml(p.num)}</span><span class="rcmsg-dd-sub">${escapeHtml(p.label)}${nMsg ? ' \u00b7 ' + nMsg + ' message' + (nMsg === 1 ? '' : 's') : ''}</span></span>
             ${rcMsgTagHtml(t)}
             <span class="rcmsg-dd-tickwrap">${i === st.phoneIdx ? RCMSG_ICON_TICK : ''}</span>
           </button>`;
@@ -7801,7 +7919,7 @@
       rcMsgCloseMenus();
       const open = dd.classList.toggle('is-open');
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if(open){ const f = dd.querySelector('.rcmsg-dd-opt.is-current:not([disabled])') || dd.querySelector('.rcmsg-dd-opt:not([disabled])'); if(f) f.focus({ preventScroll: true }); }
+      if(open){ const f = dd.querySelector('.rcmsg-dd-opt.is-current') || dd.querySelector('.rcmsg-dd-opt'); if(f) f.focus({ preventScroll: true }); }
     }
     function rcMsgRedrawRoute(card, st){
       const route = card.querySelector('.rcmsg-route');
@@ -7814,7 +7932,9 @@
       const { card, st } = rcMsgCardState(opt);
       if(!card || !st) return;
       st.phoneIdx = i;
-      rcMsgRedrawRoute(card, st);
+      st.phoneManual = true;
+      rcMsgDdClose();
+      rcMsgRenderDock();   // thread + composer follow the chosen number
     }
     function rcMsgChooseFrom(opt, i){
       const { card, st } = rcMsgCardState(opt);
@@ -8094,18 +8214,28 @@
       const last = st.messages[st.messages.length - 1];
       const phones = rcMsgPhones(c);
       const waiting = rcMsgAwaiting(st);
+      const optedOut = rcMsgOptedOut(c);
       const prev = last ? ((last.dir === 'out' ? 'You: ' : '') + last.text)
                         : (phones.length ? 'No messages yet' : 'No phone on file');
-      return `<button type="button" class="rcmsg-pick${waiting ? ' is-waiting' : ''}" onclick="rcMsgOpenDock('${escapeHtml(rcMsgKey(c))}')">
-        <span class="rcmsg-pick-flag">${waiting ? '<span class="rcmsg-dot" aria-label="Unread"></span>' : ''}</span>
-        <span class="rcmsg-avatar">${escapeHtml(rcMsgInitials(c))}</span>
-        <span class="rcmsg-pick-main">
-          <span class="rcmsg-pick-top">
-            <span class="rcmsg-pick-name">${escapeHtml(c.name)}</span>
-            <span class="rcmsg-pick-time">${last ? escapeHtml(rcMsgShortTime(last.at)) : ''}</span>
+      const rel = rcMsgHas(c.relation) ? c.relation : '';
+      const group = rcMsgGroupOf(c);
+      const sub = [rel, group].filter(Boolean).join(' \u00b7 ');
+      let tag = '';
+      if(waiting) tag = '<span class="rcmsg-inbox-tag is-reply">Needs reply</span>';
+      else if(optedOut) tag = '<span class="rcmsg-inbox-tag is-muted">Opted out</span>';
+      else if(phones.length && rcMsgFirstGoodIdx(phones) === -1) tag = '<span class="rcmsg-inbox-tag is-muted">No textable number</span>';
+      const name = escapeHtml(c.name);
+      return `<button type="button" class="rcmsg-inbox-row${waiting ? ' is-waiting' : ''}" data-q="${escapeHtml(String(c.name).toLowerCase())}" onclick="rcMsgOpenDock('${escapeHtml(rcMsgKey(c))}')">
+        <span class="rcmsg-inbox-av${waiting ? ' is-waiting' : ''}">${escapeHtml(rcMsgInitials(c))}</span>
+        <span class="rcmsg-inbox-main">
+          <span class="rcmsg-inbox-top">
+            <span class="rcmsg-inbox-name">${name}</span>
+            ${sub ? `<span class="rcmsg-inbox-sub">${escapeHtml(sub)}</span>` : ''}
+            <span class="rcmsg-inbox-time">${last ? escapeHtml(rcMsgShortTime(last.at)) : ''}</span>
           </span>
-          <span class="rcmsg-pick-bot">
-            <span class="rcmsg-pick-prev${last ? '' : ' is-muted'}">${escapeHtml(prev)}</span>
+          <span class="rcmsg-inbox-bot">
+            <span class="rcmsg-inbox-prev${last ? '' : ' is-muted'}">${escapeHtml(prev)}</span>
+            ${tag}
           </span>
         </span>
       </button>`;
@@ -8118,12 +8248,53 @@
           <span class="rcmsg-empty-title">No contacts yet</span><span>Contacts from Confirmed Owners and Other Contacts show up here.</span></div>`;
       }
       const lastAt = c => { const st = rcMsgState(c); const m = st.messages[st.messages.length-1]; return m ? m.at.getTime() : 0; };
-      const rows = contacts.slice().sort((a, b) => lastAt(b) - lastAt(a));
-      return `<div class="rcmsg-picker">
-        <div class="rcmsg-picker-head">Conversations</div>
-        ${rows.map(rcMsgPickerRow).join('')}
+      const sorted = contacts.slice().sort((a, b) => lastAt(b) - lastAt(a));
+      const needs  = sorted.filter(c => rcMsgAwaiting(rcMsgState(c)));
+      const active = sorted.filter(c => !rcMsgAwaiting(rcMsgState(c)) && rcMsgState(c).messages.length);
+      const quiet  = sorted.filter(c => !rcMsgState(c).messages.length);
+      const section = (title, list, hint) => list.length ? `<section class="rcmsg-inbox-sec">
+          <div class="rcmsg-inbox-sec-head"><span>${title}</span><span class="rcmsg-inbox-count">${list.length}</span>${hint ? `<span class="rcmsg-inbox-hint">${hint}</span>` : ''}</div>
+          <div class="rcmsg-inbox-card">${list.map(rcMsgPickerRow).join('')}</div>
+        </section>` : '';
+      const q = __rcMsgDock.q || '';
+      return `<div class="rcmsg-inbox">
+        <div class="rcmsg-inbox-bar">
+          <div class="rcmsg-inbox-summary">
+            <span class="rcmsg-inbox-title">Conversations</span>
+            <span class="rcmsg-inbox-meta">${contacts.length} contact${contacts.length === 1 ? '' : 's'}${needs.length ? ` \u00b7 <b>${needs.length} need${needs.length === 1 ? 's' : ''} a reply</b>` : ''}</span>
+          </div>
+          <label class="rcmsg-inbox-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+            <input type="search" placeholder="Search contacts" value="${escapeHtml(q)}" aria-label="Search contacts" oninput="rcMsgInboxFilter(this)">
+          </label>
+        </div>
+        <div class="rcmsg-inbox-scroll">
+          ${section('Needs reply', needs)}
+          ${section('Recent', active)}
+          ${section('No messages yet', quiet)}
+          <div class="rcmsg-inbox-none" hidden>No contacts match your search.</div>
+        </div>
       </div>`;
     }
+
+    function rcMsgInboxFilter(input){
+      const q = (input.value || '').trim().toLowerCase();
+      __rcMsgDock.q = input.value;
+      const root = input.closest('.rcmsg-inbox');
+      let shown = 0;
+      root.querySelectorAll('.rcmsg-inbox-sec').forEach(sec => {
+        let n = 0;
+        sec.querySelectorAll('.rcmsg-inbox-row').forEach(r => {
+          const hit = !q || r.getAttribute('data-q').includes(q);
+          r.hidden = !hit; if(hit) n++;
+        });
+        sec.hidden = !n; shown += n;
+        const cnt = sec.querySelector('.rcmsg-inbox-count'); if(cnt) cnt.textContent = n;
+      });
+      const none = root.querySelector('.rcmsg-inbox-none');
+      if(none) none.hidden = shown > 0;
+    }
+    window.rcMsgInboxFilter = rcMsgInboxFilter;
 
     function rcMsgRenderDock(){
       rcMsgDdClose();
@@ -8133,7 +8304,11 @@
       rcMsgRenderTabs();
       const key = __rcMsgDock.active;
       if(!key || key === '__picker'){
+        const ae = document.activeElement;
+        if(ae && ae.closest && ae.closest('.rcmsg-inbox-search') && body.contains(ae)) return;   // don't wipe while typing
         body.innerHTML = rcMsgPickerHtml();
+        const si = body.querySelector('.rcmsg-inbox-search input');
+        if(si && si.value) rcMsgInboxFilter(si);
       } else {
         body.innerHTML = rcMsgPanelHtml(key);
         const panel = body.querySelector('.rcmsg-panel');
