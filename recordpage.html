@@ -4411,6 +4411,14 @@
     .rcmsg-pick-name, .rcmsg-pick.is-waiting .rcmsg-pick-name { color: #181818; font-weight: 500; }
   </style>
 
+  <style>
+    /* Messages: queued + blocked states, disabled To options */
+    .rcmsg-meta .is-queued { color: #706e6b; }
+    .rcmsg-meta .rcmsg-blocked { white-space: normal; text-align: right; line-height: 1.35; max-width: 260px; }
+    .rcmsg-row.out.is-failed .rcmsg-meta { flex-wrap: wrap; justify-content: flex-end; }
+    .rcmsg-route-sel select option:disabled { color: #b0b8c4; }
+  </style>
+
 </head>
 
 <body>
@@ -7113,11 +7121,11 @@
     /* ══════════════════════════════════════════════════════════════
        MESSAGES — text thread + composer on an opened subitem.
 
-       MOCK-UP ONLY. Threads are held in memory for the session; nothing
-       is sent or written back. When the messaging backend is ready,
-       swap rcMsgSeed() for the real thread fetch and the setTimeout in
-       rcMsgDeliver() for the real send call — the rendering is already
-       driven off each message's { dir, text, at, status } shape.
+       SENDING is live: rcMsgSend() → rcMsgDeliver() POSTs each text to
+       the Make webhook in RCMSG_SEND_WEBHOOK.
+       HISTORY loads from RCMSG_THREAD_WEBHOOK (rcMsgLoadThreads) after the
+       record renders, when the pop-up opens, and every 20 s while it is
+       open. Remote messages merge into __rcMsgStore by monday item id.
        ══════════════════════════════════════════════════════════════ */
 
     const __rcMsgStore = {};          // key → { messages, draft, phoneIdx, open }
@@ -7142,11 +7150,36 @@
     const RCMSG_ICON_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3 3 7-7"/></svg>';
     const RCMSG_ICON_WARN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6.3"/><line x1="8" y1="4.8" x2="8" y2="8.6"/><circle cx="8" cy="11" r=".4" fill="currentColor"/></svg>';
 
-    // Numbers texts go out from. Swap in the real Twilio / carrier numbers here.
+    // Lines texts go out from. `name` is what Make receives as "line".
     const RCMSG_SENDERS = [
-      { name: 'Christian', num: '281-555-0110' },
-      { name: 'Damian',    num: '281-555-0124' }
+      { name: 'Christian', num: '832-683-1270' },
+      { name: 'Damian',    num: '832-963-6715' }
     ];
+
+    // Thread history: one POST per lead returns every message for every contact.
+    const RCMSG_THREAD_WEBHOOK = 'https://hook.us1.make.com/9psf2499a32kg9t7xhozvujh24bqyqft';
+    const RCMSG_POLL_MS = 20000;
+
+    // key (String(contact_id)) → [Message, ...] from the last thread load.
+    const __rcMsgRemote = {};
+
+    const RCMSG_ICON_CLOCK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.8V8l2.2 1.4"/></svg>';
+
+    // Opted out if the SMS Opt Status reads "Opt Out" / "Opted Out".
+    function rcMsgOptedOut(c){
+      return /opt(ed)?[\s-]*out/i.test(String((c && c.smsOptStatus) || ''));
+    }
+    // Index of the first number that isn't Wrong/Disconnected, or -1.
+    function rcMsgFirstGoodIdx(phones){
+      for(let i = 0; i < phones.length; i++) if(rcMsgPhoneTone(phones[i].status) !== 'bad') return i;
+      return -1;
+    }
+    function rcMsgSavedFrom(){
+      try {
+        const v = parseInt(localStorage.getItem('rcmsg_from_idx'), 10);
+        return (v >= 0 && v < RCMSG_SENDERS.length) ? v : 0;
+      } catch(e){ return 0; }
+    }
 
     function rcMsgHas(v){ return v != null && String(v).trim() !== '' && v !== '—'; }
 
@@ -7181,20 +7214,20 @@
       return list.sort((a,b) => rank(a.status) - rank(b.status));
     }
 
-    // Threads start empty; texts sent this session are kept in memory.
-    // To show real history, return the contact's messages here as
-    // [{ dir: 'in'|'out', text, at: Date, status }].
+    // History comes from the thread webhook (rcMsgLoadThreads → __rcMsgRemote).
+    // Contacts whose store entry is created after that load start from the cache.
     function rcMsgSeed(c){
-      return [];
+      const list = __rcMsgRemote[rcMsgKey(c)] || [];
+      return list.map(m => Object.assign({}, m)).sort((a, b) => a.at - b.at);
     }
 
     function rcMsgState(c){
       const key = rcMsgKey(c);
       if(!__rcMsgStore[key]){
         __rcMsgStore[key] = {
-          messages: rcMsgPhones(c).length ? rcMsgSeed(c) : [],
+          messages: rcMsgSeed(c),
           draft: '',
-          phoneIdx: 0,
+          phoneIdx: Math.max(0, rcMsgFirstGoodIdx(rcMsgPhones(c))),
           open: true,
           contact: c
         };
@@ -7234,7 +7267,7 @@
 
     function rcMsgThreadHtml(st){
       const c = st.contact;
-      if(!rcMsgPhones(c).length){
+      if(!st.messages.length && !rcMsgPhones(c).length){
         return `<div class="rcmsg-empty">
           <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
           <span class="rcmsg-empty-title">No phone number on file</span>
@@ -7245,7 +7278,9 @@
         return `<div class="rcmsg-empty">
           <span class="rcmsg-empty-icon">${RCMSG_ICON_CHAT_LINE}</span>
           <span class="rcmsg-empty-title">No messages yet</span>
-          <span>Write a message below or start from a template.</span>
+          <span>${rcMsgOptedOut(c) ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts.'
+                 : (rcMsgFirstGoodIdx(rcMsgPhones(c)) === -1 ? 'Every number on file is marked Wrong or Disconnected.'
+                 : 'Write a message below or start from a template.')}</span>
         </div>`;
       }
       const initials = escapeHtml(rcMsgInitials(c));
@@ -7265,10 +7300,13 @@
         if(m.status === 'failed')  cls.push('is-failed');
 
         let meta = '';
-        if(endsGroup || m.status === 'sending' || m.status === 'failed'){
+        const isLastOut = m.dir === 'out' && !st.messages.slice(i + 1).some(x => x.dir === 'out');
+        if(endsGroup || m.status === 'sending' || m.status === 'failed' || (m.status === 'queued' && isLastOut)){
           let status = '';
           if(m.dir === 'out'){
             if(m.status === 'sending')   status = '<span>Sending…</span>';
+            else if(m.status === 'queued') status = `<span class="is-queued" style="display:inline-flex;align-items:center;gap:3px;">${RCMSG_ICON_CLOCK}Queued</span>`;
+            else if(m.status === 'failed' && m.blocked) status = `<span class="is-failed rcmsg-blocked" style="display:inline-flex;align-items:center;gap:3px;">${RCMSG_ICON_WARN}${escapeHtml(m.error || 'This contact can\u2019t be texted.')}</span>`;
             else if(m.status === 'failed') status = `<span class="is-failed" style="display:inline-flex;align-items:center;gap:3px;">${RCMSG_ICON_WARN}Not delivered</span><button type="button" class="rcmsg-retry" onclick="rcMsgRetry(this, ${i})">Retry</button>`;
             else status = `<span class="is-delivered" style="display:inline-flex;align-items:center;">${RCMSG_ICON_CHECK}</span><span>${m.status === 'sent' ? 'Sent' : 'Delivered'}</span>`;
           }
@@ -7352,21 +7390,28 @@
       if(!st) return '';
       const c = st.contact;
       const phones = rcMsgPhones(c);
-      if(st.phoneIdx >= phones.length) st.phoneIdx = 0;
-      const canText = phones.length > 0;
+      const goodIdx = rcMsgFirstGoodIdx(phones);
+      if(st.phoneIdx >= phones.length || (phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad' && goodIdx !== -1)){
+        st.phoneIdx = Math.max(0, goodIdx);
+      }
+      const optedOut = rcMsgOptedOut(c);
+      const allBad = phones.length > 0 && goodIdx === -1;
+      const canText = phones.length > 0 && !allBad && !optedOut;
       const k = escapeHtml(key);
-      const placeholder = phones.length ? 'Text ' + escapeHtml(rcMsgFirst(c)) + '…' : 'Add a phone number to send texts';
+      const placeholder = optedOut ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts'
+        : !phones.length ? 'Add a phone number to send texts'
+        : allBad ? 'No textable number (all marked Wrong/Disconnected)'
+        : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
 
-
-      if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = 0;
+      if(st.fromIdx == null || st.fromIdx >= RCMSG_SENDERS.length) st.fromIdx = rcMsgSavedFrom();
       const chev = '<svg class="rcmsg-route-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
       const cur = phones[st.phoneIdx];
-      const toHtml = canText
+      const toHtml = phones.length
         ? `<span class="rcmsg-route-dot is-${rcMsgPhoneTone(cur && cur.status)}" title="${escapeHtml(cur && rcMsgHas(cur.status) ? cur.status : 'Unverified')}"></span>
            <span class="rcmsg-route-sel">
              <span class="rcmsg-route-val">${escapeHtml(cur ? cur.num : '')}</span>
              <select aria-label="Send to" onchange="rcMsgPickPhone(this)">
-               ${phones.map((p, i) => `<option value="${i}"${i === st.phoneIdx ? ' selected' : ''}>${escapeHtml(p.num)} · ${escapeHtml(p.label)}${rcMsgHas(p.status) ? ' (' + escapeHtml(p.status) + ')' : ''}</option>`).join('')}
+               ${phones.map((p, i) => `<option value="${i}"${i === st.phoneIdx ? ' selected' : ''}${rcMsgPhoneTone(p.status) === 'bad' ? ' disabled' : ''}>${escapeHtml(p.num)} · ${escapeHtml(p.label)}${rcMsgHas(p.status) ? ' (' + escapeHtml(p.status) + ')' : ''}</option>`).join('')}
              </select>${chev}
            </span>`
         : `<span class="rcmsg-to-none">No number on file</span>`;
@@ -7590,6 +7635,7 @@
     function rcMsgPickFrom(sel){
       const { st } = rcMsgCardState(sel);
       if(st) st.fromIdx = parseInt(sel.value, 10) || 0;
+      try { localStorage.setItem('rcmsg_from_idx', String(st ? st.fromIdx : 0)); } catch(e){}
       const snd = RCMSG_SENDERS[st ? st.fromIdx : 0];
       const val = sel.parentElement.querySelector('.rcmsg-route-val');
       if(val && snd) val.textContent = snd.name;
@@ -7661,7 +7707,16 @@
           body: JSON.stringify(payload)
         });
         if(!res.ok) throw new Error('HTTP ' + res.status);
-        msg.status = 'sent';
+        let data = null;
+        try { data = await res.json(); } catch(e){}   // tolerate an empty body
+        if(data && data.ok === false){
+          msg.status  = 'failed';
+          msg.error   = data.reason || 'This contact can\u2019t be texted.';
+          msg.blocked = true;                          // no Retry
+        } else {
+          msg.status = 'queued';                       // queued for the phone; poll moves it on
+          if(data && data.conversation_id) msg.id = String(data.conversation_id);
+        }
       } catch(err){
         console.error('Text send failed:', err, payload);
         msg.status = 'failed';
@@ -7675,8 +7730,11 @@
       const ta = card.querySelector('.rcmsg-input');
       const text = (ta.value || '').trim();
       if(!text) return;
+      if(rcMsgOptedOut(st.contact)) return;
       const phones = rcMsgPhones(st.contact);
-      const to = phones[st.phoneIdx] ? phones[st.phoneIdx].num : null;
+      const pick = phones[st.phoneIdx];
+      if(!pick || rcMsgPhoneTone(pick.status) === 'bad') return;
+      const to = pick.num;
       const sender = RCMSG_SENDERS[st.fromIdx || 0] || RCMSG_SENDERS[0];
       const msg = { dir: 'out', text, at: new Date(), status: 'sending', to, from: sender.num, fromName: sender.name };
       st.messages.push(msg);
@@ -7693,7 +7751,9 @@
       const { card, st } = rcMsgCardState(btn);
       if(!card || !st || !st.messages[idx]) return;
       const msg = st.messages[idx];
+      if(msg.blocked) return;
       msg.status = 'sending';
+      msg.error = '';
       const key = card.getAttribute('data-rcmsg');
       rcMsgRefresh(key);
       rcMsgDeliver(key, msg);
@@ -7762,7 +7822,10 @@
       if(open && typeof utilityTasksOpen !== 'undefined' && utilityTasksOpen && window.__rcTasksToggleOrig){
         window.__rcTasksToggleOrig();   // one utility panel at a time
       }
+      const wasDockOpen = __rcMsgDock.open;
       __rcMsgDock.open = open;
+      if(open && !wasDockOpen){ rcMsgLoadThreads(); rcMsgStartPolling(); }
+      if(!open) rcMsgStopPolling();
       if(open){
         const wasOpen = tray.classList.contains('is-open');
         tray.classList.add('is-open');
@@ -7923,7 +7986,162 @@
     }
 
     // Called after fresh record data lands (initial load + silent refreshes).
+    // ══════════════════════════════════════════════════════════════════
+    // THREAD LOADING — POST { lead_id } to RCMSG_THREAD_WEBHOOK. The reply
+    // is the raw monday GraphQL result for the Conversations board; every
+    // item is one text. Runs in the background after the record renders,
+    // on pop-up open, and every RCMSG_POLL_MS while the pop-up is open.
+    // ══════════════════════════════════════════════════════════════════
+    let __rcMsgLoading = false;
+    let __rcMsgPollTimer = null;
+    let __rcMsgFirstData = true;
+
+    const RCMSG_COL = {
+      contact:   'text_mm7j2eah',
+      phone:     'text_mm7gnjce',
+      direction: 'color_mm7gm8qb',
+      line:      'color_mm7gkkg7',
+      body:      'long_text_mm7gwgze',
+      at:        'date_mm7gt3z8',
+      source:    'color_mm7ga4xc',
+      guid:      'text_mm7gb4qx',
+      status:    'color_mm7jf6f8',
+      read:      'boolean_mm7jk99r'
+    };
+
+    function rcMsgParseAt(col){
+      if(!col) return null;
+      try {
+        const v = col.value ? JSON.parse(col.value) : null;
+        if(v && v.date){
+          const d = new Date(v.date + 'T' + (v.time || '00:00:00') + 'Z');   // monday stores UTC
+          if(!isNaN(d)) return d;
+        }
+      } catch(e){}
+      if(col.text){
+        const d = new Date(String(col.text).replace(' ', 'T'));
+        if(!isNaN(d)) return d;
+      }
+      return null;
+    }
+
+    function rcMsgFromItem(item){
+      const cols = {};
+      (item.column_values || []).forEach(cv => { if(cv && cv.id) cols[cv.id] = cv; });
+      const txt = id => (cols[id] && cols[id].text != null) ? String(cols[id].text).trim() : '';
+      const contact = txt(RCMSG_COL.contact);
+      const at = rcMsgParseAt(cols[RCMSG_COL.at]);
+      if(!contact || !at) return null;
+      const dir = /^in/i.test(txt(RCMSG_COL.direction)) ? 'in' : 'out';
+      const statusMap = { sending: 'queued', sent: 'sent', delivered: 'delivered', failed: 'failed' };
+      const rawStatus = txt(RCMSG_COL.status).toLowerCase();
+      const status = statusMap[rawStatus] || (dir === 'in' ? 'delivered' : 'queued');
+      const fromName = txt(RCMSG_COL.line);
+      const sender = RCMSG_SENDERS.find(x => x.name.toLowerCase() === fromName.toLowerCase());
+      let read = false;
+      try { const rv = cols[RCMSG_COL.read] && cols[RCMSG_COL.read].value ? JSON.parse(cols[RCMSG_COL.read].value) : null; read = !!(rv && String(rv.checked) === 'true'); } catch(e){}
+      return {
+        contact,
+        msg: {
+          id:       String(item.id),
+          guid:     txt(RCMSG_COL.guid),
+          dir,
+          text:     txt(RCMSG_COL.body),
+          at,
+          status,
+          to:       dir === 'out' ? txt(RCMSG_COL.phone) : '',
+          from:     dir === 'out' ? (sender ? sender.num : '') : txt(RCMSG_COL.phone),
+          fromName: sender ? sender.name : fromName,
+          source:   txt(RCMSG_COL.source),
+          read,
+          error:    ''
+        }
+      };
+    }
+
+    // Merge remote messages into a contact's thread. Returns true if anything changed.
+    function rcMsgMerge(st, remote){
+      let changed = false;
+      remote.forEach(r => {
+        const byId = st.messages.find(m => m.id && m.id === r.id);
+        if(byId){
+          ['status','text','read'].forEach(f => { if(byId[f] !== r[f]){ byId[f] = r[f]; changed = true; } });
+          if(!byId.at || byId.at.getTime() !== r.at.getTime()){ byId.at = r.at; changed = true; }
+          if(r.guid && byId.guid !== r.guid) byId.guid = r.guid;
+          if(r.status !== 'failed' && byId.blocked){ byId.blocked = false; byId.error = ''; }
+          return;
+        }
+        const local = r.dir === 'out' && st.messages.find(m =>
+          !m.id && m.dir === 'out' && m.text === r.text &&
+          ['sending','queued','sent'].includes(m.status) &&
+          Math.abs(m.at - r.at) <= 10 * 60000);
+        if(local){ Object.assign(local, r, { to: local.to || r.to, from: local.from || r.from }); changed = true; return; }
+        st.messages.push(Object.assign({}, r));
+        changed = true;
+      });
+      if(changed) st.messages.sort((a, b) => a.at - b.at);
+      return changed;
+    }
+
+    async function rcMsgLoadThreads(){
+      if(__rcMsgLoading) return;
+      const leadId = rcMsgLeadId();
+      if(!leadId) return;
+      __rcMsgLoading = true;
+      try {
+        const res = await fetch(RCMSG_THREAD_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lead_id: leadId })
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+        let data = null;
+        try { data = await res.json(); } catch(e){ throw new Error('Thread response was not JSON'); }
+        const boards = data && data.data && Array.isArray(data.data.boards) ? data.data.boards : null;
+        if(!boards) throw new Error('Unexpected thread response shape');
+        const items = [];
+        boards.forEach(b => { const ip = b && b.items_page; if(ip && Array.isArray(ip.items)) items.push(...ip.items); });
+
+        Object.keys(__rcMsgRemote).forEach(k => delete __rcMsgRemote[k]);
+        items.forEach(it => {
+          const r = rcMsgFromItem(it);
+          if(!r) return;
+          (__rcMsgRemote[r.contact] = __rcMsgRemote[r.contact] || []).push(r.msg);
+        });
+
+        const changed = [];
+        Object.keys(__rcMsgRemote).forEach(key => {
+          const st = __rcMsgStore[key];
+          if(st && rcMsgMerge(st, __rcMsgRemote[key])) changed.push(key);
+        });
+        // Contacts seen on screen but not yet in the store pick up history via rcMsgSeed.
+        rcMsgAllContacts().forEach(c => { if(!__rcMsgStore[rcMsgKey(c)] && __rcMsgRemote[rcMsgKey(c)]){ rcMsgState(c); changed.push(rcMsgKey(c)); } });
+
+        changed.forEach(key => rcMsgRefresh(key));
+        rcMsgUpdateBadge();
+        if(__rcMsgDock.open && (!__rcMsgDock.active || __rcMsgDock.active === '__picker')) rcMsgRenderDock();
+      } catch(err){
+        console.warn('Message thread load failed:', err);
+      } finally {
+        __rcMsgLoading = false;
+      }
+    }
+
+    function rcMsgStartPolling(){
+      rcMsgStopPolling();
+      __rcMsgPollTimer = setInterval(() => {
+        if(__rcMsgDock.open && document.visibilityState === 'visible') rcMsgLoadThreads();
+      }, RCMSG_POLL_MS);
+    }
+    function rcMsgStopPolling(){
+      if(__rcMsgPollTimer){ clearInterval(__rcMsgPollTimer); __rcMsgPollTimer = null; }
+    }
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'visible' && __rcMsgDock.open) rcMsgLoadThreads();
+    });
+
     function rcMsgAfterData(){
+      if(__rcMsgFirstData){ __rcMsgFirstData = false; setTimeout(rcMsgLoadThreads, 0); }
       rcMsgUpdateBadge();
       if(__rcMsgDock.open && (!__rcMsgDock.active || __rcMsgDock.active === '__picker')) rcMsgRenderDock();
       else rcMsgRenderTabs();
