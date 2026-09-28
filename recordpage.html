@@ -4593,8 +4593,8 @@
 
     .rcmsg-inbox-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 12px 14px; scrollbar-width: thin; }
     .rcmsg-inbox-sec { margin-top: 12px; }
-    .rcmsg-inbox-sec-head { display: flex; align-items: center; gap: 6px; padding: 0 4px 6px; font-size: 11.5px; font-weight: 600; color: #444; letter-spacing: .01em; }
-    .rcmsg-inbox-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 16px; padding: 0 5px; border-radius: 999px; background: #e5e5e5; color: #444; font-size: 10.5px; font-weight: 500; }
+    .rcmsg-inbox-sec-head { display: flex; align-items: center; gap: 6px; padding: 0 4px 6px; font-size: 12.5px; font-weight: 600; color: #181818; letter-spacing: .01em; }
+    .rcmsg-inbox-count { display: inline; padding: 0; background: none; color: #181818; font-size: 12.5px; font-weight: 400; }
     .rcmsg-inbox-card {
       background: #ffffff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden;
       box-shadow: 0 1px 2px rgba(24,24,24,.05);
@@ -4639,6 +4639,357 @@
     .rcmsg-dd-btn.is-empty .rcmsg-dd-chev { color: #0176d3; }
     .rcmsg-dd-btn.is-nudge { animation: rcmsgNudge .4s ease; }
     @keyframes rcmsgNudge { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+  </style>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       CAMPAIGNS — Revival Sequence (SLDS 2 / Cosmos)
+       Built from two references:
+         • Campaign/Flow record  → header, labeled facts, solid badges
+         • Account Selection Center → summary cards, datatable card,
+           row numbers, round row-action buttons
+       Text uses the operating system's UI face (Segoe UI on Windows,
+       SF Pro on Mac) — the native Cosmos look.
+       ══════════════════════════════════════════════════════════ */
+    :root {
+      --camp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+      --camp-text: #181818;
+      --camp-text-2: #444444;
+      --camp-text-3: #5c5c5c;
+      --camp-line: #e5e5e5;
+      --camp-line-2: #c9c9c9;
+      --camp-fill: #f3f3f3;
+      --camp-brand: #0176d3;
+      --camp-brand-dark: #0b5cab;
+      --camp-sms: #0b827c;
+    }
+
+    /* Tab count — plain number like the Related Contacts tab counts */
+
+    #pane-activity { background: #f4f6f9; border-top: 1px solid var(--camp-line); }
+    #pane-activity .section { padding: 20px 20px 44px 30px; }
+    /* The follow-up banner belongs to the deal, not the campaign */
+    .panel:has(#tab-activity[aria-selected="true"]) #actionBanner { display: none !important; }
+    #campaignsHost { font-family: var(--camp-font); color: var(--camp-text); display: flex; flex-direction: column; gap: 16px; }
+    #campaignsHost button, #campaignsHost input { font-family: var(--camp-font); }
+
+    /* ── Shared card ── */
+    .rc-camp-box { background: #ffffff; border: 1px solid #e3e5e8; border-radius: 20px; box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 12px rgba(16,24,40,.05); }
+
+    /* ── 1. Campaign header (Flow record pattern) ── */
+    .rc-camp-hero { padding: 22px 28px 0; }
+    .rc-camp-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .rc-camp-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .rc-camp-icon {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--camp-sms); color: #ffffff;
+    }
+    .rc-camp-icon svg { width: 22px; height: 22px; }
+    .rc-camp-obj { font-size: 13px; color: var(--camp-text-2); line-height: 1.2; }
+    .rc-camp-title { margin: 2px 0 0; font-size: 25px; font-weight: 400; line-height: 1.2; color: var(--camp-text); letter-spacing: -.005em; }
+    .rc-camp-facts {
+      display: grid; grid-template-columns: repeat(4, minmax(0, max-content)); gap: 0 56px;
+      margin-top: 20px; padding: 16px 0 20px; border-top: 1px solid var(--camp-line); align-items: end;
+    }
+    .rc-camp-fact-l { font-size: 13px; color: var(--camp-text-2); margin-bottom: 6px; }
+    .rc-camp-fact-v { font-size: 15px; color: var(--camp-text); white-space: nowrap; line-height: 30px; }
+    .rc-rev-seg.rc-camp-lineseg { padding: 3px; background: #ffffff; box-shadow: inset 0 0 0 1px var(--camp-line-2); }
+    .rc-rev-seg.rc-camp-lineseg button { height: 28px; padding: 0 16px; font-size: 14px; font-weight: 400; color: var(--camp-text-2); }
+    .rc-rev-seg.rc-camp-lineseg button:not(.is-on):hover { color: var(--camp-text); background: var(--camp-fill); }
+    .rc-rev-seg.rc-camp-lineseg button.is-on { background: var(--camp-brand); color: #ffffff; font-weight: 600; box-shadow: none; }
+    .rc-rev-seg.rc-camp-lineseg button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.25); }
+
+    /* ── 2. Summary cards (Account Selection Center pattern) ── */
+    .rc-camp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .rc-camp-sum { display: flex; flex-direction: column; padding: 20px 28px 22px; }
+    .rc-camp-sum-h { font-size: 17px; color: var(--camp-text); margin: 0 0 16px; font-weight: 600; line-height: 1.25; }
+    .rc-camp-figs { display: flex; flex-wrap: wrap; gap: 10px 40px; }
+    .rc-camp-fig-n { font-size: 30px; font-weight: 400; line-height: 1.1; color: var(--camp-text); font-variant-numeric: tabular-nums; }
+    .rc-camp-fig-l { font-size: 13px; color: var(--camp-text-2); margin-top: 2px; white-space: nowrap; }
+    .rc-camp-fig.is-zero .rc-camp-fig-n { color: #aeaeae; }
+    .rc-camp-sum-p { margin: 16px 0 18px; font-size: 14px; line-height: 1.5; color: var(--camp-text); max-width: 60ch; }
+    .rc-camp-sum-a { margin-top: auto; }
+
+    /* ── 3. People datatable card ── */
+    .rc-camp-tcard { overflow: hidden; }
+    .rc-camp-thead { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 28px 16px; }
+    .rc-camp-thead h4 { margin: 0; font-size: 17px; font-weight: 600; color: var(--camp-text); line-height: 1.25; }
+    .rc-camp-tsub { margin-top: 3px; font-size: 13px; color: var(--camp-text-2); }
+    .rc-camp-clear { border: 0; background: none; padding: 0; margin-left: 4px; color: var(--camp-brand); font-size: 13px; cursor: pointer; }
+    .rc-camp-clear:hover { text-decoration: underline; }
+    .rc-camp-search { position: relative; width: 240px; flex-shrink: 0; }
+    .rc-camp-search svg { position: absolute; left: 11px; top: 50%; width: 14px; height: 14px; margin-top: -7px; color: var(--camp-text-3); pointer-events: none; }
+    .rc-camp-search input {
+      width: 100%; height: 34px; padding: 0 12px 0 32px; border: 1px solid var(--camp-line-2); border-radius: 8px;
+      background: #fff; font-size: 13px; color: var(--camp-text); outline: none; transition: border-color .12s ease, box-shadow .12s ease;
+    }
+    .rc-camp-search input::placeholder { color: var(--camp-text-3); }
+    .rc-camp-search input:focus { border-color: var(--camp-brand); box-shadow: 0 0 0 3px rgba(1,118,211,.18); }
+
+    .rc-camp-scroll { overflow-x: auto; }
+    .rc-camp-tcard .rc-camp-table {
+      width: 100%; min-width: 1020px; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+      font-family: var(--camp-font); background: transparent; font-size: 14px;
+    }
+    .rc-camp-table col.c-cb   { width: 52px; }
+    .rc-camp-table col.c-name { width: 17%; }
+    .rc-camp-table col.c-rel  { width: 10%; }
+    .rc-camp-table col.c-role { width: 13%; }
+    .rc-camp-table col.c-lead { width: 17%; }
+    .rc-camp-table col.c-ph   { width: 12%; }
+    .rc-camp-table col.c-st   { width: 17%; }
+    .rc-camp-table col.c-line { width: 10%; }
+    .rc-camp-table col.c-act  { width: 52px; }
+
+    .rc-camp-tcard .rc-camp-table thead th {
+      position: relative; height: 36px; padding: 0 10px;
+      background: var(--camp-fill); color: #2e2e2e;
+      font-family: var(--camp-font); font-size: 13px; font-weight: 600; text-align: left; letter-spacing: 0; text-transform: none;
+      border-top: 1px solid var(--camp-line); border-bottom: 1px solid var(--camp-line); white-space: nowrap;
+    }
+    /* Column separators, as in the reference datatable */
+    .rc-camp-tcard .rc-camp-table thead th + th::before {
+      content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 1px; background: var(--camp-line-2);
+    }
+    .rc-camp-tcard .rc-camp-table thead th.c-cb::before,
+    .rc-camp-tcard .rc-camp-table thead th.c-name::before,
+    .rc-camp-tcard .rc-camp-table thead th.c-act::before { display: none; }
+
+    .rc-camp-tcard .rc-camp-table tbody td {
+      height: 44px; padding: 5px 10px; vertical-align: middle; background: transparent;
+      font-family: var(--camp-font); font-size: 15px; line-height: 1.3; color: var(--camp-text);
+      border-bottom: 1px solid var(--camp-line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .rc-camp-table tbody tr { transition: background .1s ease; }
+    .rc-camp-table tbody tr:hover td { background: #f8f8f8; }
+    .rc-camp-table tbody tr:last-child td { border-bottom: 0; }
+    .rc-camp-tcard .rc-camp-table td.c-cb,
+    .rc-camp-tcard .rc-camp-table th.c-cb { padding: 0 0 0 22px; overflow: visible; }
+    .rc-camp-table .rc-rev-cb { display: block; margin-top: 1px; }
+    .rc-camp-table .rc-rev-cb input:disabled { cursor: not-allowed; }
+    .rc-camp-table .rc-rev-cb input:indeterminate + span { background-color: var(--camp-brand); border-color: var(--camp-brand); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6h6' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E"); }
+    .rc-camp-table tbody tr.is-sel td { background: #f0f6fd; }
+    .rc-camp-table tbody tr.is-sel:hover td { background: #e8f1fc; }
+    .rc-camp-ttools { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .rc-camp-link {
+      border: 0; background: none; padding: 0; max-width: 100%;
+      color: var(--camp-brand); font-size: 15px; font-weight: 600; cursor: pointer; text-align: left;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .rc-camp-link:hover { text-decoration: underline; }
+    .rc-camp-link:focus-visible { outline: 2px solid var(--camp-brand); outline-offset: 2px; border-radius: 3px; }
+    .rc-camp-ph { font-variant-numeric: tabular-nums; }
+    .rc-camp-none { color: #aeaeae; }
+    .rc-camp-tcard .rc-camp-table td.c-st { white-space: normal; }
+    .rc-camp-st { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+    .rc-camp-why { font-size: 13px; color: var(--camp-text-3); white-space: nowrap; }
+    .rc-camp-tcard .rc-camp-table td.c-act { text-align: center; padding: 0 14px 0 0; overflow: visible; }
+    .rc-camp-empty-row td { text-align: center; color: var(--camp-text-3); font-size: 13px; height: 64px; }
+
+    /* Round row-action button (reference: circled chevron at row end) */
+    .rc-camp-rowbtn {
+      width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--camp-line-2); background: #fff;
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--camp-brand);
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .rc-camp-rowbtn svg { width: 12px; height: 12px; }
+    .rc-camp-rowbtn:hover, .rc-camp-rowbtn[aria-expanded="true"] { background: #f3f8fd; border-color: var(--camp-brand); }
+    .rc-camp-rowbtn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.22); }
+
+    /* Row-action menu (rendered on <body> so the table never clips it) */
+    .rc-camp-menu {
+      position: fixed; z-index: 10040; min-width: 220px; padding: 6px;
+      background: #fff; border: 1px solid var(--camp-line); border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 12px 32px rgba(3,45,96,.14);
+      font-family: var(--camp-font);
+    }
+    .rc-camp-menu button {
+      display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 1px;
+      border: 0; background: none; padding: 8px 12px; border-radius: 8px; text-align: left; cursor: pointer;
+      font-family: var(--camp-font); font-size: 14px; color: var(--camp-text);
+    }
+    .rc-camp-menu button:hover:not(:disabled), .rc-camp-menu button:focus-visible { background: var(--camp-fill); outline: none; }
+    .rc-camp-menu button:disabled { cursor: not-allowed; color: #aeaeae; }
+    .rc-camp-menu button small { font-size: 12px; color: var(--camp-text-3); }
+    .rc-camp-menu button.is-danger { color: #ba0517; }
+    .rc-camp-menu hr { border: 0; border-top: 1px solid var(--camp-line); margin: 5px 4px; }
+
+    /* ── Revival status — plain text, no tags ── */
+    .rc-camp-stt { font-size: 15px; color: var(--camp-text); white-space: nowrap; }
+    .rc-camp-unenrolled { font-size: 15px; color: var(--camp-text-3); }
+    .rc-rev-modal .rc-camp-stt, .rc-rev-modal .rc-camp-unenrolled { font-size: 14px; }
+
+    /* ── Shared bits used elsewhere on the page ── */
+    .rc-rev-av {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #eef1f6; color: #032d60; font-size: 11.5px; font-weight: 600;
+    }
+    /* Record-field version of the Revival status (Deal Information tab) */
+    .rc-rev-pill {
+      display: inline-flex; align-items: center; gap: 7px; height: 24px; padding: 0 10px 0 9px; border-radius: 999px;
+      background: #f3f3f3; border: 0; color: var(--text, #1f2937); font-size: 12.5px; font-weight: 500; white-space: nowrap; font-family: var(--font);
+    }
+    .rc-rev-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rev); flex-shrink: 0; }
+    .rc-rev-none { font-size: 13px; color: #939393; }
+    .rc-rev-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; min-height: 28px; }
+    .rc-rev-hint { font-size: 12px; color: #747474; line-height: 1.4; }
+    .rc-rev-tip { display: inline-flex; cursor: not-allowed; }
+    .rc-rev-tip .rc-rev-btn { pointer-events: none; }
+
+    /* Buttons — Cosmos: fully rounded */
+    .rc-rev-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      height: 34px; padding: 0 18px; border-radius: 999px;
+      border: 1px solid var(--camp-line-2); background: #ffffff; color: var(--camp-brand);
+      font-family: var(--camp-font); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: background .12s ease, border-color .12s ease, box-shadow .12s ease, color .12s ease;
+    }
+    .rc-rev-btn svg { width: 14px; height: 14px; }
+    .rc-rev-btn:hover:not(:disabled) { background: #f3f8fd; border-color: var(--camp-brand); }
+    .rc-rev-btn:active:not(:disabled) { transform: translateY(1px); }
+    .rc-rev-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.22); }
+    .rc-rev-btn.is-sm { height: 30px; padding: 0 14px; font-size: 13px; }
+    .rc-rev-btn.is-brand { background: var(--camp-brand); border-color: var(--camp-brand); color: #ffffff; }
+    .rc-rev-btn.is-brand:hover:not(:disabled) { background: var(--camp-brand-dark); border-color: var(--camp-brand-dark); }
+    .rc-rev-btn.is-danger { background: #ba0517; border-color: #ba0517; color: #ffffff; }
+    .rc-rev-btn.is-danger:hover:not(:disabled) { background: #8e030f; border-color: #8e030f; }
+    .rc-rev-btn:disabled { background: #ffffff; border-color: var(--camp-line); color: #aeaeae; cursor: not-allowed; box-shadow: none; }
+    .rc-rev-btn.is-brand:disabled { background: var(--camp-line); border-color: var(--camp-line); color: #939393; }
+    .rc-rev-spin { width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: rcRevSpin .7s linear infinite; }
+    @keyframes rcRevSpin { to { transform: rotate(360deg); } }
+
+    /* ── Dialogs ── */
+    .rc-rev-overlay {
+      position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: rgba(3, 20, 45, .42); opacity: 0; transition: opacity .16s ease; font-family: var(--camp-font);
+    }
+    .rc-rev-overlay.is-open { opacity: 1; }
+    .rc-rev-modal {
+      width: 100%; max-width: 480px; max-height: calc(100vh - 48px); display: flex; flex-direction: column;
+      background: #ffffff; border-radius: 20px; overflow: hidden; color: var(--camp-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06), 0 20px 48px rgba(3,45,96,.18);
+      transform: translateY(8px); transition: transform .18s ease;
+    }
+    .rc-rev-overlay.is-open .rc-rev-modal { transform: none; }
+    .rc-rev-modal.is-wide { max-width: 760px; }
+    .rc-rev-modal button { font-family: var(--camp-font); }
+    .rc-rev-mhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 24px 16px; border-bottom: 1px solid var(--camp-line); }
+    .rc-rev-mhead-l { display: flex; align-items: center; gap: 12px; }
+    .rc-rev-micon { width: 40px; height: 40px; border-radius: 50%; background: var(--camp-sms); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rc-rev-micon svg { width: 20px; height: 20px; }
+    .rc-rev-mhead h2 { margin: 0; font-size: 20px; font-weight: 400; color: var(--camp-text); letter-spacing: 0; line-height: 1.25; }
+    .rc-rev-mhead p { margin: 2px 0 0; font-size: 13px; color: var(--camp-text-2); }
+    .rc-rev-x { width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--camp-text-3); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .rc-rev-x svg { width: 15px; height: 15px; }
+    .rc-rev-x:hover { background: var(--camp-fill); color: var(--camp-text); }
+    .rc-rev-x:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.22); }
+    .rc-rev-mbody { padding: 20px 24px; overflow-y: auto; flex: 1; min-height: 0; }
+    .rc-rev-mfoot { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 24px; border-top: 1px solid var(--camp-line); background: #ffffff; }
+    .rc-rev-mfoot:empty { display: none; }
+    .rc-rev-count { margin-right: auto; font-size: 13px; color: var(--camp-text-2); }
+    .rc-rev-count b { color: var(--camp-text); font-weight: 600; }
+    .rc-rev-q { margin: 0; font-size: 14px; color: var(--camp-text); line-height: 1.55; }
+    .rc-rev-q b { font-weight: 600; }
+
+    .rc-rev-notice { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.45; background: var(--camp-fill); color: #2e2e2e; border: 0; }
+    .rc-rev-notice svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--camp-text-3); }
+    .rc-rev-notice.is-warn { background: var(--camp-fill); color: #2e2e2e; border: 0; }
+    .rc-rev-notice.is-err { background: #fef1ee; color: #8e030f; border: 0; }
+    .rc-rev-notice.is-err svg { color: #ba0517; }
+    .rc-rev-notice.is-info { background: var(--camp-fill); color: #2e2e2e; border: 0; }
+    .rc-rev-notice.is-info svg { color: var(--camp-brand); }
+
+    .rc-rev-linepick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 16px; padding: 12px 14px; border: 1px solid var(--camp-line); border-radius: 12px; }
+    .rc-rev-linepick-l { font-size: 13px; color: var(--camp-text); font-weight: 600; }
+    .rc-rev-linepick-h { flex-basis: 100%; font-size: 12px; color: var(--camp-text-3); }
+    .rc-rev-seg { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--camp-fill); }
+    .rc-rev-seg button { border: 0; background: transparent; height: 28px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--camp-text-2); cursor: pointer; }
+    .rc-rev-seg button.is-on { background: #ffffff; color: var(--camp-brand); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+
+    /* Steps — a real two-step sequence */
+    .rc-rev-steps { display: flex; align-items: center; gap: 10px; list-style: none; margin: 0 0 18px; padding: 0; font-size: 13px; color: var(--camp-text-3); }
+    .rc-rev-steps li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .rc-rev-steps li span { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: #ffffff; color: var(--camp-text-3); border: 1px solid var(--camp-line-2); }
+    .rc-rev-steps li span svg { width: 11px; height: 11px; }
+    .rc-rev-steps li.is-on { color: var(--camp-text); font-weight: 600; }
+    .rc-rev-steps li.is-on span { background: var(--camp-brand); border-color: var(--camp-brand); color: #fff; }
+    .rc-rev-steps li.is-done span { background: #ffffff; border-color: var(--camp-brand); color: var(--camp-brand); }
+    .rc-rev-steps .rc-rev-steps-bar { flex: 1; height: 1px; background: var(--camp-line); }
+
+    /* Select list — same datatable language as the tab */
+    .rc-rev-list { border: 1px solid var(--camp-line); border-radius: 12px; overflow: hidden; }
+    .rc-rev-list-head, .rc-rev-row { display: grid; grid-template-columns: 34px minmax(0, 1.6fr) 130px minmax(0, 1.5fr); align-items: center; gap: 10px; padding: 0 16px; }
+    .rc-rev-list-head { height: 36px; background: var(--camp-fill); border-bottom: 1px solid var(--camp-line); font-size: 13px; font-weight: 600; color: var(--camp-text-2); }
+    .rc-rev-row { min-height: 56px; border-top: 1px solid var(--camp-line); cursor: pointer; transition: background .1s ease; }
+    .rc-rev-list-head + .rc-rev-row { border-top: 0; }
+    .rc-rev-row:hover { background: #f8f8f8; }
+    .rc-rev-row.is-on { background: #f0f6fd; }
+    .rc-rev-row.is-off { cursor: default; background: #ffffff; }
+    .rc-rev-row.is-off .rc-rev-row-name, .rc-rev-row.is-off .rc-rev-row-phone { color: #939393; }
+    .rc-rev-row-main { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+    .rc-rev-row-name { font-size: 14px; font-weight: 600; color: var(--camp-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rc-rev-row-sub { font-size: 12px; color: var(--camp-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rc-rev-row-phone { font-size: 13px; color: var(--camp-text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .rc-rev-row-st { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 8px 0; }
+    .rc-rev-row-why { font-size: 12px; color: var(--camp-text-3); }
+    .rc-rev-cb { position: relative; width: 16px; height: 16px; }
+    .rc-rev-cb input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+    .rc-rev-cb span { position: absolute; inset: 0; border-radius: 4px; border: 1px solid #939393; background: #fff center / 12px 12px no-repeat; transition: background-color .12s ease, border-color .12s ease; pointer-events: none; }
+    .rc-rev-cb input:checked + span { background-color: var(--camp-brand); border-color: var(--camp-brand); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+    .rc-rev-cb input:disabled + span { background-color: var(--camp-fill); border-color: #dddddd; }
+    .rc-rev-cb input:focus-visible + span { box-shadow: 0 0 0 3px rgba(1,118,211,.22); }
+    .rc-rev-foot-note { display: flex; align-items: center; gap: 8px; margin: 14px 2px 0; font-size: 12px; color: var(--camp-text-3); }
+    .rc-rev-foot-note svg { width: 14px; height: 14px; color: #939393; flex-shrink: 0; }
+    .rc-rev-empty { padding: 32px 16px; text-align: center; font-size: 13px; color: var(--camp-text-3); }
+
+    /* Confirm + progress — names only, no initials circles */
+    .rc-rev-modal .rc-rev-av { display: none; }
+    .rc-rev-sum h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; font-weight: 600; color: var(--camp-text); letter-spacing: 0; }
+    .rc-rev-sum h3 svg { width: 16px; height: 16px; }
+    .rc-rev-sum h3.is-ok svg { color: #2e844a; }
+    .rc-rev-sum h3.is-bad { color: #ba0517; }
+    .rc-rev-sum p { margin: 4px 0 0; font-size: 13px; color: var(--camp-text-2); line-height: 1.5; }
+    .rc-rev-names { margin-top: 16px; border: 1px solid var(--camp-line); border-radius: 12px; overflow: hidden; }
+    .rc-rev-name { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-top: 1px solid var(--camp-line); }
+    .rc-rev-name:first-child { border-top: 0; }
+    .rc-rev-name .rc-rev-row-main { flex: 1; }
+    .rc-rev-warn-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 400; color: var(--camp-text-2); white-space: nowrap; background: none; padding: 0; height: auto; }
+    .rc-rev-warn-tag svg { width: 13px; height: 13px; color: var(--camp-text-3); }
+    .rc-rev-bar { margin-top: 16px; height: 6px; border-radius: 999px; background: #eeeeee; overflow: hidden; }
+    .rc-rev-bar span { display: block; height: 100%; border-radius: 999px; background: var(--camp-brand); transition: width .25s ease; }
+    .rc-rev-rs { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--camp-text-3); white-space: nowrap; }
+    .rc-rev-rs svg { width: 13px; height: 13px; }
+    .rc-rev-rs.is-done { color: var(--camp-text); }
+    .rc-rev-rs.is-done svg { color: #2e844a; }
+    .rc-rev-rs.is-fail { color: #ba0517; font-weight: 600; }
+    .rc-rev-rs.is-send { color: var(--camp-brand); }
+    .rc-rev-rs.is-skip { color: #939393; }
+
+    .rc-rev-toast {
+      position: fixed; left: 50%; bottom: 64px; z-index: 10060; transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px;
+      background: #032d60; color: #ffffff; font-family: var(--camp-font); font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(3,45,96,.25); transition: opacity .18s ease, transform .18s ease;
+    }
+    .rc-rev-toast svg { width: 14px; height: 14px; color: #ffffff; }
+    .rc-rev-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 1000px){
+      .rc-camp-cards { grid-template-columns: 1fr; }
+      .rc-camp-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }
+    }
+    @media (max-width: 700px){
+      .rc-camp-hero-top { flex-wrap: wrap; }
+      .rc-camp-thead { flex-wrap: wrap; }
+      .rc-camp-ttools { width: 100%; }
+      .rc-camp-search { width: auto; flex: 1; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .rc-rev-modal, .rc-rev-overlay, .rc-rev-toast, .rc-rev-bar span { transition: none; }
+      .rc-rev-btn:active:not(:disabled) { transform: none; }
+    }
   </style>
 
 </head>
@@ -4727,7 +5078,7 @@
           <div class="tabs" role="tablist" aria-label="Record Tabs">
             <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
             <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
-            <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Activity</button>
+            <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Campaigns</button>
           </div>
           <div class="tabs-actions">
             <button class="btn" id="btnRefresh" type="button" title="Refresh">
@@ -5029,19 +5380,10 @@
             </div>
           </div>
 
-          <!-- ACTIVITY -->
+          <!-- CAMPAIGNS (replaces Activity) -->
           <div class="tab-pane" id="pane-activity" role="tabpanel" aria-labelledby="tab-activity">
             <div class="section">
-              <div class="section-head"><div><h3>Activity</h3></div></div>
-              <div class="slds-grid">
-                <div class="slds-col-left">
-                  <div class="slds-field" data-field="last_contacted"><div class="slds-label">Last Contacted</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
-                  <div class="slds-field" data-field="days_of_inactivity"><div class="slds-label">Days of Inactivity</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
-                </div>
-                <div class="slds-col-right">
-                  <div class="slds-field" data-field="activity_notes"><div class="slds-label">Notes</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
-                </div>
-              </div>
+              <div id="campaignsHost"></div>
             </div>
           </div>
 
@@ -6252,8 +6594,8 @@
       phoneStatus:      { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzfhq2' },
       phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzdvd2' },
       phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzw44e' },
-      // TODO: replace with the real SMS Opt Status column ID once it exists on the subitem boards.
-      smsOptStatus:     { type:'select', opts:['Opted In','Opted Out'], columnId:'status_sms_opt' },
+      // SMS Opt Status on the people board (Make sends it as SMS_Opt_Status).
+      smsOptStatus:     { type:'select', opts:['Opted In','Opted Out'], columnId:'color_mm7gpc70' },
       followUp:         { type:'date',   columnId:'date_mkzt8vfa' },
       phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_mkkz9bay' },
       phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3_mkkz1y89' },
@@ -6380,6 +6722,758 @@
         </div>
       </div>`;
     }
+
+    // ══════════════════════════════════════════════════════════════════
+    // CAMPAIGNS — Revival Sequence enrollment
+    // The page only writes two columns on the people board, through the
+    // existing column-change webhook (RC_CHANGE_WEBHOOK):
+    //   Revival Line  color_mm7mqqqt → "Christian" | "Damian"   (whose phone sends)
+    //   Revival       color_mm7mhdmr → "Enroll" | "Remove"
+    // Enroll = Line first, then Enroll (wait for the first to succeed).
+    // Remove = Revival only. Every other Revival label (Waiting, Active,
+    // Stopped - Replied, Blocked, Exhausted) is set by the VPS script and is
+    // display-only here. The page never texts anyone itself.
+    // ══════════════════════════════════════════════════════════════════
+    const REV_BOARD_ID = '9193383321';          // Subitems of Sales Pipeline
+    const REV_COL      = 'color_mm7mhdmr';      // Revival
+    const REV_LINE_COL = 'color_mm7mqqqt';      // Revival Line
+    const REV_LINES    = ['Christian', 'Damian'];
+    const REV_PAUSE_MS = 300;                   // between people in a mass enroll
+    const REV_TIMEOUT_MS = 20000;
+
+    const REV_META = {
+      'Enroll':            { color: '#0176d3', short: 'Starting…',          pill: l => `Revival: starting…${l ? ' (' + l + ')' : ''}`,         hint: () => 'Sent to Monday. The revival script picks it up within a few minutes.' },
+      'Waiting':           { color: '#0176d3', short: 'Waiting for a spot', pill: l => `Revival: waiting for a spot${l ? ' (' + l + ')' : ''}`, hint: l => `${l || 'The'}${l ? '\u2019s' : ''} line is at its daily limit. Starts on its own when a spot opens.` },
+      'Active':            { color: '#0176d3', short: 'Active',             pill: l => `Revival: active${l ? ' (' + l + ')' : ''}`,             hint: l => `In the 14-day sequence. Texts are going out${l ? ' from ' + l + '\u2019s line' : ''}.` },
+      'Remove':            { color: '#939393', short: 'Stopping…',          pill: () => 'Revival: stopping…',                                   hint: () => 'Stop requested. The script stops it within a few minutes.' },
+      'Stopped - Replied': { color: '#2e844a', short: 'Replied',            pill: () => 'Revival: stopped, they replied',                       hint: () => 'They replied, so automated texts stopped. A person takes it from here.' },
+      'Blocked':           { color: '#ba0517', short: 'Blocked',            pill: () => 'Revival: blocked',                                     hint: () => 'Couldn\u2019t start or continue: opted out, deceased, no textable number or no line.' },
+      'Exhausted':         { color: '#939393', short: 'Finished, no reply', pill: () => 'Revival: finished, no reply',                          hint: () => 'All 7 texts went out over 14 days with no reply.' }
+    };
+    const REV_IN_PROGRESS = ['Enroll', 'Waiting', 'Active'];
+    const REV_REENROLL_WARN = ['Exhausted', 'Stopped - Replied'];
+
+    let __rcRevLineChoice = '';     // only used when the viewer isn't identified
+
+    // Normalise whatever Monday sent to one of the known labels ('' = never enrolled).
+    function rcRevState(c){
+      const raw = String((c && c.revival) || '').trim();
+      if(!raw || raw === '—') return '';
+      const k = raw.toLowerCase().replace(/[\u2013\u2014]/g, '-').replace(/\s+/g, ' ');
+      if(k.startsWith('stopped')) return 'Stopped - Replied';
+      const hit = Object.keys(REV_META).find(x => x.toLowerCase() === k);
+      return hit || raw;
+    }
+    function rcRevLineOf(c){
+      const v = String((c && c.revivalLine) || '').trim();
+      return (v && v !== '—') ? v : '';
+    }
+    // The line texts come from = the person using the page.
+    function rcRevLine(){
+      // A line picked on the Campaigns tab wins; otherwise whoever opened the page.
+      if(__rcRevLineChoice) return __rcRevLineChoice;
+      const who = (typeof window.rcWho === 'function' ? window.rcWho() : '') || '';
+      if(REV_LINES.includes(who)) return who;
+      try {
+        if(typeof rcMsgFromIdx === 'function' && rcMsgFromIdx() != null && typeof RCMSG_SENDERS !== 'undefined'){
+          const n = RCMSG_SENDERS[rcMsgFromIdx()].name;
+          if(REV_LINES.includes(n)) return n;
+        }
+      } catch(e){}
+      return '';
+    }
+    function rcRevHasPhone(c){
+      return [c.phone, c.phone2, c.phone3].some(p => p && p !== '—' && String(p).replace(/\D/g, '').length >= 7);
+    }
+    // Why Enroll can't be offered (the script checks these too; this saves a wasted click).
+    function rcRevEnrollBlock(c){
+      if(!c || c.pulseId == null) return 'This person isn\u2019t saved in Monday yet';
+      if(String(c.boardId || '') !== REV_BOARD_ID) return 'Revival isn\u2019t set up on this person\u2019s board yet';
+      if(/opt(ed)?[\s-]*out/i.test(String(c.smsOptStatus || ''))) return 'Opted out of workflows';
+      if(/dead|deceased/i.test(String(c.livingStatus || ''))) return 'Marked as deceased';
+      if(!rcRevHasPhone(c)) return 'No phone number on file';
+      return '';
+    }
+    function rcRevAllPeople(){
+      const own = (typeof rcOwners !== 'undefined' ? rcOwners : []) || [];
+      const oth = (typeof rcOthers !== 'undefined' ? rcOthers : []) || [];
+      return own.map(c => ({ c, group: 'Confirmed Owner' })).concat(oth.map(c => ({ c, group: 'Other Contact' })));
+    }
+    function rcRevById(pid){
+      return (typeof rcContactsById !== 'undefined' && rcContactsById[String(pid)]) || null;
+    }
+    function rcRevFirstPhone(c){
+      const p = [c.phone, c.phone2, c.phone3].find(x => x && x !== '—');
+      return p || '';
+    }
+
+    function rcRevPillHtml(c, short){
+      const st = rcRevState(c);
+      if(!st) return short ? '<span class="rc-rev-none">Not enrolled</span>' : '';
+      const m = REV_META[st] || { color: '#747474', short: st, pill: () => 'Revival: ' + st, hint: () => '' };
+      const line = rcRevLineOf(c);
+      const text = short ? m.short : m.pill(line);
+      return `<span class="rc-rev-pill" style="--rev:${m.color}" title="${escapeHtml(m.hint(line))}"><span class="rc-rev-dot"></span>${escapeHtml(text)}</span>`;
+    }
+
+    // Enroll / Remove button for one person. `size` 'sm' is used in the table.
+    function rcRevActionHtml(c, size){
+      const st = rcRevState(c);
+      const pid = escapeHtml(String(c.pulseId));
+      const cls = 'rc-rev-btn' + (size === 'sm' ? ' is-sm' : '');
+      if(REV_IN_PROGRESS.includes(st)){
+        return `<button type="button" class="${cls}" onclick="event.stopPropagation(); rcRevAskRemove('${pid}')">Remove from Revival</button>`;
+      }
+      const why = rcRevEnrollBlock(c);
+      if(why){
+        return `<span class="rc-rev-tip" title="${escapeHtml(why)}"><button type="button" class="${cls}" disabled aria-disabled="true">Enroll in Revival</button></span>`;
+      }
+      return `<button type="button" class="${cls}" onclick="event.stopPropagation(); rcRevAskEnroll('${pid}')">Enroll in Revival</button>`;
+    }
+
+    // Field on the person's record, next to SMS Opt Status.
+    function rcRevivalFieldHtml(c){
+      const st = rcRevState(c);
+      const m = REV_META[st];
+      const line = rcRevLineOf(c);
+      const why = !REV_IN_PROGRESS.includes(st) ? rcRevEnrollBlock(c) : '';
+      const hint = m ? m.hint(line) : (why || 'Not in a revival sequence.');
+      return `<div class="rc-field rc-rev-field" data-rev-pid="${escapeHtml(String(c.pulseId))}"><div class="rc-field-inner">
+          <span class="rc-label">Revival Sequence</span>
+          <div class="rc-rev-line">${st ? rcRevPillHtml(c, false) : '<span class="rc-rev-none">Not enrolled</span>'}${rcRevActionHtml(c, 'sm')}</div>
+          <span class="rc-rev-hint">${escapeHtml(hint)}</span>
+        </div></div>`;
+    }
+
+    // Re-draw anything on screen that shows this person's Revival status.
+    function rcRevRefreshPerson(pid){
+      const c = rcRevById(pid);
+      if(!c) return;
+      document.querySelectorAll(`.rc-rev-field[data-rev-pid="${CSS.escape(String(pid))}"]`).forEach(el => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = rcRevivalFieldHtml(c).trim();
+        el.replaceWith(tmp.firstElementChild);
+      });
+    }
+
+    // ── Writes ────────────────────────────────────────────────────────
+    async function rcRevWrite(c, columnId, value){
+      const ctrl = ('AbortController' in window) ? new AbortController() : null;
+      const timer = ctrl ? setTimeout(() => ctrl.abort(), REV_TIMEOUT_MS) : null;
+      try {
+        const res = await fetch(RC_CHANGE_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pulse_id:     String(c.pulseId),
+            board_id:     REV_BOARD_ID,
+            column_id:    columnId,
+            column_value: value,
+            who:          (typeof window.rcWho === 'function' ? window.rcWho() : '')
+          }),
+          signal: ctrl ? ctrl.signal : undefined
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+      } finally {
+        if(timer) clearTimeout(timer);
+      }
+    }
+    // Line first, then Enroll — the second only after the first succeeds.
+    async function rcRevEnrollOne(c, line){
+      await rcRevWrite(c, REV_LINE_COL, line);
+      c.revivalLine = line; rcMarkPending(c.pulseId, 'revivalLine', line);
+      await rcRevWrite(c, REV_COL, 'Enroll');
+      c.revival = 'Enroll'; rcMarkPending(c.pulseId, 'revival', 'Enroll');
+    }
+    async function rcRevRemoveOne(c){
+      await rcRevWrite(c, REV_COL, 'Remove');
+      c.revival = 'Remove'; rcMarkPending(c.pulseId, 'revival', 'Remove');
+    }
+    function rcRevAfterWrites(pids){
+      pids.forEach(rcRevRefreshPerson);
+      rcRevRender();
+      if(typeof scheduleSilentRefresh === 'function') scheduleSilentRefresh(7000);
+    }
+
+    // ── Modal shell (SLDS modal) ──────────────────────────────────────
+    function rcRevModal(opts){
+      rcRevCloseModal();
+      const ov = document.createElement('div');
+      ov.id = 'rcRevOverlay';
+      ov.className = 'rc-rev-overlay';
+      ov.innerHTML = `<div class="rc-rev-modal${opts.wide ? ' is-wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="rcRevTitle">
+          <div class="rc-rev-mhead">
+            <div class="rc-rev-mhead-l">
+              <span class="rc-rev-micon">${REV_ICON}</span>
+              <div><h2 id="rcRevTitle">${opts.title}</h2>${opts.sub ? `<p>${opts.sub}</p>` : ''}</div>
+            </div>
+            <button type="button" class="rc-rev-x" aria-label="Close" onclick="rcRevCloseModal()">${REV_ICON_X}</button>
+          </div>
+          <div class="rc-rev-mbody" id="rcRevBody"></div>
+          <div class="rc-rev-mfoot" id="rcRevFoot"></div>
+        </div>`;
+      ov.addEventListener('mousedown', e => { if(e.target === ov && !ov.dataset.busy) rcRevCloseModal(); });
+      document.body.appendChild(ov);
+      requestAnimationFrame(() => ov.classList.add('is-open'));
+      return ov;
+    }
+    function rcRevCloseModal(){
+      const ov = document.getElementById('rcRevOverlay');
+      if(ov && !ov.dataset.busy) ov.remove();
+    }
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape' && document.getElementById('rcRevOverlay')) rcRevCloseModal();
+    });
+
+    // Show the line picker whenever the page couldn't identify the viewer.
+    function rcRevNeedsPick(){
+      const who = (typeof window.rcWho === 'function' ? window.rcWho() : '') || '';
+      return !REV_LINES.includes(who);
+    }
+    function rcRevLinePickerHtml(){
+      const cur = rcRevLine();
+      return `<div class="rc-rev-linepick">
+          <span class="rc-rev-linepick-l">Send from</span>
+          <div class="rc-rev-seg" role="radiogroup" aria-label="Send from">
+            ${REV_LINES.map(n => `<button type="button" role="radio" aria-checked="${cur === n}" class="${cur === n ? 'is-on' : ''}" onclick="rcRevPickLine('${n}')">${n}</button>`).join('')}
+          </div>
+          <span class="rc-rev-linepick-h">We couldn\u2019t tell who\u2019s using this page. Pick whose line sends.</span>
+        </div>`;
+    }
+    function rcRevPickLine(n){
+      __rcRevLineChoice = n;
+      const ov = document.getElementById('rcRevOverlay');
+      if(ov && typeof ov._redraw === 'function') ov._redraw();
+    }
+
+    // ── Single person ─────────────────────────────────────────────────
+    function rcRevAskEnroll(pid){
+      const c = rcRevById(pid);
+      if(!c || rcRevEnrollBlock(c)) return;
+      const name = escapeHtml(c.name);
+      const ov = rcRevModal({ title: 'Enroll in Revival', sub: '7 texts over 14 days' });
+      let err = '';
+      const draw = (busy) => {
+        const line = rcRevLine();
+        const warn = REV_REENROLL_WARN.includes(rcRevState(c));
+        document.getElementById('rcRevBody').innerHTML = `
+          <p class="rc-rev-q">Enroll <b>${name}</b> in the 14-day Revival Sequence?${line ? ` Texts will come from <b>${escapeHtml(line)}</b>\u2019s line.` : ''}</p>
+          ${rcRevNeedsPick() ? rcRevLinePickerHtml() : ''}
+          ${warn ? `<div class="rc-rev-notice is-warn">${REV_ICON_WARN}<span>They already finished a revival / replied before. Enroll again anyway?</span></div>` : ''}
+          ${err ? `<div class="rc-rev-notice is-err">${REV_ICON_ERR}<span>${escapeHtml(err)}</span></div>` : ''}`;
+        document.getElementById('rcRevFoot').innerHTML = `
+          <button type="button" class="rc-rev-btn" onclick="rcRevCloseModal()" ${busy ? 'disabled' : ''}>Cancel</button>
+          <button type="button" class="rc-rev-btn is-brand" id="rcRevGo" ${busy || !line ? 'disabled' : ''}>${busy ? '<span class="rc-rev-spin"></span>Enrolling…' : (warn ? 'Enroll again' : 'Enroll')}</button>`;
+        const go = document.getElementById('rcRevGo');
+        if(go && !busy) go.onclick = run;
+      };
+      const run = async () => {
+        const line = rcRevLine();
+        if(!line) return;
+        ov.dataset.busy = '1'; err = ''; draw(true);
+        try {
+          await rcRevEnrollOne(c, line);
+          delete ov.dataset.busy; rcRevCloseModal();
+          rcRevAfterWrites([pid]);
+          rcRevToast(`${c.name} enrolled in Revival`);
+        } catch(e){
+          console.error('Revival enroll failed:', e);
+          delete ov.dataset.busy;
+          err = 'Couldn\u2019t reach Monday, so the enrollment didn\u2019t go through. Check your connection and try again.';
+          draw(false);
+          rcRevAfterWrites([pid]);
+        }
+      };
+      ov._redraw = () => draw(false);
+      draw(false);
+    }
+
+    function rcRevAskRemove(pid){
+      const c = rcRevById(pid);
+      if(!c) return;
+      const name = escapeHtml(c.name);
+      const ov = rcRevModal({ title: 'Remove from Revival', sub: 'Stops the sequence for this person' });
+      let err = '';
+      const draw = (busy) => {
+        document.getElementById('rcRevBody').innerHTML = `
+          <p class="rc-rev-q">Stop <b>${name}</b>\u2019s revival now? No more revival texts will go out.</p>
+          ${err ? `<div class="rc-rev-notice is-err">${REV_ICON_ERR}<span>${escapeHtml(err)}</span></div>` : ''}`;
+        document.getElementById('rcRevFoot').innerHTML = `
+          <button type="button" class="rc-rev-btn" onclick="rcRevCloseModal()" ${busy ? 'disabled' : ''}>Cancel</button>
+          <button type="button" class="rc-rev-btn is-danger" id="rcRevGo" ${busy ? 'disabled' : ''}>${busy ? '<span class="rc-rev-spin"></span>Removing…' : 'Remove'}</button>`;
+        const go = document.getElementById('rcRevGo');
+        if(go && !busy) go.onclick = run;
+      };
+      const run = async () => {
+        ov.dataset.busy = '1'; err = ''; draw(true);
+        try {
+          await rcRevRemoveOne(c);
+          delete ov.dataset.busy; rcRevCloseModal();
+          rcRevAfterWrites([pid]);
+          rcRevToast(`Revival stopping for ${c.name}`);
+        } catch(e){
+          console.error('Revival remove failed:', e);
+          delete ov.dataset.busy;
+          err = 'Couldn\u2019t reach Monday, so the revival wasn\u2019t stopped. Try again.';
+          draw(false);
+        }
+      };
+      draw(false);
+    }
+
+    // ── Mass enroller (2 steps) ───────────────────────────────────────
+    function rcRevSelectReason(c){
+      const st = rcRevState(c);
+      if(st === 'Enroll')  return 'Already starting';
+      if(st === 'Waiting') return 'Already waiting';
+      if(st === 'Active')  return 'Already active';
+      return rcRevEnrollBlock(c);
+    }
+
+    function rcRevOpenMass(pre){
+      const people = rcRevAllPeople();
+      // Optional starting selection (checked rows on the Campaigns tab);
+      // anyone who can't be enrolled is dropped.
+      const picked = new Set((Array.isArray(pre) ? pre : []).map(String).filter(id => {
+        const hit = people.find(p => String(p.c.pulseId) === id);
+        return hit && !rcRevSelectReason(hit.c);
+      }));
+      let step = picked.size ? 2 : 1;
+      let run = null;   // { list:[{c,state:'pending'|'sending'|'done'|'failed'|'skipped'}], i, done }
+      const ov = rcRevModal({ title: 'Enroll in Revival Sequence', sub: 'Choose who on this file gets the 14-day sequence', wide: true });
+
+      const stepper = () => `<ol class="rc-rev-steps">
+          <li class="${step === 1 ? 'is-on' : 'is-done'}"><span>${step > 1 ? REV_ICON_TICK : '1'}</span>Select people</li>
+          <li class="rc-rev-steps-bar"></li>
+          <li class="${step === 2 ? 'is-on' : ''}"><span>2</span>Confirm</li>
+        </ol>`;
+
+      const drawSelect = () => {
+        const rows = people.map(({ c, group }) => {
+          const why = rcRevSelectReason(c);
+          const pid = escapeHtml(String(c.pulseId));
+          const on = picked.has(String(c.pulseId));
+          return `<label class="rc-rev-row${why ? ' is-off' : ''}${on ? ' is-on' : ''}">
+              <span class="rc-rev-cb"><input type="checkbox" ${why ? 'disabled' : ''} ${on ? 'checked' : ''} data-pid="${pid}"><span></span></span>
+              <span class="rc-rev-row-main">
+                <span class="rc-rev-row-name">${escapeHtml(c.name)}</span>
+                <span class="rc-rev-row-sub">${escapeHtml([rcHasVal(c.relation) ? c.relation : '', (group === 'Confirmed Owner' ? 'Confirmed owner' : 'Other contact')].filter(Boolean).join(', '))}</span>
+              </span>
+              <span class="rc-rev-row-phone">${escapeHtml(rcRevFirstPhone(c) || '\u2014')}</span>
+              <span class="rc-rev-row-st">${rcCampBadge(c)}${why ? `<span class="rc-rev-row-why">${escapeHtml(why)}</span>` : ''}</span>
+            </label>`;
+        }).join('');
+        document.getElementById('rcRevBody').innerHTML = `${stepper()}
+          ${people.length ? `<div class="rc-rev-list">
+              <div class="rc-rev-list-head"><span></span><span>Person</span><span>Phone</span><span>Status</span></div>
+              ${rows}
+            </div>` : '<div class="rc-rev-empty">No people on this file yet.</div>'}
+          <p class="rc-rev-foot-note">${REV_ICON_INFO}Only enroll people you\u2019ve tried to reach. Revival sends 7 texts over 14 days.</p>`;
+        document.getElementById('rcRevFoot').innerHTML = `
+          <span class="rc-rev-count">${picked.size ? `<b>${picked.size}</b> selected` : 'Nobody selected'}</span>
+          <button type="button" class="rc-rev-btn" onclick="rcRevCloseModal()">Cancel</button>
+          <button type="button" class="rc-rev-btn is-brand" id="rcRevNext" ${picked.size ? '' : 'disabled'}>Next</button>`;
+        document.querySelectorAll('#rcRevBody input[type=checkbox]').forEach(cb => {
+          cb.addEventListener('change', () => {
+            const id = cb.getAttribute('data-pid');
+            if(cb.checked) picked.add(id); else picked.delete(id);
+            drawSelect();
+          });
+        });
+        const nx = document.getElementById('rcRevNext');
+        if(nx) nx.onclick = () => { step = 2; draw(); };
+      };
+
+      const chosen = () => people.map(p => p.c).filter(c => picked.has(String(c.pulseId)));
+
+      const drawConfirm = () => {
+        const list = chosen();
+        const line = rcRevLine();
+        const n = list.length;
+        document.getElementById('rcRevBody').innerHTML = `${stepper()}
+          <div class="rc-rev-sum">
+            <h3>Enroll ${n} ${n === 1 ? 'person' : 'people'} in Revival</h3>
+            <p>${line ? `Texts from <b>${escapeHtml(line)}</b>\u2019s line.` : 'Choose whose line sends these texts.'}</p>
+          </div>
+          ${rcRevNeedsPick() ? rcRevLinePickerHtml() : ''}
+          <div class="rc-rev-names">
+            ${list.map(c => `<div class="rc-rev-name">
+                <span class="rc-rev-av">${escapeHtml(rcRevInitials(c))}</span>
+                <span class="rc-rev-row-main"><span class="rc-rev-row-name">${escapeHtml(c.name)}</span><span class="rc-rev-row-sub">${escapeHtml(rcRevFirstPhone(c))}</span></span>
+                ${REV_REENROLL_WARN.includes(rcRevState(c)) ? `<span class="rc-rev-warn-tag" title="They already finished a revival / replied before.">${REV_ICON_WARN}${rcRevState(c) === 'Exhausted' ? 'Finished a revival before' : 'Replied before'}</span>` : ''}
+              </div>`).join('')}
+          </div>
+          <div class="rc-rev-notice is-info">${REV_ICON_INFO}<span>If ${line ? escapeHtml(line) + '\u2019s' : 'the'} line is full, some may start as Waiting and begin when a spot opens.</span></div>`;
+        document.getElementById('rcRevFoot').innerHTML = `
+          <button type="button" class="rc-rev-btn" id="rcRevBack">Back</button>
+          <button type="button" class="rc-rev-btn is-brand" id="rcRevGo" ${line ? '' : 'disabled'}>Enroll ${n} ${n === 1 ? 'person' : 'people'}</button>`;
+        document.getElementById('rcRevBack').onclick = () => { step = 1; draw(); };
+        const go = document.getElementById('rcRevGo');
+        if(go) go.onclick = () => startRun(list.map(c => ({ c, state: 'pending' })));
+      };
+
+      const drawRun = () => {
+        const total = run.list.length;
+        const done = run.list.filter(x => x.state === 'done').length;
+        const failed = run.list.filter(x => x.state === 'failed' || x.state === 'skipped');
+        const nFail = run.list.filter(x => x.state === 'failed').length;
+        const nSkip = failed.length - nFail;
+        const cur = Math.min(total, run.list.findIndex(x => x.state === 'sending') + 1 || done);
+        const pct = Math.round((run.list.filter(x => x.state === 'done' || x.state === 'failed').length / total) * 100);
+        const stIcon = s => s === 'done' ? `<span class="rc-rev-rs is-done">${REV_ICON_TICK}Enrolled</span>`
+          : s === 'failed'  ? `<span class="rc-rev-rs is-fail">${REV_ICON_ERR}Failed</span>`
+          : s === 'skipped' ? `<span class="rc-rev-rs is-skip">Not sent</span>`
+          : s === 'sending' ? `<span class="rc-rev-rs is-send"><span class="rc-rev-spin"></span>Sending…</span>`
+          : `<span class="rc-rev-rs">Queued</span>`;
+        let head;
+        if(!run.done) head = `<h3>Enrolling ${cur || 1} of ${total}…</h3><p>Keep this window open until it finishes.</p>`;
+        else if(!failed.length) head = `<h3 class="is-ok">${REV_ICON_TICK}${done} enrolled</h3><p>Their Revival shows <b>Starting…</b> now. Within a few minutes the script changes it to Active, Waiting or Blocked.</p>`;
+        else head = `<h3 class="is-bad">${done} enrolled, ${nFail} failed${nSkip ? `, ${nSkip} not sent` : ''}</h3><p>${nSkip ? 'Sending stopped at the failure, so the rest weren\u2019t sent. ' : ''}Retry to send ${failed.length === 1 ? 'it' : 'them'} again.</p>`;
+        document.getElementById('rcRevBody').innerHTML = `
+          <div class="rc-rev-sum">${head}</div>
+          <div class="rc-rev-bar"><span style="width:${run.done && !failed.length ? 100 : pct}%"></span></div>
+          <div class="rc-rev-names">
+            ${run.list.map(x => `<div class="rc-rev-name">
+                <span class="rc-rev-av">${escapeHtml(rcRevInitials(x.c))}</span>
+                <span class="rc-rev-row-main"><span class="rc-rev-row-name">${escapeHtml(x.c.name)}</span></span>
+                ${stIcon(x.state)}
+              </div>`).join('')}
+          </div>`;
+        const foot = document.getElementById('rcRevFoot');
+        if(!run.done){ foot.innerHTML = ''; return; }
+        foot.innerHTML = failed.length
+          ? `<button type="button" class="rc-rev-btn" id="rcRevClose">Close</button>
+             <button type="button" class="rc-rev-btn is-brand" id="rcRevRetry">Retry ${failed.length} ${failed.length === 1 ? 'person' : 'people'}</button>`
+          : `<button type="button" class="rc-rev-btn is-brand" id="rcRevClose">Done</button>`;
+        document.getElementById('rcRevClose').onclick = rcRevCloseModal;
+        const rt = document.getElementById('rcRevRetry');
+        if(rt) rt.onclick = () => startRun(failed.map(x => ({ c: x.c, state: 'pending' })));
+      };
+
+      const startRun = async (list) => {
+        const line = rcRevLine();
+        if(!line || !list.length) return;
+        run = { list, done: false };
+        step = 3; ov.dataset.busy = '1';
+        const touched = [];
+        for(let i = 0; i < list.length; i++){
+          const x = list[i];
+          x.state = 'sending'; drawRun();
+          try {
+            await rcRevEnrollOne(x.c, line);
+            x.state = 'done';
+            touched.push(String(x.c.pulseId));
+          } catch(e){
+            console.error('Revival enroll failed for', x.c.name, e);
+            x.state = 'failed';
+            for(let j = i + 1; j < list.length; j++) list[j].state = 'skipped';
+            break;
+          }
+          if(i < list.length - 1) await new Promise(r => setTimeout(r, REV_PAUSE_MS));
+        }
+        run.done = true;
+        delete ov.dataset.busy;
+        drawRun();
+        rcRevAfterWrites(touched);
+      };
+
+      const draw = () => { if(step === 1) drawSelect(); else if(step === 2) drawConfirm(); else drawRun(); };
+      ov._redraw = draw;
+      draw();
+    }
+
+    function rcRevInitials(c){
+      const parts = String(c.name || '').trim().split(/\s+/).filter(Boolean);
+      return ((parts[0] || '?')[0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+    }
+
+    function rcRevToast(msg){
+      let t = document.getElementById('rcRevToast');
+      if(!t){ t = document.createElement('div'); t.id = 'rcRevToast'; t.className = 'rc-rev-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+      t.innerHTML = `${REV_ICON_TICK}<span>${escapeHtml(msg)}</span>`;
+      t.classList.remove('is-on'); void t.offsetWidth; t.classList.add('is-on');
+      clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('is-on'), 3200);
+    }
+
+    // ── Campaigns tab ─────────────────────────────────────────────────
+    // Display only. Reads the same people/states as before and hands every
+    // action to the existing rcRevAskEnroll / rcRevAskRemove / rcRevOpenMass.
+    let __rcCampQuery = '';        // search box text (kept across re-renders)
+    let __rcCampFilter = '';       // '' | 'replied' | 'eligible'
+    const __rcCampPicked = new Set(); // pulse IDs checked in the table
+
+    // Solid status badge (reference: the "Draft" / "Unpublished" badges).
+    const REV_BADGE = {
+      'Active':            ['is-success', 'Active'],
+      'Stopped - Replied': ['is-brand',   'Replied'],
+      'Enroll':            ['',           'Starting'],
+      'Waiting':           ['',           'Waiting for a spot'],
+      'Remove':            ['',           'Stopping'],
+      'Exhausted':         ['is-inverse', 'Finished, no reply'],
+      'Blocked':           ['is-error',   'Blocked']
+    };
+    function rcCampBadge(c){
+      const st = rcRevState(c);
+      if(!st) return '<span class="rc-camp-unenrolled">Not enrolled</span>';
+      const b = REV_BADGE[st] || ['', st];
+      const m = REV_META[st];
+      const hint = m ? m.hint(rcRevLineOf(c)) : '';
+      return `<span class="rc-camp-stt" title="${escapeHtml(hint)}">${escapeHtml(b[1])}</span>`;
+    }
+
+    function rcRevRender(){
+      const host = document.getElementById('campaignsHost');
+      if(!host) return;
+      rcCampCloseMenu();
+      const people = rcRevAllPeople();
+      const count = st => people.filter(p => rcRevState(p.c) === st).length;
+      const inSeq = count('Active') + count('Enroll') + count('Waiting');
+      const inSeqDetail = [[count('Active'), 'active'], [count('Waiting'), 'waiting'], [count('Enroll'), 'starting']]
+        .filter(([n]) => n).map(([n, l]) => `${n} ${l}`).join(', ');
+      const replied = count('Stopped - Replied');
+      const finished = count('Exhausted');
+      const blocked = count('Blocked');
+      const eligible = people.filter(p => !rcRevSelectReason(p.c)).length;
+      const notEligible = people.filter(p => !REV_IN_PROGRESS.includes(rcRevState(p.c)) && rcRevEnrollBlock(p.c)).length;
+      const line = rcRevLine();
+      const tab = document.getElementById('tab-activity');
+      if(tab) tab.textContent = 'Campaigns';
+      if(__rcCampFilter === 'replied' && !replied) __rcCampFilter = '';
+      if(__rcCampFilter === 'eligible' && !eligible) __rcCampFilter = '';
+
+      [...__rcCampPicked].forEach(id => { const hit = people.find(p => String(p.c.pulseId) === id); if(!hit || rcRevSelectReason(hit.c)) __rcCampPicked.delete(id); });
+      const pl = n => n === 1 ? 'person' : 'people';
+      const fig = (n, l) => `<div class="rc-camp-fig${n ? '' : ' is-zero'}"><div class="rc-camp-fig-n">${n}</div><div class="rc-camp-fig-l">${l}</div></div>`;
+
+      const seqText = (inSeq ? `${inSeq} ${pl(inSeq)} ${inSeq === 1 ? 'is' : 'are'} getting texts right now${inSeqDetail ? ` (${inSeqDetail})` : ''}.` : 'Nobody on this file is getting texts right now.')
+        + (replied ? ` ${replied} replied and ${replied === 1 ? 'is' : 'are'} ready for a call.` : '');
+      const enrText = (eligible ? `${eligible} ${pl(eligible)} can start the sequence. Check the ones you\u2019ve already tried to reach, then choose Enroll people.` : 'Everyone who can be enrolled already is.')
+        + (notEligible ? ` ${notEligible} can\u2019t be enrolled; the reason shows next to their name.` : '');
+
+      const rows = people.map(({ c, group }) => {
+        const st = rcRevState(c);
+        const pid = escapeHtml(String(c.pulseId));
+        const rel = rcHasVal(c.relation) ? c.relation : '';
+        const phone = rcRevFirstPhone(c);
+        const lineOf = rcRevLineOf(c);
+        const why = rcRevSelectReason(c);
+        const showWhy = why && !REV_IN_PROGRESS.includes(st);
+        const search = [c.name, rel, group, phone, c.status].join(' ').toLowerCase();
+        return `<tr data-search="${escapeHtml(search)}" data-st="${escapeHtml(st)}" data-elig="${why ? '0' : '1'}">
+            <td class="c-cb">${why
+              ? `<span class="rc-rev-cb" title="${escapeHtml(why)}"><input type="checkbox" disabled aria-label="${escapeHtml(c.name)} can\u2019t be enrolled: ${escapeHtml(why)}"><span></span></span>`
+              : `<label class="rc-rev-cb"><input type="checkbox" data-pid="${pid}" ${__rcCampPicked.has(String(c.pulseId)) ? 'checked' : ''} onchange="rcCampPick(this)" aria-label="Select ${escapeHtml(c.name)}"><span></span></label>`}</td>
+            <td><button type="button" class="rc-camp-link" onclick="rcCampOpen('${pid}')" title="Open ${escapeHtml(c.name)}\u2019s record">${escapeHtml(c.name)}</button></td>
+            <td>${rel ? escapeHtml(rel) : '<span class="rc-camp-none">\u2014</span>'}</td>
+            <td>${escapeHtml(group === 'Confirmed Owner' ? 'Confirmed owner' : 'Other contact')}</td>
+            <td>${rcHasVal(c.status) ? escapeHtml(c.status) : '<span class="rc-camp-none">\u2014</span>'}</td>
+            <td class="rc-camp-ph">${phone ? escapeHtml(phone) : '<span class="rc-camp-none">\u2014</span>'}</td>
+            <td class="c-st"><div class="rc-camp-st">${rcCampBadge(c)}${showWhy ? `<span class="rc-camp-why">${escapeHtml(why)}</span>` : ''}</div></td>
+            <td>${st && lineOf ? escapeHtml(lineOf) : '<span class="rc-camp-none">\u2014</span>'}</td>
+            <td class="c-act"><button type="button" class="rc-camp-rowbtn" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${escapeHtml(c.name)}" onclick="rcCampMenu(this, '${pid}')">${REV_ICON_CHEV}</button></td>
+          </tr>`;
+      }).join('');
+
+      host.innerHTML = `
+        <section class="rc-camp-box rc-camp-hero" aria-label="Campaign">
+          <div class="rc-camp-hero-top">
+            <div class="rc-camp-id">
+              <span class="rc-camp-icon" aria-hidden="true">${REV_ICON}</span>
+              <div>
+                <div class="rc-camp-obj">Campaign</div>
+                <h4 class="rc-camp-title">Revival Sequence</h4>
+              </div>
+            </div>
+          </div>
+          <div class="rc-camp-facts">
+            <div><div class="rc-camp-fact-l">Channel</div><div class="rc-camp-fact-v">Text message</div></div>
+            <div><div class="rc-camp-fact-l">Cadence</div><div class="rc-camp-fact-v">7 texts over 14 days</div></div>
+            <div><div class="rc-camp-fact-l">Ends when</div><div class="rc-camp-fact-v">They reply, or after the 7th text</div></div>
+            <div><div class="rc-camp-fact-l" id="rcCampLineL">Sending line</div>
+              <div class="rc-rev-seg rc-camp-lineseg" role="radiogroup" aria-labelledby="rcCampLineL">${REV_LINES.map(n => `<button type="button" role="radio" aria-checked="${line === n}" class="${line === n ? 'is-on' : ''}" onclick="rcCampPickLine('${n}')">${n}</button>`).join('')}</div></div>
+          </div>
+        </section>
+
+        <div class="rc-camp-cards">
+          <section class="rc-camp-box rc-camp-sum" aria-label="Sequence summary">
+            <h5 class="rc-camp-sum-h">Sequence summary</h5>
+            <div class="rc-camp-figs">${fig(inSeq, 'In sequence')}${fig(replied, 'Replied')}${fig(finished, 'Finished, no reply')}</div>
+            <p class="rc-camp-sum-p">${seqText}</p>
+            <div class="rc-camp-sum-a"><button type="button" class="rc-rev-btn" onclick="rcCampSetFilter('replied')" ${replied ? '' : 'disabled'}>Show who replied</button></div>
+          </section>
+          <section class="rc-camp-box rc-camp-sum" aria-label="Enrollment">
+            <h5 class="rc-camp-sum-h">Enrollment</h5>
+            <div class="rc-camp-figs">${fig(eligible, 'Can be enrolled')}${fig(notEligible, 'Can\u2019t be enrolled')}${fig(people.length, 'On this file')}</div>
+            <p class="rc-camp-sum-p">${enrText}</p>
+            <div class="rc-camp-sum-a"><button type="button" class="rc-rev-btn" onclick="rcCampSetFilter('eligible')" ${eligible ? '' : 'disabled'}>Show who can be enrolled</button></div>
+          </section>
+        </div>
+
+        <section class="rc-camp-box rc-camp-tcard" aria-label="People on this file">
+          <div class="rc-camp-thead">
+            <div>
+              <h4>People on this file</h4>
+              <div class="rc-camp-tsub" id="rcCampSub"></div>
+            </div>
+            <div class="rc-camp-ttools">
+              <label class="rc-camp-search">
+                ${REV_ICON_SEARCH}
+                <input type="search" id="rcCampSearch" placeholder="Search this list\u2026" aria-label="Search people on this file" value="${escapeHtml(__rcCampQuery)}" oninput="rcCampSearch(this.value)">
+              </label>
+              <button type="button" class="rc-rev-btn is-brand" id="rcCampEnroll" onclick="rcCampEnrollSelected()" disabled>${REV_ICON_PLUS}<span>Enroll people</span></button>
+            </div>
+          </div>
+          ${people.length ? `<div class="rc-camp-scroll"><table class="rc-camp-table">
+            <colgroup><col class="c-cb"><col class="c-name"><col class="c-rel"><col class="c-role"><col class="c-lead"><col class="c-ph"><col class="c-st"><col class="c-line"><col class="c-act"></colgroup>
+            <thead><tr><th class="c-cb"><label class="rc-rev-cb"><input type="checkbox" id="rcCampAll" onchange="rcCampPickAll(this)" aria-label="Select everyone shown who can be enrolled"><span></span></label></th><th class="c-name">Name</th><th>Relationship</th><th>Role</th><th>Lead status</th><th>Phone</th><th>Revival status</th><th>Sending line</th><th class="c-act"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Actions</span></th></tr></thead>
+            <tbody id="rcCampRows">${rows}<tr class="rc-camp-empty-row" hidden><td colspan="9">No one matches this search.</td></tr></tbody>
+          </table></div>` : '<div class="rc-rev-empty">No people on this file yet.</div>'}
+        </section>`;
+      rcCampApply(people.length);
+    }
+
+    // Search + card filters: show/hide rows in place and renumber them.
+    function rcCampApply(total){
+      const body = document.getElementById('rcCampRows');
+      const sub = document.getElementById('rcCampSub');
+      if(total == null) total = body ? body.querySelectorAll('tr[data-search]').length : 0;
+      const q = __rcCampQuery.trim().toLowerCase();
+      let shown = 0;
+      if(body){
+        body.querySelectorAll('tr[data-search]').forEach(tr => {
+          const okQ = !q || tr.dataset.search.includes(q);
+          const okF = !__rcCampFilter
+            || (__rcCampFilter === 'replied' && tr.dataset.st === 'Stopped - Replied')
+            || (__rcCampFilter === 'eligible' && tr.dataset.elig === '1');
+          tr.hidden = !(okQ && okF);
+          if(!tr.hidden) shown++;
+        });
+        const empty = body.querySelector('.rc-camp-empty-row');
+        if(empty) empty.hidden = shown > 0;
+      }
+      if(sub){
+        const fl = __rcCampFilter === 'replied' ? 'people who replied' : __rcCampFilter === 'eligible' ? 'people who can be enrolled' : '';
+        if(fl) sub.innerHTML = `Showing ${shown} ${escapeHtml(fl)} <button type="button" class="rc-camp-clear" onclick="rcCampSetFilter('')">Show everyone</button>`;
+        else if(q) sub.textContent = `${shown} of ${total} ${total === 1 ? 'person' : 'people'} match`;
+        else sub.textContent = `${total} ${total === 1 ? 'person' : 'people'}, confirmed owners first`;
+      }
+      rcCampSyncSel();
+    }
+    function rcCampPickLine(n){
+      if(!REV_LINES.includes(n)) return;
+      __rcRevLineChoice = n;
+      rcRevRender();
+      rcRevToast(`New enrollments send from ${n}\u2019s line`);
+    }
+    // ── Row selection → Enroll people ──
+    function rcCampSyncSel(){
+      const body = document.getElementById('rcCampRows');
+      if(!body) return;
+      body.querySelectorAll('input[data-pid]').forEach(cb => {
+        cb.checked = __rcCampPicked.has(cb.dataset.pid);
+        cb.closest('tr').classList.toggle('is-sel', cb.checked);
+      });
+      const vis = [...body.querySelectorAll('tr:not([hidden]) input[data-pid]')];
+      const on = vis.filter(cb => cb.checked).length;
+      const all = document.getElementById('rcCampAll');
+      if(all){
+        all.disabled = !vis.length;
+        all.checked = !!vis.length && on === vis.length;
+        all.indeterminate = on > 0 && on < vis.length;
+      }
+      const n = __rcCampPicked.size;
+      const btn = document.getElementById('rcCampEnroll');
+      if(btn){
+        btn.disabled = !n;
+        btn.querySelector('span').textContent = n ? `Enroll ${n} ${n === 1 ? 'person' : 'people'}` : 'Enroll people';
+      }
+    }
+    function rcCampPick(cb){
+      if(cb.checked) __rcCampPicked.add(cb.dataset.pid); else __rcCampPicked.delete(cb.dataset.pid);
+      rcCampSyncSel();
+    }
+    function rcCampPickAll(all){
+      const body = document.getElementById('rcCampRows');
+      if(!body) return;
+      body.querySelectorAll('tr:not([hidden]) input[data-pid]').forEach(cb => {
+        if(all.checked) __rcCampPicked.add(cb.dataset.pid); else __rcCampPicked.delete(cb.dataset.pid);
+      });
+      rcCampSyncSel();
+    }
+    function rcCampEnrollSelected(){
+      if(!__rcCampPicked.size) return;
+      rcRevOpenMass([...__rcCampPicked]);
+    }
+    function rcCampSearch(v){ __rcCampQuery = String(v || ''); rcCampApply(); }
+    function rcCampSetFilter(f){
+      __rcCampFilter = (__rcCampFilter === f) ? '' : f;
+      rcCampApply();
+      if(__rcCampFilter){ const t = document.querySelector('.rc-camp-tcard'); if(t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+
+    // Name link → the person's record on the Deal Information tab.
+    function rcCampOpen(pid){
+      rcCampCloseMenu();
+      const dealTab = document.getElementById('tab-deal');
+      if(dealTab) dealTab.click();
+      if(typeof rcOpenById === 'function') rcOpenById(pid, { instant: true });
+      setTimeout(() => {
+        const rv = document.querySelector('[id^="recordview-"][style*="block"]');
+        if(rv) rv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    }
+
+    // Row-action menu, drawn on <body> so the scrolling table never clips it.
+    function rcCampCloseMenu(){
+      const m = document.getElementById('rcCampMenu');
+      if(m){ if(m._btn) m._btn.setAttribute('aria-expanded', 'false'); m.remove(); }
+    }
+    function rcCampMenu(btn, pid){
+      const open = document.getElementById('rcCampMenu');
+      if(open && open._btn === btn){ rcCampCloseMenu(); return; }
+      rcCampCloseMenu();
+      const c = rcRevById(pid);
+      if(!c) return;
+      const st = rcRevState(c);
+      const why = rcRevEnrollBlock(c);
+      const id = escapeHtml(String(pid));
+      let action;
+      if(REV_IN_PROGRESS.includes(st)) action = `<button type="button" role="menuitem" class="is-danger" onclick="rcCampCloseMenu(); rcRevAskRemove('${id}')">Remove from Revival</button>`;
+      else if(why) action = `<button type="button" role="menuitem" disabled>Enroll in Revival<small>${escapeHtml(why)}</small></button>`;
+      else action = `<button type="button" role="menuitem" onclick="rcCampCloseMenu(); rcRevAskEnroll('${id}')">${REV_REENROLL_WARN.includes(st) ? 'Enroll again' : 'Enroll in Revival'}</button>`;
+      const m = document.createElement('div');
+      m.id = 'rcCampMenu'; m.className = 'rc-camp-menu'; m.setAttribute('role', 'menu');
+      m.innerHTML = `<button type="button" role="menuitem" onclick="rcCampOpen('${id}')">Open record</button><hr>${action}`;
+      document.body.appendChild(m);
+      m._btn = btn; btn.setAttribute('aria-expanded', 'true');
+      const r = btn.getBoundingClientRect();
+      const mw = m.offsetWidth, mh = m.offsetHeight;
+      const top = (r.bottom + 6 + mh > window.innerHeight) ? r.top - mh - 6 : r.bottom + 6;
+      m.style.top = Math.max(8, top) + 'px';
+      m.style.left = Math.max(8, Math.min(window.innerWidth - mw - 8, r.right - mw)) + 'px';
+      const first = m.querySelector('button:not(:disabled)');
+      if(first) first.focus({ preventScroll: true });
+    }
+    document.addEventListener('mousedown', e => {
+      const m = document.getElementById('rcCampMenu');
+      if(m && !m.contains(e.target) && e.target !== m._btn && !(m._btn && m._btn.contains(e.target))) rcCampCloseMenu();
+    });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') rcCampCloseMenu(); });
+    window.addEventListener('scroll', rcCampCloseMenu, true);
+    window.addEventListener('resize', rcCampCloseMenu);
+
+    const REV_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.9 2 11.7c0 2.5 1.2 4.7 3.2 6.3-.1 1.1-.6 2.4-1.6 3.4-.2.2 0 .6.3.6 2 0 3.7-.9 4.8-1.8 1 .3 2.1.4 3.3.4 5.5 0 10-3.9 10-8.8S17.5 3 12 3z"/><rect x="7" y="9" width="10" height="1.7" rx=".85" fill="#0b827c"/><rect x="7" y="12.4" width="6.5" height="1.7" rx=".85" fill="#0b827c"/></svg>';
+    const REV_ICON_CHEV = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>';
+    const REV_ICON_SEARCH = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>';
+    const REV_ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+    const REV_ICON_WARN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.2 14.3 13H1.7z"/><path d="M8 6.5v3"/><circle cx="8" cy="11.3" r=".4" fill="currentColor"/></svg>';
+    const REV_ICON_ERR = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.8v3.6"/><circle cx="8" cy="10.9" r=".4" fill="currentColor"/></svg>';
+    const REV_ICON_INFO = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v3.9"/><circle cx="8" cy="5" r=".4" fill="currentColor"/></svg>';
+    const REV_ICON_TICK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+    const REV_ICON_PLUS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3.5v9M3.5 8h9"/></svg>';
+
+    Object.assign(window, { rcRevAskEnroll, rcRevAskRemove, rcRevOpenMass, rcRevCloseModal, rcRevPickLine, rcRevRender, rcCampMenu, rcCampCloseMenu, rcCampOpen, rcCampSearch, rcCampSetFilter, rcCampPickLine, rcCampPick, rcCampPickAll, rcCampEnrollSelected });
+
 
     // SMS Opt Status: green check when Opted In, small red x when Opted Out.
     function rcSmsOptFieldHtml(c){
@@ -7566,9 +8660,8 @@
       if(!st.messages.length){
         return `<div class="rcmsg-empty">
           <span class="rcmsg-empty-title">No messages yet</span>
-          <span>${rcMsgOptedOut(c) ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts.'
-                 : (rcMsgFirstGoodIdx(rcMsgPhones(c)) === -1 ? 'Every number on file is marked Wrong or Disconnected.'
-                 : 'Write a message below or start from a template.')}</span>
+          <span>${rcMsgFirstGoodIdx(rcMsgPhones(c)) === -1 ? 'Every number on file is marked Wrong or Disconnected.'
+                 : 'Write a message below or start from a template.'}</span>
         </div>`;
       }
       const initials = escapeHtml(rcMsgInitials(c));
@@ -7683,13 +8776,12 @@
       if(st.phoneIdx >= phones.length || (!st.phoneManual && phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad' && goodIdx !== -1)){
         st.phoneIdx = Math.max(0, goodIdx);
       }
-      const optedOut = rcMsgOptedOut(c);
+      // Opted out only removes someone from automated workflows; a rep can still text them.
       const allBad = phones.length > 0 && goodIdx === -1;
       const curBad = !!(phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad');
-      const canText = phones.length > 0 && !curBad && !optedOut;
+      const canText = phones.length > 0 && !curBad;
       const k = escapeHtml(key);
-      const placeholder = optedOut ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts'
-        : !phones.length ? 'Add a phone number to send texts'
+      const placeholder = !phones.length ? 'Add a phone number to send texts'
         : allBad ? 'No textable number on file'
         : curBad ? 'This number is marked ' + escapeHtml(rcMsgPhoneTag(phones[st.phoneIdx].status).label.toLowerCase()) + '. View only.'
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
@@ -8185,7 +9277,6 @@
       const ta = card.querySelector('.rcmsg-input');
       const text = (ta.value || '').trim();
       if(!text) return;
-      if(rcMsgOptedOut(st.contact)) return;
       const phones = rcMsgPhones(st.contact);
       const pick = phones[st.phoneIdx];
       if(!pick || rcMsgPhoneTone(pick.status) === 'bad') return;
@@ -8357,7 +9448,6 @@
                      onclick="rcMsgSelectTab('${k}')"
                      onkeydown="if(event.key==='Enter'){rcMsgSelectTab('${k}');}">
           <span class="rcmsg-tab-name">${escapeHtml(c.name)}</span>
-          ${rcMsgAwaiting(st) ? '<span class="rcmsg-dot" aria-label="Awaiting reply"></span>' : ''}
           <button type="button" class="rcmsg-tab-x" title="Close tab" aria-label="Close ${escapeHtml(c.name)}" onclick="rcMsgCloseTab(event, '${k}')">${RCMSG_ICON_X}</button>
         </div>`;
       }).join('');
@@ -8380,12 +9470,10 @@
       const last = st.messages[st.messages.length - 1];
       const phones = rcMsgPhones(c);
       const waiting = rcMsgAwaiting(st);
-      const optedOut = rcMsgOptedOut(c);
       const prev = last ? ((last.dir === 'out' ? 'You: ' : '') + last.text)
                         : (phones.length ? 'No messages yet' : 'No phone on file');
       let tag = '';
       if(waiting) tag = '<span class="rcmsg-inbox-tag is-reply">Needs reply</span>';
-      else if(optedOut) tag = '<span class="rcmsg-inbox-tag is-muted">Opted out</span>';
       else if(phones.length && rcMsgFirstGoodIdx(phones) === -1) tag = '<span class="rcmsg-inbox-tag is-muted">No textable number</span>';
       const name = escapeHtml(c.name);
       return `<button type="button" class="rcmsg-inbox-row${waiting ? ' is-waiting' : ''}" data-q="${escapeHtml(String(c.name).toLowerCase())}" onclick="rcMsgOpenDock('${escapeHtml(rcMsgKey(c))}')">
@@ -8425,7 +9513,6 @@
         <div class="rcmsg-inbox-bar">
           <div class="rcmsg-inbox-summary">
             <span class="rcmsg-inbox-title">Conversations</span>
-            <span class="rcmsg-inbox-meta">${contacts.length} contact${contacts.length === 1 ? '' : 's'}${needs.length ? ` \u00b7 <b>${needs.length} need${needs.length === 1 ? 's' : ''} a reply</b>` : ''}</span>
           </div>
           <label class="rcmsg-inbox-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -8878,7 +9965,7 @@
                 // Row 1: Address | Contact Outcome
                 rows.push('<div class="rc-row">' + addrHtml + outcomeHtml + '</div>');
                 // Phones, then SMS Opt Status, two per row
-                const cells = toShow.map(phoneFieldHtml).concat([rcSmsOptFieldHtml(c)]);
+                const cells = toShow.map(phoneFieldHtml).concat([rcSmsOptFieldHtml(c), rcRevivalFieldHtml(c)]);
                 for(let i=0;i<cells.length;i+=2){
                   rows.push('<div class="rc-row">' + cells[i] + (cells[i+1] || '<div class="rc-field"></div>') + '</div>');
                 }
@@ -9043,7 +10130,7 @@
               <!-- Row 3: SMS Opt Status -->
               <div class="rc-row">
                 ${rcSmsOptFieldHtml(c)}
-                <div class="rc-field"></div>
+                ${rcRevivalFieldHtml(c)}
               </div>
             </div>
           </div>
@@ -9819,6 +10906,15 @@
       return raw;
     }
 
+    // Monday status columns can arrive as a plain label ("Active") or, when a
+    // Make field maps the whole column instead of its .text, as an object
+    // ({ text, label, index, ... }). Either way, return the label.
+    function rcColText(v){
+      if(v == null) return v;
+      if(typeof v === 'object') return String(v.text ?? v.label ?? v.value ?? '').trim();
+      return String(v).trim();
+    }
+
     function rcMapContact(c){
       const status    = c.lead_status ?? c.leadStatus ?? c.status ?? "New";
       const statusOn  = ['Contacted','Interested In Selling','Negotiations/Review','Accepted Offer','Closed'].includes(status);
@@ -9867,7 +10963,13 @@
         phone3:           formatPhone(c.phone_3 ?? c.phone3 ?? "—"),
         phone3Status:     c.phone_3_status ?? c.phone3Status ?? "—",
         contactOutcome:   c.contact_outcome ?? c.contactOutcome ?? "—",
-        smsOptStatus:     c.sms_opt_status ?? c.smsOptStatus ?? "—",
+        // Make sends SMS_Opt_Status (people board column color_mm7gpc70)
+        smsOptStatus:     rcColText(c.SMS_Opt_Status ?? c.sms_opt_status ?? c.smsOptStatus) || "—",
+        // Revival Sequence (people board 9193383321): Revival = color_mm7mhdmr, Revival Line = color_mm7mqqqt
+        // Make sends Revival and Revival_line ("—" when empty)
+        revival:          rcColText(c.Revival ?? c.revival ?? c.revival_status ?? c.color_mm7mhdmr) ?? "",
+        revivalLine:      rcColText(c.Revival_line ?? c.Revival_Line ?? c.revival_line ?? c.revivalLine ?? c.color_mm7mqqqt) ?? "",
+        livingStatus:     c.living_status ?? c.Living_Status ?? c.livingStatus ?? "",
         address:          toProperAddress(c.Address ?? c.address ?? c.text5__1 ?? "—"),
         keyContact:       !!(c.key_contact ?? c.keyContact ?? false),
         notes:            c.notes ?? "",
@@ -9945,6 +11047,7 @@
       rcUpdateMeta();
       rcBuildList(rcOwners, "list-owners", "inner-owners", "detail-owners", rcRenderDetailOwner, true);
       rcBuildList(rcOthers, "list-other",  "inner-other",  "detail-other",  rcRenderDetailOther, false);
+      if(typeof rcRevRender === 'function') rcRevRender();
 
       // The contact objects were just replaced. Any record left open on screen
       // is now bound to a stale object, so re-render it against the new one —
