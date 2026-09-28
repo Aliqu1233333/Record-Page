@@ -6595,7 +6595,7 @@
       phone2Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzdvd2' },
       phone3Status:     { type:'select', opts:['Correct Number','Dial NA','Wrong Number','Disconnected/ No longer in service'], columnId:'status_1_mkkzw44e' },
       // SMS Opt Status on the people board (Make sends it as SMS_Opt_Status).
-      smsOptStatus:     { type:'select', opts:['Opted In','Opted Out'], columnId:'color_mm7gpc70' },
+      smsOptStatus:     { type:'select', opts:['Opt In','Opt Out'], columnId:'color_mm7gpc70' },
       followUp:         { type:'date',   columnId:'date_mkzt8vfa' },
       phone:            { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_mkkz9bay' },
       phone2:           { type:'text',   placeholder:'e.g. 713-555-0192', columnId:'phone_3_mkkz1y89' },
@@ -6785,11 +6785,14 @@
     function rcRevHasPhone(c){
       return [c.phone, c.phone2, c.phone3].some(p => p && p !== '—' && String(p).replace(/\D/g, '').length >= 7);
     }
+    // SMS Opt Status labels in Monday are exactly "Opt In" and "Opt Out".
+    // Anything else, including "—" or empty, counts as Opt In.
+    function rcIsOptOut(v){ return String(v == null ? '' : v).trim().toLowerCase() === 'opt out'; }
     // Why Enroll can't be offered (the script checks these too; this saves a wasted click).
     function rcRevEnrollBlock(c){
       if(!c || c.pulseId == null) return 'This person isn\u2019t saved in Monday yet';
       if(String(c.boardId || '') !== REV_BOARD_ID) return 'Revival isn\u2019t set up on this person\u2019s board yet';
-      if(/opt(ed)?[\s-]*out/i.test(String(c.smsOptStatus || ''))) return 'Opted out of workflows';
+      if(rcIsOptOut(c.smsOptStatus)) return 'Opt Out (no workflows)';
       if(/dead|deceased/i.test(String(c.livingStatus || ''))) return 'Marked as deceased';
       if(!rcRevHasPhone(c)) return 'No phone number on file';
       return '';
@@ -7475,18 +7478,18 @@
     Object.assign(window, { rcRevAskEnroll, rcRevAskRemove, rcRevOpenMass, rcRevCloseModal, rcRevPickLine, rcRevRender, rcCampMenu, rcCampCloseMenu, rcCampOpen, rcCampSearch, rcCampSetFilter, rcCampPickLine, rcCampPick, rcCampPickAll, rcCampEnrollSelected });
 
 
-    // SMS Opt Status: green check when Opted In, small red x when Opted Out.
+    // SMS Opt Status: green check when Opt In, small red x when Opt Out.
     function rcSmsOptFieldHtml(c){
       const v = rcHasVal(c.smsOptStatus) ? String(c.smsOptStatus) : '';
       let badge = '';
-      if(/^opted in$/i.test(v)){
+      if(/^opt in$/i.test(v)){
         badge = '<span class="rc-status-badge rc-status-badge--success"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
-      } else if(/^opted out$/i.test(v)){
+      } else if(rcIsOptOut(v)){
         badge = '<span class="rc-status-badge rc-status-badge--optout"><svg viewBox="0 0 12 12" fill="none"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>';
       }
       return '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">SMS Opt Status</span>'
         + '<div style="display:flex;align-items:center;gap:6px;">' + badge
-        + '<div class="rc-value">' + rcStyledDropdown(c.smsOptStatus, ['Opted In','Opted Out'], 'smsOptStatus', '—', true, false) + '</div>'
+        + '<div class="rc-value">' + rcStyledDropdown(c.smsOptStatus, ['Opt In','Opt Out'], 'smsOptStatus', '—', true, false) + '</div>'
         + '</div></div></div>';
     }
 
@@ -8516,9 +8519,9 @@
 
     const RCMSG_ICON_CLOCK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.8V8l2.2 1.4"/></svg>';
 
-    // Opted out if the SMS Opt Status reads "Opt Out" / "Opted Out".
+    // SMS Opt Status is exactly "Opt Out" (workflows only; manual texts still allowed).
     function rcMsgOptedOut(c){
-      return /opt(ed)?[\s-]*out/i.test(String((c && c.smsOptStatus) || ''));
+      return rcIsOptOut(c && c.smsOptStatus);
     }
     // Index of the first number that isn't Wrong/Disconnected, or -1.
     function rcMsgFirstGoodIdx(phones){
