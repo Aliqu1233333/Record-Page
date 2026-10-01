@@ -5280,6 +5280,16 @@
     #rcmsgTray .rcmsg-row.in .rcmsg-bubble { background: #e9ecf1; border-color: transparent; color: #181818; }
   </style>
 
+  <style>
+    /* Opted out of automated texts: small amber note above the composer */
+    #rcmsgTray .rcmsg-optnote {
+      display: flex; align-items: center; gap: 7px; margin: 0 0 8px; padding: 6px 10px;
+      border-radius: 8px; background: #fef6e6; border: 1px solid #f9dfa8; color: #5d3a00;
+      font-family: "Inter", var(--font); font-size: 12px; line-height: 1.35;
+    }
+    #rcmsgTray .rcmsg-optnote svg { width: 14px; height: 14px; flex-shrink: 0; color: #a86403; }
+  </style>
+
 </head>
 
 <body>
@@ -8978,7 +8988,7 @@
       if(!st.messages.length){
         return `<div class="rcmsg-empty">
           <span class="rcmsg-empty-title">No messages yet</span>
-          <span>${rcMsgOptedOut(c) ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts.'
+          <span>${rcMsgOptedOut(c) && rcMsgFirstGoodIdx(rcMsgPhones(c)) !== -1 ? escapeHtml(rcMsgFirst(c)) + ' opted out of automated texts. You can still send a manual message.'
                  : (rcMsgFirstGoodIdx(rcMsgPhones(c)) === -1 ? 'Every number on file is marked Wrong or Disconnected.'
                  : 'Write a message below or start from a template.')}</span>
         </div>`;
@@ -9105,10 +9115,10 @@
       const optedOut = rcMsgOptedOut(c);
       const allBad = phones.length > 0 && goodIdx === -1;
       const curBad = !!(phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad');
-      const canText = phones.length > 0 && !curBad && !optedOut;
+      // Opt Out = no automated texts. Manual messages are still allowed.
+      const canText = phones.length > 0 && !curBad;
       const k = escapeHtml(key);
-      const placeholder = optedOut ? escapeHtml(rcMsgFirst(c)) + ' has opted out of texts'
-        : !phones.length ? 'Add a phone number to send texts'
+      const placeholder = !phones.length ? 'Add a phone number to send texts'
         : allBad ? 'No textable number on file'
         : curBad ? 'This number is marked ' + escapeHtml(rcMsgPhoneTag(phones[st.phoneIdx].status).label.toLowerCase()) + '. View only.'
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
@@ -9125,6 +9135,7 @@
         ${rcMsgRouteHtml(st)}
         <div class="rcmsg-thread" role="log" aria-live="polite" aria-label="Message thread">${rcMsgThreadHtml(st)}</div>
         <div class="rcmsg-composer">
+          ${optedOut ? `<div class="rcmsg-optnote" role="note"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.8v3.6"/><circle cx="8" cy="10.9" r=".4" fill="currentColor"/></svg>Opted out of automated texts. Manual messages only.</div>` : ''}
           <div class="rcmsg-input-wrap${canText ? '' : ' is-disabled'}">
             <textarea class="rcmsg-input" rows="1"
               placeholder="${placeholder}"
@@ -9610,7 +9621,6 @@
       const ta = card.querySelector('.rcmsg-input');
       const text = (ta.value || '').trim();
       if(!text) return;
-      if(rcMsgOptedOut(st.contact)) return;
       const phones = rcMsgPhones(st.contact);
       const pick = phones[st.phoneIdx];
       if(!pick || rcMsgPhoneTone(pick.status) === 'bad') return;
@@ -9854,7 +9864,7 @@
       const open = `onclick="rcMsgOpenFromInbox('${key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();rcMsgOpenFromInbox('${key}');}"`;
       if(!last){
         const phones = rcMsgPhones(c);
-        const meta = rcMsgOptedOut(c) ? 'Opted out of texts'
+        const meta = rcMsgOptedOut(c) && rcMsgFirstGoodIdx(phones) !== -1 && phones.length ? 'Opted out of automated texts'
           : !phones.length ? 'No phone on file'
           : rcMsgFirstGoodIdx(phones) === -1 ? 'No textable number'
           : 'Ready to message';
