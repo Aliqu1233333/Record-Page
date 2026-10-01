@@ -6815,6 +6815,47 @@
       return mapped;
     }
 
+    // ── Dial NA trigger ───────────────────────────────────────────────
+    // When a person's Phone 1 or Phone 2 status is set to "Dial NA", the
+    // status change is saved as usual and then this webhook fires once for
+    // that number (Make takes it from there; source "Dial NA").
+    const RC_DIALNA_WEBHOOK = 'https://hook.us1.make.com/wjrf12w1awfi6tep3y5ky9w3p2710i3i';
+    const RC_DIALNA_COLUMNS = { status_1_mkkzfhq2: { slot: 'Phone 1', field: 'phone' },
+                                status_1_mkkzdvd2: { slot: 'Phone 2', field: 'phone2' } };
+
+    async function fireDialNaWebhook(pulseId, boardId, columnId){
+      const cfg = RC_DIALNA_COLUMNS[columnId];
+      if(!cfg) return;
+      const c = (typeof rcContactsById !== 'undefined' && rcContactsById[String(pulseId)]) || {};
+      const raw = c[cfg.field];
+      const num = (raw && raw !== '—') ? String(raw) : '';
+      const digits = num.replace(/\D/g, '');
+      const e164 = digits.length === 10 ? '+1' + digits : (digits.length === 11 && digits[0] === '1' ? '+' + digits : (digits ? '+' + digits : ''));
+      const who = rcWho();
+      const payload = {
+        lead_id:      (typeof rcMsgLeadId === 'function' ? rcMsgLeadId() : null),
+        contact_id:   String(pulseId),
+        board_id:     String(boardId || ''),
+        contact_name: c.name || '',
+        phone:        e164,
+        phone_slot:   cfg.slot,               // "Phone 1" | "Phone 2"
+        column_id:    columnId,
+        status:       'Dial NA',
+        message:      '',
+        line:         who,
+        source:       'Dial NA',
+        who:          who
+      };
+      try {
+        const res = await fetch(RC_DIALNA_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+      } catch(err){ console.warn('Dial NA webhook error:', err, payload); }
+    }
+
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
       const key = `${pulseId}::${columnId}`;
       const now = Date.now();
@@ -6826,6 +6867,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue, who: rcWho() })
         });
+        // Phone 1 / Phone 2 set to Dial NA → also trigger the Dial NA webhook.
+        if(RC_DIALNA_COLUMNS[columnId] && String(columnValue).trim() === 'Dial NA'){
+          fireDialNaWebhook(pulseId, boardId, columnId);
+        }
         // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
         // without a manual refresh. 2.5s was shorter than a Make → monday
         // round trip, so the re-read routinely came back with the pre-edit
