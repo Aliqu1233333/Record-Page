@@ -4227,7 +4227,7 @@
     /* ── Tray ── */
     .rcmsg-tray {
       position: fixed; bottom: 40px; right: 16px; left: auto;
-      width: 440px; height: 600px; max-height: calc(100vh - 56px);
+      width: 462px; height: 630px; max-height: calc(100vh - 56px);
       background: #fff; border: 1px solid #c9d0d8; border-bottom: none;
       border-radius: 11px 11px 0 0;
       box-shadow: 0 0 0 1px rgba(3,45,96,.04), 0 2px 8px rgba(3,45,96,.12), 0 12px 40px rgba(3,45,96,.24);
@@ -6815,6 +6815,47 @@
       return mapped;
     }
 
+    // ── Dial NA trigger ───────────────────────────────────────────────
+    // When a person's Phone 1 or Phone 2 status is set to "Dial NA", the
+    // status change is saved as usual and then this webhook fires once for
+    // that number (Make takes it from there; source "Dial NA").
+    const RC_DIALNA_WEBHOOK = 'https://hook.us1.make.com/wjrf12w1awfi6tep3y5ky9w3p2710i3i';
+    const RC_DIALNA_COLUMNS = { status_1_mkkzfhq2: { slot: 'Phone 1', field: 'phone' },
+                                status_1_mkkzdvd2: { slot: 'Phone 2', field: 'phone2' } };
+
+    async function fireDialNaWebhook(pulseId, boardId, columnId){
+      const cfg = RC_DIALNA_COLUMNS[columnId];
+      if(!cfg) return;
+      const c = (typeof rcContactsById !== 'undefined' && rcContactsById[String(pulseId)]) || {};
+      const raw = c[cfg.field];
+      const num = (raw && raw !== '—') ? String(raw) : '';
+      const digits = num.replace(/\D/g, '');
+      const e164 = digits.length === 10 ? '+1' + digits : (digits.length === 11 && digits[0] === '1' ? '+' + digits : (digits ? '+' + digits : ''));
+      const who = rcWho();
+      const payload = {
+        lead_id:      (typeof rcMsgLeadId === 'function' ? rcMsgLeadId() : null),
+        contact_id:   String(pulseId),
+        board_id:     String(boardId || ''),
+        contact_name: c.name || '',
+        phone:        e164,
+        phone_slot:   cfg.slot,               // "Phone 1" | "Phone 2"
+        column_id:    columnId,
+        status:       'Dial NA',
+        message:      '',
+        line:         who,
+        source:       'Dial NA',
+        who:          who
+      };
+      try {
+        const res = await fetch(RC_DIALNA_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('HTTP ' + res.status);
+      } catch(err){ console.warn('Dial NA webhook error:', err, payload); }
+    }
+
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
       const key = `${pulseId}::${columnId}`;
       const now = Date.now();
@@ -6826,6 +6867,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue, who: rcWho() })
         });
+        // Phone 1 / Phone 2 set to Dial NA → also trigger the Dial NA webhook.
+        if(RC_DIALNA_COLUMNS[columnId] && String(columnValue).trim() === 'Dial NA'){
+          fireDialNaWebhook(pulseId, boardId, columnId);
+        }
         // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
         // without a manual refresh. 2.5s was shorter than a Make → monday
         // round trip, so the re-read routinely came back with the pre-edit
@@ -8788,8 +8833,9 @@
     const RCMSG_SEGMENT = 160;
 
     const RCMSG_TEMPLATES = [
-      { name: 'Introduction',
-        text: 'Hi {first}, I\'m reaching out about a property connected to your family. Do you have a few minutes this week to talk?' },
+      // Signature card from whichever line is picked in From.
+      { name: 'Contact Information',
+        text: '{sender_full}\nTransparency Funding Inc\nHad a good conversation about {street}.\nThis is my personal cell for you to save.' },
       { name: 'Follow-up',
         text: 'Hi {first}, just following up on my last message. Is there a good time to give you a quick call?' },
       { name: 'Schedule a call',
@@ -8808,8 +8854,8 @@
 
     // Lines texts go out from. `name` is what Make receives as "line".
     const RCMSG_SENDERS = [
-      { name: 'Christian', num: '832-683-1270' },
-      { name: 'Damian',    num: '832-963-6715' }
+      { name: 'Christian', num: '832-683-1270', full: 'Christian Higgins' },
+      { name: 'Damian',    num: '832-963-6715', full: 'Damian' }   // TODO: Damian's last name for the Contact Information template
     ];
 
     // Thread history: one POST per lead returns every message for every contact.
@@ -9124,7 +9170,7 @@
         : 'Text ' + escapeHtml(rcMsgFirst(c)) + '…';
 
       const tplOpts = RCMSG_TEMPLATES.map((t, i) => {
-        const preview = t.text.replace('{first}', rcMsgFirst(c));
+        const preview = rcMsgFillTemplate(t.text, st).replace(/\n/g, ' \u00b7 ');
         return `<button type="button" class="rcmsg-tpl-opt" onclick="rcMsgPickTemplate(this, ${i})">
           <span class="rcmsg-tpl-name">${escapeHtml(t.name)}</span>
           <span class="rcmsg-tpl-prev">${escapeHtml(preview)}</span>
@@ -9411,7 +9457,8 @@
     }
 
     function rcMsgOnKey(e, ta){
-      if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){
+      // Enter adds a new line (default). Ctrl+Enter / Cmd+Enter sends.
+      if(e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing){
         e.preventDefault();
         const btn = ta.closest('.rcmsg-composer').querySelector('.rcmsg-send');
         if(btn && !btn.disabled) rcMsgSend(btn);
@@ -9668,12 +9715,25 @@
       if(open){ const first = menu.querySelector('.rcmsg-tpl-opt'); if(first) first.focus(); }
     }
 
+    // Fill a template's placeholders for this conversation:
+    // {first} contact's first name · {sender_full} From line's full name · {street} property street.
+    function rcMsgFillTemplate(text, st){
+      const snd = (st && st.fromIdx != null) ? RCMSG_SENDERS[st.fromIdx] : null;
+      const rec = window.__mlrRecord || {};
+      const street = [rec.subject_street, rec.subject_address].map(v => (v == null ? '' : String(v).trim())).find(v => v && v !== '\u2014');
+      return String(text)
+        .replace(/\{first\}/g, rcMsgFirst(st ? st.contact : {}))
+        .replace(/\{sender_full\}/g, snd ? (snd.full || snd.name) : '')
+        .replace(/\{street\}/g, street || 'the property');
+    }
+
     function rcMsgPickTemplate(opt, i){
       const { card, st } = rcMsgCardState(opt);
       if(!card || !st) return;
       const ta = card.querySelector('.rcmsg-input');
-      const text = RCMSG_TEMPLATES[i].text.replace('{first}', rcMsgFirst(st.contact));
-      ta.value = ta.value.trim() ? (ta.value.replace(/\s+$/,'') + ' ' + text) : text;
+      const text = rcMsgFillTemplate(RCMSG_TEMPLATES[i].text, st);
+      const sep = text.includes('\n') ? '\n' : ' ';
+      ta.value = ta.value.trim() ? (ta.value.replace(/\s+$/,'') + sep + text) : text;
       st.draft = ta.value;
       rcMsgCloseMenus();
       rcMsgSyncComposer(card, st);
