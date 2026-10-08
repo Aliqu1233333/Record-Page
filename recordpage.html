@@ -6815,47 +6815,6 @@
       return mapped;
     }
 
-    // ── Dial NA trigger ───────────────────────────────────────────────
-    // When a person's Phone 1 or Phone 2 status is set to "Dial NA", the
-    // status change is saved as usual and then this webhook fires once for
-    // that number (Make takes it from there; source "Dial NA").
-    const RC_DIALNA_WEBHOOK = 'https://hook.us1.make.com/wjrf12w1awfi6tep3y5ky9w3p2710i3i';
-    const RC_DIALNA_COLUMNS = { status_1_mkkzfhq2: { slot: 'Phone 1', field: 'phone' },
-                                status_1_mkkzdvd2: { slot: 'Phone 2', field: 'phone2' } };
-
-    async function fireDialNaWebhook(pulseId, boardId, columnId){
-      const cfg = RC_DIALNA_COLUMNS[columnId];
-      if(!cfg) return;
-      const c = (typeof rcContactsById !== 'undefined' && rcContactsById[String(pulseId)]) || {};
-      const raw = c[cfg.field];
-      const num = (raw && raw !== '—') ? String(raw) : '';
-      const digits = num.replace(/\D/g, '');
-      const e164 = digits.length === 10 ? '+1' + digits : (digits.length === 11 && digits[0] === '1' ? '+' + digits : (digits ? '+' + digits : ''));
-      const who = rcWho();
-      const payload = {
-        lead_id:      (typeof rcMsgLeadId === 'function' ? rcMsgLeadId() : null),
-        contact_id:   String(pulseId),
-        board_id:     String(boardId || ''),
-        contact_name: c.name || '',
-        phone:        e164,
-        phone_slot:   cfg.slot,               // "Phone 1" | "Phone 2"
-        column_id:    columnId,
-        status:       'Dial NA',
-        message:      '',
-        line:         who,
-        source:       'Dial NA',
-        who:          who
-      };
-      try {
-        const res = await fetch(RC_DIALNA_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok) throw new Error('HTTP ' + res.status);
-      } catch(err){ console.warn('Dial NA webhook error:', err, payload); }
-    }
-
     async function fireRcWebhook(pulseId, boardId, columnId, columnValue) {
       const key = `${pulseId}::${columnId}`;
       const now = Date.now();
@@ -6867,10 +6826,6 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ pulse_id: pulseId, board_id: boardId, column_id: columnId, column_value: columnValue, who: rcWho() })
         });
-        // Phone 1 / Phone 2 set to Dial NA → also trigger the Dial NA webhook.
-        if(RC_DIALNA_COLUMNS[columnId] && String(columnValue).trim() === 'Dial NA'){
-          fireDialNaWebhook(pulseId, boardId, columnId);
-        }
         // Pull fresh data so e.g. a newly-tagged owner moves to the right tab
         // without a manual refresh. 2.5s was shorter than a Make → monday
         // round trip, so the re-read routinely came back with the pre-edit
@@ -9625,6 +9580,15 @@
       return d ? '+' + d : '';
     }
 
+    // The ONLY gate to RCMSG_SEND_WEBHOOK: a real message, a person (item ID)
+    // and a phone number, or no request is made.
+    function rcMsgSendAllowed(p){
+      const msgOk   = typeof p.message === 'string' && p.message.trim().length > 0;
+      const idOk    = /^\d+$/.test(String(p.contact_id || ''));
+      const phoneOk = String(p.phone || '').replace(/\D/g, '').length >= 10;
+      return msgOk && idOk && phoneOk;
+    }
+
     async function rcMsgDeliver(key, msg){
       const st = __rcMsgStore[key];
       const c = st ? st.contact : null;
@@ -9637,7 +9601,7 @@
         source:     'CRM'
       };
       try {
-        if(!payload.contact_id || !payload.phone) throw new Error('Missing contact or phone');
+        if(!rcMsgSendAllowed(payload)) throw new Error('Blocked: missing message, contact ID or phone');
         const res = await fetch(RCMSG_SEND_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -9667,7 +9631,8 @@
       if(!card || !st) return;
       const ta = card.querySelector('.rcmsg-input');
       const text = (ta.value || '').trim();
-      if(!text) return;
+      if(!text) return;                                                     // never send an empty text
+      if(!/^\d+$/.test(String(st.contact && st.contact.pulseId || ''))) return;  // never send without a person (item ID)
       const phones = rcMsgPhones(st.contact);
       const pick = phones[st.phoneIdx];
       if(!pick || rcMsgPhoneTone(pick.status) === 'bad') return;
