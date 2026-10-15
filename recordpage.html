@@ -4829,6 +4829,7 @@
 
     /* ── Revival status — plain text, no tags ── */
     .rc-camp-stt { font-size: 15px; color: var(--camp-text); white-space: nowrap; }
+    .rc-camp-check { display: inline-flex; vertical-align: -3px; margin-right: 6px; }
     .rc-camp-unenrolled { font-size: 15px; color: var(--camp-text-3); }
     .rc-rev-modal .rc-camp-stt, .rc-rev-modal .rc-camp-unenrolled { font-size: 14px; }
 
@@ -7535,7 +7536,12 @@
       const b = REV_BADGE[st] || ['', st];
       const m = REV_META[st];
       const hint = m ? m.hint(rcRevLineOf(c)) : '';
-      return `<span class="rc-camp-stt" title="${escapeHtml(hint)}">${escapeHtml(b[1])}</span>`;
+      // In the sequence right now (Starting / Waiting / Active): a green check so
+      // it's visible at a glance.
+      const check = REV_IN_PROGRESS.includes(st)
+        ? '<span class="rc-camp-check" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="8" fill="#2e844a"/><path d="M4.6 8.3l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+        : '';
+      return `<span class="rc-camp-stt" title="${escapeHtml(hint)}">${check}${escapeHtml(b[1])}</span>`;
     }
 
     function rcRevRender(){
@@ -7567,7 +7573,12 @@
       const enrText = (eligible ? `${eligible} ${pl(eligible)} can start the sequence. Check the ones you\u2019ve already tried to reach, then choose Enroll people.` : 'Everyone who can be enrolled already is.')
         + (notEligible ? ` ${notEligible} can\u2019t be enrolled; the reason shows next to their name.` : '');
 
-      const rows = people.map(({ c, group }) => {
+      // People in the sequence right now go to the top (Active, then Starting,
+      // then Waiting); everyone else keeps their usual order underneath.
+      const revRank = st => ({ 'Active': 0, 'Enroll': 1, 'Waiting': 2 }[st] ?? 3);
+      const ordered = people.map((p, i) => ({ p, i, r: revRank(rcRevState(p.c)) }))
+        .sort((a, b) => (a.r - b.r) || (a.i - b.i)).map(x => x.p);
+      const rows = ordered.map(({ c, group }) => {
         const st = rcRevState(c);
         const pid = escapeHtml(String(c.pulseId));
         const rel = rcHasVal(c.relation) ? c.relation : '';
