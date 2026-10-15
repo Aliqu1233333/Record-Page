@@ -7089,11 +7089,23 @@
     }
     // SMS Opt Status labels in Monday are exactly "Opt In" and "Opt Out".
     // Anything else, including "—" or empty, counts as Opt In.
+    // The person's board. Make's load scenario sends board_id for people on
+    // Logan's board but NOT for Christian's (Sales Pipeline 9193383085), whose
+    // people all live on Subitems of Sales Pipeline (9193383321). So a person
+    // with no board_id on a Sales Pipeline record IS on the Revival board.
+    const REV_PIPELINE_BOARD_ID = '9193383085';
+    function rcRevPersonBoard(c){
+      const own = String((c && c.boardId) || '').trim();
+      if(own) return own;
+      let page = '';
+      try { page = String(((typeof extractIdsFromUrl === 'function' ? extractIdsFromUrl() : null) || {}).boardId || '').trim(); } catch(e){}
+      return page === REV_PIPELINE_BOARD_ID ? REV_BOARD_ID : '';
+    }
     function rcIsOptOut(v){ return String(v == null ? '' : v).trim().toLowerCase() === 'opt out'; }
     // Why Enroll can't be offered (the script checks these too; this saves a wasted click).
     function rcRevEnrollBlock(c){
       if(!c || c.pulseId == null) return 'This person isn\u2019t saved in Monday yet';
-      if(String(c.boardId || '') !== REV_BOARD_ID) return 'Revival isn\u2019t set up on this person\u2019s board yet';
+      if(rcRevPersonBoard(c) !== REV_BOARD_ID) return 'Revival isn\u2019t set up on this person\u2019s board yet';
       if(rcIsOptOut(c.smsOptStatus)) return 'Opt Out (no workflows)';
       if(/dead|deceased/i.test(String(c.livingStatus || ''))) return 'Marked as deceased';
       if(!rcRevHasPhone(c)) return 'No phone number on file';
