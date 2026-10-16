@@ -5726,6 +5726,14 @@
     window.RecordPage = {
       applyData(payload){
         if (!payload || typeof payload !== "object") return;
+        // People list: accept a single object, drop empty/null entries (Make can
+        // send these when a subitem is new or a bundle is empty).
+        if (payload.confirmed_owners && !Array.isArray(payload.confirmed_owners) && typeof payload.confirmed_owners === 'object'){
+          payload.confirmed_owners = [payload.confirmed_owners];
+        }
+        if (Array.isArray(payload.confirmed_owners)){
+          payload.confirmed_owners = payload.confirmed_owners.filter(p => p && typeof p === 'object' && !Array.isArray(p) && Object.keys(p).length);
+        }
         // ── If this is a tasks-only push from Make, route it directly ──
         if (payload.tasks && !payload.confirmed_owners && !payload.deceased_owner) {
           this.applyTasks(payload.tasks);
@@ -6526,6 +6534,74 @@
     // `who` for every webhook this page sends ('Christian' / 'Damian' / '').
     window.rcWho = function(){ try { return rcGetViewer().who || ''; } catch(e){ return ''; } };
 
+    // ── Record-load response parsing ─────────────────────────────────
+    // Make builds this JSON from Monday text. A value with a raw line break,
+    // a stray double quote, an empty value or a trailing comma makes it
+    // invalid JSON, and the page used to stay blank. Parse leniently instead,
+    // and if it still can't be read, say so on the page.
+    function rcRepairJson(text){
+      let out = '', inStr = false;
+      for(let i = 0; i < text.length; i++){
+        const ch = text[i];
+        if(!inStr){ out += ch; if(ch === '"') inStr = true; continue; }
+        if(ch === '\\'){ out += ch + (text[i + 1] ?? ''); i++; continue; }
+        if(ch === '"'){
+          // A quote only ends the string if what follows is JSON punctuation.
+          let j = i + 1; while(j < text.length && /\s/.test(text[j])) j++;
+          const nx = text[j];
+          if(nx === undefined || nx === ',' || nx === '}' || nx === ']' || nx === ':'){ out += ch; inStr = false; }
+          else out += '\\"';
+          continue;
+        }
+        if(ch === '\n'){ out += '\\n'; continue; }
+        if(ch === '\r'){ out += '\\r'; continue; }
+        if(ch === '\t'){ out += '\\t'; continue; }
+        if(ch < ' '){ out += ' '; continue; }
+        out += ch;
+      }
+      return out
+        .replace(/:\s*(?=[,}\]])/g, ':null')     // "key": ,  → "key": null
+        .replace(/,\s*(?=[}\]])/g, '');         // trailing commas
+    }
+    function rcParseRecordJson(text){
+      const raw = String(text || '').replace(/^\uFEFF/, '').trim();
+      if(!raw || /^accepted$/i.test(raw)){
+        const e = new Error(raw ? 'Make replied "Accepted" instead of the record' : 'Empty response from Make');
+        e.kind = 'no-data'; throw e;
+      }
+      let data;
+      try { data = JSON.parse(raw); }
+      catch(e1){
+        try { data = JSON.parse(rcRepairJson(raw)); console.warn('Record data had invalid JSON from Make; repaired it.', e1.message); }
+        catch(e2){
+          const m = /position (\d+)/.exec(e1.message);
+          const at = m ? +m[1] : -1;
+          const err = new Error('Invalid JSON from Make: ' + e1.message);
+          err.snippet = at >= 0 ? raw.slice(Math.max(0, at - 90), at + 60) : raw.slice(0, 150);
+          throw err;
+        }
+      }
+      if(Array.isArray(data)) data = data.find(x => x && typeof x === 'object') || {};
+      return data;
+    }
+    function rcShowLoadError(err){
+      let box = document.getElementById('rcLoadError');
+      if(!box){
+        box = document.createElement('div');
+        box.id = 'rcLoadError';
+        box.style.cssText = 'margin:16px;padding:14px 16px;border:1px solid #f7c6be;background:#fef1ee;color:#8e030f;border-radius:12px;font:13px/1.5 Inter,system-ui,sans-serif;';
+        (document.querySelector('.page, main, body') || document.body).prepend(box);
+      }
+      const httpErr = err && /HTTP error/.test(err.message || '');
+      const noData  = err && err.kind === 'no-data';
+      box.innerHTML = '<b>This record couldn\u2019t be loaded.</b> ' + (
+        noData || httpErr
+          ? 'Make didn\u2019t send the record back' + (httpErr ? ' (' + escapeHtml(err.message.replace(/^HTTP error! /, '')) + ')' : '') + '. Its record-load scenario most likely stopped with an error on this record. Check that scenario\u2019s run history in Make.'
+          : 'Make returned data the page can\u2019t read' + (err && err.snippet ? ', near: <code style="display:block;margin-top:6px;padding:6px 8px;background:#fff;border-radius:6px;color:#181818;white-space:pre-wrap;word-break:break-all;font-size:12px;">' + escapeHtml(err.snippet) + '</code>' : '.') +
+            '<div style="margin-top:6px;color:#5c5c5c;">Usually a field on one of the people (often a newly added one) has a character Make didn\u2019t escape. Details are in the browser console.</div>'
+      );
+    }
+
     async function fetchDataFromMake(){
       const webhookURL='https://hook.us1.make.com/21ud4j5gjibssi32lwxdlfa2bg6mmrrf';
       showLoading();
@@ -6534,9 +6610,10 @@
       try{
         const response=await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({boardId,pulseId}, rcGetViewer()))});
         if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data=await response.json();
+        const data=rcParseRecordJson(await response.text());
         window.RecordPage.applyData(data);
-      }catch(error){ console.error('Error fetching data from Make.com:',error); }
+        const eb=document.getElementById('rcLoadError'); if(eb) eb.remove();
+      }catch(error){ console.error('Error fetching data from Make.com:',error, error && error.snippet ? '\nNear: ' + error.snippet : ''); rcShowLoadError(error); }
       finally{ hideLoading(); }
     }
 
@@ -6581,7 +6658,7 @@
       try{
         const response = await fetch(webhookURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({boardId,pulseId}, rcGetViewer()))});
         if(!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
+        const data = rcParseRecordJson(await response.text());
         // One more guard: user may have started editing during the fetch.
         if (isUserEditing()) { scheduleSilentRefresh(2500); return; }
         window.RecordPage.applyData(data);
