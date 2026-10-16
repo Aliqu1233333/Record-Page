@@ -8859,7 +8859,7 @@
     let __rcMsgFromIdx;
     function rcMsgFromIdx(){
       if(__rcMsgFromIdx === undefined){
-        const who = (typeof window.rcGetViewer === 'function' ? window.rcGetViewer().who : '') || '';
+        const who = (typeof window.rcWho === 'function' ? window.rcWho() : '') || '';
         const i = RCMSG_SENDERS.findIndex(x => x.name.toLowerCase() === who.toLowerCase());
         __rcMsgFromIdx = i >= 0 ? i : null;
       }
@@ -8973,8 +8973,11 @@
     }
 
     // Number + line of the most recent message, as indexes (-1 when unknown).
-    function rcMsgLatestRoute(st){
-      const last = st.messages[st.messages.length - 1];
+    // `line` (optional): only look at messages on that line.
+    function rcMsgLatestRoute(st, line){
+      const want = line ? String(line).toLowerCase() : '';
+      const pool = want ? st.messages.filter(m => { const l = rcMsgLineOf(m); return !l || l === want; }) : st.messages;
+      const last = pool[pool.length - 1];
       if(!last) return { phoneIdx: -1, fromIdx: -1 };
       const phones = rcMsgPhones(st.contact);
       const d = rcMsgNumOf(last), l = rcMsgLineOf(last);
@@ -8984,7 +8987,7 @@
       };
     }
 
-    // Opening from the conversation list always lands on the latest thread.
+    // Opening from the conversation list lands on the viewer's thread with that person.
     function rcMsgOpenFromInbox(key){
       const st = __rcMsgStore[key];
       if(st){ st.phoneManual = false; st.lineManual = false; }
@@ -9126,16 +9129,21 @@
       const c = st.contact;
       const phones = rcMsgPhones(c);
       const goodIdx = rcMsgFirstGoodIdx(phones);
-      const latest = rcMsgLatestRoute(st);
+      // From defaults to whoever is viewing the page (the same person the
+      // Campaigns tab and every webhook use, via rcWho). Only when the viewer
+      // can't be identified does it fall back to the line of the latest message.
+      const viewerIdx = rcMsgFromIdx();
+      if(!st.lineManual){
+        const anyLatest = rcMsgLatestRoute(st);
+        st.fromIdx = viewerIdx != null ? viewerIdx : (anyLatest.fromIdx >= 0 ? anyLatest.fromIdx : null);
+      }
+      const lineName = st.fromIdx != null ? RCMSG_SENDERS[st.fromIdx].name : '';
+      const latest = rcMsgLatestRoute(st, lineName);
       if(!st.phoneManual){
-        // Open on the number of the most recent message; otherwise the first textable number.
+        // Open on the number of the most recent message on that line; otherwise the first textable number.
         st.phoneIdx = latest.phoneIdx >= 0 ? latest.phoneIdx : Math.max(0, goodIdx);
       }
       if(st.phoneIdx >= phones.length) st.phoneIdx = Math.max(0, goodIdx);
-      if(!st.lineManual){
-        // Open on the line of the most recent message; otherwise whoever is viewing.
-        st.fromIdx = latest.fromIdx >= 0 ? latest.fromIdx : rcMsgFromIdx();
-      }
       const optedOut = rcMsgOptedOut(c);
       const allBad = phones.length > 0 && goodIdx === -1;
       const curBad = !!(phones[st.phoneIdx] && rcMsgPhoneTone(phones[st.phoneIdx].status) === 'bad');
