@@ -423,6 +423,67 @@
     }
     .fpn-toggle:hover { text-decoration: underline; }
     .fpn-toggle.show { display: inline-block; }
+
+    /* ── Fact Pattern Notes → "Identify with AI" button + loading skeleton ── */
+    .slds-field.fpn-field .slds-value { justify-content: flex-start; gap: 8px; }
+    .slds-field.fpn-field .slds-value .value-text { flex: 1 1 auto; }
+    .fpn-ai-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; padding: 0; flex: 0 0 auto; margin-top: -1px;
+      appearance: none; background: transparent; border: none; box-shadow: none;
+      cursor: pointer; transition: background .12s ease, transform .06s ease;
+    }
+    .fpn-ai-btn svg { width: 22px; height: 22px; display: block; transition: transform .2s ease; }
+    
+    .fpn-ai-btn:hover svg { transform: rotate(-12deg) scale(1.08); }
+    .fpn-ai-btn:active { transform: translateY(1px); }
+    .fpn-ai-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(1,118,211,.18); }
+    .fpn-ai-btn:disabled { cursor: progress; }
+    .fpn-ai-btn.is-busy svg { animation: fpnAiStarPulse 1.1s ease-in-out infinite; }
+    @keyframes fpnAiStarPulse {
+      0%,100% { opacity: 1;   transform: scale(1)   rotate(0deg); }
+      50%     { opacity: .55; transform: scale(.86) rotate(-18deg); }
+    }
+
+    /* Skeleton shown in place of the notes while AI is writing */
+    .fpn-ai-skeleton {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 100%; padding: 6px 0 4px;
+    }
+    .fpn-ai-skeleton .fpn-sk-bar {
+      height: 9px; border-radius: 999px;
+      background: linear-gradient(90deg, #dfe4f0 0%, #eef1f8 40%, #f6f8fc 50%, #eef1f8 60%, #dfe4f0 100%);
+      background-size: 300% 100%;
+      animation: fpnSkShimmer 1.4s ease-in-out infinite, fpnSkFlash 1.4s ease-in-out infinite;
+    }
+    .fpn-ai-skeleton .fpn-sk-bar.is-accent {
+      background: linear-gradient(90deg, #e3dcff 0%, #efeaff 40%, #f7f4ff 50%, #efeaff 60%, #e3dcff 100%);
+      background-size: 300% 100%;
+    }
+    .fpn-ai-skeleton .fpn-sk-bar:nth-child(2) { animation-delay: .12s, .12s; }
+    .fpn-ai-skeleton .fpn-sk-bar:nth-child(3) { animation-delay: .24s, .24s; }
+    .fpn-ai-skeleton .fpn-sk-bar:nth-child(4) { animation-delay: .36s, .36s; }
+    .fpn-ai-skeleton .fpn-sk-bar:nth-child(5) { animation-delay: .48s, .48s; }
+    .fpn-ai-skeleton .fpn-sk-gap { height: 4px; }
+    .fpn-ai-skeleton-status {
+      font-size: 12px; color: #6b6b9a; margin-top: 2px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    @keyframes fpnSkShimmer { 0% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
+    @keyframes fpnSkFlash   { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+
+    /* Typewriter caret while the returned text is revealed */
+    .value-text.fpn-typing::after {
+      content: ""; display: inline-block; width: 2px; height: 1em;
+      margin-left: 2px; vertical-align: -2px; background: #6f5bff;
+      animation: fpnCaret .8s steps(1) infinite;
+    }
+    @keyframes fpnCaret { 50% { opacity: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fpn-ai-btn.is-busy svg,
+      .fpn-ai-skeleton .fpn-sk-bar { animation: none; }
+    }
     .slds-field-full .slds-value {
       align-items: flex-start;
     }
@@ -5455,7 +5516,24 @@
                   <div class="slds-field fpn-field" data-field="Fact_Pattern_Notes">
                     <div class="fpn-stack">
                       <div class="slds-label">Fact Pattern Notes</div>
-                      <div class="slds-value"><span class="value-text multiline" data-editable="true" data-multiline="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+                      <div class="slds-value"><button type="button" class="fpn-ai-btn" id="fpnAiBtn" title="Identify fact pattern with AI" aria-label="Identify fact pattern with AI">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                            <defs>
+                              <radialGradient id="fai-gold" gradientUnits="userSpaceOnUse" cx="8" cy="7" r="12">
+                                <stop offset="0" stop-color="#fff6b0"/>
+                                <stop offset="0.35" stop-color="#ffd83a"/>
+                                <stop offset="0.8" stop-color="#ffb81a"/>
+                                <stop offset="1" stop-color="#f59a0b"/>
+                              </radialGradient>
+                              <linearGradient id="fai-sky" gradientUnits="userSpaceOnUse" x1="16.5" y1="16.5" x2="22.5" y2="22.5">
+                                <stop offset="0" stop-color="#7fd6ff"/>
+                                <stop offset="1" stop-color="#1b96ff"/>
+                              </linearGradient>
+                            </defs>
+                            <path fill="url(#fai-gold)" d="M10 1.5C10.7 7 13 9.3 18.5 10C13 10.7 10.7 13 10 18.5C9.3 13 7 10.7 1.5 10C7 9.3 9.3 7 10 1.5Z"/>
+                            <path fill="url(#fai-sky)" d="M19.5 16.2C19.8 18.5 20.5 19.2 22.8 19.5C20.5 19.8 19.8 20.5 19.5 22.8C19.2 20.5 18.5 19.8 16.2 19.5C18.5 19.2 19.2 18.5 19.5 16.2Z"/>
+                          </svg>
+                        </button><span class="value-text multiline" data-editable="true" data-multiline="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
                     </div>
                   </div>
                   <div class="slds-field" data-field="equity">
@@ -5742,6 +5820,8 @@
         if (payload.column_map && typeof payload.column_map === "object") {
           Object.assign(COLUMN_ID_MAP, payload.column_map);
         }
+        // Keep the last full record so the AI Fact Pattern button can send it to Make.
+        window.__rcLastPayload = payload;
         for (const [key, value] of Object.entries(payload)) {
           const node = document.querySelector(`.slds-field[data-field="${cssEscape(key)}"] .value-text`);
           if (node) {
@@ -6423,6 +6503,204 @@
     window.addEventListener('load', refreshFpnToggles);
     window.addEventListener('resize', refreshFpnToggles);
 
+    // ── Fact Pattern Notes → "Identify with AI" ─────────────────────────────
+    // Sends everything the page knows about this file to Make, Make runs it
+    // through AI and replies with the fact pattern, which is typed into the
+    // field and saved to Monday (with an Undo).
+    //
+    // Request (POST JSON):
+    //   { action: "generate_fact_pattern", boardId, pulseId, who, deviceId, ...,
+    //     current_fact_pattern,          // what's in the field now ("" if empty)
+    //     record_text,                   // ready-to-prompt plain text of every field + contact
+    //     record,                        // the raw record payload (same shape the page loads)
+    //     contacts }                     // confirmed_owners array
+    // Response (any of these work):
+    //   plain text  |  { "fact_pattern": "..." }  |  { "text" | "result" | "output" | "response" | "message": "..." }
+    const FPN_AI_WEBHOOK = 'https://hook.us1.make.com/xe6kkx5bwbbwmafc8rvhpr2eos1ge48u';
+    const FPN_AI_TIMEOUT_MS = 120000;
+
+    function fpnVal(v){
+      if (v == null) return '';
+      if (typeof v === 'object') return '';
+      const s = String(v).trim();
+      return (s === '—' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') ? '' : s;
+    }
+
+    // Plain-text summary so the Make prompt can just use {{1.record_text}}.
+    function fpnBuildRecordText(payload){
+      const lines = [];
+      const seen = new Set();
+      // 1) Every labeled field on the page (what the user sees)
+      document.querySelectorAll('.slds-field[data-field]').forEach(f => {
+        const key = f.getAttribute('data-field');
+        if (!key || key === 'Fact_Pattern_Notes' || seen.has(key)) return;
+        const lab = f.querySelector('.fpn-label-text, .slds-label');
+        const vt  = f.querySelector('.value-text');
+        if (!lab || !vt) return;
+        let val = vt.getAttribute('data-href') || vt.textContent;
+        val = fpnVal(val);
+        if (!val || val === 'Open ↗') return;
+        seen.add(key);
+        lines.push(lab.textContent.trim() + ': ' + val);
+      });
+      // 2) Any other scalar fields in the record payload not already shown
+      const skip = /(^id$|^ID$|_id$|_ID$|[a-z]Id$|^column_map$|^task_data$|[Bb]oard|[Pp]ulse|^confirmed_owners$)/;
+      Object.entries(payload || {}).forEach(([k, v]) => {
+        if (seen.has(k) || skip.test(k) || k === 'Fact_Pattern_Notes') return;
+        const s = fpnVal(v);
+        if (!s || s.length > 1500) return;
+        seen.add(k);
+        lines.push(k.replace(/_/g, ' ') + ': ' + s);
+      });
+      // 3) Contacts / heirs
+      const owners = Array.isArray(payload && payload.confirmed_owners) ? payload.confirmed_owners : [];
+      if (owners.length){
+        lines.push('', 'CONTACTS / HEIRS (' + owners.length + '):');
+        owners.forEach((o, i) => {
+          const parts = [];
+          Object.entries(o || {}).forEach(([k, v]) => {
+            if (skip.test(k)) return;
+            const s = fpnVal(v);
+            if (!s || s.length > 1000) return;
+            parts.push(k.replace(/_/g, ' ') + ': ' + s);
+          });
+          if (parts.length) lines.push((i + 1) + '. ' + parts.join(' | '));
+        });
+      }
+      return lines.join('\n');
+    }
+
+    // Accept plain text or JSON in a few common shapes; strip code fences / wrapping quotes.
+    function fpnParseAiResponse(raw){
+      let text = String(raw || '').trim();
+      if (!text) return '';
+      try {
+        const j = JSON.parse(text);
+        if (typeof j === 'string') text = j;
+        else if (j && typeof j === 'object') {
+          const pick = j.fact_pattern ?? j.factPattern ?? j.Fact_Pattern_Notes ?? j.text ?? j.result ??
+                       j.output ?? j.response ?? j.message ?? j.reply ?? j.content ?? '';
+          if (Array.isArray(pick)) text = pick.map(p => (p && p.text) || '').join('\n');
+          else text = String(pick || '');
+        }
+      } catch(e) { /* plain text — use as is */ }
+      text = text.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
+      if (/^".*"$/s.test(text)) text = text.slice(1, -1);
+      return text.replace(/\\n/g, '\n').trim();
+    }
+
+    function fpnShowToast(msg, type, onUndo){
+      const existing = document.getElementById('saveToast'); if (existing) existing.remove();
+      const t = document.createElement('div'); t.id = 'saveToast';
+      const err = type === 'error';
+      Object.assign(t.style, { position:'fixed', bottom:'20px', right:'20px', padding:'10px 14px', borderRadius:'8px',
+        fontSize:'14px', fontWeight:'600', zIndex:'99999', transition:'opacity .4s ease', display:'flex', alignItems:'center', gap:'12px',
+        background: err ? '#fef2f2' : '#f4f1ff', color: err ? '#dc2626' : '#3b2fa0',
+        border: '1px solid ' + (err ? '#fecaca' : '#d9d0ff'), boxShadow:'0 4px 12px rgba(0,0,0,.1)', maxWidth:'360px' });
+      const span = document.createElement('span'); span.textContent = msg; t.appendChild(span);
+      if (onUndo){
+        const u = document.createElement('button'); u.type = 'button'; u.textContent = 'Undo';
+        Object.assign(u.style, { background:'none', border:'none', color:'#0176d3', fontWeight:'700', cursor:'pointer', fontSize:'14px', padding:'0' });
+        u.addEventListener('click', () => { t.remove(); onUndo(); });
+        t.appendChild(u);
+      }
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, onUndo ? 8000 : 3500);
+    }
+
+    // Reveal the text quickly, typewriter-style (max ~1.2s regardless of length).
+    function fpnTypeInto(node, text){
+      return new Promise(resolve => {
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !text) { node.textContent = text; resolve(); return; }
+        node.textContent = ''; node.classList.add('fpn-typing');
+        const steps = 60, per = Math.max(1, Math.ceil(text.length / steps));
+        let i = 0;
+        const tick = () => {
+          i = Math.min(text.length, i + per);
+          node.textContent = text.slice(0, i);
+          node.scrollTop = node.scrollHeight;
+          if (i < text.length) setTimeout(tick, 20);
+          else { node.classList.remove('fpn-typing'); node.scrollTop = 0; resolve(); }
+        };
+        tick();
+      });
+    }
+
+    async function fpnRunAi(){
+      const field = document.querySelector('.slds-field[data-field="Fact_Pattern_Notes"]');
+      const btn = document.getElementById('fpnAiBtn');
+      if (!field || !btn || field.classList.contains('fpn-ai-busy')) return;
+      if (field.querySelector('.inline-input, .inline-textarea')) return;   // mid manual edit
+
+      const { boardId, pulseId } = extractIdsFromUrl();
+      if (!boardId || !pulseId) { fpnShowToast('⚠ Missing board / item ID', 'error'); return; }
+
+      const valueWrap = field.querySelector('.slds-value');
+      const vt = field.querySelector('.value-text');
+      const pencil = field.querySelector('.edit');
+      const toggle = field.querySelector('.fpn-toggle');
+      const oldValue = fpnVal(vt.textContent);
+      const payload = window.__rcLastPayload || {};
+
+      // ── Loading state ──
+      field.classList.add('fpn-ai-busy');
+      btn.disabled = true; btn.classList.add('is-busy'); btn.setAttribute('aria-busy', 'true');
+      vt.style.display = 'none'; if (pencil) pencil.style.display = 'none'; if (toggle) toggle.style.display = 'none';
+      const sk = document.createElement('div');
+      sk.className = 'fpn-ai-skeleton'; sk.setAttribute('role', 'status'); sk.setAttribute('aria-label', 'AI is writing the fact pattern');
+      sk.innerHTML = '<div class="fpn-sk-bar is-accent" style="width:34%"></div>' +
+                     '<div class="fpn-sk-bar" style="width:100%"></div>' +
+                     '<div class="fpn-sk-bar" style="width:72%"></div>';
+      btn.insertAdjacentElement('afterend', sk);
+      sk.style.flex = '1 1 auto';
+
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), FPN_AI_TIMEOUT_MS);
+      let result = '';
+      try {
+        const body = Object.assign({
+          action: 'generate_fact_pattern',
+          boardId, pulseId,
+          current_fact_pattern: oldValue,
+          record_text: fpnBuildRecordText(payload),
+          record: Object.fromEntries(Object.entries(payload).filter(([k]) => k !== 'column_map' && k !== 'task_data')),
+          contacts: Array.isArray(payload.confirmed_owners) ? payload.confirmed_owners : []
+        }, rcGetViewer());
+        const res = await fetch(FPN_AI_WEBHOOK, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body), signal: ctrl.signal });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        result = fpnParseAiResponse(await res.text());
+        if (!result || /^accepted$/i.test(result)) throw new Error('Empty AI response (add a Webhook response module in Make)');
+      } catch (err) {
+        console.error('✗ AI fact pattern failed:', err);
+        result = '';
+        fpnShowToast(err && err.name === 'AbortError' ? '⚠ AI took too long — try again' : '⚠ AI fact pattern failed', 'error');
+      } finally {
+        clearTimeout(timer);
+        sk.remove();
+        vt.style.display = ''; if (pencil) pencil.style.display = ''; if (toggle) toggle.style.display = '';
+      }
+
+      if (result) {
+        await fpnTypeInto(vt, result);
+        await saveToMonday('Fact_Pattern_Notes', result);
+        fpnShowToast('✨ Fact pattern updated', 'success', async () => {
+          vt.textContent = oldValue;
+          refreshFpnToggles();
+          await saveToMonday('Fact_Pattern_Notes', oldValue);
+          showSaveToast('success');
+        });
+      }
+      refreshFpnToggles();
+      field.classList.remove('fpn-ai-busy');
+      btn.disabled = false; btn.classList.remove('is-busy'); btn.removeAttribute('aria-busy');
+    }
+
+    (function(){
+      const b = document.getElementById('fpnAiBtn');
+      if (b) b.addEventListener('click', (e) => { e.stopPropagation(); fpnRunAi(); });
+    })();
+
     Array.from(document.querySelectorAll('.value-text.link')).forEach(node => {
       node.addEventListener('click', () => {
         const raw = (node.getAttribute('data-href') || '').trim();
@@ -6627,6 +6905,8 @@
     let _silentRefreshInFlight = false;
 
     function isUserEditing(){
+      // AI is writing the Fact Pattern — don't let a refresh overwrite it mid-run.
+      if (document.querySelector('.fpn-field.fpn-ai-busy')) return true;
       // An inline field/textarea is open, or a modal/note dialog is active.
       if (document.querySelector('.inline-input, .inline-textarea, .rc-inline-edit')) return true;
       if (document.querySelector('.rc-update-module.active')) return true;
