@@ -5456,6 +5456,7 @@
         <div class="tabsbar" role="group" aria-label="Tabs and actions">
           <div class="tabs" role="tablist" aria-label="Record Tabs">
             <button class="tab" role="tab" id="tab-deal" aria-selected="true" aria-controls="pane-deal" type="button">Deal Information</button>
+            
             <button class="tab" role="tab" id="tab-research" aria-selected="false" aria-controls="pane-research" type="button">Research</button>
             <button class="tab" role="tab" id="tab-activity" aria-selected="false" aria-controls="pane-activity" type="button">Campaigns</button>
           </div>
@@ -6587,7 +6588,7 @@
         lines.push(lab.textContent.trim() + ': ' + val);
       });
       // 2) Any other scalar fields in the record payload not already shown
-      const skip = /(^id$|^ID$|_id$|_ID$|[a-z]Id$|^column_map$|^task_data$|[Bb]oard|[Pp]ulse|^confirmed_owners$)/;
+      const skip = /(^id$|^ID$|_id$|_ID$|[a-z]Id$|^column_map$|^task_data$|^heir_brief$|[Bb]oard|[Pp]ulse|^confirmed_owners$)/;
       Object.entries(payload || {}).forEach(([k, v]) => {
         if (seen.has(k) || skip.test(k) || k === 'Fact_Pattern_Notes') return;
         const s = fpnVal(v);
@@ -15445,6 +15446,465 @@
       flagLanding();
     });
   });
+})();
+</script>
+  <style id="heirPlanStyles">
+    /* Path to Close: inline-edit buttons and loading state (rest lives in #ptcHeirStyles) */
+    .hp-form-btns{ display:flex; justify-content:flex-end; gap:8px; }
+    .hp-btn{ font: 500 13px/1 var(--font); padding:9px 16px; border-radius:999px; border:1px solid #c9c9c9; background:#fff; color:#0176d3; cursor:pointer; }
+    .hp-btn.is-primary{ background:#0176d3; border-color:#0176d3; color:#fff; }
+    .hp-btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(1,118,211,.22); }
+    .hp-pencil{ flex:0 0 auto; }
+    .hp-text.is-loading *{ visibility:hidden; }
+  </style>
+  <style id="ptcHeirStyles">
+    /* Path to Close on the heir record: plain SLDS record fields, same as Lead Details.
+       Only additions: the SLDS utility "edit" icon, a View All link, inline-edit inputs. */
+    .ptc-heir .ptc-heir-body{ padding:0; }
+    .ptc-heir .rc-field.hp-field{ padding:6px 16px 10px 16px; border-top:0; min-width:0; }
+    .ptc-f .hp-value{ display:flex; align-items:flex-start; gap:var(--slds-g-spacing-2, 8px); }
+    .ptc-f .hp-text{ flex:1 1 auto; min-width:0; white-space:pre-line; }
+    .ptc-f .hp-text:empty{ min-height:20px; }
+    .ptc-edit{ flex:0 0 auto; width:24px; height:24px; padding:5px; margin:-2px -4px 0 0; border:0; border-radius:var(--slds-g-radius-border-circle, 9999px);
+      background:transparent; color:var(--slds-g-color-neutral-base-60, #939393); cursor:pointer; opacity:0; }
+    .ptc-edit svg{ width:14px; height:14px; display:block; }
+    .ptc-f:hover .ptc-edit, .ptc-edit:focus-visible{ opacity:1; }
+    .ptc-edit:hover{ color:var(--slds-g-color-accent-2, #0176d3); }
+    .ptc-edit:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(1,118,211,.22); }
+    /* Loading: SLDS stencil (flat neutral placeholder, no animation) */
+    .ptc-heir .hp-text.is-loading{ color:transparent; background:var(--slds-g-color-neutral-base-95, #f3f3f3); border-radius:var(--slds-g-radius-border-1, 4px); animation:none; min-height:20px; }
+    .ptc-user{ color:var(--slds-g-color-accent-2, #0176d3); }
+
+    /* Header: the toggle button and the links are siblings (no nested controls) */
+    .ptc-hdr{ cursor:default; padding-top:0; padding-bottom:0; }
+    .ptc-toggle{ appearance:none; border:0; background:none; margin:0; padding:8px 0; flex:1 1 auto; min-width:0;
+      display:flex; align-items:center; gap:8px; font:inherit; color:inherit; text-align:left; cursor:pointer; }
+    .ptc-toggle:focus-visible{ outline:none; box-shadow:0 0 0 2px var(--slds-g-color-accent-2, #0176d3); border-radius:var(--slds-g-radius-border-1, 4px); }
+    .ptc-links{ display:inline-flex; align-items:center; gap:var(--slds-g-spacing-2, 8px); margin-left:auto; }
+    .ptc-sep{ color:var(--slds-g-color-on-surface-1, #5c5c5c); font-size:var(--slds-g-font-scale-neg-1, 12px); }
+    .ptc-link:disabled, .ptc-link:disabled:hover{ color:var(--slds-g-color-on-surface-1, #5c5c5c); cursor:progress; text-decoration:none; }
+    .ptc-link{ appearance:none; border:0; background:none; padding:0; font:inherit; font-size:var(--slds-g-font-scale-base, 13px);
+      color:var(--slds-g-color-accent-2, #0176d3); cursor:pointer; }
+    .ptc-link:hover{ text-decoration:underline; }
+    .ptc-link:focus-visible{ outline:none; text-decoration:underline; }
+
+    /* Inline edit: labeled inputs (radius-border-2), pill buttons (radius-border-circle) */
+    .ptc-f.hp-editing .hp-value{ display:block; }
+    .ptc-f .hp-form{ display:flex; flex-direction:column; gap:var(--slds-g-spacing-3, 12px); padding-top:4px; }
+    .ptc-fl{ display:flex; flex-direction:column; gap:4px; font-size:var(--slds-g-font-scale-neg-1, 12px); color:var(--slds-g-color-on-surface-1, #5c5c5c); }
+    .ptc-f .hp-in, .ptc-f .hp-ta, .ptc-sel{ width:100%; box-sizing:border-box; font:400 var(--slds-g-font-scale-1, 14px)/1.4 var(--font);
+      color:var(--slds-g-color-on-surface-2, #2e2e2e); background:#fff; border:1px solid var(--slds-g-color-border-2, #747474);
+      border-radius:var(--slds-g-radius-border-2, 8px); padding:7px 10px; }
+    .ptc-f .hp-in{ font-weight:400; }
+    .ptc-sel{ appearance:auto; }
+    .ptc-f .hp-in:focus, .ptc-f .hp-ta:focus, .ptc-sel:focus{ outline:none; border-color:var(--slds-g-color-accent-2, #0176d3); box-shadow:0 0 0 1px var(--slds-g-color-accent-2, #0176d3); }
+    .ptc-f .hp-ta{ resize:vertical; min-height:64px; }
+  </style>
+
+<script id="heirPlanScript">
+/* ═══════════════════════════════════════════════════════════════════════
+   PATH TO CLOSE — seven deal indicators per heir, written by AI from the file.
+   Shown as an SLDS expandable section on each heir's record, under the
+   Lead Status path. The heir's stage decides which two indicators show
+   first; "View All" shows all seven plus Last Modified By.
+
+   Stored per heir in the subitem long-text column "Heir Brief" as JSON:
+     { "pulse_id": "...", "generated_at", "generated_by", "edited_at", "edited_by",
+       "indicators": { "<key>": { "headline", "detail", "signal", "edited" } } }
+   keys: reachability, awareness, self_solve, motivation, influence, roadblocks, intent
+   signal: positive | neutral | negative     edited: true once a rep changes it
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+
+  // ← Make scenario that writes the plan (see heir_plan_make_setup.md)
+  const HP_AI_WEBHOOK   = 'https://hook.us1.make.com/xdf8cxm1i5ltno6f1x881grn2ru8lmwr';
+  // ← Make scenario that saves a pencil edit back to the heir's "Heir Brief" column
+  const HP_SAVE_WEBHOOK = 'https://hook.us1.make.com/xdf8cxm1i5ltno6f1x881grn2ru8lmwr';   // same scenario, routed by action
+  const HP_TIMEOUT_MS = 180000;
+
+  // In deal order: first thing you learn → the finish line.
+  const FIELDS = [
+    ['reachability', 'Reachability'],
+    ['awareness',    'Awareness'],
+    ['self_solve',   'Self-solve'],
+    ['motivation',   'Motivation'],
+    ['influence',    'Influence'],
+    ['roadblocks',   'Roadblocks'],
+    ['intent',       'Intent']
+  ];
+  const LABEL = Object.fromEntries(FIELDS);
+
+  // Lead Status → the two indicators that matter at that stage (shown first).
+  const STAGE_GUIDE = [
+    { test: /^(|new|no attempt|re-skiptrace|attempt \d.*)$/, name: 'Not reached yet',
+      keys: ['reachability', 'awareness'] },
+    { test: /^contacted$/, name: 'Contacted',
+      keys: ['self_solve', 'motivation'] },
+    { test: /^interested in selling$/, name: 'Interested In Selling',
+      keys: ['influence', 'roadblocks'] },
+    { test: /^negotiations/, name: 'Negotiations/Review',
+      keys: ['intent', 'roadblocks'] }
+  ];
+  function stageFor(status){
+    const s = low(status);
+    if (/accepted offer|^closed/.test(s)) return { name: clean(status), keys: [], signed: true };
+    return STAGE_GUIDE.find(g => g.test.test(s)) || STAGE_GUIDE[0];
+  }
+
+  let hpFresh = {};        // pulse_id → brief written or edited during this visit
+  let hpBusy = false;
+
+  // ── helpers ──────────────────────────────────────────────────────────
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  function clean(v){
+    if (v == null || typeof v === 'object') return '';
+    const s = String(v).trim();
+    return (s === '—' || /^(null|undefined)$/i.test(s)) ? '' : s;
+  }
+  function low(v){ return clean(v).toLowerCase(); }
+  const pct = v => { const n = parseFloat(String(v ?? '').replace(/[^0-9.]/g,'')); return isNaN(n) ? 0 : n; };
+  const pidOf = c => clean(c && (c.pulse_id ?? c.pulseId ?? c.id));
+  const properName = s => String((typeof window.toProperName === 'function') ? window.toProperName(s) : s).replace(/([-'’])([a-z])/g, (m, p, c) => p + c.toUpperCase());
+
+  function readJson(v){
+    if (!v) return null;
+    if (typeof v === 'object') return v;
+    let s = String(v).trim();
+    if (!s || s === '—') return null;
+    // The record-load scenario sends the "Heir Brief" column base64-encoded so stray
+    // characters in it can never break the record JSON. Decode it here.
+    if (!/^[\[{`"]/.test(s) && /^[A-Za-z0-9+/=\s]+$/.test(s)) {
+      try { s = new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s+/g, '')), ch => ch.charCodeAt(0))).trim(); }
+      catch(e){ return null; }
+    }
+    s = s.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
+    try { let j = JSON.parse(s); if (typeof j === 'string') j = JSON.parse(j); return (j && typeof j === 'object') ? j : null; }
+    catch(e){ return null; }
+  }
+
+  // ── data ─────────────────────────────────────────────────────────────
+  // Every confirmed, living owner. `open` = still needs to sign.
+  function allHeirs(payload){
+    const contacts = Array.isArray(payload && payload.confirmed_owners) ? payload.confirmed_owners : [];
+    return contacts.filter(c => low(c.owner_status ?? c.ownerStatus) === 'yes' && low(c.living_status ?? c.Living_Status) !== 'dead')
+      .map(c => {
+        const pid = pidOf(c);
+        const status = clean(c.lead_status ?? c.leadStatus) || 'New';
+        const stage = stageFor(status);
+        return { c, pid, status, stage, open: !stage.signed,
+          share: pct(c.ownership_percent ?? c.ownershipPercent),
+          name: properName(clean(c.name) || 'Unnamed heir'),
+          brief: hpFresh[pid] || readJson(c.heir_brief ?? c.Heir_Brief ?? c.heirBrief) };
+      })
+      .sort((a,b) => (a.open === b.open ? 0 : a.open ? -1 : 1) || (b.share - a.share) || a.name.localeCompare(b.name));
+  }
+  const heirByPid = pid => allHeirs(window.__rcLastPayload).find(h => h.pid === String(pid));
+
+  function ind(brief, key){
+    const all = brief && (brief.indicators || brief);
+    const x = all && all[key];
+    if (!x) return null;
+    if (typeof x === 'string') return { headline: x, detail: '' };
+    return { headline: clean(x.headline ?? x.value ?? x.title), detail: x.detail ?? x.evidence ?? x.text ?? '', signal: low(x.signal) };
+  }
+  function sigOf(brief, key){
+    const v = ind(brief, key);
+    if (!v || (!v.headline && !clean(v.detail) && !Array.isArray(v.detail))) return brief ? 'unknown' : 'none';
+    if (/^unknown\b/i.test(v.headline)) return 'unknown';
+    return (v.signal === 'positive' || v.signal === 'negative') ? v.signal : 'neutral';
+  }
+
+  // ── render: section on the heir's record view ───────────────────────
+  // An SLDS expandable section with ordinary record fields, same markup as
+  // Lead Details (rc-row / rc-field / rc-label / rc-value). The stage's two
+  // indicators show by default; "View All" reveals the rest plus Last Modified By.
+  const othersOpen = {};
+  const EDIT_ICON = '<svg viewBox="0 0 520 520" aria-hidden="true" fill="currentColor"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>';
+
+  function valueText(h, key){
+    const v = ind(h.brief, key);
+    if (!v) return '';
+    const head = clean(v.headline);
+    const d = Array.isArray(v.detail) ? v.detail.map(clean).filter(Boolean).join('; ') : clean(v.detail);
+    if (!head) return d;
+    if (!d) return head;
+    return head + (/[.!?]$/.test(head) ? ' ' : '. ') + d;
+  }
+  function fieldCell(h, key){
+    return '<div class="rc-field hp-field ptc-f" data-hp-pid="' + esc(h.pid) + '" data-hp-key="' + key + '"><div class="rc-field-inner">'
+      + '<span class="rc-label">' + LABEL[key] + '</span>'
+      + '<div class="hp-value"><div class="hp-text rc-value"><span class="ptc-vt">' + esc(valueText(h, key)) + '</span></div>'
+      + '<button type="button" class="hp-pencil ptc-edit" title="Edit ' + LABEL[key] + '" aria-label="Edit ' + LABEL[key] + ' for ' + esc(h.name) + '">' + EDIT_ICON + '</button></div>'
+      + '</div></div>';
+  }
+  function modifiedCell(h){
+    const b = h.brief;
+    let val = '';
+    if (b){
+      const when = b.edited_at || b.generated_at;
+      const who = b.edited_at ? clean(b.edited_by) : 'AI';
+      const t = Date.parse(when || '');
+      const date = isNaN(t) ? '' : new Date(t).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      val = (who ? '<span class="ptc-user">' + esc(who) + '</span>' : '') + (who && date ? ', ' : '') + esc(date);
+    }
+    return '<div class="rc-field"><div class="rc-field-inner"><span class="rc-label">Last Modified By</span><div class="rc-value">' + val + '</div></div></div>';
+  }
+  function heirSectionInner(h){
+    if (!h.open) return '';
+    const focus = h.stage.keys.length ? h.stage.keys : ['reachability', 'awareness'];
+    const open = !!othersOpen[h.pid];
+    const keys = open ? FIELDS.map(f => f[0]) : focus;
+    const cells = keys.map(k => fieldCell(h, k));
+    if (open) cells.push(modifiedCell(h));
+    let rows = '';
+    for (let i = 0; i < cells.length; i += 2) rows += '<div class="rc-row">' + cells[i] + (cells[i+1] || '<div class="rc-field"></div>') + '</div>';
+    return rows;
+  }
+  // Header links, as in the SLDS activity timeline ("Refresh • Expand All")
+  function headerLinks(h){
+    if (!h.open) return '';
+    const open = !!othersOpen[h.pid];
+    return '<button type="button" class="ptc-link" data-ptc-gen="' + esc(h.pid) + '" title="Have AI re-write this heir\'s Path to Close from the file"><span>' + (h.brief ? 'Regenerate' : 'Generate') + '</span></button>'
+      + '<span class="ptc-sep" aria-hidden="true">•</span>'
+      + '<button type="button" class="ptc-link" data-ptc-more aria-expanded="' + open + '">' + (open ? 'View Less' : 'View All') + '</button>';
+  }
+  function heirSectionHtml(h){
+    return '<div class="rc-section-block ptc-heir' + (h.open ? '' : ' collapsed') + '" data-ptc-pid="' + esc(h.pid) + '">'
+      + '<div class="rc-section-header ptc-hdr">'
+      + '<button type="button" class="ptc-toggle" aria-expanded="' + h.open + '" aria-controls="ptc-body-' + esc(h.pid) + '" '
+      + 'onclick="var b=this.closest(\'.rc-section-block\');b.classList.toggle(\'collapsed\');this.setAttribute(\'aria-expanded\',!b.classList.contains(\'collapsed\'))">'
+      + '<svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>'
+      + '<span class="rc-section-header-title">Path to Close</span></button>'
+      + '<span class="ptc-links">' + headerLinks(h) + '</span></div>'
+      + '<div class="rc-section-body" id="ptc-body-' + esc(h.pid) + '"><div class="ptc-heir-body">' + heirSectionInner(h) + '</div></div></div>';
+  }
+
+  function renderHeirSections(){
+    document.querySelectorAll('.ptc-heir[data-ptc-pid]').forEach(sec => {
+      if (sec.querySelector('.hp-editing')) return;
+      const h = heirByPid(sec.getAttribute('data-ptc-pid'));
+      if (!h) return;
+      const body = sec.querySelector('.ptc-heir-body');
+      if (body) body.innerHTML = heirSectionInner(h);
+      const links = sec.querySelector('.ptc-links');
+      if (links) links.innerHTML = headerLinks(h);
+    });
+  }
+  function injectHeirSection(c, innerId){
+    const inner = document.getElementById(innerId);
+    if (!inner || !c) return;
+    const h = heirByPid(c.pulseId);
+    if (!h) return;                                   // not a confirmed, living owner
+    const anchor = inner.querySelector('.ls-chevron-inner');
+    if (!anchor || inner.querySelector('.ptc-heir')) return;
+    anchor.insertAdjacentHTML('afterend', heirSectionHtml(h));
+  }
+  function hookHeirView(){
+    if (typeof window.rcRenderDetailOwner !== 'function' || window.rcRenderDetailOwner.__ptc) return;
+    const orig = window.rcRenderDetailOwner;
+    const wrapped = function(c, innerId, detailId){
+      const out = orig.apply(this, arguments);
+      try { injectHeirSection(c, innerId); } catch(e){ console.error('Path to Close (heir view) failed:', e); }
+      return out;
+    };
+    wrapped.__ptc = true;
+    window.rcRenderDetailOwner = wrapped;
+  }
+
+  function renderAll(){ renderHeirSections(); }
+
+  // ── pencil edit ──────────────────────────────────────────────────────
+  function startEdit(fieldEl){
+    if (document.querySelector('.hp-editing')) return;
+    const pid = fieldEl.getAttribute('data-hp-pid'), key = fieldEl.getAttribute('data-hp-key');
+    const h = heirByPid(pid); if (!h) return;
+    const v = ind(h.brief, key) || { headline:'', detail:'' };
+    const detailText = Array.isArray(v.detail) ? v.detail.map(clean).filter(Boolean).map(t => '- ' + t).join('\n') : clean(v.detail);
+    fieldEl.classList.add('hp-editing');
+    const sig = v.signal === 'positive' || v.signal === 'negative' ? v.signal : 'neutral';
+    fieldEl.querySelector('.hp-value').innerHTML =
+        '<div class="hp-form">'
+      + '<label class="ptc-fl">Summary<input class="hp-in" type="text" value="' + esc(v.headline) + '"></label>'
+      + '<label class="ptc-fl">Effect on Deal<select class="ptc-sel" name="hp-sig">'
+      + [['positive','Helps'],['neutral','Neutral'],['negative','Hurts']].map(([val, txt]) => '<option value="' + val + '"' + (sig === val ? ' selected' : '') + '>' + txt + '</option>').join('')
+      + '</select></label>'
+      + '<label class="ptc-fl">Details<textarea class="hp-ta" rows="3">' + esc(detailText) + '</textarea></label>'
+      + '<div class="hp-form-btns"><button type="button" class="hp-btn" data-hp-cancel>Cancel</button><button type="button" class="hp-btn is-primary" data-hp-save>Save</button></div>'
+      + '</div>';
+    fieldEl.querySelector('.hp-in').focus();
+  }
+
+  async function saveEdit(fieldEl){
+    const pid = fieldEl.getAttribute('data-hp-pid'), key = fieldEl.getAttribute('data-hp-key');
+    const payload = window.__rcLastPayload;
+    const h = heirByPid(pid); if (!h) return;
+    const headline = fieldEl.querySelector('.hp-in').value.trim();
+    const raw = fieldEl.querySelector('.hp-ta').value.trim();
+    const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    const detail = lines.length > 1 && lines.every(l => /^[-•]/.test(l)) ? lines.map(l => l.replace(/^[-•]\s*/, '')) : raw;
+
+    const brief = JSON.parse(JSON.stringify(h.brief || { pulse_id: pid }));
+    brief.indicators = brief.indicators || {};
+    const sigEl = fieldEl.querySelector('[name="hp-sig"]');
+    brief.indicators[key] = { headline, detail, signal: sigEl ? sigEl.value : 'neutral', edited: true };
+    brief.edited_at = new Date().toISOString();
+    brief.edited_by = clean(viewer().who) || '';
+    hpFresh[pid] = brief;
+    const c = (payload.confirmed_owners || []).find(x => pidOf(x) === pid);
+    if (c) c.heir_brief = JSON.stringify(brief);
+
+    fieldEl.classList.remove('hp-editing');
+    renderAll();
+
+    if (!/^https:\/\/hook\./.test(HP_SAVE_WEBHOOK)) { toast('Saved on this page only. Connect the save webhook to keep edits.', true); return; }
+    const ids = getIds();
+    try {
+      const res = await fetch(HP_SAVE_WEBHOOK, { method:'POST', headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(Object.assign({ action:'save_heir_brief', boardId: ids.boardId, pulseId: ids.pulseId, subitemId: pid, heir_brief: JSON.stringify(brief) }, viewer())) });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      toast('Saved');
+    } catch(e){ console.error('Heir brief save failed:', e); toast('⚠ Couldn’t save. Check the save scenario is on.', true); }
+  }
+
+  // ── generate with AI ─────────────────────────────────────────────────
+  function getIds(){
+    try { if (typeof extractIdsFromUrl === 'function') return extractIdsFromUrl(); } catch(e){}
+    const q = new URLSearchParams(location.search);
+    return { boardId: q.get('boardId'), pulseId: q.get('pulseId') };
+  }
+  function viewer(){ try { return (typeof rcGetViewer === 'function') ? rcGetViewer() : {}; } catch(e){ return {}; } }
+  function toast(msg, isErr){
+    if (typeof fpnShowToast === 'function') fpnShowToast(msg, isErr ? 'error' : 'success');
+    else console.log(msg);
+  }
+
+  function heirsContext(payload){
+    const contacts = Array.isArray(payload && payload.confirmed_owners) ? payload.confirmed_owners : [];
+    return contacts.map(c => {
+      const phones = [];
+      for (let i = 1; i <= 6; i++){
+        const n = clean(c['phone_' + i]); if (n) phones.push({ number: n, status: clean(c['phone_' + i + '_status']) || null });
+      }
+      return {
+        pulse_id: pidOf(c), name: properName(clean(c.name)), relationship: clean(c.relationship ?? c.relation) || null,
+        is_owner: low(c.owner_status) === 'yes', ownership_percent: pct(c.ownership_percent) || null,
+        living_status: clean(c.living_status) || null, lead_status: clean(c.lead_status) || null,
+        focus_indicators: stageFor(c.lead_status).keys,
+        phones, contact_outcome: clean(c.contact_outcome) || null, seller_motivation: clean(c.seller_motivation) || null,
+        last_contacted: clean(c.contacted_date) || null, follow_up_date: clean(c.follow_up_date) || null,
+        offer_amount: clean(c.offer_amount) || null, notes: clean(c.notes) || null,
+        most_recent_update: (typeof c.most_recent_update === 'string') ? c.most_recent_update : (c.most_recent_update ? JSON.stringify(c.most_recent_update) : null),
+        previous_brief: readJson(c.heir_brief) || null
+      };
+    });
+  }
+
+  function parseResponse(raw){
+    let j = readJson(raw);
+    if (j && !Array.isArray(j.heirs)){
+      const inner = j.plan ?? j.result ?? j.output ?? j.response ?? j.text ?? j.content;
+      if (inner) j = readJson(inner) || j;
+    }
+    return (j && Array.isArray(j.heirs)) ? j : null;
+  }
+
+  function setBusy(on, pid){
+    document.querySelectorAll('[data-ptc-gen]').forEach(btn => {
+      btn.disabled = on; btn.classList.toggle('is-busy', on);
+      const label = btn.querySelector('span');
+      if (!label) return;
+      if (on) { btn.dataset.label = label.textContent; label.textContent = btn.classList.contains('ptc-link') ? 'Regenerating…' : 'Updating…'; }
+      else if (btn.dataset.label) label.textContent = btn.dataset.label;
+    });
+    const sel = pid ? '.ptc-heir[data-ptc-pid="' + pid + '"] .hp-text' : '.ptc-heir .hp-text';
+    document.querySelectorAll(sel).forEach(t => t.classList.toggle('is-loading', on));
+  }
+
+  async function generate(pid){
+    if (hpBusy) return;
+    pid = pid ? String(pid) : null;
+    const payload = window.__rcLastPayload;
+    if (!payload){ toast('⚠ The record hasn’t loaded yet.', true); return; }
+    const demo = false;
+    if (!demo && !/^https:\/\/hook\./.test(HP_AI_WEBHOOK)){ toast('⚠ Path to Close isn’t connected to Make yet.', true); return; }
+    const ids = getIds();
+    if (!demo && (!ids.boardId || !ids.pulseId)){ toast('⚠ Missing board or item ID in the page link.', true); return; }
+
+    const v = viewer();
+    const body = Object.assign({
+      action: 'generate_heir_plan', boardId: ids.boardId, pulseId: ids.pulseId,
+      generated_at: new Date().toISOString(), generated_by: clean(v.who) || '',
+      record_text: (typeof fpnBuildRecordText === 'function') ? fpnBuildRecordText(payload) : '',
+      record: Object.fromEntries(Object.entries(payload).filter(([k]) => !['column_map','task_data','confirmed_owners'].includes(k))),
+      heirs: heirsContext(payload),
+      target_pulse_id: pid            // null = write every heir; otherwise only this heir
+    }, v);
+
+    setBusy(true, pid);
+    hpBusy = true;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), HP_TIMEOUT_MS);
+    let ok = false;
+    try {
+      let raw;
+      {
+        const res = await fetch(HP_AI_WEBHOOK, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body), signal: ctrl.signal });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        raw = await res.text();
+      }
+      const plan = parseResponse(raw);
+      if (!plan) throw new Error('bad-shape');
+      plan.heirs.forEach(b => { if (b && b.pulse_id != null && (!pid || String(b.pulse_id) === pid)){ b.generated_at = b.generated_at || body.generated_at; delete b.edited_at; delete b.edited_by; b.generated_by = b.generated_by || body.generated_by; hpFresh[String(b.pulse_id)] = b; } });
+      ok = true;
+    } catch(e){
+      console.error('Heir plan failed:', e);
+      toast(e && e.name === 'AbortError' ? '⚠ The plan took too long. Try again.'
+          : e && e.message === 'bad-shape' ? '⚠ Make answered, but not with heir briefs.'
+          : '⚠ Couldn’t write the plan. Check the Make scenario is on.', true);
+    } finally { clearTimeout(timer); hpBusy = false; setBusy(false, pid); }
+    if (ok){
+      toast('Path to Close updated');
+    }
+    renderAll();
+  }
+
+  // ── wiring ───────────────────────────────────────────────────────────
+  document.addEventListener('click', e => {
+    const t = e.target; if (!t.closest) return;
+    const genBtn = t.closest('[data-ptc-gen]');
+    if (genBtn){ e.preventDefault(); generate(genBtn.getAttribute('data-ptc-gen')); return; }
+    const more = t.closest('[data-ptc-more]');
+    if (more){
+      e.preventDefault();
+      const sec = more.closest('.ptc-heir'); const pid = sec && sec.getAttribute('data-ptc-pid');
+      if (pid){ othersOpen[pid] = !othersOpen[pid]; renderHeirSections(); }
+      return;
+    }
+    const pen = t.closest('.hp-pencil');
+    if (pen){ e.preventDefault(); startEdit(pen.closest('.hp-field')); return; }
+    const sv = t.closest('[data-hp-save]');
+    if (sv){ e.preventDefault(); saveEdit(sv.closest('.hp-field')); return; }
+    const cx = t.closest('[data-hp-cancel]');
+    if (cx){ e.preventDefault(); cx.closest('.hp-field').classList.remove('hp-editing'); renderAll(); }
+  });
+  document.addEventListener('keydown', e => {
+    const f = e.target.closest && e.target.closest('.hp-editing'); if (!f) return;
+    if (e.key === 'Escape'){ f.classList.remove('hp-editing'); renderAll(); }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey || e.target.classList.contains('hp-in'))){ e.preventDefault(); saveEdit(f); }
+  });
+
+  function hook(){
+    hookHeirView();
+    const RP = window.RecordPage;
+    if (!RP || typeof RP.applyData !== 'function' || RP.__hpHooked) return false;
+    const orig = RP.applyData;
+    RP.applyData = function(){ const out = orig.apply(this, arguments); try { renderAll(); } catch(e){ console.error('Path to Close render failed:', e); } return out; };
+    RP.__hpHooked = true; return true;
+  }
+  if (!hook()) document.addEventListener('DOMContentLoaded', hook);
+  try { renderAll(); } catch(e){}
 })();
 </script>
 </body>
