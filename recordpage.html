@@ -15545,11 +15545,14 @@
     { test: /^interested in selling$/, name: 'Interested In Selling',
       keys: ['influence', 'roadblocks'] },
     { test: /^negotiations/, name: 'Negotiations/Review',
-      keys: ['intent', 'roadblocks'] }
+      keys: ['intent', 'roadblocks'] },
+    // Accepted but not closed yet: watch for anything that could delay or derail the close.
+    { test: /^accepted offer/, name: 'Accepted Offer',
+      keys: ['roadblocks', 'intent'] }
   ];
   function stageFor(status){
     const s = low(status);
-    if (/accepted offer|^closed/.test(s)) return { name: clean(status), keys: [], signed: true };
+    if (/^closed/.test(s)) return { name: clean(status), keys: [], signed: true };
     return STAGE_GUIDE.find(g => g.test.test(s)) || STAGE_GUIDE[0];
   }
 
