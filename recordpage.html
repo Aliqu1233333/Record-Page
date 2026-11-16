@@ -5388,13 +5388,16 @@
       grid-column: 2; grid-row: 1;
       display:flex; flex-direction:column; gap:12px;
       min-width:0;
-      position: sticky; top: 12px;
+      align-self: stretch;            /* full length: as tall as the record panel beside it */
     }
+    .rp-sidebar > .cs{ flex: 1 1 auto; overflow: clip; }   /* clip (not hidden) keeps the rounded corners and still lets the content stick */
+    .cs-stick{ position: sticky; top: 12px; }               /* the summary stays in view while you scroll the record */
     /* Narrower screens: conversation card stacks above the record panel */
     @media (max-width: 1280px){
       .layout.rp-two-col{ grid-template-columns: minmax(0, 1fr); }
       .layout.rp-two-col > .panel{ grid-column: 1; grid-row: 2; }
-      .rp-sidebar{ grid-column: 1; grid-row: 1; position: static; }
+      .rp-sidebar{ grid-column: 1; grid-row: 1; position: static; align-self: start; }
+      .cs-stick{ position: static; }
     }
 
     /* ── Flat SLDS 2 cards: no drop shadows ── */
@@ -5666,6 +5669,7 @@
       <!-- ═══════════ RIGHT SIDEBAR: LAST CONVERSATION (was index.html) ═══════════ -->
       <aside class="rp-sidebar" aria-label="Sidebar">
         <section class="cs" id="csCard" aria-label="Last Conversation">
+          <div class="cs-stick">
           <div class="cs-cardHead">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <defs>
@@ -5709,6 +5713,7 @@
               <div class="cs-empty-body">Once notes are added to related contacts, the AI summary will appear here.</div>
             </div>
           </div>
+        </div>
         </section>
       </aside>
 
@@ -12656,7 +12661,9 @@
       });
     }
 
-    rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", rcRenderDetailOwner, true);
+    // Late-bound on purpose: Path to Close wraps rcRenderDetailOwner after this runs, and a
+    // captured reference would redraw the heir panel without it (the section would flash away).
+    rcAttachPaneEvents("pane-owners", rcOwners, "inner-owners", "detail-owners", (c, i, d) => window.rcRenderDetailOwner(c, i, d), true);
     rcAttachPaneEvents("pane-other",  rcOthers, "inner-other",  "detail-other",  rcRenderDetailOther, false);
 
     /* ══════════════════════════════════════════════════════════════════
@@ -16030,6 +16037,12 @@
     if (typeof window.rcRenderDetailOwner !== 'function' || window.rcRenderDetailOwner.__ptc) return;
     const orig = window.rcRenderDetailOwner;
     const wrapped = function(c, innerId, detailId){
+      // Keep the loaded record in step with an inline Lead Status change, so the
+      // section shows the right two fields for the new stage straight away.
+      try {
+        const own = c && window.__rcLastPayload && (window.__rcLastPayload.confirmed_owners || []).find(x => pidOf(x) === String(c.pulseId));
+        if (own && c.status && c.status !== '—') own.lead_status = c.status;
+      } catch(e){}
       const out = orig.apply(this, arguments);
       try { injectHeirSection(c, innerId); } catch(e){ console.error('Path to Close (heir view) failed:', e); }
       return out;
