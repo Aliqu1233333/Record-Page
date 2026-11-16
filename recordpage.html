@@ -5380,7 +5380,7 @@
     html, body{ background: var(--rp-page-bg) !important; }
     .app{ padding-bottom: 56px; } /* clears the fixed To Do utility bar */
     .layout.rp-two-col{
-      grid-template-columns: minmax(0, 1fr) 455px;   /* Last Conversation column: 360px +15%, then +10% */
+      grid-template-columns: minmax(0, 1fr) 500px;   /* Last Conversation column: 360px +15%, +10%, then +10% again */
       column-gap: 16px;                              /* gap between the record and the card: 12px +30% */
       align-items: start;
     }
@@ -5422,9 +5422,6 @@
       margin: 6px 0 14px;
     }
     .section .section-head h3{ font-size: 17px; }
-    /* Fact Pattern Notes used to grow upward into the empty header space; with the
-       header band there it flows downward like a normal field instead */
-    .slds-field.fpn-field .fpn-stack{ position: static; padding: 8px 0 4px; }
     /* Property Details is two stacks of 4 fields. Notes that grow downward would push
        the right stack out of line, so the pairs share grid rows instead (SLDS 2 record
        detail): a tall Fact Pattern Notes grows its whole row and every row stays level. */
@@ -5433,8 +5430,20 @@
     .slds-grid--paired > .slds-col-right{ display: contents; }
     .slds-grid--paired > .slds-col-left  > .slds-field{ margin-right: 20px; }
     .slds-grid--paired > .slds-col-right > .slds-field{ margin-left: 24px; }
-    .slds-grid--paired .slds-field.fpn-field{ min-height: 0; }
-    .slds-grid--paired .slds-field.fpn-field .fpn-stack{ padding-top: 0; }   /* label lines up with Lead Type */
+    /* Property Details header: plain heading, no grey band, a step larger than field text */
+    .section.pd-section .section-head{
+      background: transparent;
+      border-radius: 0;
+      padding: 4px 0 10px !important;
+      margin: 0;
+    }
+    .section.pd-section .section-head h3{ font-size: 19px; font-weight: 400; }
+    /* Fact Pattern Notes keeps a single-row footprint (so Lead Type and the rest of the
+       left column never move). Its label + text are anchored to the field's bottom
+       gridline and grow UPWARD into the open space beside the header, up to 3 lines,
+       then scroll inside. Empty state (Generate with AI) still fits in the one row. */
+    .slds-grid--paired .slds-field.fpn-field{ min-height: 56px; }
+    .slds-grid--paired .slds-field.fpn-field .fpn-stack{ position: absolute; left: 0; right: 0; bottom: 4px; z-index: 1; }
     /* A tall neighbor (e.g. Fact Pattern Notes) sets the row height. The shorter field
        keeps its label + value sitting right on its own gridline and the spare space
        goes above it, so the long text reads as growing upward instead of leaving a gap. */
@@ -5443,6 +5452,9 @@
       .slds-grid--paired{ grid-template-rows: none; grid-auto-flow: row; }
       .slds-grid--paired > .slds-col-left > .slds-field,
       .slds-grid--paired > .slds-col-right > .slds-field{ margin: 0; }
+      /* Single column: nothing beside the notes to grow into, so they flow downward */
+      .slds-grid--paired .slds-field.fpn-field{ min-height: 0; }
+      .slds-grid--paired .slds-field.fpn-field .fpn-stack{ position: static; }
     }
     .cs-cardHead{ background:#fff; }
     /* Very narrow screens: let Open Messenger / Refresh drop under the tabs instead of running off the edge */
@@ -5599,7 +5611,7 @@
     .cs-banner{ position:absolute; inset:0; background-image:url('https://raw.githubusercontent.com/Aliqu1233333/fffffffffffadasdx/main/Mountains.jpeg'); background-size:cover; background-position:center 40%; filter: saturate(.85) opacity(.45); }
     .cs-overlay{ position:absolute; inset:0; background: linear-gradient(to bottom, rgba(255,255,255,.18) 0%, rgba(255,255,255,.34) 62%, rgba(255,255,255,.82) 92%, #fff 100%); }
     .cs-headContent{ position:relative; z-index:1; padding:16px 16px 14px; }
-    .cs-name{ font-size:19px; font-weight:700; color:var(--cs-sf-blue); text-decoration:none; letter-spacing:-.015em; line-height:1.2; display:block; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cs-name{ font-size:20.5px; font-weight:700; color:var(--cs-sf-blue); text-decoration:none; letter-spacing:-.015em; line-height:1.2; display:block; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     a.cs-name:hover{ color:var(--cs-blue); }
     .cs-meta{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:0; }
     .cs-field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
@@ -5613,7 +5625,7 @@
     @keyframes csSweep{ to{ transform: translateX(115%); } }
     .cs-kpHead{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:var(--cs-sf-blue); background:#fff; border-bottom:1px solid #dbeafe; padding:11px 14px 10px; }
     .cs-kpList{ margin:0; padding:13px 14px 14px; list-style:none; background: linear-gradient(180deg, #eaf4ff 0%, #f2f8ff 100%); }
-    .cs-kpList li{ position:relative; font-size:14px; color:#1f2937; line-height:1.6; padding:0 0 9px 17px; animation: csPointIn .42s var(--cs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    .cs-kpList li{ position:relative; font-size:15px; color:#111827; line-height:1.6; padding:0 0 9px 17px; animation: csPointIn .42s var(--cs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
     .cs-kpList li:last-child{ padding-bottom:0; }
     .cs-kpList li::before{ content:""; position:absolute; left:2px; top:.62em; width:6.5px; height:6.5px; border-radius:50%; background: radial-gradient(circle at 32% 28%, #7cc4ff 0%, #1b96ff 48%, #0166ba 100%); }
     @keyframes csPointIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
@@ -5867,7 +5879,7 @@
               </div>
             </div>
 
-            <div class="section">
+            <div class="section pd-section">
               <div class="section-head"><div><h3>Property Details</h3></div></div>
               <div class="slds-grid slds-grid--paired">
                 <div class="slds-col-left">
