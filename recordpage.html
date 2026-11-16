@@ -5380,7 +5380,8 @@
     html, body{ background: var(--rp-page-bg) !important; }
     .app{ padding-bottom: 56px; } /* clears the fixed To Do utility bar */
     .layout.rp-two-col{
-      grid-template-columns: minmax(0, 1fr) 414px;   /* Last Conversation column: 360px + 15% */
+      grid-template-columns: minmax(0, 1fr) 455px;   /* Last Conversation column: 360px +15%, then +10% */
+      column-gap: 16px;                              /* gap between the record and the card: 12px +30% */
       align-items: start;
     }
     .layout.rp-two-col > .panel{ grid-column: 1; grid-row: 1; min-width: 0; }
