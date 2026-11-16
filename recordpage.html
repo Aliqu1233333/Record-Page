@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lightning-Style Record Page</title>
+  <title>Record Page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -5371,6 +5371,235 @@
     #rcmsgTray .rcmsg-optnote svg { width: 14px; height: 14px; flex-shrink: 0; color: #a86403; }
   </style>
 
+
+  <!-- ═══════════ COMBINED PAGE: Highlights + Path + Conversation sidebar ═══════════ -->
+  <style id="combinedLayoutStyles">
+    /* ── Page layout: main record panel + right sidebar (Salesforce Lightning) ── */
+    /* SLDS 2 page grey — dark enough that the white cards stand off it */
+    :root{ --rp-page-bg:#f3f3f3; }
+    html, body{ background: var(--rp-page-bg) !important; }
+    .app{ padding-bottom: 56px; } /* clears the fixed To Do utility bar */
+    .layout.rp-two-col{
+      grid-template-columns: minmax(0, 1fr) 360px;
+      align-items: start;
+    }
+    .layout.rp-two-col > .panel{ grid-column: 1; grid-row: 1; min-width: 0; }
+    .rp-sidebar{
+      grid-column: 2; grid-row: 1;
+      display:flex; flex-direction:column; gap:12px;
+      min-width:0;
+      position: sticky; top: 12px;
+    }
+    /* Narrower screens: conversation card stacks above the record panel */
+    @media (max-width: 1280px){
+      .layout.rp-two-col{ grid-template-columns: minmax(0, 1fr); }
+      .layout.rp-two-col > .panel{ grid-column: 1; grid-row: 2; }
+      .rp-sidebar{ grid-column: 1; grid-row: 1; position: static; }
+    }
+
+    /* ── Flat SLDS 2 cards: no drop shadows ── */
+    .layout.rp-two-col > .panel{ border:0 !important; border-radius:20px !important; box-shadow:none !important; }
+    .nas-section{ box-shadow:none !important; }
+    #rcPanel{ box-shadow:none !important; }
+
+    /* SLDS 2 section header bands ("About", "Get in Touch"): a #f3f3f3 strip
+       inside the white card echoes the page grey and breaks up the long white panel */
+    .section .section-head{
+      background: var(--rp-page-bg);
+      border-radius: 12px;
+      padding: 9px 14px !important;
+      margin: 6px 0 14px;
+    }
+    .section .section-head h3{ font-size: 17px; }
+    /* Fact Pattern Notes used to grow upward into the empty header space; with the
+       header band there it flows downward like a normal field instead */
+    .slds-field.fpn-field .fpn-stack{ position: static; padding: 8px 0 4px; }
+    .cs-cardHead{ background:#fff; }
+
+    /* ════════════ HIGHLIGHTS + PATH (was dealpath.html) ════════════ */
+    .dp{
+      --dp-active-bg:#17345b; --dp-active-fg:#fff;
+      --dp-done-bg:#a6e7db;   --dp-done-fg:#0d3a33;
+      --dp-todo-bg:#dddddd;   --dp-todo-fg:#2e2e2e;
+      --dp-track-h:37px; --dp-cut:15px; --dp-radius:16px; --dp-overlap:12px; --dp-divider:2px;
+      --dp-label:#667085; --dp-value:#111827; --dp-alert:#dc2626;
+      position:relative;
+      background: transparent;   /* sits directly on the page, like the SLDS 2 record header */
+      border: 0;
+      box-shadow: none;
+      padding: 6px 4px 4px;
+      margin-bottom: 16px;
+      font-family: var(--font);
+      color:#111;
+    }
+    .dp-top{ display:flex; align-items:center; gap:14px; min-width:0; }
+    .dp-icon{ width:48px; height:48px; border-radius:50%; overflow:hidden; display:grid; place-items:center; flex:0 0 auto; }
+    .dp-icon img{ width:43px; height:43px; display:block; object-fit:contain; }
+    .dp-icon .dp-icon-fallback{ width:48px; height:48px; border-radius:50%; background:#5867e8; display:none; place-items:center; }
+    .dp-icon.dp-noimg img{ display:none; }
+    .dp-icon.dp-noimg .dp-icon-fallback{ display:grid; }
+    .dp-titleWrap{ min-width:0; display:flex; flex-direction:column; gap:1px; }
+    .dp-eyebrow{ font-size:14px; font-weight:400; color:#2e2e2e; line-height:1.2; }
+    .dp-title{ font-size:30px; font-weight:600; color:#032d60; letter-spacing:-.01em; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+    .dp-sync{ margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; color:#64748b; white-space:nowrap; }
+    .dp-sync[hidden]{ display:none; }
+    .dp-spin{ width:12px; height:12px; border:2px solid rgba(100,116,139,.35); border-top-color:#64748b; border-radius:50%; animation: dpSpin .8s linear infinite; }
+    @keyframes dpSpin{ to{ transform: rotate(360deg); } }
+
+    .dp-metrics{ margin-top:12px; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; }
+    @media (max-width: 860px){ .dp-metrics{ grid-template-columns:1fr 1fr; } }
+    .dp-metric{ min-width:0; }
+    .dp-mLabel{ font-size:12.7px; font-weight:650; color:var(--dp-label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1; }
+    .dp-mValue{ margin-top:4px; font-size:15.7px; font-weight:650; color:var(--dp-value); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; display:flex; align-items:center; gap:6px; min-width:0; }
+    .dp-stall{ display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:6px; background:rgba(220,38,38,.10); box-shadow: inset 0 0 0 1px rgba(220,38,38,.18); max-width:100%; }
+    .dp-stall svg{ width:16px; height:16px; flex:0 0 auto; display:block; }
+    .dp-badge{ display:inline-flex; align-items:center; padding:2px 6px; border-radius:999px; font-size:11px; font-weight:600; line-height:1.2; white-space:nowrap; }
+    .dp-badge.overdue{ background:rgba(220,38,38,.12); color:var(--dp-alert); box-shadow: inset 0 0 0 1px rgba(220,38,38,.18); }
+    .dp-badge.upcoming{ background:rgba(16,185,129,.18); color:#065f46; box-shadow: inset 0 0 0 1px rgba(16,185,129,.28); }
+
+    /* Path bar */
+    .dp-bar{ position:relative; width:100%; display:flex; align-items:center; gap:10px; min-width:0; margin-top:18px; }
+    @media (max-width: 760px){ .dp-bar{ flex-wrap:wrap; } .dp-cta{ margin-left:auto; } }
+    .dp-disclosure{ width:30px; height:30px; border-radius:15px; border:1px solid rgba(0,0,0,.10); background:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:none; transition: background 160ms ease; flex:0 0 auto; padding:0; }
+    .dp-disclosure:hover{ background:#f3f3f3; }
+    .dp-disclosure svg{ transition: transform 180ms ease; }
+    .dp-disclosure[aria-expanded="true"] svg{ transform: rotate(180deg); }
+
+    .dp-path{ position:relative; z-index:1; flex:1 1 auto; display:flex; height:var(--dp-track-h); user-select:none; overflow:hidden; border-radius:var(--dp-radius); min-width:0; }
+    .dp-stage{
+      position:relative; flex:1 1 0; min-width:0; display:flex; align-items:center; justify-content:center;
+      font-family: var(--font); font-size:12.5px; font-weight:600; letter-spacing:.2px;
+      cursor:pointer; outline:none; border:0; padding:0 8px;
+      background:var(--dp-todo-bg); color:var(--dp-todo-fg);
+      clip-path: polygon(0 0, calc(100% - var(--dp-cut)) 0, 100% 50%, calc(100% - var(--dp-cut)) 100%, 0 100%, var(--dp-cut) 50%);
+      margin-left: calc(var(--dp-overlap) * -1);
+      padding-left: calc(var(--dp-cut) + 2px);
+      transition: background-color .22s ease, transform .18s ease, filter 160ms ease;
+    }
+    .dp-stage:hover{ filter: brightness(0.96); }
+    .dp-stage:active{ transform: translateY(1px); }
+    .dp-stage:focus-visible{ filter: brightness(0.93); }
+    .dp-stage:first-child{ clip-path: polygon(0 0, calc(100% - var(--dp-cut)) 0, 100% 50%, calc(100% - var(--dp-cut)) 100%, 0 100%); margin-left:0; padding-left:8px; }
+    .dp-stage:last-child{ clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--dp-cut) 50%); }
+    .dp-stage:not(:last-child)::after{ content:""; position:absolute; top:0; right:0; width:var(--dp-divider); height:100%; background:#ffffff; pointer-events:none; }
+    .dp-stage[data-state="active"]{ background:var(--dp-active-bg); color:var(--dp-active-fg); font-weight:650; animation: dpStagePop .42s cubic-bezier(0.34,1.56,0.64,1); }
+    .dp-stage[data-state="done"]{ background:var(--dp-done-bg); color:var(--dp-done-fg); animation: dpDoneIn .20s ease; }
+    @keyframes dpStagePop{ 0%{transform:scale(.96);} 45%{transform:scale(1.05);} 70%{transform:scale(.99);} 100%{transform:scale(1);} }
+    @keyframes dpDoneIn{ from{ transform:scale(.99); opacity:.92; } to{ transform:scale(1); opacity:1; } }
+    .dp-stage-pressed{ animation: dpPress .5s ease !important; }
+    @keyframes dpPress{ 0%{transform:scale(1);filter:brightness(1);} 50%{transform:scale(.96);filter:brightness(.94);} 100%{transform:scale(.97);filter:brightness(.96);} }
+
+    .dp-lbl{ display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; min-width:0; }
+    .dp-lbl .dp-txt{ overflow:hidden; text-overflow:ellipsis; min-width:0; }
+    .dp-stage[data-state="done"] .dp-txt{ display:none; }
+    .dp-chk{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
+    .dp-chk:empty{ display:none; }
+    .dp-chk svg{ width:16px; height:16px; display:block; animation: dpChkIn .18s ease; }
+    @keyframes dpChkIn{ from{ transform:scale(.7); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+    /* Stage hover tooltip — rendered once, outside the clipped path */
+    .dp-tip{ position:absolute; bottom: calc(100% + 8px); transform: translateX(-50%) translateY(6px); opacity:0; pointer-events:none; white-space:nowrap; padding:6px 8px; border-radius:6px; font-size:12px; font-weight:650; background:rgba(17,17,17,.92); color:#fff; box-shadow:0 8px 30px rgba(0,0,0,.18); transition: opacity 140ms ease, transform 140ms ease; z-index:20; }
+    .dp-tip.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+    /* Off-ramp (Nurture / Lost / Dead) */
+    .dp-path.dp-offramp .dp-stage{ filter: grayscale(.7) opacity(.6); }
+    .dp-path.dp-offramp .dp-stage.dp-has-badge{ filter: grayscale(.25) opacity(.92); }
+    .dp-offramp-badge{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:6; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; pointer-events:none; }
+    .dp-tone-warn{ background:#fef3c7; color:#92400e; box-shadow: inset 0 0 0 1px #fcd34d, 0 2px 8px rgba(0,0,0,.15); }
+    .dp-tone-alert{ background:#fee2e2; color:#991b1b; box-shadow: inset 0 0 0 1px #fca5a5, 0 2px 8px rgba(0,0,0,.15); }
+    .dp-tone-muted{ background:#e5e7eb; color:#374151; box-shadow: inset 0 0 0 1px #cbd5e1, 0 2px 8px rgba(0,0,0,.15); }
+
+    /* CTA */
+    .dp-cta{ height:30px; padding:0 14px; border-radius:16px; border:0; cursor:pointer; font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.1px; color:#fff; background:#1447c0; display:flex; align-items:center; gap:6px; white-space:nowrap; flex:0 0 auto; transition: background 160ms ease, transform 140ms ease, box-shadow 140ms ease; }
+    .dp-cta:hover{ background:#123fae; }
+    .dp-cta:active{ background:#0f389d; transform:none; box-shadow:none; }
+    .dp-cta.dp-cta-done, .dp-cta.dp-cta-done:hover{ background:#16a34a; cursor:default; opacity:.95; transform:none; box-shadow:none; }
+
+    /* Guidance */
+    .dp-guidance{ margin-top:6px; padding-left:40px; }
+    .dp-guidanceWrap{ display:grid; grid-template-rows:1fr; transition: grid-template-rows 220ms ease; }
+    .dp-guidanceWrap.collapsed{ grid-template-rows:0fr; }
+    .dp-guidanceWrap > div{ overflow:hidden; min-height:0; }
+    .dp-guidanceBody{ padding:6px 0 0; color:#333; font-size:12.5px; line-height:1.4; }
+    .dp-guidanceBody h4{ margin:0 0 6px; font-size:12.5px; font-weight:600; color:#111827; }
+    .dp-guidanceBody ul{ margin:6px 0 0 16px; padding:0; }
+    .dp-guidanceBody li{ margin:4px 0; color:#4a4a4a; font-weight:550; }
+
+    /* Closed celebration */
+    .dp-fill{ animation: dpFillPop .46s cubic-bezier(0.34,1.7,0.5,1) both !important; animation-delay: var(--fill-delay, 0ms) !important; z-index:2; }
+    @keyframes dpFillPop{ 0%{transform:translateY(0) scale(1);} 35%{transform:translateY(-9px) scale(1.12);} 62%{transform:translateY(2px) scale(.97);} 82%{transform:translateY(-1px) scale(1.02);} 100%{transform:none;} }
+    .dp-fill-last{ animation: dpFillBounce .55s cubic-bezier(0.34,1.7,0.5,1), dpClosedFlash 1s cubic-bezier(0.22,1,0.36,1) forwards !important; z-index:4; }
+    @keyframes dpFillBounce{ 0%{transform:scale(1);} 30%{transform:scale(1.18);} 55%{transform:scale(.95);} 78%{transform:scale(1.05);} 100%{transform:scale(1);} }
+    @keyframes dpClosedFlash{ 0%{background:var(--dp-active-bg);} 18%{background:#16a34a;} 55%{background:#15803d;} 100%{background:var(--dp-done-bg);} }
+    .dp-confetti{ position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; z-index:50; }
+    .dp-confetti i{ position:absolute; top:0; left:0; width:7px; height:7px; border-radius:1px; opacity:0; transform:translate(-50%,-50%); animation: dpConfetti 1.2s cubic-bezier(0.2,0.6,0.3,1) forwards; }
+    @keyframes dpConfetti{
+      0%{ opacity:0; transform: translate(-50%,-50%) rotate(0) scale(.5); }
+      10%{ opacity:1; }
+      40%{ opacity:1; transform: translate(calc(-50% + var(--dx)*0.6), calc(-50% + var(--cy1))) rotate(calc(var(--cr)*0.5)) scale(1); }
+      100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--cy2))) rotate(var(--cr)) scale(.9); }
+    }
+    .dp-glow{ position:absolute; inset:-10px -6px; border-radius:18px; pointer-events:none; z-index:0; opacity:0; background: radial-gradient(ellipse at center, rgba(34,197,94,.35), rgba(34,197,94,0) 70%); }
+    .dp-glow.go{ animation: dpGlow .9s ease-out; }
+    @keyframes dpGlow{ 0%{opacity:0; transform:scale(.96);} 30%{opacity:1; transform:scale(1.02);} 100%{opacity:0; transform:scale(1.05);} }
+
+    /* Toasts */
+    .dp-toast{ position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-8px); opacity:0; pointer-events:none; background:#bff3ea; color:#0d3a33; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,.10); padding:8px 12px; display:flex; align-items:center; gap:8px; min-width:320px; max-width:min(520px, calc(100vw - 24px)); z-index:99999; transition: opacity 200ms ease, transform 200ms ease; font-family:var(--font); }
+    .dp-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+    .dp-toast .dp-toast-msg{ font-weight:700; font-size:13px; flex:1; }
+    .dp-toast .dp-toast-x{ border:0; background:transparent; cursor:pointer; width:26px; height:26px; display:grid; place-items:center; border-radius:7px; }
+    .dp-toast .dp-toast-x:hover{ background:rgba(0,0,0,.06); }
+    .dp-win{ position:fixed; top:-60px; left:50%; transform:translateX(-50%); z-index:99999; background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0; border-radius:8px; padding:9px 14px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,.10); transition: top 360ms cubic-bezier(0.22,1,0.36,1), opacity 240ms ease; opacity:0; pointer-events:none; white-space:nowrap; font-family:var(--font); font-size:13px; font-weight:650; }
+    .dp-win.show{ top:14px; opacity:1; }
+
+    /* ════════════ LAST CONVERSATION CARD (was index.html) ════════════ */
+    .cs{
+      --cs-sf-blue:#032d60; --cs-blue:#0176d3; --cs-ease: cubic-bezier(.22,1,.36,1);
+      background:#fff; border:0; border-radius: 20px;
+      box-shadow: none;
+      overflow:hidden; font-family: var(--font); color: var(--text);
+    }
+    .cs-cardHead{ display:flex; align-items:center; gap:9px; padding:13px 16px; border-bottom:1px solid #e5e7eb; font-size:15px; font-weight:700; color:#181818; }
+    .cs-cardHead svg{ flex:0 0 auto; filter: drop-shadow(0 1px 2px rgba(1,118,211,.28)); }
+    .cs-cardHead .cs-sync{ margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; font-weight:500; color:#64748b; }
+    .cs-cardHead .cs-sync[hidden]{ display:none; }
+    .cs-header{ position:relative; overflow:hidden; }
+    .cs-banner{ position:absolute; inset:0; background-image:url('https://raw.githubusercontent.com/Aliqu1233333/fffffffffffadasdx/main/Mountains.jpeg'); background-size:cover; background-position:center 40%; filter: saturate(.85) opacity(.45); }
+    .cs-overlay{ position:absolute; inset:0; background: linear-gradient(to bottom, rgba(255,255,255,.18) 0%, rgba(255,255,255,.34) 62%, rgba(255,255,255,.82) 92%, #fff 100%); }
+    .cs-headContent{ position:relative; z-index:1; padding:16px 16px 14px; }
+    .cs-name{ font-size:19px; font-weight:700; color:var(--cs-sf-blue); text-decoration:none; letter-spacing:-.015em; line-height:1.2; display:block; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    a.cs-name:hover{ color:var(--cs-blue); }
+    .cs-meta{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:0; }
+    .cs-field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .cs-field + .cs-field{ padding-left:12px; margin-left:12px; border-left:1px solid #e5e7eb; }
+    .cs-label{ font-size:11.5px; font-weight:600; color:#6b7280; white-space:nowrap; }
+    .cs-value{ font-size:13.5px; font-weight:600; color:#1f2937; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cs-value.accent{ color:var(--cs-blue); }
+    .cs-body{ padding:4px 14px 14px; }
+    .cs-kp{ position:relative; overflow:hidden; background:#f0f7ff; border:1px solid #c6ddf7; border-radius:12px; box-shadow:none; }
+    .cs-kp.arrived::after{ content:""; position:absolute; inset:0; background: linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.62) 50%, rgba(255,255,255,0) 62%); transform:translateX(-115%); pointer-events:none; animation: csSweep 1.35s var(--cs-ease) .08s 1 forwards; }
+    @keyframes csSweep{ to{ transform: translateX(115%); } }
+    .cs-kpHead{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:var(--cs-sf-blue); background:#fff; border-bottom:1px solid #dbeafe; padding:11px 14px 10px; }
+    .cs-kpList{ margin:0; padding:13px 14px 14px; list-style:none; background: linear-gradient(180deg, #eaf4ff 0%, #f2f8ff 100%); }
+    .cs-kpList li{ position:relative; font-size:14px; color:#1f2937; line-height:1.6; padding:0 0 9px 17px; animation: csPointIn .42s var(--cs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    .cs-kpList li:last-child{ padding-bottom:0; }
+    .cs-kpList li::before{ content:""; position:absolute; left:2px; top:.62em; width:6.5px; height:6.5px; border-radius:50%; background: radial-gradient(circle at 32% 28%, #7cc4ff 0%, #1b96ff 48%, #0166ba 100%); }
+    @keyframes csPointIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+    .cs-kpList li.cs-skel{ padding:0 0 11px 0 !important; animation:none !important; }
+    .cs-kpList li.cs-skel::before{ display:none; }
+    .cs-skel span{ display:block; height:11px; border-radius:5px; background: linear-gradient(90deg, #dbeafe 25%, #eff6ff 50%, #dbeafe 75%); background-size:400% 100%; animation: csShimmer 1.4s linear infinite; }
+    @keyframes csShimmer{ 0%{ background-position:100% 0; } 100%{ background-position:-100% 0; } }
+    .cs-empty{ display:none; text-align:center; padding:10px 8px 6px; }
+    .cs-empty img{ width:100%; max-width:300px; opacity:.92; margin-bottom:10px; }
+    .cs-empty-title{ font-size:15px; font-weight:700; color:#1f2937; margin-bottom:6px; }
+    .cs-empty-body{ font-size:13px; color:#6b7280; line-height:1.5; max-width:280px; margin:0 auto; }
+    .cs-error{ display:none; margin:10px 14px 0; padding:8px 10px; border-radius:8px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; font-size:12.5px; }
+
+    @media (prefers-reduced-motion: reduce){
+      .dp *, .dp *::before, .dp *::after, .cs *, .cs *::before, .cs *::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -5389,7 +5618,100 @@
   <div id="ownershipConfetti" aria-hidden="true"></div>
 
   <div class="app">
-    <div class="layout">
+
+    <!-- ═══════════ HIGHLIGHTS + PATH (was dealpath.html) ═══════════ -->
+    <section class="dp" id="dpCard" aria-label="Highlights panel">
+      <div class="dp-top">
+        <div class="dp-icon" id="dpIcon" aria-hidden="true">
+          <img src="Untitled design (8).png" alt="" onerror="this.parentNode.classList.add('dp-noimg')" />
+          <span class="dp-icon-fallback"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M12 3 2 11.5h3V20h5.5v-5.5h3V20H19v-8.5h3z"/></svg></span>
+        </div>
+        <div class="dp-titleWrap">
+          <div class="dp-eyebrow">Property</div>
+          <div class="dp-title" id="dpTitle">—</div>
+        </div>
+        <div class="dp-sync" id="dpSync" hidden aria-live="polite"><span class="dp-spin" aria-hidden="true"></span><span id="dpSyncText">Loading…</span></div>
+      </div>
+
+      <div class="dp-bar" id="dpBar">
+        <button class="dp-disclosure" id="dpGuidanceToggle" type="button" aria-expanded="false" aria-controls="dpGuidance" title="Toggle guidance">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#17345b" d="M7.4 9.2 12 13.8l4.6-4.6 1.4 1.4L12 16.6 6 10.6z"/></svg>
+        </button>
+        <div id="dpPath" class="dp-path" role="tablist" aria-label="Deal stages"></div>
+        <button class="dp-cta" id="dpCompleteBtn" type="button" title="Move to next stage"></button>
+        <div class="dp-tip" id="dpTip" role="tooltip"></div>
+      </div>
+
+      <div class="dp-guidance" id="dpGuidance">
+        <div class="dp-guidanceWrap collapsed" id="dpGuidanceWrap">
+          <div><div class="dp-guidanceBody" id="dpGuidanceBody"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="dp-toast" id="dpToast" role="status" aria-live="polite">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#0ba79c" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 14-4-4 1.4-1.4L11 12.2l5.6-5.6L18 8l-7 8Z"/></svg>
+      <div class="dp-toast-msg" id="dpToastMsg">Status changed successfully.</div>
+      <button class="dp-toast-x" id="dpToastClose" type="button" aria-label="Dismiss">
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="#0d3a33" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"/></svg>
+      </button>
+    </div>
+    <div class="dp-win" id="dpWinToast" role="status" aria-live="assertive">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 12.5L11.5 15L15.5 10" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="#16a34a" stroke-width="1.5" opacity="0.5"/></svg>
+      🎉 Deal closed — congratulations!
+    </div>
+
+    <div class="layout rp-two-col">
+
+      <!-- ═══════════ RIGHT SIDEBAR: LAST CONVERSATION (was index.html) ═══════════ -->
+      <aside class="rp-sidebar" aria-label="Sidebar">
+        <section class="cs" id="csCard" aria-label="Last Conversation">
+          <div class="cs-cardHead">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="csSparkMain" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5CC8FF"/><stop offset="0.55" stop-color="#1B96FF"/><stop offset="1" stop-color="#0176D3"/></linearGradient>
+                <linearGradient id="csSparkSmall" x1="17" y1="2" x2="23" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9BDCFF"/><stop offset="1" stop-color="#1B96FF"/></linearGradient>
+              </defs>
+              <path d="M10.4 2.9l1.5 4.1a2.6 2.6 0 0 0 1.6 1.6l4.1 1.5-4.1 1.5a2.6 2.6 0 0 0-1.6 1.6l-1.5 4.1-1.5-4.1a2.6 2.6 0 0 0-1.6-1.6L3.3 10.1l4.1-1.5a2.6 2.6 0 0 0 1.6-1.6l1.4-4.1z" fill="url(#csSparkMain)"/>
+              <path d="M18.4 14.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z" fill="url(#csSparkSmall)"/>
+            </svg>
+            Last Conversation
+            <span class="cs-sync" id="csSync" hidden><span class="dp-spin" aria-hidden="true"></span>Loading…</span>
+          </div>
+
+          <div class="cs-header">
+            <div class="cs-banner"></div>
+            <div class="cs-overlay"></div>
+            <div class="cs-headContent">
+              <a href="#" class="cs-name" id="csContactName">Loading…</a>
+              <div class="cs-meta">
+                <div class="cs-field"><span class="cs-label">Last Contact</span><span class="cs-value accent" id="csLastContact">—</span></div>
+                <div class="cs-field"><span class="cs-label">Lead Status</span><span class="cs-value" id="csLeadStatus">—</span></div>
+                <div class="cs-field"><span class="cs-label">Owner Status</span><span class="cs-value" id="csOwnerStatus">—</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-error" id="csError">⚠ Could not load conversation data.</div>
+
+          <div class="cs-body">
+            <div class="cs-kp" id="csKeyPoints">
+              <div class="cs-kpHead">Key Conversation Points</div>
+              <ul class="cs-kpList" id="csKeyPointsList">
+                <li class="cs-skel"><span style="width:100%"></span></li>
+                <li class="cs-skel"><span style="width:93%"></span></li>
+                <li class="cs-skel"><span style="width:66%"></span></li>
+              </ul>
+            </div>
+            <div class="cs-empty" id="csEmpty">
+              <img src="https://raw.githubusercontent.com/Aliqu1233333/fffffffffffadasdx/main/empty%20state%20background.jpg" alt="" />
+              <div class="cs-empty-title">No Conversation Data Added</div>
+              <div class="cs-empty-body">Once notes are added to related contacts, the AI summary will appear here.</div>
+            </div>
+          </div>
+        </section>
+      </aside>
+
       <div class="panel">
 
         <div class="topSnapshot" aria-label="Top Snapshot">
@@ -15910,5 +16232,503 @@
   try { renderAll(); } catch(e){}
 })();
 </script>
+
+<!-- ═══════════ COMBINED PAGE SCRIPTS: shared IDs, Highlights/Path, Last Conversation ═══════════ -->
+<script id="combinedPageScripts">
+/* ── Shared: one ID resolver for every module on the page ───────────────────
+   Accepts every URL shape the three original embeds understood:
+     ?boardId=1&pulseId=2   ?board_id=1&item_id=2   ?itemId=2&boardId=1
+     ?1/pulses/2            ?1/item_id=2            ?1/2
+   plus an optional &userId=… (passed to the Deal Path GET/SET webhooks).     */
+window.rpResolveIds = function(){
+  const raw = window.location.search.replace(/^\?/, '');
+  const q = new URLSearchParams(window.location.search);
+  let itemId  = q.get('pulseId') || q.get('pulse_id') || q.get('itemId') || q.get('item_id') || null;
+  let boardId = q.get('boardId') || q.get('board_id') || '';
+  if (!itemId) { const m = raw.match(/(\d+)\/pulses\/(\d+)/); if (m) { boardId = m[1]; itemId = m[2]; } }
+  if (!itemId) { const m = raw.match(/(\d+)\/item_id=(\d+)/); if (m) { boardId = m[1]; itemId = m[2]; } }
+  if (!itemId) { const m = raw.match(/(\d+)\/(\d+)/);         if (m) { boardId = m[1]; itemId = m[2]; } }
+  return { itemId: itemId, boardId: boardId || '', userId: q.get('userId') || null };
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   HIGHLIGHTS + PATH  (ported from dealpath.html — same webhooks & payloads)
+   ════════════════════════════════════════════════════════════════════════ */
+(function(){
+  const MAKE_SET_STAGE_URL = "https://hook.us1.make.com/92gwsrg3sja4ykamx8qax9tdw6nqemq6";
+  const MAKE_GET_STAGE_URL = "https://hook.us1.make.com/mnd1t2736lba22cphjm1qxfdffe1jemy";
+  const MONDAY_STATUS_COLUMN_ID = "status__1";
+
+  /* Forward deal path (file-level, strictly progressive). Contact outcomes
+     (Dial NA, Attempt 1/2/3…) live on subitems, not here. */
+  const STAGES = [
+    { key: "new",            label: "New" },
+    { key: "discovery",      label: "Discovery" },
+    { key: "contact_made",   label: "Contact Made" },
+    { key: "qualifying",     label: "Qualifying" },
+    { key: "negotiation",    label: "Negotiation/Review" },
+    { key: "under_contract", label: "Under Contract" },
+    { key: "closed",         label: "Closed" }
+  ];
+  /* Off-ramps: terminal states shown as a badge over the last-reached stage. */
+  const OFFRAMPS = [
+    { key: "nurture", label: "Long-Term Nurture", tone: "warn" },
+    { key: "lost",    label: "Lost",              tone: "alert" },
+    { key: "dead",    label: "Dead",              tone: "muted" }
+  ];
+  /* Existing Monday Lead Status labels → stage / off-ramp keys (normalized). */
+  const STAGE_ALIASES = {
+    "untouched": "new",
+    "initial dd": "discovery", "contacted discovery": "discovery", "dial na": "discovery",
+    "contacted": "contact_made", "contacted awaiting response": "contact_made",
+    "interested in selling": "qualifying", "interested unresponsive": "qualifying",
+    "negotiation review": "negotiation", "negotiations review": "negotiation", "accepted offer": "negotiation",
+    "under contract": "under_contract",
+    "sold": "closed", "auctioned off": "closed"
+  };
+  const OFFRAMP_ALIASES = {
+    "asking above retail": "lost", "asking to much": "lost", "asking too much": "lost",
+    "selling on market": "lost", "not interested in selling": "lost",
+    "not worth pursuing": "dead"
+  };
+  const STAGE_NOTES = {
+    new: { title: "Open the file", bullets: [
+      "Confirm the property address, county, and basic ownership picture.",
+      "Pull initial data (deed, tax status, appraisal) to decide if it's worth pursuing.",
+      "Set the first research task to move into Discovery." ]},
+    discovery: { title: "Find & verify the people (all dialing lives here)", bullets: [
+      "Identify and verify heirs / decision-makers; build the contact list on subitems.",
+      "Skip-trace numbers and work the dials — Dial NA, Attempt 1/2/3 are tracked per-contact, not on the file.",
+      "Stay in Discovery until a real decision-maker actually answers." ]},
+    contact_made: { title: "You reached a decision-maker", bullets: [
+      "Confirm this person can speak to the property and the decision.",
+      "Capture relationship and ownership %, log the contact outcome on the subitem.",
+      "Set the next conversation to begin qualifying." ]},
+    qualifying: { title: "Gauge motivation & gather the facts", bullets: [
+      "Why sell, and on what timeline? What problem are they solving?",
+      "Confirm ownership structure, liens, taxes owed, and condition.",
+      "Decide whether this is worth taking to an offer." ]},
+    negotiation: { title: "Offer & terms", bullets: [
+      "Present the offer; confirm payoff amounts and all parties required to sign.",
+      "Work price/terms and align on verification + timing.",
+      "Lock the exact terms before moving to contract." ]},
+    under_contract: { title: "Get to the closing table", bullets: [
+      "Confirm signed agreement and all signers verified.",
+      "Track title/closing timeline, contingencies, and key dates.",
+      "Keep all parties moving toward funding." ]},
+    closed: { title: "Close-out checklist", bullets: [
+      "Confirm signed docs received and parties verified.",
+      "Confirm funding and final closing details.",
+      "Capture lessons learned / notes for future deals." ]}
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const pathEl = $("dpPath"), completeBtn = $("dpCompleteBtn"), toggle = $("dpGuidanceToggle");
+  const guidanceWrap = $("dpGuidanceWrap"), guidanceBody = $("dpGuidanceBody"), tipEl = $("dpTip"), barEl = $("dpBar");
+  if (!pathEl) return;
+
+  let stageAgeText = "", activeIndex = 0, activeOfframp = null, closedComplete = false, isSavingRemoteStage = false;
+
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+  function pickText(v){
+    if (v === null || v === undefined) return "";
+    if (typeof v === "string") return v;
+    if (typeof v === "number" || typeof v === "boolean") return String(v);
+    if (typeof v === "object"){
+      if (typeof v.text === "string") return v.text;
+      if (typeof v.value === "string") return v.value;
+      if (typeof v.label === "string") return v.label;
+    }
+    return "";
+  }
+  function normalizeText(v){ const s = pickText(v).trim(); return s ? s : "—"; }
+  function normKey(s){ return String(s || "").trim().toLowerCase().replace(/[\/\-\.]/g, " ").replace(/\s+/g, " ").trim(); }
+
+  /* Toasts */
+  let toastTimer = null, winTimer = null;
+  function showToast(msg){
+    $("dpToastMsg").textContent = msg || "Status changed successfully.";
+    $("dpToast").classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $("dpToast").classList.remove("show"), 2500);
+  }
+  $("dpToastClose").addEventListener("click", () => $("dpToast").classList.remove("show"));
+  function showWinToast(){
+    const t = $("dpWinToast"); t.classList.add("show");
+    clearTimeout(winTimer); winTimer = setTimeout(() => t.classList.remove("show"), 3200);
+  }
+
+  /* Tooltip (one element, outside the clipped chevron track) */
+  function showTip(btn, text){
+    tipEl.textContent = text;
+    const b = btn.getBoundingClientRect(), host = barEl.getBoundingClientRect();
+    tipEl.style.left = (b.left - host.left + b.width / 2) + "px";
+    tipEl.classList.add("show");
+  }
+  function hideTip(){ tipEl.classList.remove("show"); }
+
+  function renderGuidance(){
+    const stage = STAGES[activeIndex];
+    const note = STAGE_NOTES[stage.key] || { title: "Notes", bullets: [] };
+    const bullets = (note.bullets || []).map(b => `<li>${esc(b)}</li>`).join("");
+    guidanceBody.innerHTML = `<h4>${esc(note.title || "Notes")}</h4>` +
+      (bullets ? `<ul>${bullets}</ul>` : `<div style="color:#6a6a6a;font-weight:550;">No notes set for this stage.</div>`);
+  }
+
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0d3a33" d="M9 16.2 4.8 12 3.4 13.4 9 19l12-12-1.4-1.4z"/></svg>';
+
+  function render(){
+    pathEl.innerHTML = "";
+    const ageMatch = (stageAgeText || "").match(/(\d+)/);
+    const ageText = ageMatch ? (parseInt(ageMatch[1], 10) === 1 ? "1 day" : `${parseInt(ageMatch[1], 10)} days`) : "";
+
+    STAGES.forEach((s, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "dp-stage";
+      btn.setAttribute("role", "tab");
+      btn.setAttribute("aria-selected", String(i === activeIndex));
+      btn.setAttribute("aria-label", s.label);
+      btn.dataset.stage = s.key;
+      const isLast = i === STAGES.length - 1;
+      const state = (i < activeIndex) ? "done" : (i === activeIndex ? (closedComplete && isLast ? "done" : "active") : "todo");
+      btn.dataset.state = state;
+      btn.innerHTML = `<span class="dp-lbl"><span class="dp-chk">${state === "done" ? CHECK_SVG : ""}</span><span class="dp-txt">${esc(s.label)}</span></span>`;
+      const tip = state === "done" ? `Completed: ${s.label}` : (state === "active" ? (ageText ? `${ageText} in ${s.label}` : `Current: ${s.label}`) : `Upcoming: ${s.label}`);
+      btn.addEventListener("mouseenter", () => showTip(btn, tip));
+      btn.addEventListener("mouseleave", hideTip);
+      btn.addEventListener("focus", () => showTip(btn, tip));
+      btn.addEventListener("blur", hideTip);
+      btn.addEventListener("click", () => {
+        if (i === activeIndex) return;
+        hideTip();
+        btn.classList.remove("dp-stage-pressed"); void btn.offsetWidth; btn.classList.add("dp-stage-pressed");
+        setTimeout(() => setActive(i, { announce: true, saveRemote: true }), 500);
+      });
+      pathEl.appendChild(btn);
+    });
+
+    pathEl.classList.remove("dp-offramp");
+    if (activeOfframp){
+      pathEl.classList.add("dp-offramp");
+      const stages = pathEl.querySelectorAll(".dp-stage");
+      const anchor = stages[Math.min(activeIndex, stages.length - 1)];
+      if (anchor){
+        anchor.classList.add("dp-has-badge");
+        const badge = document.createElement("span");
+        badge.className = "dp-offramp-badge dp-tone-" + activeOfframp.tone;
+        badge.textContent = activeOfframp.label;
+        anchor.appendChild(badge);
+      }
+    }
+    renderGuidance();
+  }
+
+  function updateCompleteBtn(){
+    const onClosed = (activeIndex === STAGES.length - 1) && closedComplete;
+    completeBtn.disabled = onClosed;
+    completeBtn.classList.toggle("dp-cta-done", onClosed);
+    completeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="white" d="M9 16.2 4.8 12 3.4 13.4 9 19l12-12-1.4-1.4z"/></svg>' +
+      (onClosed ? "Deal Closed" : "Mark Stage as Complete");
+  }
+
+  function setActive(i, opts){
+    opts = opts || {};
+    const prev = activeIndex;
+    if (i === prev && !activeOfframp) return;
+    activeIndex = i;
+    activeOfframp = null;
+    const isClosing = i === STAGES.length - 1;
+    closedComplete = isClosing;
+    render();
+    updateCompleteBtn();
+    if (isClosing && opts.announce) setTimeout(fireClosedCelebration, 140);
+    else if (opts.announce) setTimeout(() => showToast(`Status changed successfully. (${STAGES[activeIndex].label})`), 120);
+    if (opts.saveRemote) saveStageToMonday(prev).catch(() => {});
+  }
+
+  function offrampFallbackIndex(off){ return (off && off.key === "dead") ? 1 : Math.max(activeIndex, 1); }
+
+  function stageIndexFromResponse(data){
+    activeOfframp = null;
+    if (data && data.stageKey){
+      const idx = STAGES.findIndex(s => s.key === data.stageKey);
+      if (idx >= 0) return idx;
+      const off = OFFRAMPS.find(o => o.key === data.stageKey);
+      if (off){ activeOfframp = off; return offrampFallbackIndex(off); }
+    }
+    if (data && data.leadStatus){
+      const idx = STAGES.findIndex(s => s.key === data.leadStatus);
+      if (idx >= 0) return idx;
+    }
+    const rawLabel = data ? (data.stageLabel != null ? data.stageLabel : data.leadStatusLabel) : null;
+    if (rawLabel){
+      const target = normKey(rawLabel);
+      for (let i = 0; i < STAGES.length; i++) if (normKey(STAGES[i].label) === target) return i;
+      for (const o of OFFRAMPS) if (normKey(o.label) === target){ activeOfframp = o; return offrampFallbackIndex(o); }
+      if (STAGE_ALIASES[target]){ const idx = STAGES.findIndex(s => s.key === STAGE_ALIASES[target]); if (idx >= 0) return idx; }
+      if (OFFRAMP_ALIASES[target]){ const off = OFFRAMPS.find(o => o.key === OFFRAMP_ALIASES[target]); if (off){ activeOfframp = off; return offrampFallbackIndex(off); } }
+    }
+    return -1;
+  }
+
+  /* Dates */
+  function ordinalSuffix(n){ const v = n % 100; if (v >= 11 && v <= 13) return "th"; return ({1:"st",2:"nd",3:"rd"})[n % 10] || "th"; }
+  function formatDateNice(d){ const m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]; return `${m} ${d.getDate()}${ordinalSuffix(d.getDate())}`; }
+  function parseIsoDateOnly(text){
+    const raw = pickText(text).trim(); if (!raw) return null;
+    const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return null;
+    const d = new Date(+m[1], +m[2] - 1, +m[3]); // local date — avoids the UTC off-by-one
+    return isNaN(d.getTime()) ? null : { iso: `${m[1]}-${m[2]}-${m[3]}`, date: d };
+  }
+  function parseLooseDate(text){
+    if (!text) return null;
+    const cleaned = String(text).trim().replace(/\b(\d{1,2})(st|nd|rd|th)\b/gi, "$1");
+    const withYear = /\b(19|20)\d{2}\b/.test(cleaned) ? cleaned : (cleaned + " " + new Date().getFullYear());
+    const d = new Date(withYear); return isNaN(d.getTime()) ? null : d;
+  }
+  function computeStageAgeText(v){
+    const p = parseIsoDateOnly(v); if (!p) return "";
+    const now = new Date();
+    const diff = Math.max(0, Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(p.date.getFullYear(), p.date.getMonth(), p.date.getDate())) / 86400000));
+    return diff === 1 ? "1 Day" : `${diff} Days`;
+  }
+
+  function applyFieldsFromData(data){
+    if (!data) return;
+    const idx = stageIndexFromResponse(data);
+    // stage age feeds the path tooltip ("14 days in Qualifying")
+    stageAgeText = pickText(data.stageAge).trim() || computeStageAgeText(data.lastStatusChangeDate || data.last_status_change_date || "");
+    if (idx >= 0){ activeIndex = idx; closedComplete = (idx === STAGES.length - 1); render(); updateCompleteBtn(); }
+    $("dpTitle").textContent = normalizeText(pickText(data.address) || pickText(data.title) || "");
+  }
+
+  /* Local cache: paint instantly, then refresh from Make */
+  function cacheKey(itemId, boardId){ return "dealpath_cache::" + (boardId ? String(boardId) : "") + "::" + String(itemId); }
+  function readCache(itemId, boardId){
+    try{ const o = JSON.parse(localStorage.getItem(cacheKey(itemId, boardId)) || "null"); return (o && o.data && typeof o.data === "object") ? o : null; }catch(e){ return null; }
+  }
+  function writeCache(itemId, boardId, data){
+    try{
+      localStorage.setItem(cacheKey(itemId, boardId), JSON.stringify({ cachedAt: new Date().toISOString(), data: {
+        address: pickText(data && data.address) || pickText(data && data.title) || "",
+        title: pickText(data && data.title) || "",
+        stageKey: data && data.stageKey, stageLabel: data && data.stageLabel, leadStatusLabel: data && data.leadStatusLabel,
+        stageAge: pickText(data && data.stageAge) || "",
+        stalledReason: pickText(data && data.stalledReason) || "",
+        followUpDate: pickText(data && data.followUpDate) || "",
+        nextActionStep: pickText(data && data.nextActionStep) || "",
+        lastStatusChangeDate: pickText(data && data.lastStatusChangeDate) || pickText(data && data.last_status_change_date) || ""
+      }}));
+    }catch(e){}
+  }
+
+  function showSync(on, text){ $("dpSync").hidden = !on; if (text) $("dpSyncText").textContent = text; }
+
+  /* GET — same query params as before: itemId, boardId, userId */
+  async function loadStageFromMonday(){
+    const ids = window.rpResolveIds();
+    if (!ids.itemId) return;
+    const cached = readCache(ids.itemId, ids.boardId);
+    if (cached) applyFieldsFromData(cached.data);
+    showSync(true, cached ? "Syncing…" : "Loading…");
+    try{
+      const url = new URL(MAKE_GET_STAGE_URL);
+      url.searchParams.set("itemId", String(ids.itemId));
+      if (ids.boardId) url.searchParams.set("boardId", String(ids.boardId));
+      if (ids.userId)  url.searchParams.set("userId", String(ids.userId));
+      const res = await fetch(url.toString(), { method: "GET", headers: { "Accept": "application/json" }, cache: "no-store" });
+      if (!res.ok) throw new Error("GET fields failed: " + res.status);
+      const data = await res.json();
+      applyFieldsFromData(data);
+      writeCache(ids.itemId, ids.boardId, data);
+    }catch(e){
+      console.warn("[Deal Path] Could not load remote fields:", e);
+    }finally{
+      setTimeout(() => showSync(false), 250);
+    }
+  }
+
+  /* POST — identical payload to the original dealpath.html */
+  async function saveStageToMonday(prevIndex){
+    const ids = window.rpResolveIds();
+    if (!ids.itemId) return;
+    if (isSavingRemoteStage) return;
+    const payload = {
+      itemId: String(ids.itemId),
+      columnId: MONDAY_STATUS_COLUMN_ID,
+      stageKey: STAGES[activeIndex].key,
+      stageLabel: STAGES[activeIndex].label,
+      previousStageKey: (STAGES[prevIndex] && STAGES[prevIndex].key) || null,
+      previousStageLabel: (STAGES[prevIndex] && STAGES[prevIndex].label) || null,
+      occurredAt: new Date().toISOString(),
+      boardId: ids.boardId || null,
+      userId: ids.userId
+    };
+    isSavingRemoteStage = true;
+    try{
+      const res = await fetch(MAKE_SET_STAGE_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      // keep the cached copy in step so a reload doesn't flash the old stage
+      const c = readCache(ids.itemId, ids.boardId);
+      if (c){ c.data.stageKey = payload.stageKey; c.data.stageLabel = payload.stageLabel; writeCache(ids.itemId, ids.boardId, c.data); }
+    }catch(e){
+      console.warn("[Deal Path] Save to Monday failed:", e);
+      showToast("Could not save stage. Please retry.");
+    }finally{
+      isSavingRemoteStage = false;
+    }
+  }
+
+  /* Closed celebration */
+  function spawnConfetti(opts){
+    opts = opts || {};
+    const r = barEl.getBoundingClientRect();
+    const originX = opts.originX != null ? opts.originX : r.width * 0.5;
+    const originY = r.height * 0.5;
+    const spreadX = opts.spreadX != null ? opts.spreadX : r.width * 0.5;
+    const burst = document.createElement("span");
+    burst.className = "dp-confetti";
+    const colors = ["#1447c0","#16a34a","#f59e0b","#ec4899","#06b6d4","#ffffff","#22c55e","#a855f7"];
+    const pieces = opts.pieces || 46;
+    for (let k = 0; k < pieces; k++){
+      const i = document.createElement("i");
+      i.style.left = (originX + (Math.random()*2 - 1) * spreadX).toFixed(1) + "px";
+      i.style.top  = (originY + (Math.random()*2 - 1) * 8).toFixed(1) + "px";
+      i.style.setProperty("--dx",  ((Math.random()*2 - 1) * 120).toFixed(1) + "px");
+      i.style.setProperty("--cy1", (-(40 + Math.random()*70)).toFixed(1) + "px");
+      i.style.setProperty("--cy2", (60 + Math.random()*90).toFixed(1) + "px");
+      i.style.setProperty("--cr",  (Math.random()*900 - 450).toFixed(0) + "deg");
+      i.style.background = colors[k % colors.length];
+      if (k % 3 === 0){ i.style.width = "5px"; i.style.height = "10px"; }
+      i.style.animationDelay = (Math.random()*120) + "ms";
+      i.style.animationDuration = (1100 + Math.random()*500) + "ms";
+      burst.appendChild(i);
+    }
+    barEl.appendChild(burst);
+    setTimeout(() => burst.remove(), 1900);
+  }
+  function fireClosedCelebration(){
+    const stages = pathEl.querySelectorAll(".dp-stage");
+    const last = stages[stages.length - 1];
+    const step = 95;
+    stages.forEach((st, idx) => { st.classList.remove("dp-fill"); void st.offsetWidth; st.style.setProperty("--fill-delay", (idx * step) + "ms"); st.classList.add("dp-fill"); });
+    const finalDelay = (stages.length - 1) * step + 300;
+    setTimeout(() => {
+      if (last){ last.classList.remove("dp-fill", "dp-fill-last"); void last.offsetWidth; last.classList.add("dp-fill-last"); }
+      spawnConfetti({ pieces: 54 });
+      if (last){
+        const lr = last.getBoundingClientRect(), br = barEl.getBoundingClientRect();
+        setTimeout(() => spawnConfetti({ pieces: 30, originX: lr.left + lr.width/2 - br.left, spreadX: 40 }), 180);
+      }
+      let fx = barEl.querySelector(".dp-glow");
+      if (!fx){ fx = document.createElement("div"); fx.className = "dp-glow"; barEl.appendChild(fx); }
+      fx.classList.remove("go"); void fx.offsetWidth; fx.classList.add("go");
+      showWinToast();
+    }, finalDelay);
+  }
+
+  toggle.addEventListener("click", () => {
+    const next = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", String(next));
+    guidanceWrap.classList.toggle("collapsed", !next);
+  });
+  completeBtn.addEventListener("click", () => {
+    if (completeBtn.disabled) return;
+    if (activeIndex < STAGES.length - 1) setTimeout(() => setActive(activeIndex + 1, { announce: true, saveRemote: true }), 80);
+  });
+
+  render();
+  updateCompleteBtn();
+  loadStageFromMonday();
+  window.rpDealPathReload = loadStageFromMonday;
+})();
+
+/* ════════════════════════════════════════════════════════════════════════
+   LAST CONVERSATION  (ported from index.html — same webhook & payload)
+   ════════════════════════════════════════════════════════════════════════ */
+(function(){
+  const LOAD_WEBHOOK_URL  = "https://hook.us1.make.com/3spufybkajebciu4vjz51fcuwlncm0e8";
+
+  const $ = (id) => document.getElementById(id);
+  if (!$("csCard")) return;
+
+  function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+  function toTitleCase(s){ if (!s || s === "—") return s; return String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
+  function relativeTime(v){
+    if (!v) return "";
+    const d = new Date(v); if (isNaN(d)) return "";
+    const diff = Math.floor((Date.now() - d) / 86400000);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    if (diff < 7)  return `${diff} Days Ago`;
+    if (diff < 30) return `${Math.floor(diff/7)}w Ago`;
+    return `${Math.floor(diff/30)}mo Ago`;
+  }
+  function fmtDate(v){ if (!v) return "—"; const d = new Date(v); return isNaN(d) ? v : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); }
+
+  function renderAll(src){
+    const nameEl = $("csContactName");
+    nameEl.textContent = toTitleCase(src.contact_name || "") || "—";
+    const href = src.contact_url || src.item_url || "";
+    if (href){ nameEl.href = href; nameEl.target = "_blank"; nameEl.rel = "noopener"; }
+    else { nameEl.removeAttribute("href"); nameEl.removeAttribute("target"); }
+
+    $("csLastContact").textContent = relativeTime(src.conv_date) || fmtDate(src.conv_date);
+    $("csLeadStatus").textContent  = toTitleCase(src.lead_status  || "—");
+    $("csOwnerStatus").textContent = toTitleCase(src.owner_status || "—");
+
+    const raw = src.key_points || "";
+    const kp = Array.isArray(raw) ? raw : String(raw).split("|").map(s => s.trim()).filter(Boolean);
+    const section = $("csKeyPoints");
+    if (kp.length){
+      section.style.display = "";
+      $("csEmpty").style.display = "none";
+      $("csKeyPointsList").innerHTML = kp.map((p, i) => `<li style="--i:${i}">${esc(p)}</li>`).join("");
+      section.classList.remove("arrived"); void section.offsetWidth; section.classList.add("arrived");
+    } else {
+      section.style.display = "none";
+      $("csEmpty").style.display = "block";
+    }
+  }
+
+  /* POST { item_id, board_id } — identical to the original index.html */
+  async function loadDealData(){
+    const ids = window.rpResolveIds();
+    const item_id = ids.itemId, board_id = ids.boardId;
+    $("csError").style.display = "none";
+    if (!item_id){ renderAll({}); return; }
+    $("csSync").hidden = false;
+    try{
+      const res = await fetch(LOAD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item_id, board_id }) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      let src = {};
+      try { src = JSON.parse(text); } catch(parseErr){ console.warn("[Last Conversation] Make returned non-JSON:", text.slice(0, 200)); }
+      renderAll(src || {});
+    }catch(err){
+      console.warn("[Last Conversation] Load failed:", err);
+      $("csError").style.display = "block";
+      renderAll({});
+    }finally{
+      $("csSync").hidden = true;
+    }
+  }
+
+  loadDealData();
+  window.rpConversationReload = loadDealData;
+})();
+
+/* Header "Refresh" now refreshes all three modules (record page keeps its own handler). */
+(function(){
+  const btn = document.getElementById("btnRefresh");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    if (window.rpDealPathReload) window.rpDealPathReload();
+    if (window.rpConversationReload) window.rpConversationReload();
+  });
+})();
+</script>
+
 </body>
 </html>
