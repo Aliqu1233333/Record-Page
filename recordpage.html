@@ -5435,6 +5435,10 @@
     .slds-grid--paired > .slds-col-right > .slds-field{ margin-left: 24px; }
     .slds-grid--paired .slds-field.fpn-field{ min-height: 0; }
     .slds-grid--paired .slds-field.fpn-field .fpn-stack{ padding-top: 0; }   /* label lines up with Lead Type */
+    /* A tall neighbor (e.g. Fact Pattern Notes) sets the row height. The shorter field
+       keeps its label + value sitting right on its own gridline and the spare space
+       goes above it, so the long text reads as growing upward instead of leaving a gap. */
+    .slds-grid--paired .slds-field{ justify-content: flex-end; }
     @media (max-width: 820px){
       .slds-grid--paired{ grid-template-rows: none; grid-auto-flow: row; }
       .slds-grid--paired > .slds-col-left > .slds-field,
@@ -15816,6 +15820,9 @@
        Only additions: the SLDS utility "edit" icon, a View All link, inline-edit inputs. */
     .ptc-heir .ptc-heir-body{ padding:0; }
     .ptc-heir .rc-field.hp-field{ padding:6px 16px 10px 16px; border-top:0; min-width:0; }
+    /* Same rule for every paired rc-row (Path to Close, Lead Details): when one field wraps
+       to several lines, its neighbor's label + value stay on the gridline, spare space above. */
+    .rc-row > .rc-field > .rc-field-inner{ justify-content: flex-end; }
     .ptc-f .hp-value{ display:flex; align-items:flex-start; gap:var(--slds-g-spacing-2, 8px); }
     .ptc-f .hp-text{ flex:1 1 auto; min-width:0; white-space:pre-line; }
     .ptc-f .hp-text:empty{ min-height:20px; }
