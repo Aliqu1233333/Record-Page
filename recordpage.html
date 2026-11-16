@@ -5388,16 +5388,23 @@
       grid-column: 2; grid-row: 1;
       display:flex; flex-direction:column; gap:12px;
       min-width:0;
-      align-self: stretch;            /* full length: as tall as the record panel beside it */
+      /* SLDS 2 (Cosmos) activity panel: the WHOLE card is sticky and sized to the
+         window, not the page, so all four rounded corners stay in view while the
+         record scrolls. 80px = 12px top gap + 56px To Do bar + 12px bottom gap. */
+      align-self: start;
+      position: sticky; top: 12px;
+      height: calc(100vh - 80px);
     }
-    .rp-sidebar > .cs{ flex: 1 1 auto; overflow: clip; }   /* clip (not hidden) keeps the rounded corners and still lets the content stick */
-    .cs-stick{ position: sticky; top: 12px; }               /* the summary stays in view while you scroll the record */
+    .rp-sidebar > .cs{ flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .cs-stick{ flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+    .cs-stick > .cs-cardHead, .cs-stick > .cs-header{ flex: 0 0 auto; }
+    .cs-stick > .cs-body{ flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }  /* long summaries scroll inside the card */
     /* Narrower screens: conversation card stacks above the record panel */
     @media (max-width: 1280px){
       .layout.rp-two-col{ grid-template-columns: minmax(0, 1fr); }
       .layout.rp-two-col > .panel{ grid-column: 1; grid-row: 2; }
-      .rp-sidebar{ grid-column: 1; grid-row: 1; position: static; align-self: start; }
-      .cs-stick{ position: static; }
+      .rp-sidebar{ grid-column: 1; grid-row: 1; position: static; align-self: start; height: auto; }
+      .cs-stick > .cs-body{ overflow: visible; }
     }
 
     /* ── Flat SLDS 2 cards: no drop shadows ── */
