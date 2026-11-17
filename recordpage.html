@@ -15872,6 +15872,18 @@
     .ptc-sel{ appearance:auto; }
     .ptc-f .hp-in:focus, .ptc-f .hp-ta:focus, .ptc-sel:focus{ outline:none; border-color:var(--slds-g-color-accent-2, #0176d3); box-shadow:0 0 0 1px var(--slds-g-color-accent-2, #0176d3); }
     .ptc-f .hp-ta{ resize:vertical; min-height:64px; }
+
+    /* Deal signal: arrow beside the label (teal 60 helps, pink 40 hurts) + overall summary in the header */
+    .ptc-lbl{ display:flex; align-items:center; gap:4px; }
+    .ptc-sig{ width:13px; height:13px; flex:0 0 13px; display:block; }
+    .ptc-sig svg{ width:13px; height:13px; display:block; }
+    .ptc-sig.is-positive{ color:var(--slds-g-color-palette-teal-60, #06a59a); }
+    .ptc-sig.is-negative{ color:var(--slds-g-color-on-error-1, #b60554); }
+    .ptc-toggle .rc-section-header-title{ flex:0 1 auto; }
+    .ptc-ov{ display:inline-flex; align-items:center; gap:4px; margin-left:4px; font-size:var(--slds-g-font-scale-neg-1, 12px); font-weight:400;
+      line-height:16px; color:var(--slds-g-color-on-surface-1, #5c5c5c); white-space:nowrap; }
+    .ptc-ov .ptc-sig, .ptc-ov .ptc-sig svg{ width:12px; height:12px; flex-basis:12px; }
+    .ptc-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
   </style>
 
 <script id="heirPlanScript">
@@ -15999,6 +16011,28 @@
   const othersOpen = {};
   const EDIT_ICON = '<svg viewBox="0 0 520 520" aria-hidden="true" fill="currentColor"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>';
 
+  const ARROW_UP = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11.5V2.5M3 6.5l4-4 4 4"/></svg>';
+  const ARROW_DN = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 2.5v9M3 7.5l4 4 4-4"/></svg>';
+  // Arrow after the label: up (teal) helps the deal, down (pink) hurts it. Neutral/unknown show nothing.
+  function sigMark(s){
+    if (s === 'positive') return '<span class="ptc-sig is-positive" title="Helps the deal" aria-hidden="true">' + ARROW_UP + '</span><span class="ptc-sr">, helps the deal</span>';
+    if (s === 'negative') return '<span class="ptc-sig is-negative" title="Hurts the deal" aria-hidden="true">' + ARROW_DN + '</span><span class="ptc-sr">, hurts the deal</span>';
+    return '';
+  }
+  // Header summary: more helps than hurts = Overall positive, the reverse = Overall negative, tie = Mixed.
+  function overallSummary(h){
+    if (!h.open || !h.brief) return '';
+    let pos = 0, neg = 0;
+    FIELDS.forEach(([k]) => { const s = sigOf(h.brief, k); if (s === 'positive') pos++; if (s === 'negative') neg++; });
+    if (!pos && !neg) return '';
+    const lean = pos > neg ? 'positive' : neg > pos ? 'negative' : 'mixed';
+    const word = { positive: 'Overall positive', negative: 'Overall negative', mixed: 'Mixed' }[lean];
+    const detail = pos + ' helping, ' + neg + ' hurting';
+    const glyph = lean === 'positive' ? '<span class="ptc-sig is-positive" aria-hidden="true">' + ARROW_UP + '</span>'
+                : lean === 'negative' ? '<span class="ptc-sig is-negative" aria-hidden="true">' + ARROW_DN + '</span>' : '';
+    return '<span class="ptc-ov is-' + lean + '" title="' + detail + '">' + glyph + '<span>' + word + '</span><span class="ptc-sr"> (' + detail + ')</span></span>';
+  }
+
   function valueText(h, key){
     const v = ind(h.brief, key);
     if (!v) return '';
@@ -16010,7 +16044,7 @@
   }
   function fieldCell(h, key){
     return '<div class="rc-field hp-field ptc-f" data-hp-pid="' + esc(h.pid) + '" data-hp-key="' + key + '"><div class="rc-field-inner">'
-      + '<span class="rc-label">' + LABEL[key] + '</span>'
+      + '<span class="rc-label ptc-lbl">' + LABEL[key] + sigMark(sigOf(h.brief, key)) + '</span>'
       + '<div class="hp-value"><div class="hp-text rc-value"><span class="ptc-vt">' + esc(valueText(h, key)) + '</span></div>'
       + '<button type="button" class="hp-pencil ptc-edit" title="Edit ' + LABEL[key] + '" aria-label="Edit ' + LABEL[key] + ' for ' + esc(h.name) + '">' + EDIT_ICON + '</button></div>'
       + '</div></div>';
@@ -16052,7 +16086,7 @@
       + '<button type="button" class="ptc-toggle" aria-expanded="' + h.open + '" aria-controls="ptc-body-' + esc(h.pid) + '" '
       + 'onclick="var b=this.closest(\'.rc-section-block\');b.classList.toggle(\'collapsed\');this.setAttribute(\'aria-expanded\',!b.classList.contains(\'collapsed\'))">'
       + '<svg class="rc-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>'
-      + '<span class="rc-section-header-title">Path to Close</span></button>'
+      + '<span class="rc-section-header-title">Path to Close</span><span class="ptc-ov-slot">' + overallSummary(h) + '</span></button>'
       + '<span class="ptc-links">' + headerLinks(h) + '</span></div>'
       + '<div class="rc-section-body" id="ptc-body-' + esc(h.pid) + '"><div class="ptc-heir-body">' + heirSectionInner(h) + '</div></div></div>';
   }
@@ -16066,6 +16100,8 @@
       if (body) body.innerHTML = heirSectionInner(h);
       const links = sec.querySelector('.ptc-links');
       if (links) links.innerHTML = headerLinks(h);
+      const ov = sec.querySelector('.ptc-ov-slot');
+      if (ov) ov.innerHTML = overallSummary(h);
     });
   }
   function injectHeirSection(c, innerId){
