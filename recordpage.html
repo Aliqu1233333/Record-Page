@@ -16333,7 +16333,9 @@
     const RP = window.RecordPage;
     if (!RP || typeof RP.applyData !== 'function' || RP.__hpHooked) return false;
     const orig = RP.applyData;
-    RP.applyData = function(){ const out = orig.apply(this, arguments); try { renderAll(); } catch(e){ console.error('Path to Close render failed:', e); } return out; };
+    RP.applyData = function(){ const out = orig.apply(this, arguments); try { renderAll(); } catch(e){ console.error('Path to Close render failed:', e); }
+      try { if (window.rpRenderForecast) window.rpRenderForecast(arguments[0]); } catch(e){ console.error('Forecast render failed:', e); }   // forecast_category from the record load
+      return out; };
     RP.__hpHooked = true; return true;
   }
   if (!hook()) document.addEventListener('DOMContentLoaded', hook);
@@ -16614,9 +16616,19 @@ window.rpResolveIds = function(){
 
   /* Forecast: Omitted / Pipeline / Best Case / Commit, read-only, from the monday Forecast column */
   const FC_TIP = { "omitted":"Not counted in the forecast", "pipeline":"Possible, still early", "best case":"Likely if things go right", "commit":"Expected to close" };
+  // monday Forecast column (dropdown_mm956bxc), sent by Make as "forecast_category".
+  // Accepts plain text ("Commit"), monday's column object ({ text: "Commit" }) or a list (["Commit"]).
+  function fcText(v){
+    if (Array.isArray(v)) return v.map(fcText).filter(Boolean)[0] || "";
+    if (v && typeof v === "object" && Array.isArray(v.labels)) return fcText(v.labels);
+    return pickText(v);
+  }
+  function forecastOf(data){
+    return fcText(data.forecast_category) || fcText(data.Forecast_Category) || fcText(data.forecast) || fcText(data.Forecast) || fcText(data.forecastCategory) || "";
+  }
   function renderForecast(data){
-    const el = $("dpForecast"); if (!el) return;
-    const raw = normalizeText(pickText(data.forecast) || pickText(data.Forecast) || pickText(data.forecastCategory) || "").trim();
+    const el = $("dpForecast"); if (!el || !data) return;
+    const raw = normalizeText(forecastOf(data)).trim();
     const key = raw.toLowerCase().replace(/\s+/g, " ");
     if (!FC_TIP[key]){ el.hidden = true; return; }        // nothing set (or an unknown value): show nothing
     el.hidden = false;
@@ -16625,6 +16637,12 @@ window.rpResolveIds = function(){
     el.title = raw + ": " + FC_TIP[key];
     $("dpForecastText").textContent = raw;
   }
+
+  // The record-load scenario can send forecast_category too; it calls this (see below).
+  window.rpRenderForecast = function(data){
+    if (!data || !["forecast_category","Forecast_Category","forecast","Forecast","forecastCategory"].some(k => k in data)) return;
+    renderForecast(data);
+  };
 
   /* Local cache: paint instantly, then refresh from Make */
   function cacheKey(itemId, boardId){ return "dealpath_cache::" + (boardId ? String(boardId) : "") + "::" + String(itemId); }
@@ -16638,7 +16656,7 @@ window.rpResolveIds = function(){
         title: pickText(data && data.title) || "",
         stageKey: data && data.stageKey, stageLabel: data && data.stageLabel, leadStatusLabel: data && data.leadStatusLabel,
         stageAge: pickText(data && data.stageAge) || "",
-        forecast: pickText(data && (data.forecast || data.Forecast || data.forecastCategory)) || "",
+        forecast_category: (data && forecastOf(data)) || "",
         stalledReason: pickText(data && data.stalledReason) || "",
         followUpDate: pickText(data && data.followUpDate) || "",
         nextActionStep: pickText(data && data.nextActionStep) || "",
