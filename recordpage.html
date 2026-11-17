@@ -228,6 +228,7 @@
     .svalue.link{ color: #60a5fa; cursor: pointer; }
     .svalue.link:hover{ text-decoration: underline; }
     .svalue.ok{ color: #4ade80; font-weight: 600; }
+    .svalue .ds-of{ font-size: 13px; font-weight: 500; color: rgba(255,255,255,.62); margin-left: 3px; }
 
     /* =====================================================
        CRM FIELD LAYOUT
@@ -1738,6 +1739,33 @@
       align-items: center;
       gap: 8px;
     }
+    /* SLDS button group, same as Open Messenger | Refresh: white pill, blue text, dividers.
+       (No overflow:hidden, so the Write Update pop-over can still open below.) */
+    .rc-det-header-actions{ gap:0; height:32px; align-items:stretch; border:1px solid var(--slds-g-color-neutral-base-70, #aeaeae); border-radius:999px;
+      background:#fff; box-shadow:0 1px 2px rgba(24,24,24,.05); }
+    .rc-det-header-actions > * + *{ border-left:1px solid var(--slds-g-color-neutral-base-70, #aeaeae); }
+    .rc-det-header-actions .rc-update-wrap{ display:flex; }
+    .rc-det-header-actions .rc-det-action-mail,
+    .rc-det-header-actions .rc-det-action-ghost,
+    .rc-det-header-actions .rc-det-action-primary{
+      display:inline-flex !important; align-items:center; gap:7px; height:100% !important; padding:0 16px !important; margin:0 !important;
+      border:0 !important; border-radius:0 !important; background:transparent !important; background-image:none !important; box-shadow:none !important;
+      color:#0176d3 !important; font-family:"Inter", var(--font) !important; font-size:13px !important; font-weight:600 !important;
+      transform:none !important; filter:none !important; text-decoration:none; white-space:nowrap; cursor:pointer; }
+    .rc-det-header-actions > :first-child,
+    .rc-det-header-actions > :first-child > button{ border-radius:999px 0 0 999px !important; }
+    .rc-det-header-actions > :last-child,
+    .rc-det-header-actions > :last-child > button{ border-radius:0 999px 999px 0 !important; }
+    .rc-det-header-actions .rc-det-action-mail:hover,
+    .rc-det-header-actions .rc-det-action-ghost:hover,
+    .rc-det-header-actions .rc-det-action-primary:hover{ background:#f3f3f3 !important; color:#0b5cab !important; }
+    .rc-det-header-actions .rc-det-action-mail:focus-visible,
+    .rc-det-header-actions .rc-det-action-ghost:focus-visible,
+    .rc-det-header-actions .rc-det-action-primary:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px rgba(1,118,211,.35) !important; }
+    .rc-det-header-actions .rc-det-action-mail svg,
+    .rc-det-header-actions .rc-det-action-primary svg{ width:14px; height:14px; color:#0176d3 !important; }
+    .rc-det-header-actions .rc-det-action-mail.is-sent{ color:#939393 !important; opacity:1; filter:none !important; }
+    .rc-det-header-actions .rc-det-action-mail.is-sent svg{ color:#939393 !important; }
     .rc-det-action-primary {
       display: inline-flex;
       align-items: center;
@@ -3427,6 +3455,11 @@
     /* ── Chevron stages — darker done ── */
     .ls-chev.ls-done    { background: #62c97e; color: #0C2912; }
     .ls-chev.ls-active  { background: #1f5eae; color: #ffffff; font-weight: 600; }
+    /* The current stage always shows its full name; the others share what's left */
+    .ls-chev-wrap.ls-active-wrap { flex: 0 0 auto; }
+    .ls-chev-wrap.ls-active-wrap .ls-chev { width: auto; padding: 0 18px 0 24px; }
+    .ls-chev-wrap.ls-active-wrap:first-child .ls-chev { padding-left: 14px; }
+    .ls-chev-wrap.ls-active-wrap:last-child .ls-chev { padding-right: 14px; }
     .ls-chev.ls-pending { background: #f3f3f3; color: #6b7280; }
     .ls-chev.ls-mail-alert { background: #fee2e2; color: #991b1b; font-weight: 600; }
     /* Visually separate the read-only Mailer Sent milestone from the clickable stages */
@@ -3504,7 +3537,7 @@
     .nas-complete-btn {
       display: flex; align-items: center; gap: 7px;
       padding: 8px 18px;
-      background: #2E844A;
+      background: #0176d3;
       color: #fff;
       border: none;
       border-radius: 999px;
@@ -3515,9 +3548,9 @@
       transition: background .15s ease, transform .15s cubic-bezier(0.34,1.56,0.64,1), box-shadow .15s ease, filter .15s ease;
     }
     .nas-complete-btn:hover {
-      background: #246b3c;
+      background: #014486;
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 6px 16px rgba(46,132,74,0.34), 0 2px 4px rgba(12,41,18,0.18);
+      box-shadow: 0 6px 16px rgba(1,118,211,0.30), 0 2px 4px rgba(3,45,96,0.18);
     }
     .nas-complete-btn:active {
       transform: translateY(1px) scale(0.98);
@@ -3527,11 +3560,17 @@
     /* "Pressed/committing" state during the deliberate delay before the reward */
     .nas-complete-btn.nas-pressing {
       transform: translateY(1px) scale(0.97);
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.22), 0 1px 2px rgba(12,41,18,0.18);
-      background: #246b3c;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.22), 0 1px 2px rgba(3,45,96,0.18);
+      background: #014486;
       pointer-events: none;
     }
     .nas-complete-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    /* No action step yet: nothing to complete (SLDS disabled button) */
+    .nas-complete-btn:disabled,
+    .nas-complete-btn:disabled:hover {
+      background: #c9c9c9 !important; background-image: none !important; color: #fff;
+      box-shadow: none !important; transform: none !important; filter: none; cursor: not-allowed;
+    }
     .nas-overdue-badge {
       display: inline-flex;
       align-items: center;
@@ -5117,20 +5156,20 @@
     /* ── Header button group: Open Messenger | Refresh (SLDS button group) ── */
     .rc-btngroup {
       display: inline-flex; align-items: stretch; height: 32px;
-      border: 1px solid #c9c9c9; border-radius: 999px; background: #ffffff; overflow: hidden;
+      border: 1px solid var(--slds-g-color-neutral-base-70, #aeaeae); border-radius: 999px; background: #ffffff; overflow: hidden;
       box-shadow: 0 1px 2px rgba(24,24,24,.05);
     }
     .rc-btngroup-btn {
       display: inline-flex; align-items: center; gap: 7px; padding: 0 16px;
       border: 0; background: transparent; cursor: pointer; white-space: nowrap;
-      font-family: "Inter", var(--font); font-size: 13px; font-weight: 400; color: #0176d3;
+      font-family: "Inter", var(--font); font-size: 13px; font-weight: 600; color: #0176d3;
       transition: background .12s ease, color .12s ease;
     }
-    .rc-btngroup-btn + .rc-btngroup-btn { border-left: 1px solid #c9c9c9; }
+    .rc-btngroup-btn + .rc-btngroup-btn { border-left: 1px solid var(--slds-g-color-neutral-base-70, #aeaeae); }
     .rc-btngroup-btn:hover { background: #f3f3f3; color: #0b5cab; }
     .rc-btngroup-btn:active { background: #eef1f5; }
     .rc-btngroup-btn:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(1,118,211,.35); }
-    .rc-btngroup-btn.is-msgr { padding-left: 6px; font-weight: 500; color: #0b5cab; }
+    .rc-btngroup-btn.is-msgr { padding-left: 6px; font-weight: 600; color: #0176d3; }
     .rc-btngroup-btn.is-msgr.is-active { background: #eef4ff; }
     .rc-msgr-ico {
       width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
@@ -5491,7 +5530,7 @@
     /* Forecast (monday Forecast column) at the start of the Deal Path row.
        Plain text; only Commit gets a teal check and semibold. Omitted is gray. */
     .dp-fc{ display:inline-flex; align-items:center; gap:8px; flex:0 0 auto; height:24px; padding:0 12px 0 4px;
-      border-right:1px solid var(--slds-g-color-border-1, #c9c9c9); font-size:13px; white-space:nowrap; }
+      border-right:1px solid var(--slds-g-color-border-1, #c9c9c9); font-size:14px; white-space:nowrap; }
     .dp-fc[hidden]{ display:none; }
     .dp-fc-lab{ color:var(--slds-g-color-on-surface-1, #5c5c5c); }
     .dp-fc-val{ display:inline-flex; align-items:center; gap:6px; color:#181818; line-height:20px; }
@@ -5568,9 +5607,9 @@
     .dp-tone-muted{ background:#e5e7eb; color:#374151; box-shadow: inset 0 0 0 1px #cbd5e1, 0 2px 8px rgba(0,0,0,.15); }
 
     /* CTA */
-    .dp-cta{ height:30px; padding:0 14px; border-radius:16px; border:0; cursor:pointer; font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.1px; color:#fff; background:#1447c0; display:flex; align-items:center; gap:6px; white-space:nowrap; flex:0 0 auto; transition: background 160ms ease, transform 140ms ease, box-shadow 140ms ease; }
-    .dp-cta:hover{ background:#123fae; }
-    .dp-cta:active{ background:#0f389d; transform:none; box-shadow:none; }
+    .dp-cta{ height:30px; padding:0 14px; border-radius:16px; border:0; cursor:pointer; font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.1px; color:#fff; background:var(--slds-g-color-accent-container-1, #0176d3); display:flex; align-items:center; gap:6px; white-space:nowrap; flex:0 0 auto; transition: background 160ms ease, transform 140ms ease, box-shadow 140ms ease; }
+    .dp-cta:hover{ background:#014486; }   /* SLDS brand blue hover */
+    .dp-cta:active{ background:#032d60; transform:none; box-shadow:none; }
     .dp-cta.dp-cta-done, .dp-cta.dp-cta-done:hover{ background:#16a34a; cursor:default; opacity:.95; transform:none; box-shadow:none; }
 
     /* Guidance */
@@ -5624,8 +5663,8 @@
     .cs-header{ position:relative; overflow:hidden; }
     .cs-banner{ position:absolute; inset:0; background-image:url('https://raw.githubusercontent.com/Aliqu1233333/fffffffffffadasdx/main/Mountains.jpeg'); background-size:cover; background-position:center 40%; filter: saturate(.85) opacity(.45); }
     .cs-overlay{ position:absolute; inset:0; background: linear-gradient(to bottom, rgba(255,255,255,.18) 0%, rgba(255,255,255,.34) 62%, rgba(255,255,255,.82) 92%, #fff 100%); }
-    .cs-headContent{ position:relative; z-index:1; padding:16px 16px 14px; }
-    .cs-name{ font-size:20.5px; font-weight:700; color:var(--cs-sf-blue); text-decoration:none; letter-spacing:-.015em; line-height:1.2; display:block; margin-bottom:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cs-headContent{ position:relative; z-index:1; padding:20px 16px 18px; }
+    .cs-name{ font-size:21px; font-weight:700; color:var(--cs-sf-blue); text-decoration:none; letter-spacing:-.015em; line-height:1.2; display:block; margin-bottom:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     a.cs-name:hover{ color:var(--cs-blue); }
     .cs-meta{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:0; }
     .cs-field{ display:flex; flex-direction:column; gap:4px; min-width:0; }
@@ -5633,19 +5672,23 @@
     .cs-label{ font-size:11.5px; font-weight:600; color:#6b7280; white-space:nowrap; }
     .cs-value{ font-size:13.5px; font-weight:600; color:#1f2937; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .cs-value.accent{ color:var(--cs-blue); }
-    .cs-body{ padding:4px 14px 14px; }
-    .cs-kp{ position:relative; overflow:hidden; background:#f0f7ff; border:1px solid #c6ddf7; border-radius:12px; box-shadow:none; }
-    .cs-kp.arrived::after{ content:""; position:absolute; inset:0; background: linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.62) 50%, rgba(255,255,255,0) 62%); transform:translateX(-115%); pointer-events:none; animation: csSweep 1.35s var(--cs-ease) .08s 1 forwards; }
-    @keyframes csSweep{ to{ transform: translateX(115%); } }
-    .cs-kpHead{ display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:var(--cs-sf-blue); background:#fff; border-bottom:1px solid #dbeafe; padding:11px 14px 10px; }
-    .cs-kpList{ margin:0; padding:13px 14px 14px; list-style:none; background: linear-gradient(180deg, #eaf4ff 0%, #f2f8ff 100%); }
-    .cs-kpList li{ position:relative; font-size:15px; color:#111827; line-height:1.6; padding:0 0 9px 17px; animation: csPointIn .42s var(--cs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
+    .cs-body{ padding:10px 14px 14px; }
+    /* Key Conversation Points: clean white summary in the Agentforce style.
+       "Generated by AI" label top right, bold heading with a hairline, neutral bullets. */
+    .cs-kp{ position:relative; background:#fff; border:0; border-radius:0; box-shadow:none; padding:2px 2px 0; }
+    .cs-kpGen{ display:flex; justify-content:flex-end; align-items:center; gap:5px; font-size:12px; color:#2e2e2e; margin:0 0 10px; }
+    .cs-kpGen .cs-gen-spark{ width:14px; height:14px; flex:0 0 14px; }
+    .cs-kpGen .cs-gen-info{ width:14px; height:14px; flex:0 0 14px; color:#5c5c5c; cursor:help; }
+    .cs-kpHead{ font-size:16px; font-weight:700; color:#181818; background:none; border:0; padding:0 0 10px; border-bottom:1px solid #e5e5e5; }
+    .cs-kpList{ margin:0; padding:12px 0 0; list-style:none; background:none; }
+    .cs-kpList li{ position:relative; font-size:15.5px; color:#181818; line-height:1.55; padding:0 0 12px 16px;
+      animation: csPointIn .42s var(--cs-ease) both; animation-delay: calc(var(--i, 0) * 70ms); }
     .cs-kpList li:last-child{ padding-bottom:0; }
-    .cs-kpList li::before{ content:""; position:absolute; left:2px; top:.62em; width:6.5px; height:6.5px; border-radius:50%; background: radial-gradient(circle at 32% 28%, #7cc4ff 0%, #1b96ff 48%, #0166ba 100%); }
+    .cs-kpList li::before{ content:""; position:absolute; left:2px; top:.66em; width:5px; height:5px; border-radius:50%; background:#5c5c5c; }
     @keyframes csPointIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
     .cs-kpList li.cs-skel{ padding:0 0 11px 0 !important; animation:none !important; }
     .cs-kpList li.cs-skel::before{ display:none; }
-    .cs-skel span{ display:block; height:11px; border-radius:5px; background: linear-gradient(90deg, #dbeafe 25%, #eff6ff 50%, #dbeafe 75%); background-size:400% 100%; animation: csShimmer 1.4s linear infinite; }
+    .cs-skel span{ display:block; height:11px; border-radius:5px; background: linear-gradient(90deg, #ececec 25%, #f6f6f6 50%, #ececec 75%); background-size:400% 100%; animation: csShimmer 1.4s linear infinite; }
     @keyframes csShimmer{ 0%{ background-position:100% 0; } 100%{ background-position:-100% 0; } }
     .cs-empty{ display:none; text-align:center; padding:10px 8px 6px; }
     .cs-empty img{ width:100%; max-width:300px; opacity:.92; margin-bottom:10px; }
@@ -5756,6 +5799,7 @@
 
           <div class="cs-body">
             <div class="cs-kp" id="csKeyPoints">
+              <div class="cs-kpGen"><svg class="cs-gen-spark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="csGenSpark" x1="4" y1="3" x2="20" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5CC8FF"/><stop offset="0.55" stop-color="#1B96FF"/><stop offset="1" stop-color="#0176D3"/></linearGradient></defs><path d="M10.4 2.9l1.5 4.1a2.6 2.6 0 0 0 1.6 1.6l4.1 1.5-4.1 1.5a2.6 2.6 0 0 0-1.6 1.6l-1.5 4.1-1.5-4.1a2.6 2.6 0 0 0-1.6-1.6L3.3 10.1l4.1-1.5a2.6 2.6 0 0 0 1.6-1.6l1.4-4.1z" fill="url(#csGenSpark)"/><path d="M18.4 14.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z" fill="url(#csGenSpark)"/></svg><span>Generated by AI</span><svg class="cs-gen-info" viewBox="0 0 16 16" fill="none" role="img" aria-label="About this summary"><title>Summarized by AI from the notes on this conversation. Check key details before acting on them.</title><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="5" r=".8" fill="currentColor"/></svg></div>
               <div class="cs-kpHead">Key Conversation Points</div>
               <ul class="cs-kpList" id="csKeyPointsList">
                 <li class="cs-skel"><span style="width:100%"></span></li>
@@ -5886,7 +5930,7 @@
                 <div class="nas-actions">
                   <button class="nas-edit-btn" id="nasEditBtn">Edit</button>
                   <div class="nas-divider"></div>
-                  <button class="nas-complete-btn" id="nasCompleteBtn" aria-label="Mark action step as completed">
+                  <button class="nas-complete-btn" id="nasCompleteBtn" aria-label="Mark action step as completed" disabled title="Set a next action step first">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                     Mark As Completed
                   </button>
@@ -11206,15 +11250,6 @@
                   <div class="rc-field-inner">
                   <span class="rc-label">Follow-Up Date</span>
                   <div style="display:flex;align-items:center;gap:6px;">
-                    ${(()=>{
-                      const WARN_SVG = '<svg viewBox="0 0 12 12" fill="none"><path d="M6 1L11 10H1L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r="0.5" fill="currentColor"/></svg>';
-                      const CHECK_SVG = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5l2.5 2.5 5.5-5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-                      if (!rcHasVal(c.followUp)) return '<span class="rc-status-badge rc-status-badge--warning">' + WARN_SVG + '</span>';
-                      const fpDate = parseFlexibleDate(c.followUp);
-                      const today = new Date(); today.setHours(0,0,0,0);
-                      if (fpDate && fpDate < today) return '<span class="rc-status-badge rc-status-badge--overdue">' + WARN_SVG + '</span>';
-                      return '<span class="rc-status-badge rc-status-badge--success">' + CHECK_SVG + '</span>';
-                    })()}
                     <div class="rc-value">${rcEditableEl('followUp', rcHasVal(c.followUp)?c.followUp:'—', c.overdue?'overdue':'', false)}</div>
                   </div>
                   </div>
@@ -13998,6 +14033,12 @@
       function nasSetStep(val, due) {
         nasCurrentStep = val || '';
         nasCurrentDue  = due || '';
+        var nasBtn = document.getElementById('nasCompleteBtn');
+        if (nasBtn) {
+          var nasNone = !(nasCurrentStep && nasCurrentStep !== '—');
+          nasBtn.disabled = nasNone;
+          nasBtn.title = nasNone ? 'Set a next action step first' : '';
+        }
         var el = document.getElementById('nasValue');
         var badge = document.getElementById('nasOverdueBadge');
         if (!el) return;
@@ -15881,7 +15922,7 @@
     .ptc-f .hp-form{ display:flex; flex-direction:column; gap:var(--slds-g-spacing-3, 12px); padding-top:4px; }
     .ptc-fl{ display:flex; flex-direction:column; gap:4px; font-size:var(--slds-g-font-scale-neg-1, 12px); color:var(--slds-g-color-on-surface-1, #5c5c5c); }
     .ptc-f .hp-in, .ptc-f .hp-ta, .ptc-sel{ width:100%; box-sizing:border-box; font:400 var(--slds-g-font-scale-1, 14px)/1.4 var(--font);
-      color:var(--slds-g-color-on-surface-2, #2e2e2e); background:#fff; border:1px solid var(--slds-g-color-border-2, #747474);
+      color:var(--slds-g-color-on-surface-2, #2e2e2e); background:#fff; border:1px solid var(--slds-g-color-neutral-base-70, #aeaeae);
       border-radius:var(--slds-g-radius-border-2, 8px); padding:7px 10px; }
     .ptc-f .hp-in{ font-weight:400; }
     .ptc-sel{ appearance:auto; }
@@ -16335,6 +16376,16 @@
     const orig = RP.applyData;
     RP.applyData = function(){ const out = orig.apply(this, arguments); try { renderAll(); } catch(e){ console.error('Path to Close render failed:', e); }
       try { if (window.rpRenderForecast) window.rpRenderForecast(arguments[0]); } catch(e){ console.error('Forecast render failed:', e); }   // forecast_category from the record load
+      try {   // Deal Score: show it out of 100 ("82 / 100")
+        const ds = document.querySelector('[data-snapshot="true"][data-field="deal_score"]');
+        if (ds && !ds.querySelector('.ds-of')){
+          const n = parseFloat(String(ds.textContent).replace(/[^0-9.]/g, ''));
+          if (!isNaN(n) && n >= 0 && n <= 100 && /^\s*[0-9.]+\s*%?\s*$/.test(ds.textContent)){
+            ds.textContent = String(Math.round(n));
+            ds.insertAdjacentHTML('beforeend', '<span class="ds-of">/ 100</span>');
+          }
+        }
+      } catch(e){}
       return out; };
     RP.__hpHooked = true; return true;
   }
@@ -16827,7 +16878,7 @@ window.rpResolveIds = function(){
       section.style.display = "";
       $("csEmpty").style.display = "none";
       $("csKeyPointsList").innerHTML = kp.map((p, i) => `<li style="--i:${i}">${esc(p)}</li>`).join("");
-      section.classList.remove("arrived"); void section.offsetWidth; section.classList.add("arrived");
+      section.classList.remove("arrived"); void section.offsetWidth;
     } else {
       section.style.display = "none";
       $("csEmpty").style.display = "block";
