@@ -3973,7 +3973,35 @@
       background: #fde4e2;
       color: #c23934;
     }
-  </style>
+      /* ── Research Phase checklist (Research tab) ── */
+    .rsx{ padding:10px 0 12px; border-bottom:1px solid #ebedf0; font-family: var(--font); }
+    .rsx-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+    .rsx-head .slds-label{ margin:0; }
+    .rsx-pills{ display:inline-flex; border:1px solid #c9c9c9; border-radius:999px; overflow:hidden; background:#fff; }
+    .rsx-pill{ font: 500 12.5px var(--font); padding:4px 12px; background:#fff; color:#2e333d; border:0; border-right:1px solid #c9c9c9; cursor:pointer; line-height:1.4; }
+    .rsx-pill:last-child{ border-right:0; }
+    .rsx-pill:hover{ background:#f3f6fa; }
+    .rsx-pill.is-done{ color:#0b827c; }
+    .rsx-pill.is-current{ background:#032d60; color:#fff; }
+    .rsx-pill:focus-visible{ outline:2px solid #0176d3; outline-offset:-2px; }
+    .rsx-sub{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:#5c6470; margin:2px 0 6px; }
+    .rsx-bar{ height:4px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin-bottom:8px; }
+    .rsx-bar > span{ display:block; height:100%; background:#0176d3; border-radius:4px; transition:width .25s ease; }
+    .rsx-group + .rsx-group{ margin-top:10px; }
+    .rsx-group-title{ font-size:12px; font-weight:600; color:#2e333d; margin:4px 0 2px; }
+    .rsx-list{ list-style:none; margin:0; padding:0; }
+    .rsx-item{ display:flex; align-items:flex-start; gap:9px; padding:5px 0; }
+    .rsx-item input{ width:16px; height:16px; margin:2px 0 0; accent-color:#0176d3; cursor:pointer; flex:0 0 auto; }
+    .rsx-item label{ flex:1 1 auto; min-width:0; cursor:pointer; font-size:14px; color:#080707; line-height:1.4; }
+    .rsx-item.is-done label{ color:#5c6470; }
+    .rsx-meta{ display:block; font-size:11.5px; color:#747474; margin-top:1px; }
+    .rsx-link{ background:none; border:0; padding:0; font: 500 12px var(--font); color:#0176d3; cursor:pointer; }
+    .rsx-link:hover{ text-decoration:underline; }
+    .rsx-note{ margin-top:8px; padding:8px 10px; border-radius:8px; font-size:12.5px; line-height:1.4; }
+    .rsx-note.ok{ background:#ebf7f6; border:1px solid #b9e3df; color:#0b5f5a; }
+    .rsx-note.err{ background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
+    .rsx-muted{ font-size:13px; color:#747474; padding:4px 0; }
+</style>
 
   <style>
     /* ══════════════════════════════════════════════════════
@@ -6216,6 +6244,7 @@
                   <div class="slds-field" data-field="probate_case_number"><div class="slds-label">Probate Case Number</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                 </div>
                 <div class="slds-col-right">
+                  <div class="rsx" id="rsxField" aria-live="polite"></div>
                   <div class="slds-field" data-field="birth_date"><div class="slds-label">Birth Date</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                   <div class="slds-field" data-field="death_date"><div class="slds-label">Death Date</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
                   <div class="slds-field" data-field="age"><div class="slds-label">Age</div><div class="slds-value"><span class="value-text" data-editable="true"></span><span class="edit" title="Edit"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
@@ -16927,5 +16956,149 @@ window.rpResolveIds = function(){
 })();
 </script>
 
+<script id="researchChecklistScript">
+(function(){
+  'use strict';
+  // Research Phase checklist. Loads/saves through Make scenario "A7.) Record Page -> Research Checklist".
+  // Monday: Research Phase (dropdown_mm9788xq) + Research Checklist (long_text_mm97zj1q, JSON).
+  const WEBHOOK = 'https://hook.us1.make.com/nw543qi9ihljxnb7xr1jcwpt7pmob5zs';
+  const PHASES = [
+    { key:'Basic', items:[
+      ['heirs_added',      'All heirs added'],
+      ['family_added',     'Known family members and occupants added'],
+      ['called_attempt3',  'Every heir called through Attempt 3'],
+      ['texted',           'Every heir texted'] ]},
+    { key:'Deep', items:[
+      ['property_occupants','All occupants of the property added'],
+      ['heirs_family',      'Family members of the heirs added'],
+      ['address_occupants', "Occupants at the heirs' addresses added"],
+      ['social_search',     'Social media search on the heirs'],
+      ['google_search',     'Google search on the heirs'] ]},
+    { key:'Exhausted', items:[
+      ['neighbors_called',  'Neighbors called'],
+      ['mail_sent',         'Mail sent to all heirs'] ]}
+  ];
+  const ORDER = PHASES.map(p => p.key);
+  const idx = k => ORDER.indexOf(k);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let state = { phase:'', done:{} }, showAll = false, loaded = false, saveTimer = null;
+
+  function ids(){
+    try { if (typeof extractIdsFromUrl === 'function') return extractIdsFromUrl(); } catch(e){}
+    const q = new URLSearchParams(location.search);
+    return { boardId: q.get('boardId') || q.get('board_id'), pulseId: q.get('pulseId') || q.get('pulse_id') || q.get('itemId') || q.get('item_id') };
+  }
+  const host = () => document.getElementById('rsxField');
+  const phaseDef = k => PHASES.find(p => p.key === k);
+  const countDone = p => p.items.filter(([k]) => state.done[k]).length;
+  const complete = p => countDone(p) === p.items.length;
+  // The furthest phase the checks justify: the first phase with anything left to do.
+  function autoPhase(){ for (const p of PHASES) if (!complete(p)) return p.key; return 'Exhausted'; }
+  function fmtDate(iso){
+    if (!iso) return '';
+    const d = new Date(iso + (iso.length === 10 ? 'T12:00:00' : ''));
+    return isNaN(d) ? '' : d.toLocaleDateString('en-US', { month:'short', day:'numeric', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+  }
+
+  function itemsHtml(p){
+    return '<ul class="rsx-list">' + p.items.map(([k, label]) => {
+      const d = state.done[k];
+      const meta = d ? '<span class="rsx-meta">' + esc([d.by, fmtDate(d.at)].filter(Boolean).join(' · ')) + '</span>' : '';
+      return '<li class="rsx-item' + (d ? ' is-done' : '') + '"><input type="checkbox" id="rsx-' + k + '" data-rsx-item="' + k + '"' + (d ? ' checked' : '') + '>' +
+             '<label for="rsx-' + k + '">' + esc(label) + meta + '</label></li>';
+    }).join('') + '</ul>';
+  }
+
+  function render(){
+    const el = host(); if (!el) return;
+    const head = '<div class="rsx-head"><div class="slds-label">Research Phase</div>';
+    if (!loaded){ el.innerHTML = head + '</div><div class="rsx-muted">Loading…</div>'; return; }
+    const cur = phaseDef(state.phase) || PHASES[0];
+    const pills = '<div class="rsx-pills" role="group" aria-label="Research phase">' + PHASES.map(p => {
+      const cls = 'rsx-pill' + (p.key === cur.key ? ' is-current' : '') + (complete(p) && p.key !== cur.key ? ' is-done' : '');
+      return '<button type="button" class="' + cls + '" data-rsx-phase="' + p.key + '" aria-pressed="' + (p.key === cur.key) + '">' + (complete(p) ? '✓ ' : '') + p.key + '</button>';
+    }).join('') + '</div>';
+    const n = countDone(cur), t = cur.items.length;
+    let body = '<div class="rsx-sub"><span>' + n + ' of ' + t + ' done in ' + cur.key + '</span>' +
+               '<button type="button" class="rsx-link" data-rsx-all>' + (showAll ? 'Show current phase' : 'Show all phases') + '</button></div>' +
+               '<div class="rsx-bar"><span style="width:' + Math.round(100 * n / t) + '%"></span></div>';
+    if (showAll){
+      body += PHASES.map(p => '<div class="rsx-group"><div class="rsx-group-title">' + p.key + ' · ' + countDone(p) + ' of ' + p.items.length + '</div>' + itemsHtml(p) + '</div>').join('');
+    } else {
+      body += itemsHtml(cur);
+    }
+    if (cur.key === 'Exhausted' && complete(cur) && PHASES.every(complete)){
+      body += '<div class="rsx-note ok">All research is done. This file can be disqualified with confidence.</div>';
+    } else if (cur.key === 'Exhausted' && complete(cur)){
+      body += '<div class="rsx-note ok">Exhausted tasks are done. Open “Show all phases” to finish any earlier items.</div>';
+    }
+    el.innerHTML = head + pills + '</div>' + body + (state.error ? '<div class="rsx-note err">' + esc(state.error) + '</div>' : '');
+  }
+
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      const { boardId, pulseId } = ids();
+      if (!pulseId) return;
+      const checklist = JSON.stringify({ v:1, phase: state.phase, done: state.done });
+      try {
+        const r = await fetch(WEBHOOK, { method:'POST', headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ action:'save_research', boardId, pulseId, phase: state.phase, checklist }) });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        state.error = '';
+        if (typeof showSaveToast === 'function') showSaveToast('success');
+      } catch(e){
+        state.error = 'Couldn’t save the research checklist. Try again in a moment.';
+        if (typeof showSaveToast === 'function') showSaveToast('error');
+      }
+      render();
+    }, 500);
+  }
+
+  async function load(){
+    const { boardId, pulseId } = ids();
+    if (!pulseId || !host()) return;
+    try {
+      const r = await fetch(WEBHOOK, { method:'POST', headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ action:'get_research', boardId, pulseId }) });
+      const data = await r.json();
+      let c = {};
+      try { c = typeof data.checklist === 'string' && data.checklist.trim() ? JSON.parse(data.checklist) : (data.checklist || {}); } catch(e){ c = {}; }
+      state.done = (c && typeof c.done === 'object' && c.done) ? c.done : {};
+      const ph = String(data.phase || c.phase || '').trim();
+      state.phase = idx(ph) >= 0 ? ph : autoPhase();
+    } catch(e){
+      state.phase = autoPhase();
+      state.error = 'Couldn’t load the research checklist. Refresh to try again.';
+    }
+    loaded = true; render();
+  }
+
+  document.addEventListener('change', e => {
+    const box = e.target.closest && e.target.closest('#rsxField [data-rsx-item]');
+    if (!box) return;
+    const k = box.getAttribute('data-rsx-item');
+    if (box.checked){
+      const who = (typeof window.rcWho === 'function' ? window.rcWho() : '') || '';
+      state.done[k] = { by: who, at: new Date().toISOString().slice(0,10) };
+    } else {
+      delete state.done[k];
+    }
+    // Auto-advance: move forward when a phase is finished, never backward on its own.
+    const a = autoPhase();
+    if (idx(a) > idx(state.phase)) state.phase = a;
+    render(); save();
+    const again = document.getElementById('rsx-' + k); if (again) again.focus();   // keep keyboard focus after the redraw
+  });
+  document.addEventListener('click', e => {
+    const pill = e.target.closest && e.target.closest('#rsxField [data-rsx-phase]');
+    if (pill){ const p = pill.getAttribute('data-rsx-phase'); if (p !== state.phase){ state.phase = p; render(); save(); } return; }
+    if (e.target.closest && e.target.closest('#rsxField [data-rsx-all]')){ showAll = !showAll; render(); }
+  });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { render(); load(); });
+  else { render(); load(); }
+})();
+</script>
 </body>
 </html>
