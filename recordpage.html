@@ -5702,6 +5702,7 @@
     }
     .rpp-why{ margin-top: var(--slds-g-spacing-3); }
     #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-1); }
+    #rpp .rpp-building{ padding-top: var(--slds-g-spacing-3); color: var(--slds-g-color-on-surface-1); }
     .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
     #rpp *, #rpp *::before, #rpp *::after{ box-sizing: border-box; }
@@ -17400,10 +17401,10 @@ window.RPP_VERSION = 'B';
   function renderNextCall(d){
     const b = d.bestMove; if (!b || !(b.heir || b.action)) return "";
     const who = b.heir ? properName(b.heir) : b.action;
-    const body = `<div class="rpp-band"><p class="rpp-band__label">Reccommend Next Call</p><p class="rpp-band__action">${esc(who)}</p></div>
+    const body = `<div class="rpp-band"><p class="rpp-band__label">Call next</p><p class="rpp-band__action">${esc(who)}</p></div>
       ${b.goal ? `<div class="rpp-why"><p class="rpp-label">Goal</p><p>${esc(b.goal)}</p></div>` : ""}
       ${b.reason ? `<div class="rpp-why"><p class="rpp-label">Why</p><p>${esc(b.reason)}</p></div>` : ""}`;
-    return section("rppNext", "standard:task", "Next Call", body, coachingTip(d.callFeedback));
+    return section("rppNext", "standard:task", "Next Recommended Call", body, coachingTip(d.callFeedback));
   }
 
   /* 3. Move Toward Close (4A): the gap, its fact, and the forecast step it unlocks */
@@ -17452,21 +17453,51 @@ window.RPP_VERSION = 'B';
     root.querySelectorAll(".rpp-tip.is-open").forEach(tip => { tip.classList.remove("is-open"); const b = tip.querySelector(".rpp-tip__btn"); b.setAttribute("aria-expanded", "false"); b.focus(); });
   });
 
-  async function load(){
+  /* No saved panel yet: Make starts building one on the first request (5 to 12 seconds).
+     Show a loading state and check back every 4 seconds. Follow-up checks send poll:1 so
+     Scenario 10 only reads the saved panel and never starts a second build. */
+  const POLL_MS = 4000, POLL_MAX_MS = 60000;
+  let building = false, buildStarted = 0, pollTimer = null;
+  function showBuilding(){
+    $("rppBody").innerHTML = `<p class="rpp-building" role="status">Building guidance for this file…</p>
+      <div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div><div class="rpp-skel" style="width:60%"></div></div>`;
+    if ($("rppGenerated")) $("rppGenerated").textContent = "Building…";
+  }
+  function stopBuilding(){ building = false; clearTimeout(pollTimer); pollTimer = null; }
+
+  async function load(opts){
+    const poll = !!(opts && opts.poll === true);
+    if (building && !poll) return; /* Refresh during a build: keep waiting on the same build */
     const ids = window.rpResolveIds ? window.rpResolveIds() : {};
     $("rppError").hidden = true;
-    if ($("rppGenerated")) $("rppGenerated").textContent = "Refreshing…";
+    if (!poll && $("rppGenerated")) $("rppGenerated").textContent = "Refreshing…";
     $("rppRefresh").disabled = true;
     if (!ids.itemId){ render({}); $("rppRefresh").disabled = false; return; }
     try{
-      const res = await fetch(LOAD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item_id: ids.itemId, board_id: ids.boardId }) });
+      const body = { item_id: ids.itemId, board_id: ids.boardId };
+      if (poll) body.poll = 1;
+      const res = await fetch(LOAD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       let src = {};
       try { src = JSON.parse(text); } catch(_){ console.warn("[Right panel] Make returned non-JSON:", text.slice(0, 200)); }
+      const panel = src && (src.rightPanel || src.panel);
+      if (!panel && !(src && src.key_points)){
+        if (!building){ building = true; buildStarted = Date.now(); showBuilding(); }
+        if (Date.now() - buildStarted < POLL_MAX_MS){ pollTimer = setTimeout(() => load({ poll: true }), POLL_MS); }
+        else {
+          stopBuilding();
+          $("rppBody").innerHTML = `<p class="rpp-empty">Guidance for this file isn’t ready yet. Use Refresh to try again.</p>`;
+          if ($("rppGenerated")) $("rppGenerated").textContent = "";
+        }
+        return;
+      }
+      stopBuilding();
       render(src || {});
     }catch(err){
       console.warn("[Right panel] Load failed:", err);
+      if (building && Date.now() - buildStarted < POLL_MAX_MS){ pollTimer = setTimeout(() => load({ poll: true }), POLL_MS); return; }
+      stopBuilding();
       $("rppError").textContent = hasRendered ? "Couldn't refresh. Showing the last guidance." : "Couldn't load guidance for this file. Try Refresh.";
       $("rppError").hidden = false;
       if (!hasRendered) $("rppBody").innerHTML = "";
@@ -17477,9 +17508,9 @@ window.RPP_VERSION = 'B';
   }
 
   $("rppBody").innerHTML = `<div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div></div>`;
-  $("rppRefresh").addEventListener("click", load);
+  $("rppRefresh").addEventListener("click", () => load());
   load();
-  window.rpConversationReload = load;
+  window.rpConversationReload = () => load();
   window.rpPanelRender = render;
 })();
 
