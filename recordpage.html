@@ -5698,6 +5698,8 @@
     .rp-sidebar > .rpp-card{ flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
     .rpp-why{ margin-top: var(--slds-g-spacing-3); }
     #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-2); }
+    /* Heir name, "Last contact" and date above the summary: bold, 1pt larger, darker */
+    #rpp .cx-meta.rpp-ai__src{ font-size: calc(var(--slds-g-font-scale-neg-1) + 1pt); font-weight: var(--slds-g-font-weight-bold); color: var(--slds-g-color-on-surface-2); }
     #rpp .rpp-building{ padding-top: var(--slds-g-spacing-3); color: var(--slds-g-color-on-surface-1); }
     .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
@@ -17477,7 +17479,7 @@ window.RPP_VERSION = 'B';
     const cat = ((c && c.forecast && c.forecast.category) || "");
     const nextCat = NEXT_CATEGORY[cat.toLowerCase()];
     const first = properName(String(w.heir).split(" ")[0]);
-    const killer = w.isDealKiller && String(w.signal || "").toLowerCase() === "hurts";
+    const killer = cat.toLowerCase() === "omitted"; /* the forecast decides: Omitted means deal killer, so the panel always agrees with it */
     return { id: "rppClose", icon: "standard:opportunity", title: "Move Toward Close", body: `
       <p class="rpp-lead">${esc(first)}'s ${esc(String(w.field || "key field").toLowerCase())} ${(String(w.field || "").toLowerCase() === "roadblocks" ? "are " : "is ") + (({helps:"helping the deal",hurts:"hurting the deal",neutral:"neutral"})[String(w.signal || "").toLowerCase()] || "unknown")}.${killer ? " Possible deal-killer." : ""}</p>
       ${nextCat ? `<p class="rpp-step"><span data-icon="utility:arrowup" data-class="rpp-step__icon"></span><span>Fixing this is the likeliest step from <b>${esc(cat)}</b> to <b>${esc(nextCat)}</b>.</span></p>` : ""}` };
