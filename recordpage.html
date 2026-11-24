@@ -5696,12 +5696,8 @@
        Each section has its own shape so they read differently at a glance:
        summary = tinted block with forecast, next call = tiles + labeled rows, close = gap + forecast step. */
     .rp-sidebar > .rpp-card{ flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    @media (min-width: 1281px){
-      .rp-sidebar{ height: calc(100vh - 80px); }
-      .rp-sidebar > .rpp-card{ flex: 1 1 auto; }
-    }
     .rpp-why{ margin-top: var(--slds-g-spacing-3); }
-    #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-1); }
+    #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-2); }
     #rpp .rpp-building{ padding-top: var(--slds-g-spacing-3); color: var(--slds-g-color-on-surface-1); }
     .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
@@ -5712,14 +5708,47 @@
     :where(#rpp) h3, :where(#rpp) h4{ font-weight: 400; }
     #rpp [hidden]{ display: none !important; }
 
-    .rpp-meta{ flex: none; display: flex; align-items: center; justify-content: flex-end; gap: var(--slds-g-spacing-2); padding: var(--slds-g-spacing-4) var(--slds-g-spacing-4) 0; }
+    .rpp-meta{ flex: none; display: flex; align-items: center; justify-content: flex-end; gap: var(--slds-g-spacing-2); padding: var(--slds-g-spacing-4) var(--slds-g-spacing-5) 0; }
     .rpp-meta .cx-meta{ flex: 1; min-width: 0; }
     .rpp-error{ padding: var(--slds-g-spacing-2) var(--slds-g-spacing-4) 0 !important; font-size: var(--slds-g-font-scale-neg-1); color: var(--slds-g-color-error-1); }
-    .rpp-scroll{ flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--slds-g-spacing-3) var(--slds-g-spacing-4) var(--slds-g-spacing-2); }
+    .rpp-scroll{ flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--slds-g-spacing-3) var(--slds-g-spacing-5) var(--slds-g-spacing-5); }
 
     /* Section frame: round icon + regular 18px title */
-    .rpp-sec{ padding: var(--slds-g-spacing-5) 0; }
+    .rpp-sec{ padding: var(--slds-g-spacing-6) 0; }
     .rpp-sec + .rpp-sec{ border-top: var(--slds-g-sizing-border-1) solid var(--slds-g-color-border-1); }
+
+    /* Stacked cards: the panel itself is transparent; each card sits on the gray page, 12px apart */
+    #rpp > .rpp-card.rpp-card{ background: transparent; box-shadow: none; border-radius: 0; }
+    #rpp .rpp-scroll{ padding: 0; }
+    #rpp .rpp-meta{ padding: 0 0 var(--slds-g-spacing-3); }
+    #rpp .rpp-meta[hidden]{ display: none !important; }
+    #rpp .rpp-error{ padding: 0 0 var(--slds-g-spacing-3) !important; }
+    #rppBody > .rpp-ai{ border-radius: var(--slds-g-radius-border-4); }
+    #rppBody > * + *{ margin-top: var(--slds-g-spacing-3); }
+    #rppBody > .rpp-building, #rppBody > .rpp-empty{ background: var(--slds-g-color-surface-container-1); border-radius: var(--slds-g-radius-border-4); padding: var(--slds-g-spacing-5); }
+    #rppBody > div[aria-hidden="true"]{ background: var(--slds-g-color-surface-container-1); border-radius: var(--slds-g-radius-border-4); padding: var(--slds-g-spacing-3) var(--slds-g-spacing-5); }
+    #rppBody > .rpp-building + div[aria-hidden="true"]{ margin-top: 0; border-radius: 0 0 var(--slds-g-radius-border-4) var(--slds-g-radius-border-4); padding-top: 0; }
+    #rppBody > .rpp-building:has(+ div[aria-hidden="true"]){ border-radius: var(--slds-g-radius-border-4) var(--slds-g-radius-border-4) 0 0; }
+    #rppSummary .rpp-sec__head > #rppRefresh{ margin-left: auto; }
+
+    /* Card 2: Next Recommended Call + Move Toward Close; each section collapses on its own */
+    .rpp-group{ background: var(--slds-g-color-surface-container-1); border-radius: var(--slds-g-radius-border-4); overflow: visible; }
+    .rpp-part{ padding: var(--slds-g-spacing-5); }
+    .rpp-part > .rpp-sec__head{ margin-bottom: var(--slds-g-spacing-4); }
+    /* Section titles in the combined card: 1px larger than the 18px card-title scale (19px) */
+    .rpp-part .rpp-sec__title{ font-size: calc(var(--slds-g-font-scale-3) + var(--slds-g-sizing-border-1)); }
+    .rpp-part__toggle{ margin-left: auto; }
+    .rpp-part.is-collapsed > .rpp-sec__head{ margin-bottom: 0; }
+    .rpp-part.is-collapsed > .rpp-part__body{ display: none; }
+    .rpp-part__toggle svg{ transition: transform 150ms ease; }
+    .rpp-part.is-collapsed .rpp-part__toggle svg{ transform: rotate(180deg); }
+    @media (prefers-reduced-motion: reduce){ .rpp-part__toggle svg{ transition: none; } }
+    /* Divider styles between the two sections */
+    .rpp-group[data-divider="line"] .rpp-part + .rpp-part{ margin: 0 var(--slds-g-spacing-5); padding: var(--slds-g-spacing-5) 0; border-top: var(--slds-g-sizing-border-1) solid var(--slds-g-color-border-1); }
+    .rpp-group[data-divider="space"] .rpp-part + .rpp-part{ padding-top: var(--slds-g-spacing-3); }
+    .rpp-group[data-divider="full"] .rpp-part + .rpp-part{ border-top: var(--slds-g-sizing-border-1) solid var(--slds-g-color-border-1); }
+    .rpp-group[data-divider="band"] .rpp-part + .rpp-part{ background: var(--slds-g-color-surface-container-2); border-radius: 0 0 var(--slds-g-radius-border-4) var(--slds-g-radius-border-4); }
+    .rpp-group[data-divider="band"] .rpp-part:only-child{ border-radius: var(--slds-g-radius-border-4); }
     .rpp-sec__head{ position: relative; display: flex; align-items: center; gap: var(--slds-g-spacing-2); margin-bottom: var(--slds-g-spacing-4); }
     .rpp-sec__title{ flex: 0 1 auto; min-width: 0; font-size: var(--slds-g-font-scale-3); color: var(--slds-g-color-on-surface-3); line-height: 1.3; }
     .rpp-lead{ font-size: var(--slds-g-font-scale-2); color: var(--slds-g-color-on-surface-3); line-height: 1.4; }
@@ -5727,12 +5756,12 @@
     .rpp-label{ font-size: var(--slds-g-font-scale-neg-1); color: var(--slds-g-color-on-surface-1); }
 
     /* 1 · File Summary: the one flat purple-95 AI block; forecast set large like a KPI */
-    .rpp-ai{ background: var(--slds-g-color-palette-purple-95); border-radius: var(--slds-g-radius-border-3); padding: var(--slds-g-spacing-4); }
+    .rpp-ai{ background: var(--slds-g-color-palette-purple-95); border-radius: var(--slds-g-radius-border-3); padding: var(--slds-g-spacing-5); }
     .rpp-ai + .rpp-sec{ border-top: 0; }
     .rpp-ai-mark{ flex: none; width: var(--slds-g-sizing-7); height: var(--slds-g-sizing-7); }
     .rpp-ai .rpp-sec__head{ margin-bottom: var(--slds-g-spacing-4); }
     .rpp-ai__by{ font-size: var(--slds-g-font-scale-neg-1); color: var(--slds-g-color-palette-purple-30); }
-    .rpp-kpi{ display: flex; align-items: baseline; gap: var(--slds-g-spacing-3); padding-bottom: var(--slds-g-spacing-3); margin-bottom: var(--slds-g-spacing-3); border-bottom: var(--slds-g-sizing-border-1) solid var(--slds-g-color-palette-purple-80); }
+    .rpp-kpi{ display: flex; align-items: baseline; gap: var(--slds-g-spacing-3); padding-bottom: var(--slds-g-spacing-4); margin-bottom: var(--slds-g-spacing-4); border-bottom: var(--slds-g-sizing-border-1) solid var(--slds-g-color-palette-purple-80); }
     .rpp-kpi__value{ flex: none; font-size: var(--slds-g-font-scale-5); color: var(--slds-g-color-on-surface-3); line-height: 1.2; }
     .rpp-kpi__text{ font-size: var(--slds-g-font-scale-base); color: var(--slds-g-color-on-surface-2); }
     .rpp-ai__points li{ position: relative; padding: var(--slds-g-spacing-1) 0 var(--slds-g-spacing-1) var(--slds-g-spacing-4); }
@@ -5750,10 +5779,10 @@
     .rpp-band{ background: var(--slds-g-color-palette-blue-95); border-radius: var(--slds-g-radius-border-2); padding: var(--slds-g-spacing-3) var(--slds-g-spacing-4); }
     .rpp-band__label{ font-size: var(--slds-g-font-scale-neg-1); color: var(--slds-g-color-accent-2); }
     .rpp-band__action{ margin-top: var(--slds-g-spacing-1) !important; font-size: var(--slds-g-font-scale-3); color: var(--slds-g-color-on-surface-3); line-height: 1.35; }
-    .rpp-cols{ display: grid; grid-template-columns: 1fr 1fr; margin-top: var(--slds-g-spacing-4); }
+    .rpp-cols{ display: grid; grid-template-columns: 1fr 1fr; margin-top: var(--slds-g-spacing-5); }
     .rpp-col{ padding-right: var(--slds-g-spacing-4); }
     .rpp-col + .rpp-col{ padding: 0 0 0 var(--slds-g-spacing-4); border-left: var(--slds-g-sizing-border-1) solid var(--slds-g-color-border-1); }
-    .rpp-col .rpp-label, .rpp-field .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
+    .rpp-col .rpp-label, .rpp-field .rpp-label{ margin-bottom: var(--slds-g-spacing-2) !important; }
     /* C · Salesforce record fields: label above value, rule under each */
     .rpp-fields{ display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--slds-g-spacing-4); margin-top: var(--slds-g-spacing-3); }
     .rpp-field{ padding: var(--slds-g-spacing-2) 0; border-bottom: var(--slds-g-sizing-border-1) solid var(--slds-g-color-border-1); }
@@ -5779,7 +5808,7 @@
     /* 3 · Move Toward Close: the gap and the forecast step it unlocks */
     .rpp-gap{ display: flex; align-items: center; gap: var(--slds-g-spacing-2); }
     .rpp-step__icon{ flex: none; width: var(--slds-g-sizing-5); height: var(--slds-g-sizing-5); fill: var(--slds-g-color-palette-teal-50); }
-    .rpp-step{ display: flex; align-items: center; gap: var(--slds-g-spacing-2); margin-top: var(--slds-g-spacing-3) !important; font-size: var(--slds-g-font-scale-base); color: var(--slds-g-color-on-surface-1); }
+    .rpp-step{ display: flex; align-items: center; gap: var(--slds-g-spacing-2); margin-top: var(--slds-g-spacing-4) !important; font-size: var(--slds-g-font-scale-base); color: var(--slds-g-color-on-surface-1); }
     .rpp-step b{ font-weight: 400; color: var(--slds-g-color-on-surface-3); }
     .rpp-dl{ display: grid; grid-template-columns: auto 1fr; gap: var(--slds-g-spacing-2) var(--slds-g-spacing-4); margin-top: var(--slds-g-spacing-4) !important; }
     .rpp-dl dt{ font-size: var(--slds-g-font-scale-neg-1); color: var(--slds-g-color-on-surface-1); line-height: 1.75; white-space: nowrap; }
@@ -17329,6 +17358,17 @@ window.RPP_VERSION = 'B';
     const d = toDate(v) || new Date();
     return `Updated ${d.toDateString() === new Date().toDateString() ? "today" : fmtDate(d)} at ${fmtTime(d)}`;
   }
+  /* Every redraw of the panel body goes through setBody so the refresh button (kept
+     with its listener) moves into the File Summary header, or back to the top row if
+     there is no summary yet. */
+  function setBody(html){
+    const btn = $("rppRefresh"), meta = root.querySelector(".rpp-meta");
+    if (btn && meta && btn.parentElement !== meta) meta.appendChild(btn);
+    $("rppBody").innerHTML = html;
+    const dock = root.querySelector("#rppSummary .rpp-sec__head");
+    if (btn && dock){ dock.appendChild(btn); if (meta) meta.hidden = true; }
+    else if (meta) meta.hidden = false;
+  }
   const NEXT_CATEGORY = { "pipeline": "Best Case", "best case": "Commit" };
 
   /* Monday stores some names in ALL CAPS: show them as proper names (Jr., II, etc. kept) */
@@ -17351,7 +17391,7 @@ window.RPP_VERSION = 'B';
   function latestHead(l){
     if (!l) return "";
     const who = String(l.heir || "").trim();
-    if (!who) return `<p class="cx-meta rpp-ai__src"><span>—</span></p>`;
+    if (!who) return "";
     return `<p class="cx-meta rpp-ai__src"><span>${esc(properName(who))}</span>${l.date ? `<span>Last contact ${esc(fmtDate(l.date))}</span>` : ""}</p>`;
   }
 
@@ -17397,27 +17437,50 @@ window.RPP_VERSION = 'B';
     </div>`;
   }
 
+  /* Card 2: Next Recommended Call + Move Toward Close in one collapsible card.
+     The first section's header carries the collapse button; collapsing keeps that row. */
+  const collapsed = {};               /* section id -> true when collapsed; kept across refreshes */
+  const RPP_DIVIDER = "full";
+  function head(id, icon, title, extra){
+    return `<div class="rpp-sec__head"><span data-icon="${icon}" data-size="small"></span><h3 class="rpp-sec__title" id="${id}T">${esc(title)}</h3>${extra || ""}</div>`;
+  }
+  function toggleBtn(id){
+    const open = !collapsed[id];
+    return `<button type="button" class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-small rpp-part__toggle"
+        data-part="${id}" aria-expanded="${open}" aria-controls="${id}Body" title="${open ? "Collapse" : "Expand"}">
+        <span data-icon="utility:chevronup" data-class="slds-button__icon"></span>
+        <span class="slds-assistive-text">${open ? "Collapse" : "Expand"}</span></button>`;
+  }
+  function renderGroup(d){
+    const parts = [nextCallPart(d), closePart(d.weakestLink, d.context)].filter(Boolean);
+    if (!parts.length) return "";
+    return `<div class="rpp-group" id="rppGroup" data-divider="${RPP_DIVIDER}">${parts.map(p => `
+      <section class="rpp-part${collapsed[p.id] ? " is-collapsed" : ""}" id="${p.id}" aria-labelledby="${p.id}T">
+        ${head(p.id, p.icon, p.title, (p.extra || "") + toggleBtn(p.id))}
+        <div class="rpp-part__body" id="${p.id}Body">${p.body}</div>
+      </section>`).join("")}
+    </div>`;
+  }
+
   /* 2. Next Call (4B, before the call): the move, two tiles, then labeled rows */
-  function renderNextCall(d){
-    const b = d.bestMove; if (!b || !(b.heir || b.action)) return "";
+  function nextCallPart(d){
+    const b = d.bestMove; if (!b || !(b.heir || b.action)) return null;
     const who = b.heir ? properName(b.heir) : b.action;
     const body = `<div class="rpp-band"><p class="rpp-band__label">Call next</p><p class="rpp-band__action">${esc(who)}</p></div>
-      ${b.goal ? `<div class="rpp-why"><p class="rpp-label">Goal</p><p>${esc(b.goal)}</p></div>` : ""}
-      ${b.reason ? `<div class="rpp-why"><p class="rpp-label">Why</p><p>${esc(b.reason)}</p></div>` : ""}`;
-    return section("rppNext", "standard:task", "Next Recommended Call", body, coachingTip(d.callFeedback));
+      ${(b.goal || b.reason) ? `<div class="rpp-cols">${[["Goal", b.goal], ["Why", b.reason]].filter(t => t[1]).map(([k, v]) => `<div class="rpp-col"><p class="rpp-label">${k}</p><p>${esc(v)}</p></div>`).join("")}</div>` : ""}`;
+    return { id: "rppNext", icon: "standard:task", title: "Next Recommended Call", body, extra: coachingTip(d.callFeedback) };
   }
 
   /* 3. Move Toward Close (4A): the gap, its fact, and the forecast step it unlocks */
-  function renderClose(w, c){
-    if (!w || !w.heir) return "";
+  function closePart(w, c){
+    if (!w || !w.heir) return null;
     const cat = ((c && c.forecast && c.forecast.category) || "");
     const nextCat = NEXT_CATEGORY[cat.toLowerCase()];
     const first = properName(String(w.heir).split(" ")[0]);
     const killer = w.isDealKiller && String(w.signal || "").toLowerCase() === "hurts";
-    return section("rppClose", "standard:opportunity", "Move Toward Close", `
+    return { id: "rppClose", icon: "standard:opportunity", title: "Move Toward Close", body: `
       <p class="rpp-lead">${esc(first)}'s ${esc(String(w.field || "key field").toLowerCase())} ${(String(w.field || "").toLowerCase() === "roadblocks" ? "are " : "is ") + (({helps:"helping the deal",hurts:"hurting the deal",neutral:"neutral"})[String(w.signal || "").toLowerCase()] || "unknown")}.${killer ? " Possible deal-killer." : ""}</p>
-      ${w.fact ? `<p class="rpp-sub">${esc(w.fact)}</p>` : ""}
-      ${nextCat ? `<p class="rpp-step"><span data-icon="utility:arrowup" data-class="rpp-step__icon"></span><span>Fixing this is the likeliest step from <b>${esc(cat)}</b> to <b>${esc(nextCat)}</b>.</span></p>` : ""}`);
+      ${nextCat ? `<p class="rpp-step"><span data-icon="utility:arrowup" data-class="rpp-step__icon"></span><span>Fixing this is the likeliest step from <b>${esc(cat)}</b> to <b>${esc(nextCat)}</b>.</span></p>` : ""}` };
   }
 
   let hasRendered = false, lastLabel = "";
@@ -17431,16 +17494,23 @@ window.RPP_VERSION = 'B';
       const points = Array.isArray(raw) ? raw : String(raw).split("|").map(s => s.trim()).filter(Boolean);
       if (points.length) d.context = { points };
     }
-    const o = d.override;
-    const note = o ? `<p class="rpp-note">Forecast set by hand to ${esc(o.label)} on ${esc(fmtDate(o.setOn))}; kept until ${esc(fmtDate(o.holdsUntil))}.</p>` : "";
-    const html = renderSummary(d.context) + note + renderNextCall(d) + renderClose(d.weakestLink, d.context);
-    $("rppBody").innerHTML = html.trim() || `<p class="rpp-empty">Guidance for this file appears after its first update is posted.</p>`;
+    const html = renderSummary(d.context) + renderGroup(d);
+    setBody(html.trim() || `<p class="rpp-empty">Guidance for this file appears after its first update is posted.</p>`);
     lastLabel = generatedLabel(p.generatedAt);
     if ($("rppGenerated")) $("rppGenerated").textContent = lastLabel;
     hasRendered = !!html.trim();
   }
 
   root.addEventListener("click", (e) => {
+    const g = e.target.closest(".rpp-part__toggle");
+    if (g){
+      const id = g.dataset.part; collapsed[id] = !collapsed[id];
+      $(id).classList.toggle("is-collapsed", !!collapsed[id]);
+      g.setAttribute("aria-expanded", !collapsed[id]);
+      g.title = collapsed[id] ? "Expand" : "Collapse";
+      g.querySelector(".slds-assistive-text").textContent = g.title;
+      return;
+    }
     const t = e.target.closest(".rpp-tip__btn"); if (!t) return;
     const tip = t.closest(".rpp-tip"), open = !tip.classList.contains("is-open");
     tip.classList.toggle("is-open", open); t.setAttribute("aria-expanded", open);
@@ -17459,8 +17529,8 @@ window.RPP_VERSION = 'B';
   const POLL_MS = 4000, POLL_MAX_MS = 60000;
   let building = false, buildStarted = 0, pollTimer = null;
   function showBuilding(){
-    $("rppBody").innerHTML = `<p class="rpp-building" role="status">Building guidance for this file…</p>
-      <div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div><div class="rpp-skel" style="width:60%"></div></div>`;
+    setBody(`<p class="rpp-building" role="status">Building guidance for this file…</p>
+      <div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div><div class="rpp-skel" style="width:60%"></div></div>`);
     if ($("rppGenerated")) $("rppGenerated").textContent = "Building…";
   }
   function stopBuilding(){ building = false; clearTimeout(pollTimer); pollTimer = null; }
@@ -17487,7 +17557,7 @@ window.RPP_VERSION = 'B';
         if (Date.now() - buildStarted < POLL_MAX_MS){ pollTimer = setTimeout(() => load({ poll: true }), POLL_MS); }
         else {
           stopBuilding();
-          $("rppBody").innerHTML = `<p class="rpp-empty">Guidance for this file isn’t ready yet. Use Refresh to try again.</p>`;
+          setBody(`<p class="rpp-empty">Guidance for this file isn’t ready yet. Use Refresh to try again.</p>`);
           if ($("rppGenerated")) $("rppGenerated").textContent = "";
         }
         return;
@@ -17500,14 +17570,14 @@ window.RPP_VERSION = 'B';
       stopBuilding();
       $("rppError").textContent = hasRendered ? "Couldn't refresh. Showing the last guidance." : "Couldn't load guidance for this file. Try Refresh.";
       $("rppError").hidden = false;
-      if (!hasRendered) $("rppBody").innerHTML = "";
+      if (!hasRendered) setBody("");
       if ($("rppGenerated")) $("rppGenerated").textContent = lastLabel;
     }finally{
       $("rppRefresh").disabled = false;
     }
   }
 
-  $("rppBody").innerHTML = `<div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div></div>`;
+  setBody(`<div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div></div>`);
   $("rppRefresh").addEventListener("click", () => load());
   load();
   window.rpConversationReload = () => load();
