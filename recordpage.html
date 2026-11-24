@@ -5701,6 +5701,7 @@
       .rp-sidebar > .rpp-card{ flex: 1 1 auto; }
     }
     .rpp-why{ margin-top: var(--slds-g-spacing-3); }
+    #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-1); }
     .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
     #rpp *, #rpp *::before, #rpp *::after{ box-sizing: border-box; }
@@ -17304,8 +17305,8 @@ window.rpResolveIds = function(){
 window.RPP_VERSION = 'B';
 /* ════════════════════════════════════════════════════════════════════════
    RIGHT PANEL: AI FILE SUMMARY + DIRECTION
-   1. File Summary (AI)      context.summary, context.forecast
-   2. Next Call              bestMove, nextStep            (spec 4B, before the call)
+   1. File Summary (AI)      context.forecast, context.latest, context.points
+   2. Next Call              bestMove (heir, goal, reason)           (spec 4B, before the call)
       Coaching tip (popover)   callFeedback                  (spec 4B, after the call)
    3. Move Toward Close      weakestLink                   (spec 4A)
    Reads the spec's output contract from the same Make webhook (top level, or
@@ -17344,6 +17345,15 @@ window.RPP_VERSION = 'B';
     </section>`;
   }
 
+  /* Small header over the bullets: the heir whose update is summarized, and its date.
+     Older panels have no "latest" and show no header; a panel with no heir update shows a dash. */
+  function latestHead(l){
+    if (!l) return "";
+    const who = String(l.heir || "").trim();
+    if (!who) return `<p class="cx-meta rpp-ai__src"><span>—</span></p>`;
+    return `<p class="cx-meta rpp-ai__src"><span>${esc(properName(who))}</span>${l.date ? `<span>Last contact ${esc(fmtDate(l.date))}</span>` : ""}</p>`;
+  }
+
   /* 1. File Summary (AI): forecast as a KPI, then the summary */
   function renderSummary(c){
     if (!c || !(c.summary || c.forecast || (c.points && c.points.length))) return "";
@@ -17353,6 +17363,7 @@ window.RPP_VERSION = 'B';
         <div style="flex:1;min-width:0"><h3 class="rpp-sec__title" id="rppSummaryT">File Summary</h3></div>
       </div>
       <div class="rpp-kpi"><span class="rpp-kpi__value">${f.category ? esc(f.category) : "—"}</span>${(f.reason && f.reason.trim()) ? `<span class="rpp-kpi__text">${esc(f.reason)}</span>` : ""}</div>
+      ${latestHead(c.latest)}
       ${(c.points && c.points.length) ? `<ul class="rpp-ai__points">${c.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>` : (c.summary ? `<p class="rpp-ai__body">${esc(c.summary)}</p>` : "")}
     </section>`;
   }
@@ -17390,6 +17401,7 @@ window.RPP_VERSION = 'B';
     const b = d.bestMove; if (!b || !(b.heir || b.action)) return "";
     const who = b.heir ? properName(b.heir) : b.action;
     const body = `<div class="rpp-band"><p class="rpp-band__label">Call next</p><p class="rpp-band__action">${esc(who)}</p></div>
+      ${b.goal ? `<div class="rpp-why"><p class="rpp-label">Goal</p><p>${esc(b.goal)}</p></div>` : ""}
       ${b.reason ? `<div class="rpp-why"><p class="rpp-label">Why</p><p>${esc(b.reason)}</p></div>` : ""}`;
     return section("rppNext", "standard:task", "Next Call", body, coachingTip(d.callFeedback));
   }
