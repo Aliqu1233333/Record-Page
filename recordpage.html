@@ -5696,6 +5696,12 @@
        Each section has its own shape so they read differently at a glance:
        summary = tinted block with forecast, next call = tiles + labeled rows, close = gap + forecast step. */
     .rp-sidebar > .rpp-card{ flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    @media (min-width: 1281px){
+      .rp-sidebar{ height: calc(100vh - 80px); }
+      .rp-sidebar > .rpp-card{ flex: 1 1 auto; }
+    }
+    .rpp-why{ margin-top: var(--slds-g-spacing-3); }
+    .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
     #rpp *, #rpp *::before, #rpp *::after{ box-sizing: border-box; }
     #rpp p, #rpp h3, #rpp h4, #rpp ul, #rpp dl, #rpp dd{ margin: 0; padding: 0; }
@@ -17339,8 +17345,7 @@ window.RPP_VERSION = 'B';
         <div style="flex:1;min-width:0"><h3 class="rpp-sec__title" id="rppSummaryT">File Summary</h3></div>
       </div>
       ${f.category ? `<div class="rpp-kpi"><span class="rpp-kpi__value">${esc(f.category)}</span>${f.reason ? `<span class="rpp-kpi__text">${esc(f.reason)}</span>` : ""}</div>` : ""}
-      ${c.summary ? `<p class="rpp-ai__body">${esc(c.summary)}</p>` : ""}
-      ${(!c.summary && c.points && c.points.length) ? `<ul class="rpp-ai__points">${c.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>` : ""}
+      ${(c.points && c.points.length) ? `<ul class="rpp-ai__points">${c.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>` : (c.summary ? `<p class="rpp-ai__body">${esc(c.summary)}</p>` : "")}
     </section>`;
   }
 
@@ -17374,26 +17379,10 @@ window.RPP_VERSION = 'B';
 
   /* 2. Next Call (4B, before the call): the move, two tiles, then labeled rows */
   function renderNextCall(d){
-    const b = d.bestMove; if (!b || !b.action) return "";
-    const v = window.RPP_VERSION || "A";
-    const pair = [["Goal", b.goal], ["Why", b.reason]].filter(t => t[1]);
-    const more = [];
-    const dl = (rows, cls) => rows.length ? `<dl class="${cls}">${rows.map(([k, val]) => `<dt>${k}</dt><dd>${esc(val)}</dd>`).join("")}</dl>` : "";
-    let body;
-    if (v === "B"){
-      /* B · Highlight band: action in a flat blue band; Goal | Open With as two plain columns */
-      body = `<div class="rpp-band"><p class="rpp-band__label">Suggested Action</p><p class="rpp-band__action">${esc(b.action)}</p></div>
-        ${pair.length ? `<div class="rpp-cols">${pair.map(([k, val]) => `<div class="rpp-col"><p class="rpp-label">${k}</p><p>${esc(val)}</p></div>`).join("")}</div>` : ""}
-        ${dl(more, "rpp-dl")}`;
-    } else if (v === "C"){
-      /* C · Record fields: action in Cosmos blue; every detail as a stacked record field */
-      body = `<p class="rpp-label">Suggested Action</p><p class="rpp-action rpp-action_blue">${esc(b.action)}</p>
-        <div class="rpp-fields">${pair.concat(more).map(([k, val], i) => `<div class="rpp-field${i >= pair.length ? " rpp-field_wide" : ""}"><p class="rpp-label">${k}</p><p>${esc(val)}</p></div>`).join("")}</div>`;
-    } else {
-      /* A · Simple rows: plain action under a gray label; one even list of labeled rows */
-      body = `<p class="rpp-label">Suggested Action</p><p class="rpp-action">${esc(b.action)}</p>
-        ${dl(pair.concat(more), "rpp-dl rpp-dl_even")}`;
-    }
+    const b = d.bestMove; if (!b || !(b.heir || b.action)) return "";
+    const who = b.heir || b.action;
+    const body = `<div class="rpp-band"><p class="rpp-band__label">Call next</p><p class="rpp-band__action">${esc(who)}</p></div>
+      ${b.reason ? `<div class="rpp-why"><p class="rpp-label">Why</p><p>${esc(b.reason)}</p></div>` : ""}`;
     return section("rppNext", "standard:task", "Next Call", body, coachingTip(d.callFeedback));
   }
 
