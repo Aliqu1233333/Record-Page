@@ -17400,7 +17400,7 @@ window.RPP_VERSION = 'B';
   function renderNextCall(d){
     const b = d.bestMove; if (!b || !(b.heir || b.action)) return "";
     const who = b.heir ? properName(b.heir) : b.action;
-    const body = `<div class="rpp-band"><p class="rpp-band__label">Call next</p><p class="rpp-band__action">${esc(who)}</p></div>
+    const body = `<div class="rpp-band"><p class="rpp-band__label">Reccommend Next Call</p><p class="rpp-band__action">${esc(who)}</p></div>
       ${b.goal ? `<div class="rpp-why"><p class="rpp-label">Goal</p><p>${esc(b.goal)}</p></div>` : ""}
       ${b.reason ? `<div class="rpp-why"><p class="rpp-label">Why</p><p>${esc(b.reason)}</p></div>` : ""}`;
     return section("rppNext", "standard:task", "Next Call", body, coachingTip(d.callFeedback));
