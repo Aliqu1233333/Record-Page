@@ -17562,15 +17562,19 @@ window.RPP_VERSION = 'B';
      Scenario 10 only reads the saved panel and never starts a second build. */
   const POLL_MS = 4000, POLL_MAX_MS = 60000;
   let building = false, buildStarted = 0, pollTimer = null;
-  function showBuilding(){
-    setBody(`<p class="rpp-building" role="status">Building guidance for this file…</p>
+  /* Refresh asks Make to rebuild from the latest notes. Until a panel newer than the one
+     on screen arrives, keep checking. lastGen = generatedAt of the panel on screen. */
+  let lastGen = "", waitForNewer = null;
+  function showBuilding(msg){
+    setBody(`<p class="rpp-building" role="status">${msg || "Building guidance for this file…"}</p>
       <div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div><div class="rpp-skel" style="width:60%"></div></div>`);
     if ($("rppGenerated")) $("rppGenerated").textContent = "Building…";
   }
-  function stopBuilding(){ building = false; clearTimeout(pollTimer); pollTimer = null; }
+  function stopBuilding(){ building = false; waitForNewer = null; clearTimeout(pollTimer); pollTimer = null; }
 
   async function load(opts){
     const poll = !!(opts && opts.poll === true);
+    const force = !!(opts && opts.force === true);
     if (building && !poll) return; /* Refresh during a build: keep waiting on the same build */
     const ids = window.rpResolveIds ? window.rpResolveIds() : {};
     $("rppError").hidden = true;
@@ -17580,15 +17584,28 @@ window.RPP_VERSION = 'B';
     try{
       const body = { item_id: ids.itemId, board_id: ids.boardId };
       if (poll) body.poll = 1;
+      if (force){
+        body.force = 1;
+        building = true; buildStarted = Date.now(); waitForNewer = lastGen;
+        showBuilding("Updating guidance with the latest notes…");
+      }
       const res = await fetch(LOAD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       let src = {};
       try { src = JSON.parse(text); } catch(_){ console.warn("[Right panel] Make returned non-JSON:", text.slice(0, 200)); }
       const panel = src && (src.rightPanel || src.panel);
-      if (!panel && !(src && src.key_points)){
+      const gen = (panel && panel.generatedAt) || "";
+      const stillOld = waitForNewer !== null && !!panel && gen === waitForNewer;
+      if ((!panel && !(src && src.key_points)) || stillOld){
         if (!building){ building = true; buildStarted = Date.now(); showBuilding(); }
         if (Date.now() - buildStarted < POLL_MAX_MS){ pollTimer = setTimeout(() => load({ poll: true }), POLL_MS); }
+        else if (panel){
+          /* Rebuild took too long: put the last guidance back and say so */
+          stopBuilding(); lastGen = gen; render(src);
+          $("rppError").textContent = "Couldn't update just now. Showing the last guidance.";
+          $("rppError").hidden = false;
+        }
         else {
           stopBuilding();
           setBody(`<p class="rpp-empty">Guidance for this file isn’t ready yet. Use Refresh to try again.</p>`);
@@ -17597,6 +17614,7 @@ window.RPP_VERSION = 'B';
         return;
       }
       stopBuilding();
+      lastGen = gen;
       render(src || {});
     }catch(err){
       console.warn("[Right panel] Load failed:", err);
@@ -17612,7 +17630,7 @@ window.RPP_VERSION = 'B';
   }
 
   setBody(`<div aria-hidden="true"><div class="rpp-skel" style="width:40%"></div><div class="rpp-skel"></div><div class="rpp-skel" style="width:75%"></div></div>`);
-  $("rppRefresh").addEventListener("click", () => load());
+  $("rppRefresh").addEventListener("click", () => load({ force: true }));
   load();
   window.rpConversationReload = () => load();
   window.rpPanelRender = render;
