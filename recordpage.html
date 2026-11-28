@@ -5735,7 +5735,7 @@
     .rpp-why{ margin-top: var(--slds-g-spacing-3); }
     #rpp .rpp-ai__src{ margin-bottom: var(--slds-g-spacing-2); }
     /* Heir name, "Last contact" and date above the summary: bold, 1pt larger, darker */
-    #rpp .cx-meta.rpp-ai__src{ font-size: calc(var(--slds-g-font-scale-neg-1) + 1pt); font-weight: var(--slds-g-font-weight-bold); color: var(--slds-g-color-on-surface-2); }
+    #rpp .cx-meta.rpp-ai__src{ font-size: calc(var(--slds-g-font-scale-neg-1) + 2.5pt); font-weight: var(--slds-g-font-weight-bold); color: var(--slds-g-color-on-surface-2); }
     #rpp .rpp-building{ padding-top: var(--slds-g-spacing-3); color: var(--slds-g-color-on-surface-1); }
     .rpp-why .rpp-label{ margin-bottom: var(--slds-g-spacing-1) !important; }
     #rpp{ font-family: var(--slds-g-font-family); font-size: var(--slds-g-font-scale-1); line-height: 1.5; color: var(--slds-g-color-on-surface-2); }
@@ -5803,6 +5803,8 @@
     .rpp-kpi__value{ flex: none; font-size: var(--slds-g-font-scale-5); color: var(--slds-g-color-on-surface-3); line-height: 1.2; }
     .rpp-kpi__text{ font-size: var(--slds-g-font-scale-base); color: var(--slds-g-color-on-surface-2); }
     .rpp-ai__points li{ position: relative; padding: var(--slds-g-spacing-1) 0 var(--slds-g-spacing-1) var(--slds-g-spacing-4); }
+    /* File Summary bullets: 1pt larger than the 14px base */
+    #rpp .rpp-ai__points li{ font-size: calc(0.875rem + 1pt); }
     .rpp-ai__points li::before{ content: ""; position: absolute; left: var(--slds-g-spacing-1); top: 0.85em; width: var(--slds-g-sizing-2); height: var(--slds-g-sizing-2); border-radius: var(--slds-g-radius-border-circle); background: var(--slds-g-color-palette-purple-30); }
     .rpp-empty{ padding: var(--slds-g-spacing-5) 0; color: var(--slds-g-color-on-surface-1); }
     .rpp-ai__body{ color: var(--slds-g-color-on-surface-2); }
@@ -17440,6 +17442,7 @@ window.RPP_VERSION = 'B';
       <div class="rpp-sec__head"><svg class="rpp-ai-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="rpp-ai-gold" gradientUnits="userSpaceOnUse" cx="8" cy="7" r="12"><stop offset="0" stop-color="#fff6b0"/><stop offset="0.35" stop-color="#ffd83a"/><stop offset="0.8" stop-color="#ffb81a"/><stop offset="1" stop-color="#f59a0b"/></radialGradient><linearGradient id="rpp-ai-sky" gradientUnits="userSpaceOnUse" x1="16.5" y1="16.5" x2="22.5" y2="22.5"><stop offset="0" stop-color="#7fd6ff"/><stop offset="1" stop-color="#1b96ff"/></linearGradient></defs><path fill="url(#rpp-ai-gold)" d="M10 1.5C10.7 7 13 9.3 18.5 10C13 10.7 10.7 13 10 18.5C9.3 13 7 10.7 1.5 10C7 9.3 9.3 7 10 1.5Z"/><path fill="url(#rpp-ai-sky)" d="M19.5 16.2C19.8 18.5 20.5 19.2 22.8 19.5C20.5 19.8 19.8 20.5 19.5 22.8C19.2 20.5 18.5 19.8 16.2 19.5C18.5 19.2 19.2 18.5 19.5 16.2Z"/></svg>
         <div style="flex:1;min-width:0"><h3 class="rpp-sec__title" id="rppSummaryT">File Summary</h3></div>
       </div>
+      ${latestHead(c.latest)}
       ${(c.points && c.points.length) ? `<ul class="rpp-ai__points">${c.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>` : (c.summary ? `<p class="rpp-ai__body">${esc(c.summary)}</p>` : "")}
     </section>`;
   }
